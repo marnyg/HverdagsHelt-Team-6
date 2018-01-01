@@ -6,6 +6,8 @@ import { withRouter } from 'react-router-dom';
 import UserService from '../services/UserService.js';
 import Notify from "./Notify";
 import Alert from './Alert.js';
+import VerificationModal from "./VerificationModal";
+import ForgottenPWModal from "./ForgottenPWModal";
 
 
 class LoginModal extends Component {
@@ -28,9 +30,7 @@ class LoginModal extends Component {
                         <input type="password" name="pass" placeholder="Passord" onKeyPress={this.keyCheck} onChange={this.pwChange}></input>
                         <input name="login" className="btn btn-primary" value="Logg inn" onChange={this.submit} onClick={this.submit}></input>
                         <div className="login-help">
-                            <a href="#">Glemt passordet ditt?</a>
-                            <br/>
-                            <a href="#">Innlogging for kommuneansatte</a>
+                            <div className={'nav-link'} style={{ cursor: 'pointer' }} onClick={(event) => this.forgottenPasswordModal()}>Glemt passordet ditt?</div>
                         </div>
                     </div>
                 </div>
@@ -94,6 +94,21 @@ class LoginModal extends Component {
             }
         }
         return false;
+    }
+
+    forgottenPasswordModal() {
+        $('#' + this.props.modal_id).modal('hide');
+        let modal_header = "Skriv inn eposten din";
+        let modal_body = (
+            <ForgottenPWModal onSubmitted={() => {}}/>
+        );
+        let modal_footer = (
+            <div>
+                <strong>VIKTIG:</strong> Endre passordet ditt så snart du har fått logget inn igjen!
+            </div>
+        );
+        VerificationModal.setcontent(modal_header, modal_body, modal_footer);
+        $('#verify-modal').modal('show');
     }
 }
 export default withRouter(LoginModal);
