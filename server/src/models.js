@@ -2,18 +2,24 @@
 
 import Sequelize from 'sequelize';
 import type { Model } from 'sequelize';
+require("dotenv").config();
 
-let sequelize = new Sequelize('School', 'root', '', {
-  host: process.env.CI ? 'mysql' : 'localhost', // The host is 'mysql' when running in gitlab CI
-  dialect: 'mysql',
+let sequelize = new Sequelize(
+  process.env.CI ? 'School' : process.env.DB_USER,
+  process.env.CI ? 'root' : process.env.DB_USER,
+  process.env.CI ? '' : process.env.DB_PW,
+  {
+    host: process.env.CI ? 'mysql' : process.env.DB_HOST, // The host is 'mysql' when running in gitlab CI
+    dialect: 'mysql',
 
-  pool: {
-    max: 5,
-    min: 0,
-    acquire: 30000,
-    idle: 10000
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 30000,
+      idle: 10000
+    }
   }
-});
+);
 
 export let Students: Class<
   Model<{ id?: number, firstName: string, lastName: string, email: string }>
