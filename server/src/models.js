@@ -138,6 +138,35 @@ export let Picture: Class<
   alt: { type: Sequelize.STRING }
 });
 
+export let Region_subscriptions: Class<
+  Model<{ user_id: number, region_id: number, notify: boolean }>
+> = sequelize.define(
+  'Region_subscriptions',
+  {
+    user_id: { type: Sequelize.INTEGER, primaryKey: true },
+    region_id: { type: Sequelize.INTEGER, primaryKey: true },
+    notify: { type: Sequelize.BOOLEAN, allowNull: false }
+  },
+  {
+    timestamps: false
+  }
+);
+
+export let Case_subscriptions: Class<
+  Model<{ user_id: number, case_id: number, notify_by_email: boolean, is_up_to_date: boolean }>
+> = sequelize.define(
+  'Case_subscriptions',
+  {
+    user_id: { type: Sequelize.INTEGER, primaryKey: true },
+    case_id: { type: Sequelize.INTEGER, primaryKey: true },
+    notify_by_email: { type: Sequelize.BOOLEAN, allowNull: false },
+    is_up_to_date: { type: Sequelize.BOOLEAN, allowNull: false }
+  },
+  {
+    timestamps: false
+  }
+);
+
 Region.belongsTo(County, { foreignKey: { name: 'county_id', allowNull: false } });
 User.belongsTo(Role, { foreignKey: { name: 'role_id', allowNull: false } });
 User.belongsTo(Region, { foreignKey: { name: 'region_id', allowNull: false } });
@@ -149,6 +178,10 @@ Case.belongsTo(Region, { foreignKey: { name: 'region_id', allowNull: false } });
 Case.belongsTo(User, { foreignKey: { name: 'user_id', allowNull: false } });
 Case.belongsTo(Category, { foreignKey: { name: 'category_id', allowNull: false } });
 Case.belongsTo(Status, { foreignKey: { name: 'status_id', allowNull: false } });
+Region_subscriptions.belongsTo(User, { foreignKey: { name: 'user_id', allowNull: false } });
+Region_subscriptions.belongsTo(Region, { foreignKey: { name: 'region_id', allowNull: false } });
+Case_subscriptions.belongsTo(User, { foreignKey: { name: 'user_id', allowNull: false } });
+Case_subscriptions.belongsTo(Case, { foreignKey: { name: 'case_id', allowNull: false } });
 
 // Drop tables and create test data when not in production environment
 let production = process.env.NODE_ENV === 'production';
@@ -219,6 +252,21 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(() =
           case_id: 1,
           path: 'asdflkjasdfkljasdflkjsdf',
           alt: 'et bilde'
+        })
+      )
+      .then(() =>
+        Region_subscriptions.create({
+          user_id: 1,
+          region_id: 1,
+          notify: true
+        })
+      )
+      .then(() =>
+        Case_subscriptions.create({
+          user_id: 1,
+          case_id: 1,
+          notify_by_email: true,
+          is_up_to_date: false
         })
       );
 });
