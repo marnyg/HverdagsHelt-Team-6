@@ -4,8 +4,8 @@ import express from 'express';
 import path from 'path';
 import reload from 'reload';
 import fs from 'fs';
-import { Students } from './models.js';
 import { Region } from './models.js';
+import { County } from './models.js';
 
 type Request = express$Request;
 type Response = express$Response;
@@ -16,6 +16,10 @@ let app = express();
 
 app.use(express.static(public_path));
 app.use(express.json()); // For parsing application/json
+
+app.get('/api/counties', (req: Request, res: Response) => {
+  return County.findAll().then(counties => res.send(counties));
+});
 
 app.get('/api/regions', (req: Request, res: Response) => {
   return Region.findAll().then(regions => res.send(regions));
@@ -66,30 +70,10 @@ app.put('/api/regions/:region_id', (req: Request, res: Response) => {
   ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
 });
 
-app.get('/students', (req: Request, res: Response) => {
-  return Students.findAll().then(students => res.send(students));
-});
-
-app.get('/students/:id', (req: Request, res: Response) => {
-  return Students.findOne({ where: { id: Number(req.params.id) } }).then(
-    student => (student ? res.send(student) : res.sendStatus(404))
+app.delete('/api/regions/:region_id', (req: Request, res: Response) => {
+  return Region.destroy({ where: { region_id: Number(req.params.region_id) } }).then(
+    region => (region ? res.send() : res.status(500).send())
   );
-});
-
-app.put('/students', (req: Request, res: Response) => {
-  if (
-    !req.body ||
-    typeof req.body.id != 'number' ||
-    typeof req.body.firstName != 'string' ||
-    typeof req.body.lastName != 'string' ||
-    typeof req.body.email != 'string'
-  )
-    return res.sendStatus(400);
-
-  return Students.update(
-    { firstName: req.body.firstName, lastName: req.body.lastName, email: req.body.email },
-    { where: { id: req.body.id } }
-  ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
 });
 
 // Hot reload application when not in production environment
