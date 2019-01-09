@@ -2,25 +2,46 @@
 import axios from 'axios';
 axios.interceptors.response.use(response => response.data);
 
-class Case {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
+export class Case {
+  case_id: number;
+  region_id: number;
+  user_id: number;
+  category_id: number;
+  status_id: number;
+  title: string;
+  description: string;
+  created_at: any;
+  updated_at: any;
+  lat: number;
+  lon: number;
 }
 
-class StudentService {
-  getStudents(): Promise<Student[]> {
-    return axios.get('/students');
+class CaseService {
+  //Get all cases
+  getAllCases(): Promise<Case[]> {
+    return axios.get('/api/cases');
   }
 
-  getStudent(id: number): Promise<Student> {
-    return axios.get('/students/' + id);
+  //Get one specific case
+  getCase(case_id: number): Promise<Case> {
+    return axios.get('/api/cases/' + case_id);
   }
 
-  updateStudent(student: Student): Promise<void> {
-    return axios.put('/students', student);
+  updateCase(case_id: number): Promise<void> {
+    return axios.put('api/cases/', case_id);
+  }
+
+  deleteCase(case_id: number): Promise<void> {
+    return axios.delete('/api/cases/' + case_id);
+  }
+
+  /*createCase(case: Case): Promise<Case> {
+    return axios.post('/cases/newCase', case);
+  }*/
+
+  getAllCasesGivenUser(user_id: number): Promise<Case[]> {
+    return axios.get('/api/cases/user_cases/' + user_id);
   }
 }
 
-export let studentService = new StudentService();
+export let caseService = new CaseService();

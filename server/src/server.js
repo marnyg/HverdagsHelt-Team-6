@@ -4,6 +4,7 @@ import express from 'express';
 import path from 'path';
 import reload from 'reload';
 import fs from 'fs';
+import { hashPassword } from './auth.js';
 import { User } from './models.js';
 import { Role } from './models.js';
 import { Region } from './models.js';
@@ -25,27 +26,30 @@ app.get('/api/users', (req: Request, res: Response) => {
 });
 
 app.post('/api/users', (req: Request, res: Response) => {
+  console.log('Recieved post request for /api/users');
   if (
     !req.body ||
     typeof req.body.firstname != 'string' ||
     typeof req.body.lastname != 'string' ||
     typeof req.body.tlf != 'number' ||
     typeof req.body.email != 'string' ||
-    typeof req.body.hashed_password != 'string' ||
-    typeof req.body.salt != 'string' ||
-    typeof req.body.role_id != 'number' ||
+    typeof req.body.password != 'string' ||
     typeof req.body.region_id != 'number'
   )
     return res.sendStatus(400);
+
+  let hashedPassword = hashPassword(req.body.password);
+  let password = hashedPassword['passwordHash'];
+  let salt = hashedPassword['salt'];
 
   return User.create({
     firstname: req.body.firstname,
     lastname: req.body.lastname,
     tlf: req.body.tlf,
     email: req.body.email,
-    hashed_password: req.body.hashed_password,
-    salt: req.body.salt,
-    role_id: req.body.role_id,
+    hashed_password: password,
+    salt: salt,
+    role_id: 1,
     region_id: req.body.region_id
   }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
 });
@@ -58,8 +62,6 @@ app.get('/api/users/:user_id', (req: Request, res: Response) => {
 
 app.put('/api/users/:user_id', (req: Request, res: Response) => {
   if (
-    !req.params.user_id ||
-    typeof req.params.user_id != 'number' ||
     !req.body ||
     typeof req.body.firstname != 'string' ||
     typeof req.body.lastname != 'string' ||
@@ -89,19 +91,19 @@ app.delete('/api/users/:user_id', (req: Request, res: Response) => {
 
 app.put('/api/users/:user_id/password', (req: Request, res: Response) => {
   if (
-    !req.params.user_id ||
-    typeof req.params.user_id != 'number' ||
     !req.body ||
-    typeof req.body.hashed_password != 'string' ||
+    typeof req.body.old_password != 'string' ||
+    typeof req.body.new_password != 'string' ||
     typeof req.body.salt != 'string'
   )
     return res.sendStatus(400);
+
   return User.update(
     {
-      hashed_password: req.body.hashed_password,
+      hashed_password: req.body.new_password,
       salt: req.body.salt
     },
-    { where: { user_id: req.params.user_id } }
+    { where: { user_id: Number(req.params.user_id), hashed_password: req.body.old_password } }
   ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
 });
 
@@ -146,6 +148,7 @@ app.put('/api/regions/:region_id', (req: Request, res: Response) => {
     typeof req.body.county_id != 'number'
   )
     return res.sendStatus(400);
+
   return Region.update(
     {
       name: req.body.name,
