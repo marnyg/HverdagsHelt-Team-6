@@ -316,6 +316,12 @@ app.delete('/api/regions/:region_id/subscribe', (req: Request, res: Response) =>
   }).then(region => (region ? res.send() : res.status(500).send()));
 });
 
+app.get('/api/email_available', (req: Request, res: Response) => {
+  return User.findAll().then(users =>
+      res.send(!users.some(user => user.email === req.body.email))
+  );
+});
+
 // Hot reload application when not in production environment
 if (process.env.NODE_ENV !== 'production') {
   let reloadServer = reload(app);
