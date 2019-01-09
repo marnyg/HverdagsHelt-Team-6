@@ -6,9 +6,7 @@ import App from './components/App.js';
 import * as serviceWorker from './components/serviceWorker';
 import { Component } from 'react-simplified';
 import { BrowserRouter, Route, NavLink } from 'react-router-dom';
-import { studentService } from './services';
-import { HashRouter, Route, NavLink } from 'react-router-dom';
-import { Alert } from './widgets';
+// import { Alert } from './widgets';
 
 // Reload application when not in production environment
 if (process.env.NODE_ENV !== 'production') {
