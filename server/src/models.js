@@ -21,15 +21,6 @@ let sequelize = new Sequelize(
   }
 );
 
-export let Students: Class<
-  Model<{ id?: number, firstName: string, lastName: string, email: string }>
-> = sequelize.define('Students', {
-  id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-  firstName: Sequelize.STRING,
-  lastName: Sequelize.STRING,
-  email: Sequelize.STRING
-});
-
 export let County: Class<Model<{ county_id?: number, name: string }>> = sequelize.define(
   'County',
   {
@@ -96,32 +87,77 @@ export let User: Class<
   }
 );
 
+export let Status: Class<Model<{ status_id?: number, name: string }>> = sequelize.define(
+  'Status',
+  {
+    status_id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: Sequelize.STRING, allowNull: false, unique: true }
+  },
+  {
+    timestamps: false
+  }
+);
+
+export let Status_comment: Class<
+  Model<{ status_comment_id?: number, comment: string, case_id?: number, status_id?: number, user_id?: number }>
+> = sequelize.define('Status_comment', {
+  status_comment_id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+  comment: { type: Sequelize.STRING, allowNull: false, unique: true }
+});
+
+export let Case: Class<
+  Model<{
+    case_id?: number,
+    title: string,
+    description: string,
+    lat: number,
+    lon: number,
+    region_id?: number,
+    user_id?: number,
+    category_id?: number,
+    status_id?: number
+  }>
+> = sequelize.define('Case', {
+  case_id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+  title: { type: Sequelize.STRING, allowNull: false },
+  description: { type: Sequelize.STRING },
+  lat: { type: Sequelize.DOUBLE, allowNull: false },
+  lon: { type: Sequelize.DOUBLE, allowNull: false }
+});
+
+export let Category: Class<Model<{ category_id?: number, name: string }>> = sequelize.define('Category', {
+  category_id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+  name: { type: Sequelize.STRING, allowNull: false, unique: true }
+});
+
+export let Picture: Class<
+  Model<{ picture_id?: number, path: string, alt: string, case_id?: number }>
+> = sequelize.define('Picture', {
+  picture_id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+  path: { type: Sequelize.STRING, allowNull: false, unique: true },
+  alt: { type: Sequelize.STRING }
+});
+
 Region.belongsTo(County, { foreignKey: { name: 'county_id', allowNull: false } });
 User.belongsTo(Role, { foreignKey: { name: 'role_id', allowNull: false } });
 User.belongsTo(Region, { foreignKey: { name: 'region_id', allowNull: false } });
+Status_comment.belongsTo(Case, { foreignKey: { name: 'case_id', allowNull: false } });
+Status_comment.belongsTo(Status, { foreignKey: { name: 'status_id', allowNull: false } });
+Status_comment.belongsTo(User, { foreignKey: { name: 'user_id', allowNull: false } });
+Picture.belongsTo(Case, { foreignKey: { name: 'case_id', allowNull: false } });
+Case.belongsTo(Region, { foreignKey: { name: 'region_id', allowNull: false } });
+Case.belongsTo(User, { foreignKey: { name: 'user_id', allowNull: false } });
+Case.belongsTo(Category, { foreignKey: { name: 'category_id', allowNull: false } });
+Case.belongsTo(Status, { foreignKey: { name: 'status_id', allowNull: false } });
 
 // Drop tables and create test data when not in production environment
 let production = process.env.NODE_ENV === 'production';
 // The sync promise can be used to wait for the database to be ready (for instance in your tests)
 export let sync = sequelize.sync({ force: production ? false : true }).then(() => {
   if (!production)
-    return Students.create({
-      firstName: 'Ola',
-      lastName: 'Jensen',
-      email: 'ola.jensen@ntnu.no'
+    return County.create({
+      name: 'Trøndelag'
     })
-      .then(() =>
-        Students.create({
-          firstName: 'Kari',
-          lastName: 'Larsen',
-          email: 'kari.larsen@ntnu.no'
-        })
-      )
-      .then(() =>
-        County.create({
-          name: 'Trøndelag'
-        })
-      )
       .then(() =>
         Region.create({
           name: 'Trondheim',
@@ -138,14 +174,51 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(() =
       )
       .then(() =>
         User.create({
-            firstname: 'Ola',
-            lastname: 'Nordmann',
-            tlf: 12345678,
-            email: 'ola.nordmann@gmail.com',
-            hashed_password: 'passord123',
-            salt: 'a12b',
-            role_id: 1,
-            region_id: 1
+          firstname: 'Ola',
+          lastname: 'Nordmann',
+          tlf: 12345678,
+          email: 'ola.nordmann@gmail.com',
+          hashed_password: 'passord123',
+          salt: 'a12b',
+          role_id: 1,
+          region_id: 1
+        })
+      )
+      .then(() =>
+        Status.create({
+          name: 'Under behandling'
+        })
+      )
+      .then(() =>
+        Category.create({
+          name: 'Måking'
+        })
+      )
+      .then(() =>
+        Case.create({
+          title: 'Trenger måking!',
+          description: 'Veldig dårlig måkt i gata mi',
+          lat: 63.42846459999999,
+          lon: 10.388523800000002,
+          region_id: 1,
+          user_id: 1,
+          category_id: 1,
+          status_id: 1
+        })
+      )
+      .then(() =>
+        Status_comment.create({
+          comment: 'Starter behandling',
+          case_id: 1,
+          status_id: 1,
+          user_id: 1
+        })
+      )
+      .then(() =>
+        Picture.create({
+          case_id: 1,
+          path: 'asdflkjasdfkljasdflkjsdf',
+          alt: 'et bilde'
         })
       );
 });
