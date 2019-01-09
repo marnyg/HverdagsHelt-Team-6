@@ -163,6 +163,10 @@ app.delete('/api/regions/:region_id', (req: Request, res: Response) => {
   );
 });
 
+app.get('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
+  return Region_subscriptions.findAll().then(subs => res.send(subs));
+});
+
 app.post('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
   let region_id = Number(req.params.region_id);
   if (
@@ -178,6 +182,29 @@ app.post('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
     region_id: Number(req.params.region_id),
     notify: req.body.notify
   }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+});
+
+app.put('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
+  let region_id = Number(req.params.region_id);
+  if (
+    !req.body ||
+    typeof req.body.user_id != 'number' ||
+    typeof region_id != 'number' ||
+    typeof req.body.notify != 'boolean'
+  )
+    return res.sendStatus(400);
+  return Region_subscriptions.update(
+    {
+      notify: req.body.notify
+    },
+    { where: { region_id: region_id, user_id: req.body.user_id } }
+  ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+});
+
+app.delete('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
+    return Region_subscriptions.destroy({ where: { region_id: Number(req.params.region_id), user_id: req.body.user_id } }).then(region =>
+        region ? res.send() : res.status(500).send()
+    );
 });
 
 // Hot reload application when not in production environment
