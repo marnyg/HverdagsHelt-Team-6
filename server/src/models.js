@@ -34,7 +34,7 @@ export let County: Class<Model<{ county_id?: number, name: string }>> = sequeliz
   'County',
   {
     county_id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-    name: Sequelize.STRING
+    name: { type: Sequelize.STRING, allowNull: false }
   },
   {
     timestamps: false
@@ -47,9 +47,49 @@ export let Region: Class<
   'Region',
   {
     region_id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-    name: Sequelize.STRING,
-    lat: Sequelize.DOUBLE,
-    lon: Sequelize.DOUBLE
+    name: { type: Sequelize.STRING, allowNull: false },
+    lat: { type: Sequelize.DOUBLE, allowNull: false },
+    lon: { type: Sequelize.DOUBLE, allowNull: false }
+  },
+  {
+    timestamps: false
+  }
+);
+
+export let Role: Class<Model<{ role_id?: number, name: string, access_level: number }>> = sequelize.define(
+  'Role',
+  {
+    role_id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: Sequelize.STRING, allowNull: false, unique: true },
+    access_level: { type: Sequelize.INTEGER, allowNull: false }
+  },
+  {
+    timestamps: false
+  }
+);
+
+export let User: Class<
+  Model<{
+    user_id?: number,
+    firstname: string,
+    lastname: string,
+    tlf: number,
+    email: string,
+    hashed_password: string,
+    salt: string,
+    role_id?: number,
+    region_id?: number
+  }>
+> = sequelize.define(
+  'User',
+  {
+    user_id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+    firstname: { type: Sequelize.STRING, allowNull: false },
+    lastname: { type: Sequelize.STRING, allowNull: false },
+    tlf: { type: Sequelize.BIGINT, allowNull: false },
+    email: { type: Sequelize.STRING, allowNull: false, unique: true },
+    hashed_password: { type: Sequelize.STRING, allowNull: false },
+    salt: { type: Sequelize.STRING, allowNull: false }
   },
   {
     timestamps: false
@@ -57,6 +97,8 @@ export let Region: Class<
 );
 
 Region.belongsTo(County, { foreignKey: { name: 'county_id', allowNull: false } });
+User.belongsTo(Role, { foreignKey: { name: 'role_id', allowNull: false } });
+User.belongsTo(Region, { foreignKey: { name: 'region_id', allowNull: false } });
 
 // Drop tables and create test data when not in production environment
 let production = process.env.NODE_ENV === 'production';
@@ -86,6 +128,24 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(() =
           lat: 63.42846459999999,
           lon: 10.388523800000002,
           county_id: 1
+        })
+      )
+      .then(() =>
+        Role.create({
+          name: 'Bruker',
+          access_level: 2
+        })
+      )
+      .then(() =>
+        User.create({
+            firstname: 'Ola',
+            lastname: 'Nordmann',
+            tlf: 12345678,
+            email: 'ola.nordmann@gmail.com',
+            hashed_password: 'passord123',
+            salt: 'a12b',
+            role_id: 1,
+            region_id: 1
         })
       );
 });
