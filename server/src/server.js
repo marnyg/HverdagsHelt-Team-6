@@ -25,6 +25,7 @@ app.get('/api/users', (req: Request, res: Response) => {
 });
 
 app.post('/api/users', (req: Request, res: Response) => {
+  console.log('Recieved post request for /api/users');
   if (
     !req.body ||
     typeof req.body.firstname != 'string' ||
@@ -37,7 +38,7 @@ app.post('/api/users', (req: Request, res: Response) => {
     return res.sendStatus(400);
 
   let hashedPassword = hashPassword(req.body.password);
-  let password = hashedPassword.password;
+  let password = hashedPassword['passwordHash'];
   let salt = hashedPassword['salt'];
 
   return User.create({
