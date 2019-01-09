@@ -203,7 +203,7 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(() =
       .then(() =>
         Role.create({
           name: 'Bruker',
-          access_level: 2
+          access_level: 1
         })
       )
       .then(() =>
