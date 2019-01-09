@@ -1,0 +1,11 @@
+
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+    height: 900px;
+}
+
+#sidebar{
+  padding:25px 
+}
