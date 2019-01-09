@@ -4,7 +4,8 @@ import express from 'express';
 import path from 'path';
 import reload from 'reload';
 import fs from 'fs';
-import { Students } from './models.js';
+import { User } from './models.js';
+import { Role } from './models.js';
 
 type Request = express$Request;
 type Response = express$Response;
@@ -16,30 +17,85 @@ let app = express();
 app.use(express.static(public_path));
 app.use(express.json()); // For parsing application/json
 
-app.get('/students', (req: Request, res: Response) => {
-  return Students.findAll().then(students => res.send(students));
+app.get('/api/users', (req: Request, res: Response) => {
+    return User.findAll().then(users => res.send(users));
 });
 
-app.get('/students/:id', (req: Request, res: Response) => {
-  return Students.findOne({ where: { id: Number(req.params.id) } }).then(
-    student => (student ? res.send(student) : res.sendStatus(404))
-  );
+app.post('/api/users', (req: Request, res: Response) => {
+    if (
+        !req.body ||
+        typeof req.body.firstname != 'string' ||
+        typeof req.body.lastname != 'string' ||
+        typeof req.body.tlf != 'number' ||
+        typeof req.body.email != 'string' ||
+        typeof req.body.hashed_password !='string' ||
+        typeof req.body.salt !='string' ||
+        typeof req.body.role_id !='number' ||
+        typeof req.body.region_id !='number'
+    )
+        return res.sendStatus(400);
+
+    return User.create({
+        firstname: req.body.firstname,
+        lastname: req.body.lastname,
+        tlf: req.body.tlf,
+        email: req.body.email,
+        hashed_password: req.body.hashed_password,
+        salt: req.body.salt,
+        role_id: req.body.role_id,
+        region_id: req.body.region_id
+    }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));;
 });
 
-app.put('/students', (req: Request, res: Response) => {
-  if (
-    !req.body ||
-    typeof req.body.id != 'number' ||
-    typeof req.body.firstName != 'string' ||
-    typeof req.body.lastName != 'string' ||
-    typeof req.body.email != 'string'
-  )
-    return res.sendStatus(400);
+app.get('/api/users/:user_id', (req: Request, res: Response) => {
+    return User.findOne({ where: { user_id: Number(req.params.user_id) } }).then(
+        user => (user ? res.send(user) : res.sendStatus(404)));
+});
 
-  return Students.update(
-    { firstName: req.body.firstName, lastName: req.body.lastName, email: req.body.email },
-    { where: { id: req.body.id } }
-  ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+app.put('/api/users/:user_id', (req: Request, res: Response) => {
+    if (
+        !req.params.user_id ||
+        typeof req.params.user_id !='number' ||
+        !req.body ||
+        typeof req.body.firstname != 'string' ||
+        typeof req.body.lastname != 'string' ||
+        typeof req.body.tlf != 'number' ||
+        typeof req.body.email != 'string' ||
+        typeof req.body.region_id !='number'
+    )
+        return res.sendStatus(400);
+
+    return User.update(
+        { firstname: req.body.firstname,
+            lastName: req.body.lastname,
+            tlf: req.body.tlf,
+            email: req.body.email,
+            region_id: req.body.region_id},
+        { where: { user_id: req.params.user_id } }
+    ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+});
+
+app.delete('/api/users/:user_id', (req: Request, res: Response) => {
+    return User.destroy({ where: { user_id: Number(req.params.user_id) } }).then(
+        user => (user ? res.send() : res.status(500).send())
+    );
+});
+
+app.put('/api/users/:user_id/password', (req: Request, res: Response) => {
+    if (
+        !req.params.user_id ||
+        typeof req.params.user_id !='number' ||
+        !req.body ||
+        typeof req.body.hashed_password != 'string' ||
+        typeof req.body.salt != 'string'
+    )
+        return res.sendStatus(400);
+
+    return User.update(
+        { hashed_password: req.body.hashed_password,
+            salt: req.body.salt},
+        { where: { user_id: req.params.user_id } }
+    ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
 });
 
 // Hot reload application when not in production environment
