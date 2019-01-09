@@ -9,7 +9,7 @@ import { User } from './models.js';
 import { Role } from './models.js';
 import { Region } from './models.js';
 import { County } from './models.js';
-import { Region_subscriptions } from './models';
+import { Case_subscriptions, Region_subscriptions } from './models';
 import { Case } from './models.js';
 
 type Request = express$Request;
@@ -102,6 +102,31 @@ app.delete('/api/cases/:case_id', (req: Request, res: Response) => {
   );
 });
 
+app.post('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
+  let case_id = Number(req.params.case_id);
+  if (
+    !req.body ||
+    typeof req.body.user_id != 'number' ||
+    typeof req.body.case_id != 'number' ||
+    typeof req.body.notify_by_email != 'boolean' ||
+    typeof req.body.is_up_to_date != 'boolean'
+  )
+    return res.sendStatus(400);
+
+  return Case_subscriptions.create({
+    user_id: req.body.user_id,
+    case_id: Number(req.params.case_id),
+    notify_by_email: req.body.notify_by_email,
+    is_up_to_date: req.body.is_up_to_date
+  }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+});
+
+app.delete('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
+  return Case_subscriptions.destroy({
+    where: { case_id: Number(req.params.case_id), user_id: Number(req.body.user_id) }
+  }).then(cases => (cases ? res.send() : res.status(500).send()));
+});
+
 app.get('/api/users', (req: Request, res: Response) => {
   return User.findAll().then(users => res.send(users));
 });
@@ -136,8 +161,8 @@ app.post('/api/users', (req: Request, res: Response) => {
 });
 
 app.get('/api/users/:user_id', (req: Request, res: Response) => {
-  return User.findOne({ where: { user_id: Number(req.params.user_id) } }).then(user =>
-    user ? res.send(user) : res.sendStatus(404)
+  return User.findOne({ where: { user_id: Number(req.params.user_id) } }).then(
+    user => (user ? res.send(user) : res.sendStatus(404))
   );
 });
 
@@ -165,8 +190,8 @@ app.put('/api/users/:user_id', (req: Request, res: Response) => {
 });
 
 app.delete('/api/users/:user_id', (req: Request, res: Response) => {
-  return User.destroy({ where: { user_id: Number(req.params.user_id) } }).then(user =>
-    user ? res.send() : res.status(500).send()
+  return User.destroy({ where: { user_id: Number(req.params.user_id) } }).then(
+    user => (user ? res.send() : res.status(500).send())
   );
 });
 
@@ -214,8 +239,8 @@ app.post('/api/regions', (req: Request, res: Response) => {
 });
 
 app.get('/api/regions/:region_id', (req: Request, res: Response) => {
-  return Region.findOne({ where: { id: Number(req.params.id) } }).then(region =>
-    region ? res.send(region) : res.sendStatus(404)
+  return Region.findOne({ where: { id: Number(req.params.id) } }).then(
+    region => (region ? res.send(region) : res.sendStatus(404))
   );
 });
 
@@ -242,8 +267,8 @@ app.put('/api/regions/:region_id', (req: Request, res: Response) => {
 });
 
 app.delete('/api/regions/:region_id', (req: Request, res: Response) => {
-  return Region.destroy({ where: { region_id: Number(req.params.region_id) } }).then(region =>
-    region ? res.send() : res.status(500).send()
+  return Region.destroy({ where: { region_id: Number(req.params.region_id) } }).then(
+    region => (region ? res.send() : res.status(500).send())
   );
 });
 
@@ -286,9 +311,9 @@ app.put('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
 });
 
 app.delete('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
-    return Region_subscriptions.destroy({ where: { region_id: Number(req.params.region_id), user_id: req.body.user_id } }).then(region =>
-        region ? res.send() : res.status(500).send()
-    );
+  return Region_subscriptions.destroy({
+    where: { region_id: Number(req.params.region_id), user_id: req.body.user_id }
+  }).then(region => (region ? res.send() : res.status(500).send()));
 });
 
 app.get('/api/email_available', (req: Request, res: Response) => {
