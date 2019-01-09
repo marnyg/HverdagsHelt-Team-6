@@ -127,6 +127,15 @@ app.delete('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
   }).then(cases => (cases ? res.send() : res.status(500).send()));
 });
 
+app.get('/api/cases/subscriptions/:user_id', (req: Request, res: Response) => {
+  return Case_subscriptions.findAll({
+      where: {
+        user_id: req.params.user_id
+      },
+      order: [['createdAt', 'DESC']] //Order by updatedAt???
+  }).then(cases => res.send(cases));
+});
+
 app.get('/api/users', (req: Request, res: Response) => {
   return User.findAll().then(users => res.send(users));
 });
