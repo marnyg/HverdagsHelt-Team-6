@@ -2,7 +2,11 @@
 
 import ReactDOM from 'react-dom';
 import * as React from 'react';
+import App from './components/App.js';
+import * as serviceWorker from './components/serviceWorker';
 import { Component } from 'react-simplified';
+import { BrowserRouter, Route, NavLink } from 'react-router-dom';
+import { studentService } from './services';
 import { HashRouter, Route, NavLink } from 'react-router-dom';
 import { Alert } from './widgets';
 
@@ -314,15 +318,5 @@ class NewCase extends Component {
 }
 
 const root = document.getElementById('root');
-if (root)
-  ReactDOM.render(
-    <HashRouter>
-      <div>
-        <Alert />
-        <Menu />
-        <Route exact path="/" component={Home} />
-        <Route exact path="/nysak" component={NewCase} />
-      </div>
-    </HashRouter>,
-    root
-  );
+ReactDOM.render(<App />, root);
+serviceWorker.unregister();
