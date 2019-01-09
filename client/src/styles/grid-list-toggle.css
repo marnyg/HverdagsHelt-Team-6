@@ -1,0 +1,100 @@
+.list-grid-demo .glyphicon {
+  margin-right: 5px;
+}
+
+@media only screen and (min-width: 481px) {
+  .grid-group-wrapper.row {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+  }
+  
+  .grid-group-wrapper.row:after,
+  .grid-group-wrapper.row:before {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+  }
+  
+  .grid-group-wrapper.row > [class*='col-'] {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+  }
+  .grid-group-wrapper.row .thumbnail,
+  .grid-group-wrapper.row .caption {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-flex: 1;
+    -ms-flex: 1 0 auto;
+    flex: 1 0 auto;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+  }
+  .grid-group-wrapper.row .caption-text {
+    -webkit-box-flex: 1;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+  }
+  .grid-group-wrapper.row img {
+    width: 100%;
+    height: auto;
+  }
+  .grid-group-wrapper.row .price-buy-spacing {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+  }
+  .grid-group-wrapper.row .price-buy-spacing .lead {
+    margin-bottom: 0px;
+  }
+  .grid-group-wrapper.row .price-buy-spacing {
+    margin-bottom: 10px;
+  }
+  
+  .list-group-wrapper .item {
+    float: none;
+    width: 100%;
+  }
+  .list-group-wrapper .item:before,
+  .list-group-wrapper .item:after {
+    display: table;
+    content: " ";
+  }
+  .list-group-wrapper .item:after {
+    clear: both;
+  }
+  .list-group-wrapper .item .thumbnail img {
+    margin-right: 10px;
+    float: left;
+  }
+  .list-group-wrapper .item .caption,
+  .list-group-wrapper .item .thumbnail {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+  }
+  .list-group-wrapper .item .caption {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+  }
+  .list-group-wrapper .item .caption-text {
+    -webkit-box-flex: 1;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+  }
+}
