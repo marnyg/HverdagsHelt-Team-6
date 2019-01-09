@@ -8,6 +8,7 @@ import { User } from './models.js';
 import { Role } from './models.js';
 import { Region } from './models.js';
 import { County } from './models.js';
+import { Region_subscriptions } from './models';
 
 type Request = express$Request;
 type Response = express$Response;
@@ -50,8 +51,8 @@ app.post('/api/users', (req: Request, res: Response) => {
 });
 
 app.get('/api/users/:user_id', (req: Request, res: Response) => {
-  return User.findOne({ where: { user_id: Number(req.params.user_id) } }).then(
-    user => (user ? res.send(user) : res.sendStatus(404))
+  return User.findOne({ where: { user_id: Number(req.params.user_id) } }).then(user =>
+    user ? res.send(user) : res.sendStatus(404)
   );
 });
 
@@ -81,8 +82,8 @@ app.put('/api/users/:user_id', (req: Request, res: Response) => {
 });
 
 app.delete('/api/users/:user_id', (req: Request, res: Response) => {
-  return User.destroy({ where: { user_id: Number(req.params.user_id) } }).then(
-    user => (user ? res.send() : res.status(500).send())
+  return User.destroy({ where: { user_id: Number(req.params.user_id) } }).then(user =>
+    user ? res.send() : res.status(500).send()
   );
 });
 
@@ -130,8 +131,8 @@ app.post('/api/regions', (req: Request, res: Response) => {
 });
 
 app.get('/api/regions/:region_id', (req: Request, res: Response) => {
-  return Region.findOne({ where: { id: Number(req.params.id) } }).then(
-    region => (region ? res.send(region) : res.sendStatus(404))
+  return Region.findOne({ where: { id: Number(req.params.id) } }).then(region =>
+    region ? res.send(region) : res.sendStatus(404)
   );
 });
 
@@ -157,9 +158,26 @@ app.put('/api/regions/:region_id', (req: Request, res: Response) => {
 });
 
 app.delete('/api/regions/:region_id', (req: Request, res: Response) => {
-  return Region.destroy({ where: { region_id: Number(req.params.region_id) } }).then(
-    region => (region ? res.send() : res.status(500).send())
+  return Region.destroy({ where: { region_id: Number(req.params.region_id) } }).then(region =>
+    region ? res.send() : res.status(500).send()
   );
+});
+
+app.post('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
+  let region_id = Number(req.params.region_id);
+  if (
+    !req.body ||
+    typeof req.body.user_id != 'number' ||
+    typeof region_id != 'number' ||
+    typeof req.body.notify != 'boolean'
+  )
+    return res.sendStatus(400);
+
+  return Region_subscriptions.create({
+    user_id: req.body.user_id,
+    region_id: Number(req.params.region_id),
+    notify: req.body.notify
+  }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
 });
 
 // Hot reload application when not in production environment
