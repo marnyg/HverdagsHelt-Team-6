@@ -5,6 +5,7 @@ import { Component } from 'react-simplified';
 
 
 export class Minside extends Component {
+
     render() {
         return (
             <div class="wrapper">
@@ -15,10 +16,10 @@ export class Minside extends Component {
 
                     <ul class="list-unstyled components">
                         <li>
-                            <a href="#">About</a>
+                            <a href="#">Mine Saker</a>
                         </li>
                         <li>
-                            <a href="#">Portfolio</a>
+                            <a href="#">Kommuner</a>
                         </li>
                         <li>
                             <a href="#">Contact</a>
