@@ -4,6 +4,7 @@ import express from 'express';
 import path from 'path';
 import reload from 'reload';
 import fs from 'fs';
+import { hashPassword } from './auth.js';
 import { User } from './models.js';
 import { Role } from './models.js';
 import { Region } from './models.js';
@@ -30,18 +31,22 @@ app.post('/api/users', (req: Request, res: Response) => {
     typeof req.body.lastname != 'string' ||
     typeof req.body.tlf != 'number' ||
     typeof req.body.email != 'string' ||
-    typeof req.body.hashed_password != 'string' ||
+    typeof req.body.password != 'string' ||
     typeof req.body.region_id != 'number'
   )
     return res.sendStatus(400);
+
+  let hashedPassword = hashPassword(req.body.password);
+  let password = hashedPassword.password;
+  let salt = hashedPassword['salt'];
 
   return User.create({
     firstname: req.body.firstname,
     lastname: req.body.lastname,
     tlf: req.body.tlf,
     email: req.body.email,
-    hashed_password: req.body.hashed_password,
-    salt: req.body.salt,
+    hashed_password: password,
+    salt: salt,
     role_id: 1,
     region_id: req.body.region_id
   }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
