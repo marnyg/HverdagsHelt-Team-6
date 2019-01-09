@@ -86,7 +86,7 @@ if (process.env.NODE_ENV !== 'production') {
 export let listen = new Promise<void>((resolve, reject) => {
   app.listen(3000, error => {
     if (error) reject(error.message);
-    console.log('Server started');
+    console.log('Server started on port 3000');
     resolve();
   });
 });
