@@ -9,6 +9,7 @@ import { User } from './models.js';
 import { Role } from './models.js';
 import { Region } from './models.js';
 import { County } from './models.js';
+import { Case } from './models.js';
 
 type Request = express$Request;
 type Response = express$Response;
@@ -19,6 +20,86 @@ let app = express();
 
 app.use(express.static(public_path));
 app.use(express.json()); // For parsing application/json
+
+app.get('/api/cases', (req: Request, res: Response) => {
+  return Case.findAll().then(cases => res.send(cases));
+});
+
+app.post('/api/cases', (req: Request, res: Response) => {
+  if (
+    !req.body ||
+    typeof req.body.title != 'string' ||
+    typeof req.body.description != 'string' ||
+    typeof req.body.lat != 'number' ||
+    typeof req.body.lon != 'number' ||
+    typeof req.body.region_id != 'number' ||
+    typeof req.body.user_id != 'number' ||
+    typeof req.body.category_id != 'number' ||
+    typeof req.body.status_id != 'number'
+  )
+    return res.sendStatus(400);
+
+  return Case.create({
+    title: req.body.title,
+    description: req.body.description,
+    lat: req.body.lat,
+    lon: req.body.lon,
+    region_id: req.body.region_id,
+    user_id: req.body.user_id,
+    category_id: req.body.category_id,
+    status_id: req.body.status_id
+  }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+});
+
+app.get('/api/cases/user_cases/:user_id', (req: Request, res: Response) => {
+  return Case.findAll({
+    where: {
+      user_id: req.params.user_id
+    },
+    order: [['createdAt', 'DESC']] //Order by updatedAt????
+  }).then(cases => res.send(cases));
+});
+
+app.get('/api/cases/:case_id', (req: Request, res: Response) => {
+  return Case.findOne({ where: { case_id: Number(req.params.case_id) } }).then(
+    cases => (cases ? res.send(cases) : res.sendStatus(404))
+  );
+});
+
+app.put('/api/cases/:case_id', (req: Request, res: Response) => {
+  if (
+    !req.body ||
+    typeof req.body.title != 'string' ||
+    typeof req.body.description != 'string' ||
+    typeof req.body.lat != 'number' ||
+    typeof req.body.lon != 'number' ||
+    typeof req.body.region_id != 'number' ||
+    typeof req.body.user_id != 'number' ||
+    typeof req.body.category_id != 'number' ||
+    typeof req.body.status_id != 'number'
+  )
+    return res.sendStatus(400);
+
+  return Case.update(
+    {
+      title: req.body.title,
+      description: req.body.description,
+      lat: req.body.lat,
+      lon: req.body.lon,
+      region_id: req.body.region_id,
+      user_id: req.body.user_id,
+      category_id: req.body.category_id,
+      status_id: req.body.status_id
+    },
+    { where: { case_id: req.params.case_id } }
+  ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+});
+
+app.delete('/api/cases/:case_id', (req: Request, res: Response) => {
+  return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(
+    cases => (cases ? res.send() : res.status(500).send())
+  );
+});
 
 app.get('/api/users', (req: Request, res: Response) => {
   return User.findAll().then(users => res.send(users));
