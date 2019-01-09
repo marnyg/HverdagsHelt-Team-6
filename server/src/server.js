@@ -88,22 +88,50 @@ app.delete('/api/users/:user_id', (req: Request, res: Response) => {
   );
 });
 
-app.put('/api/users/:user_id/password', (req: Request, res: Response) => {
+app.get('/api/users/:user_id/salt',(req: Request, res: Response) => {
+    return User.findOne({
+        where: { user_id: Number(req.params.user_id) },
+        attributes: ['salt']
+    }).then(user => res.send(user));
+});
+
+app.put('/api/users/:user_id/password', async (req: Request, res: Response) => {
   if (
     !req.body ||
-    typeof req.body.old_password != 'string' ||
-    typeof req.body.new_password != 'string' ||
-    typeof req.body.salt != 'string'
+    typeof req.body.old_password !== 'string' ||
+    typeof req.body.new_password !== 'string'
   )
     return res.sendStatus(400);
 
-  return User.update(
-    {
-      hashed_password: req.body.new_password,
-      salt: req.body.salt
-    },
-    { where: { user_id: Number(req.params.user_id), hashed_password: req.body.old_password } }
-  ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+
+    let user = await User.findOne({
+        where: { user_id: Number(req.params.user_id) }
+    });
+
+    let salt = user.salt;
+    let old = user.hashed_password;
+
+    console.log(salt);
+    console.log(old);
+
+    let oldHashedPassword = hashPassword(req.body.old_password,salt);
+    let old_password = oldHashedPassword['passwordHash'];
+
+    if (old_password === old){
+        let newHashedPassword = hashPassword(req.body.new_password);
+        let new_password = newHashedPassword['passwordHash'];
+        let new_salt = newHashedPassword['salt'];
+
+        return User.update(
+            {
+                hashed_password: new_password,
+                salt: new_salt
+            },
+            { where: { user_id: Number(req.params.user_id) } }
+        ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+    }else{
+        return res.sendStatus(403);
+    }
 });
 
 app.get('/api/counties', (req: Request, res: Response) => {
