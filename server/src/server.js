@@ -6,6 +6,8 @@ import reload from 'reload';
 import fs from 'fs';
 import { User } from './models.js';
 import { Role } from './models.js';
+import { Region } from './models.js';
+import { County } from './models.js';
 
 type Request = express$Request;
 type Response = express$Response;
@@ -16,6 +18,7 @@ let app = express();
 
 app.use(express.static(public_path));
 app.use(express.json()); // For parsing application/json
+
 
 app.get('/api/users', (req: Request, res: Response) => {
     return User.findAll().then(users => res.send(users));
@@ -49,9 +52,35 @@ app.post('/api/users', (req: Request, res: Response) => {
 
 app.get('/api/users/:user_id', (req: Request, res: Response) => {
     return User.findOne({ where: { user_id: Number(req.params.user_id) } }).then(
-        user => (user ? res.send(user) : res.sendStatus(404)));
+        user => (user ? res.send(user) : res.sendStatus(404)))
+
+app.get('/api/counties', (req: Request, res: Response) => {
+  return County.findAll().then(counties => res.send(counties));
 });
 
+app.get('/api/regions', (req: Request, res: Response) => {
+  return Region.findAll().then(regions => res.send(regions));
+});
+
+app.post('/api/regions', (req: Request, res: Response) => {
+  if (
+    !req.body ||
+    typeof req.body.name != 'string' ||
+    typeof req.body.lat != 'number' ||
+    typeof req.body.lon != 'number' ||
+    typeof req.body.county_id != 'number'
+  )
+    return res.sendStatus(400);
+  return Region.create({
+    name: req.body.name,
+    lat: req.body.lat,
+    lon: req.body.lon,
+    county_id: req.body.county_id
+  }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+app.get('/api/regions/:region_id', (req: Request, res: Response) => {
+  return Region.findOne({ where: { id: Number(req.params.id) } }).then(
+    region => (region ? res.send(region) : res.sendStatus(404))
+  );
 app.put('/api/users/:user_id', (req: Request, res: Response) => {
     if (
         !req.params.user_id ||
@@ -79,8 +108,16 @@ app.delete('/api/users/:user_id', (req: Request, res: Response) => {
     return User.destroy({ where: { user_id: Number(req.params.user_id) } }).then(
         user => (user ? res.send() : res.status(500).send())
     );
-});
-
+app.put('/api/regions/:region_id', (req: Request, res: Response) => {
+  if (
+    !req.body ||
+    typeof req.body.region_id != 'number' ||
+    typeof req.body.name != 'string' ||
+    typeof req.body.lat != 'number' ||
+    typeof req.body.lon != 'number' ||
+    typeof req.body.county_id != 'number'
+  )
+    return res.sendStatus(400);
 app.put('/api/users/:user_id/password', (req: Request, res: Response) => {
     if (
         !req.params.user_id ||
@@ -90,12 +127,25 @@ app.put('/api/users/:user_id/password', (req: Request, res: Response) => {
         typeof req.body.salt != 'string'
     )
         return res.sendStatus(400);
-
+  return Region.update(
+    {
+      name: req.body.name,
+      lat: req.body.lat,
+      lon: req.body.lon,
+      county_id: req.body.county_id
+    },
+    { where: { region_id: Number(req.params.region_id) } }
+  ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
     return User.update(
         { hashed_password: req.body.hashed_password,
             salt: req.body.salt},
         { where: { user_id: req.params.user_id } }
     ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+
+app.delete('/api/regions/:region_id', (req: Request, res: Response) => {
+  return Region.destroy({ where: { region_id: Number(req.params.region_id) } }).then(
+    region => (region ? res.send() : res.status(500).send())
+  );
 });
 
 // Hot reload application when not in production environment
