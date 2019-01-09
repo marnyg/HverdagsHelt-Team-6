@@ -135,8 +135,6 @@ app.get('/api/regions/:region_id', (req: Request, res: Response) => {
   );
 });
 
-
-
 app.put('/api/regions/:region_id', (req: Request, res: Response) => {
   if (
     !req.body ||
