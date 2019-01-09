@@ -14,8 +14,14 @@ if (process.env.NODE_ENV !== 'production') {
   if (document.body) document.body.appendChild(script);
 }
 
-class MyCases extends Component {
+export class MyCases extends Component <{ match: { params: { user_id: number } } }> {
+  cases = [];
+
   render() {
+    if(!this.cases) {
+      return null;
+    }
+
     return(
       <table className="table">
         <thead>
@@ -24,9 +30,54 @@ class MyCases extends Component {
             <th scope="col">Case status</th>
             <th scope="col">Region</th>
             <th scope="col">Date created</th>
+            <th scope="col">Last updated</th>
+            <th scope="col">User</th> //hente ut navnet på bruker
           </tr>
         </thead>
+        <tbody>
+          {this.cases.map((c, i) => (
+            <tr key={i}>
+              <td>{c.title}</td>
+              <td>{c.status_id}</td> //hente ut navnet til en status gitt id.
+              <td>{c.created_at}</td>
+              <td>{c.updated_at}</td>
+              <td>{c.user_id}</td>
+            </tr>
+          ))}
+        </tbody>
       </table>
     )
   }
+
+  mounted() {
+    caseService
+    .getAllCasesGivenUser(this.props.match.params.user_id)
+    .then(cases => (this.cases = cases));
+  }
+
+  /*render() {
+    return(
+      <table className="table">
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Case status</th>
+            <th scope="col">Region</th>
+            <th scope="col">Date created</th>
+            <th scope="col">Last updated</th>
+            <th scope="col">User</th> //hente ut navnet på bruker
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Hei</td>
+            <td>Ja</td> //hente ut navnet til en status gitt id.
+            <td>Smil</td>
+            <td>Ja</td>
+            <td>Hurra!</td>
+          </tr>
+        </tbody>
+      </table>
+    )
+  }*/
 }
