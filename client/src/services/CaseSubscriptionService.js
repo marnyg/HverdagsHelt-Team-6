@@ -1,13 +1,6 @@
 // @flow
 import axios from 'axios';
-axios.interceptors.response.use(response => response.data);
-
-export class CaseSubscription {
-  user_id: number;
-  case_id: number;
-  notify_by_email: boolean;
-  is_up_to_date: boolean;
-}
+import CaseSubscription from '../classes/CaseSubscription.js';
 
 class CaseSubscriptionService {
   //Get all subscriotions, given user
