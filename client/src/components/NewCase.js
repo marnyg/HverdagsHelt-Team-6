@@ -6,94 +6,123 @@ import { countyService } from '../services/CountyService';
 import { regionService } from '../services/RegionService';
 import { categoryService } from '../services/CategoryService';
 import { Notify } from './Notify';
+import LocationService from '../services/LocationService';
 
 class NewCase extends Component {
   form = null;
   counties = [];
   municipalities = [];
   categories = [];
+  images = [];
   list1 = null;
   list2 = null;
   lastResortAddress = null;
   pos = { lat: 59.9138688, lon: 10.752245399999993 }; // Last resort position OSLO
+  fileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
   render() {
     return (
       <div>
-        <form
-          ref={e => {
-            this.form = e;
-          }}
-        >
-          <label htmlFor="category">Kategori</label>
-          <select id={'category'} required>
-            <option selected disabled>
-              Kategori
-            </option>
-            {this.categories.map(e => (
-              <option key={e.category_id} value={e.category_id}>
-                {' '}
-                {e.name}{' '}
-              </option>
-            ))}
-          </select>
-          <label htmlFor="title">Tittel</label>
-          <input id={'title'} type="text" pattern="^.{2,255}$" autoComplete="off" required />
-          <label htmlFor="description">Beskrivelse</label>
-          <textarea
-            id={'description'}
-            maxLength={255}
-            placeholder="Skriv en kort beskrivelse her, så blir det enklere for oss å hjelpe deg."
-          />
-          Posisjon
-          <ul>
-            <li>
-              <label>
-                <input type="radio" name="pos" value="auto" onClick={this.radioListener} defaultChecked />
-                Hent automatisk
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="radio" name="pos" value="mapmarker" onClick={this.radioListener} />
-                Marker på kart
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="radio" name="pos" value="last-resort-selection" onClick={this.radioListener} />
-                Velg fra liste
-              </label>
-            </li>
-          </ul>
-          <select id={'last-resort-county'} onChange={this.countyListener} hidden>
-            <option selected disabled>
-              Velg fylke
-            </option>
-            {this.counties.map(e => (
-              <option key={e.county_id} value={e.county_id}>
-                {' '}
-                {e.name}{' '}
-              </option>
-            ))}
-          </select>
-          <select id={'last-resort-municipality'} onChange={this.municipalityListener} hidden>
-            <option selected disabled>
-              Velg kommune
-            </option>
-            {this.municipalities.map(e => (
-              <option key={e.region_id} value={e.region_id}>
-                {' '}
-                {e.name}{' '}
-              </option>
-            ))}
-          </select>
-          <input id={'last-resort-address'} type="text" placeholder={'Skriv inn eventuell adresse'} hidden />
-        </form>
-        <button onClick={this.submit}>Send sak</button>
-        <NavLink exact to={'/'}>
-          Avbryt
-        </NavLink>
+        <div id={'left'}>
+          <form
+            ref={e => {
+              this.form = e;
+            }}
+          >
+            <div>
+              <label htmlFor="category">Kategori</label>
+              <select id={'category'} required>
+                <option selected disabled>
+                  Kategori
+                </option>
+                {this.categories.map(e => (
+                  <option key={e.category_id} value={e.category_id}>
+                    {' '}
+                    {e.name}{' '}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="title">Tittel</label>
+              <input id={'title'} type="text" pattern="^.{2,255}$" autoComplete="off" required />
+            </div>
+            <div>
+              <label htmlFor="description">Beskrivelse</label>
+              <textarea
+                id={'description'}
+                maxLength={255}
+                placeholder="Skriv en kort beskrivelse her, så blir det enklere for oss å hjelpe deg."
+              />
+            </div>
+            <div>
+              Posisjon
+              <ul>
+                <li>
+                  <label>
+                    <input type="radio" name="pos" value="auto" onClick={this.radioListener} defaultChecked />
+                    Hent automatisk
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    <input type="radio" name="pos" value="mapmarker" onClick={this.radioListener} />
+                    Marker på kart
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    <input type="radio" name="pos" value="last-resort-selection" onClick={this.radioListener} />
+                    Velg fra liste
+                  </label>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <select id={'last-resort-county'} onChange={this.countyListener} hidden>
+                <option selected disabled>
+                  Velg fylke
+                </option>
+                {this.counties.map(e => (
+                  <option key={e.county_id} value={e.county_id}>
+                    {' '}
+                    {e.name}{' '}
+                  </option>
+                ))}
+              </select>
+              <select id={'last-resort-municipality'} onChange={this.municipalityListener} hidden>
+                <option selected disabled>
+                  Velg kommune
+                </option>
+                {this.municipalities.map(e => (
+                  <option key={e.region_id} value={e.region_id}>
+                    {' '}
+                    {e.name}{' '}
+                  </option>
+                ))}
+              </select>
+              <input id={'last-resort-address'} type="text" placeholder={'Skriv inn eventuell adresse'} hidden />
+            </div>
+            <div>
+              <label>Legg ved bilder</label>
+              <input id={'image-inpu'} type={'file'} accept={'.png, .jpg, .jpeg'} onChange={this.fileInputListener} />
+            </div>
+          </form>
+          <div>
+            <button onClick={this.submit}>Send sak</button>
+            <NavLink exact to={'/'}>
+              Avbryt
+            </NavLink>
+          </div>
+        </div>
+        <div id={'right'}>
+          {this.images.map(e => (
+            <div>
+              <button onClick={}></button>
+              <img src={e.src} alt={e.alt} />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -173,6 +202,7 @@ class NewCase extends Component {
     this.list1.hidden = true;
     this.list2.hidden = true;
     this.lastResortAddress.hidden = true;
+    // let gpos = LocationService.getLocartion();
   }
 
   radio2() {
@@ -212,6 +242,7 @@ class NewCase extends Component {
     );
     this.list2.hidden = false;
     this.fetchMunicipalities(county.value);
+    this.resetMunicipalityList();
     console.log(this.list2.options[this.list2.selectedIndex].value);
   }
 
@@ -239,16 +270,57 @@ class NewCase extends Component {
         ').'
     );
     // Fetching logic here
-    /*regionService.getAllGivenCounty()
-        .then(e => this.municipalities = e)
-        .then(e => console.log("Received " + e.length + " municipalities from server."))
-        .catch((err: Error) => {
-            console.warn(err.toString());
-            Notify.danger("Det oppstod en feil under lasting av kommuner fra fylke " +
-	            this.list1.options[this.list1.selectedIndex].text + ". " +
-                "Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig." +
-                "\n\nFeilmelding: " + err.toString());
-        });*/
+    regionService
+      .getAllRegionGivenCounty(county_id)
+      .then(e => (this.municipalities = e))
+      .then(e => console.log('Received ' + e.length + ' municipalities from server.'))
+      .catch((err: Error) => {
+        console.warn(err.toString());
+        Notify.danger(
+          'Det oppstod en feil under lasting av kommuner fra fylke ' +
+            this.list1.options[this.list1.selectedIndex].text +
+            '. ' +
+            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+            '\n\nFeilmelding: ' +
+            err.toString()
+        );
+      });
+  }
+
+  resetMunicipalityList() {
+    this.list2.selectedIndex = 0;
+  }
+
+  fileInputListener(event: SyntheticInputEvent<HTMLInputElement>) {
+    let files = Array.from(event.target.files);
+
+    console.log(files);
+
+    if (files.length === 0) {
+      // No files were selected. No changes committed.
+      console.log('No files were selected.');
+    } else {
+      // Files selected. Processing changes.
+      console.log('Files were selected.');
+      // Redundant file type check.
+      if (files.filter(e => this.fileTypes.includes(e.type))) {
+        // File type is accepted.
+        files.map(e => {
+          this.images.push({
+            alt: 'Bildenavn:' + e.name + ', størrelse ' + e.size + ' bytes.',
+            src: window.URL.createObjectURL(e)
+          });
+        });
+      } else {
+        // File type not accepted.
+        console.warn('File type not accepted.');
+      }
+    }
+  }
+  
+  fileInputDeleteImage(event: SyntheticInputEvent<HTMLInputElement>){
+    let image = event.target;
+    this.images.splice();
   }
 
   submit() {
