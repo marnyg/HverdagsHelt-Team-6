@@ -1,12 +1,7 @@
 // @flow
 import axios from 'axios';
 axios.interceptors.response.use(response => response.data);
-
-export class RegionSubscription {
-  user_id: number;
-  region_id: number;
-  notify: boolean;
-}
+import RegionSubscription from '../classes/RegionSubscription.js';
 
 class RegionSubscriptionService {
   //Get all subscribers, given region
