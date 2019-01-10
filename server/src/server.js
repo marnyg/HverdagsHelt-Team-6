@@ -481,7 +481,6 @@ app.delete('/api/categories/:category_id', (req: Request, res: Response) => {
   }).then(category => (category ? res.send() : res.status(500).send()));
 });
 
-
 // Hot reload application when not in production environment
 if (process.env.NODE_ENV !== 'production') {
   let reloadServer = reload(app);
