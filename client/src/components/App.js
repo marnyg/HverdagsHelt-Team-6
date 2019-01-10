@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Component } from 'react-simplified';
 import { Minside } from './Minside'
 import { Footer } from './Footer'
+import { NewCase } from './NewCase'
 
 import '../styles/styles.css';
 import '../styles/loginmodal.css';
