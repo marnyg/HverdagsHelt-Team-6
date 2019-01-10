@@ -37,6 +37,10 @@ describe('Sequelize model findAll() tests', () => {
       {
         id: 2,
         name: 'Akershus'
+      },
+      {
+        id: 4,
+        name: 'Møre og Romsdal'
       }
     ]);
   });
@@ -111,12 +115,22 @@ describe('Sequelize model findAll() tests', () => {
       {
         id: 1,
         name: 'Privat bruker',
-        access_level: 2
+        access_level: 4
       },
       {
         id: 2,
         name: 'Admin',
         access_level: 1
+      },
+      {
+        access_level: 2,
+        id: 3,
+        name: 'Kommune ansatt'
+      },
+      {
+        access_level: 3,
+        id: 4,
+        name: 'Bedrift bruker'
       }
     ]);
   });
@@ -375,30 +389,4 @@ describe('Sequelize model findAll() tests', () => {
       }
     ]);
   });
-});
-
-describe('Database constraint tests', () => {
-    it('Role.findAll() returns correct data', async () => {
-        let role = await Role.findAll();
-        expect(
-            role
-                .map(role => role.toJSON())
-                .map(role => ({
-                    id: role.role_id,
-                    name: role.name,
-                    access_level: role.access_level
-                }))
-        ).toEqual([
-            {
-                id: 1,
-                name: 'Privat bruker',
-                access_level: 2
-            },
-            {
-                id: 2,
-                name: 'Admin',
-                access_level: 1
-            }
-        ]);
-    });
 });
