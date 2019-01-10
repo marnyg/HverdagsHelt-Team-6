@@ -19,6 +19,7 @@ export class GoogleMapsContainer extends Component {
         });
     }
     onClick(t, map, coord) {
+        console.log(this.props.userPos)
 
         const latLng = coord.pa;
         console.log(latLng);
@@ -36,12 +37,12 @@ export class GoogleMapsContainer extends Component {
                 google={this.props.google}
                 onClick={this.onClick}
                 zoom={14}
-                initialCenter={{ lat: 39.648209, lng: -75.711185 }}
+                initialCenter={this.props.userPos}
             >
                 <Marker
                     onClick={this.onMarkerClick}
                     title={'Changing Colors Garage'}
-                    position={{ lat: 39.648209, lng: -75.711185 }}
+                    position={this.props.userPos}
                     name={'Changing Colors Garage'}
                 />
             </Map>

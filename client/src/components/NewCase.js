@@ -7,6 +7,7 @@ import { regionService } from '../services/RegionService';
 import { categoryService } from '../services/CategoryService';
 import { Notify } from './Notify';
 import LocationService from '../services/LocationService';
+import GoogleApiWrapper from './GoogleApiWrapper'
 
 class NewCase extends Component {
   form = null;
@@ -103,6 +104,7 @@ class NewCase extends Component {
               </select>
               <input id={'last-resort-address'} type="text" placeholder={'Skriv inn eventuell adresse'} hidden />
             </div>
+            <GoogleApiWrapper userPos={{ lat: 60, lng: 10 }}></GoogleApiWrapper>
             <div>
               <label>Legg ved bilder</label>
               <input id={'image-inpu'} type={'file'} accept={'.png, .jpg, .jpeg'} onChange={this.fileInputListener} />
@@ -118,12 +120,14 @@ class NewCase extends Component {
         <div id={'right'}>
           {this.images.map(e => (
             <div>
-              <button onClick={}></button>
+              <button onClick={console.log("asd")
+              }></button>
               <img src={e.src} alt={e.alt} />
             </div>
           ))}
         </div>
-      </div>
+
+      </div >
     );
   }
 
@@ -142,9 +146,9 @@ class NewCase extends Component {
         console.warn('FEIL!' + err.toString());
         Notify.danger(
           'Det oppstod en feil under lasting av kategorier. ' +
-            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-            '\n\nFeilmelding: ' +
-            err.toString()
+          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+          '\n\nFeilmelding: ' +
+          err.toString()
         );
       });
     console.log('Fetchng counties.');
@@ -156,9 +160,9 @@ class NewCase extends Component {
         console.warn('FEIL!' + err.toString());
         Notify.danger(
           'Det oppstod en feil under lasting av fylker. ' +
-            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-            '\n\nFeilmelding: ' +
-            err.toString()
+          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+          '\n\nFeilmelding: ' +
+          err.toString()
         );
       });
     console.log('Mounted!');
@@ -235,10 +239,10 @@ class NewCase extends Component {
     let county = event.target;
     console.log(
       'Slected ' +
-        county.options[county.selectedIndex].text +
-        ' with id = ' +
-        county.value +
-        ' as county from drop-down list.'
+      county.options[county.selectedIndex].text +
+      ' with id = ' +
+      county.value +
+      ' as county from drop-down list.'
     );
     this.list2.hidden = false;
     this.fetchMunicipalities(county.value);
@@ -252,10 +256,10 @@ class NewCase extends Component {
     let obj = this.municipalities.find(e => e.region_id === parseInt(muni.value));
     console.log(
       'Slected ' +
-        muni.options[muni.selectedIndex].text +
-        ' with id = ' +
-        muni.value +
-        ' as municipality from drop-down list.'
+      muni.options[muni.selectedIndex].text +
+      ' with id = ' +
+      muni.value +
+      ' as municipality from drop-down list.'
     );
     this.lastResortAddress.hidden = false;
     this.pos = { lat: obj.lat, lon: obj.lon };
@@ -264,10 +268,10 @@ class NewCase extends Component {
   fetchMunicipalities(county_id: number) {
     console.log(
       'Fetching municipalities for county: ' +
-        this.list1.options[this.list1.selectedIndex].text +
-        ' (county_id = ' +
-        county_id +
-        ').'
+      this.list1.options[this.list1.selectedIndex].text +
+      ' (county_id = ' +
+      county_id +
+      ').'
     );
     // Fetching logic here
     regionService
@@ -278,11 +282,11 @@ class NewCase extends Component {
         console.warn(err.toString());
         Notify.danger(
           'Det oppstod en feil under lasting av kommuner fra fylke ' +
-            this.list1.options[this.list1.selectedIndex].text +
-            '. ' +
-            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-            '\n\nFeilmelding: ' +
-            err.toString()
+          this.list1.options[this.list1.selectedIndex].text +
+          '. ' +
+          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+          '\n\nFeilmelding: ' +
+          err.toString()
         );
       });
   }
@@ -317,8 +321,8 @@ class NewCase extends Component {
       }
     }
   }
-  
-  fileInputDeleteImage(event: SyntheticInputEvent<HTMLInputElement>){
+
+  fileInputDeleteImage(event: SyntheticInputEvent<HTMLInputElement>) {
     let image = event.target;
     this.images.splice();
   }
