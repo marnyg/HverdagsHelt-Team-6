@@ -2,8 +2,6 @@
 import * as React from 'react';
 import { Component } from 'react-simplified';
 
-
-
 export class Minside extends Component {
 
     render() {

@@ -4,15 +4,9 @@ import ReactDOM from 'react-dom';
 import * as React from 'react';
 import { Component } from 'react-simplified';
 import { HashRouter, Route, NavLink } from 'react-router-dom';
+import { caseService } from '../services/CaseService.js';
 //import { Alert } from './widgets';
 //import { studentService } from './services';
-
-// Reload application when not in production environment
-if (process.env.NODE_ENV !== 'production') {
-  let script = document.createElement('script');
-  script.src = '/reload/reload.js';
-  if (document.body) document.body.appendChild(script);
-}
 
 export class MyCases extends Component <{ match: { params: { user_id: number } } }> {
   cases = [];
