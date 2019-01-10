@@ -1,11 +1,8 @@
 // @flow
 import axios from 'axios';
 
-
-import Category from '../classes/Category.js';
-
-
 axios.interceptors.response.use((response: any) => response.data);
+import Category from '../classes/Category.js';
 
 class CategoryService {
   //Get all categories
