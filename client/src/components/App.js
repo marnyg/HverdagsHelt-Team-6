@@ -9,6 +9,7 @@ import '../styles/grid-list-toggle.css';
 
 import Navbar from './Navbar.js';
 import Content from './Content.js';
+//import NewCase from './NewCase.js';
 import { BrowserRouter, Route } from 'react-router-dom';
 
 class App extends Component {
@@ -18,7 +19,7 @@ class App extends Component {
                 <div>
                     <Navbar/>
                     <div className="content-wrapper">
-                        <Content/>
+                        <Route exact path="/" render={<Content/>}/>
                     </div>
                 </div>
             </BrowserRouter>
