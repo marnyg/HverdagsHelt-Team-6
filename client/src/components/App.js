@@ -11,17 +11,21 @@ import '../styles/registermodal.css';
 import '../styles/grid-list-toggle.css';
 import '../styles/simple-sidebar.css';
 
+import Navbar from './Navbar.js';
+import Content from './Content.js';
 import { BrowserRouter, Route } from 'react-router-dom';
 
 class App extends Component {
     render() {
         return (
-            <div style={{ fontSize: 16 }}>
-                This is the app, place all the initialization of other components here.
-            <Minside ></Minside>
-                <Footer></Footer>
-            </div>
-
+            <BrowserRouter>
+                <div>
+                    <Navbar/>
+                    <div className="content-wrapper">
+                        <Content/>
+                    </div>
+                </div>
+            </BrowserRouter>
         );
     }
 }
