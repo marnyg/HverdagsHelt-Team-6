@@ -1,6 +1,5 @@
 // @flow
 import axios from 'axios';
-axios.interceptors.response.use(response => response.data);
 import Region from '../classes/Region.js';
 
 class RegionService {

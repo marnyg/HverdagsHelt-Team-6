@@ -9,19 +9,8 @@ import { Notify } from './Notify';
 
 class NewCase extends Component {
   form = null;
-  counties = [
-    { county_id: 11, name: 'Trøndelag' },
-    { county_id: 12, name: 'Hordaland' },
-    { county_id: 13, name: 'Akershus' }
-  ];
-  municipalities = [
-    { region_id: 1, name: 'Trondheim', lat: 63.1, lon: 10.2 },
-    { region_id: 2, name: 'Roan', lat: 63.3, lon: 10.2 },
-    { region_id: 3, name: 'Bergen', lat: 63.4, lon: 10.1 },
-    { region_id: 4, name: 'Lillestrøm', lat: 63.2, lon: 10.7 },
-    { region_id: 5, name: 'Fet', lat: 63.9, lon: 10.1 },
-    { region_id: 6, name: 'Singsaker', lat: 63.8, lon: 10.1 }
-  ];
+  counties = [];
+  municipalities = [];
   categories = [];
   list1 = null;
   list2 = null;
@@ -250,7 +239,7 @@ class NewCase extends Component {
         ').'
     );
     // Fetching logic here
-    /*regionService.getAll()
+    /*regionService.getAllGivenCounty()
         .then(e => this.municipalities = e)
         .then(e => console.log("Received " + e.length + " municipalities from server."))
         .catch((err: Error) => {

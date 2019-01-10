@@ -1,13 +1,13 @@
 // @flow
 import axios from 'axios';
-
-axios.interceptors.response.use((response: any) => response.data);
 import Category from '../classes/Category.js';
 
 class CategoryService {
   //Get all categories
   getAllCategories(): Promise<Category[]> {
-    return axios.get('/api/categories');
+    let a = axios.get('/api/categories');
+    console.log(a);
+    return a;
   }
 
   //Update one specific category

@@ -1,6 +1,5 @@
 // @flow
 import axios from 'axios';
-axios.interceptors.response.use(response => response.data);
 import RegionSubscription from '../classes/RegionSubscription.js';
 
 class RegionSubscriptionService {
