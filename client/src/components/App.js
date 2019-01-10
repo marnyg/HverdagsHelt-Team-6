@@ -22,7 +22,7 @@ class App extends Component {
                 <div>
                     <Navbar/>
                     <div className="content-wrapper">
-                        <Route exact path="/" render={<Content/>}/>
+                        <Route exact path="/" render={() => (<Content/>)}/>
                     </div>
                 </div>
             </BrowserRouter>
