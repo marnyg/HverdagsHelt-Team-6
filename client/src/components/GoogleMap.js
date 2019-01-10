@@ -1,20 +1,19 @@
-import {Component} from "react-simplified";
 
-export class NewCase extends Component {
-	gmap = null;
-	pos = { lat: 59.9138688, lon: 10.752245399999993 };
-	
+import * as React from 'react';
+import { Component } from 'react-simplified';
+import { DumMap } from "./dumMap";
+
+export class GoogleMap extends Component {
+
 	render() {
 		return (
-			<div id={"gmap"}>
-			
-			</div>
+			<DumMap
+				doctors={this.props.doctors}
+				googleMapURL={`https://maps.googleapis.com/maps/api/js?key=AIzaSyDhfEwBKYpfnkGiGMNV44wkKBtxI_oH_lo&v=3.exp&libraries=geometry,drawing,places`}
+				loadingElement={<div style={{ height: `100%` }} />}
+				containerElement={<div style={{ height: `600px`, width: `600px` }} />}
+				mapElement={<div style={{ height: `100%` }} />}
+			/>
 		);
-	}
-	
-	mounted() {
-		
-		console.log('Mounted!');
-		// Fetching counties logic here
 	}
 }
