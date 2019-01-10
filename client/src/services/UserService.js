@@ -1,18 +1,7 @@
 // @flow
 import axios from 'axios';
 axios.interceptors.response.use(response => response.data);
-
-export class User {
-  user_id: number;
-  role_id: number;
-  region_id: number;
-  firstname: string;
-  lastname: string;
-  tlf: number;
-  email: string;
-  hashed_password: string;
-  salt: string;
-}
+import User from '../classes/User.js';
 
 class UserService {
   //Get all users

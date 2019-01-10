@@ -1,14 +1,7 @@
 // @flow
 import axios from 'axios';
 axios.interceptors.response.use(response => response.data);
-
-export class Region {
-  region_id: number;
-  county_id: number;
-  name: string;
-  lat: number;
-  lon: number;
-}
+import Region from '../classes/Region.js';
 
 class RegionService {
   //Get all regions
