@@ -129,10 +129,9 @@ app.delete('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
 
 app.get('/api/cases/subscriptions/:user_id', (req: Request, res: Response) => {
   return Case_subscriptions.findAll({
-      where: {
-        user_id: req.params.user_id
-      },
-      order: [['createdAt', 'DESC']] //Order by updatedAt???
+    where: {
+      user_id: req.params.user_id
+    }
   }).then(cases => res.send(cases));
 });
 
@@ -205,39 +204,34 @@ app.delete('/api/users/:user_id', (req: Request, res: Response) => {
 });
 
 app.put('/api/users/:user_id/password', async (req: Request, res: Response) => {
-  if (
-    !req.body ||
-    typeof req.body.old_password !== 'string' ||
-    typeof req.body.new_password !== 'string'
-  )
+  if (!req.body || typeof req.body.old_password !== 'string' || typeof req.body.new_password !== 'string')
     return res.sendStatus(400);
 
+  let user = await User.findOne({
+    where: { user_id: Number(req.params.user_id) }
+  });
 
-    let user = await User.findOne({
-        where: { user_id: Number(req.params.user_id) }
-    });
+  let salt = user.salt;
+  let old = user.hashed_password;
 
-    let salt = user.salt;
-    let old = user.hashed_password;
+  let oldHashedPassword = hashPassword(req.body.old_password, salt);
+  let old_password = oldHashedPassword['passwordHash'];
 
-    let oldHashedPassword = hashPassword(req.body.old_password,salt);
-    let old_password = oldHashedPassword['passwordHash'];
+  if (old_password === old) {
+    let newHashedPassword = hashPassword(req.body.new_password);
+    let new_password = newHashedPassword['passwordHash'];
+    let new_salt = newHashedPassword['salt'];
 
-    if (old_password === old){
-        let newHashedPassword = hashPassword(req.body.new_password);
-        let new_password = newHashedPassword['passwordHash'];
-        let new_salt = newHashedPassword['salt'];
-
-        return User.update(
-            {
-                hashed_password: new_password,
-                salt: new_salt
-            },
-            { where: { user_id: Number(req.params.user_id) } }
-        ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
-    }else{
-        return res.sendStatus(403);
-    }
+    return User.update(
+      {
+        hashed_password: new_password,
+        salt: new_salt
+      },
+      { where: { user_id: Number(req.params.user_id) } }
+    ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+  } else {
+    return res.sendStatus(403);
+  }
 });
 
 app.get('/api/counties', (req: Request, res: Response) => {
@@ -266,7 +260,7 @@ app.post('/api/regions', (req: Request, res: Response) => {
 });
 
 app.get('/api/regions/:region_id', (req: Request, res: Response) => {
-  return Region.findOne({ where: { id: Number(req.params.id) } }).then(
+  return Region.findOne({ where: { region_id: Number(req.params.region_id) } }).then(
     region => (region ? res.send(region) : res.sendStatus(404))
   );
 });
@@ -295,7 +289,7 @@ app.put('/api/regions/:region_id', (req: Request, res: Response) => {
 
 app.delete('/api/regions/:region_id', (req: Request, res: Response) => {
   return Region.destroy({ where: { region_id: Number(req.params.region_id) } }).then(
-    region => (region ? res.send() : res.status(500).send())
+    regions => (regions ? res.send() : res.status(500).send())
   );
 });
 
@@ -344,9 +338,7 @@ app.delete('/api/regions/:region_id/subscribe', (req: Request, res: Response) =>
 });
 
 app.get('/api/email_available', (req: Request, res: Response) => {
-  return User.findAll().then(users =>
-      res.send(!users.some(user => user.email === req.body.email))
-  );
+  return User.findAll().then(users => res.send(!users.some(user => user.email === req.body.email)));
 });
 
 // Hot reload application when not in production environment
