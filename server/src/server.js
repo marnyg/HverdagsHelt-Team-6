@@ -62,8 +62,8 @@ app.get('/api/cases/user_cases/:user_id', (req: Request, res: Response) => {
 });
 
 app.get('/api/cases/:case_id', (req: Request, res: Response) => {
-  return Case.findOne({ where: { case_id: Number(req.params.case_id) } }).then(cases =>
-    cases ? res.send(cases) : res.sendStatus(404)
+  return Case.findOne({ where: { case_id: Number(req.params.case_id) } }).then(
+    cases => (cases ? res.send(cases) : res.sendStatus(404))
   );
 });
 
@@ -97,8 +97,8 @@ app.put('/api/cases/:case_id', (req: Request, res: Response) => {
 });
 
 app.delete('/api/cases/:case_id', (req: Request, res: Response) => {
-  return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(cases =>
-    cases ? res.send() : res.status(500).send()
+  return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(
+    cases => (cases ? res.send() : res.status(500).send())
   );
 });
 
@@ -131,8 +131,7 @@ app.get('/api/cases/subscriptions/:user_id', (req: Request, res: Response) => {
   return Case_subscriptions.findAll({
     where: {
       user_id: req.params.user_id
-    },
-    order: [['createdAt', 'DESC']] //Order by updatedAt???
+    }
   }).then(cases => res.send(cases));
 });
 
@@ -170,8 +169,8 @@ app.post('/api/users', (req: Request, res: Response) => {
 });
 
 app.get('/api/users/:user_id', (req: Request, res: Response) => {
-  return User.findOne({ where: { user_id: Number(req.params.user_id) } }).then(user =>
-    user ? res.send(user) : res.sendStatus(404)
+  return User.findOne({ where: { user_id: Number(req.params.user_id) } }).then(
+    user => (user ? res.send(user) : res.sendStatus(404))
   );
 });
 
@@ -199,8 +198,8 @@ app.put('/api/users/:user_id', (req: Request, res: Response) => {
 });
 
 app.delete('/api/users/:user_id', (req: Request, res: Response) => {
-  return User.destroy({ where: { user_id: Number(req.params.user_id) } }).then(user =>
-    user ? res.send() : res.status(500).send()
+  return User.destroy({ where: { user_id: Number(req.params.user_id) } }).then(
+    user => (user ? res.send() : res.status(500).send())
   );
 });
 
@@ -261,8 +260,8 @@ app.post('/api/regions', (req: Request, res: Response) => {
 });
 
 app.get('/api/regions/:region_id', (req: Request, res: Response) => {
-  return Region.findOne({ where: { id: Number(req.params.id) } }).then(region =>
-    region ? res.send(region) : res.sendStatus(404)
+  return Region.findOne({ where: { region_id: Number(req.params.region_id) } }).then(
+    region => (region ? res.send(region) : res.sendStatus(404))
   );
 });
 
@@ -289,8 +288,8 @@ app.put('/api/regions/:region_id', (req: Request, res: Response) => {
 });
 
 app.delete('/api/regions/:region_id', (req: Request, res: Response) => {
-  return Region.destroy({ where: { region_id: Number(req.params.region_id) } }).then(region =>
-    region ? res.send() : res.status(500).send()
+  return Region.destroy({ where: { region_id: Number(req.params.region_id) } }).then(
+    regions => (regions ? res.send() : res.status(500).send())
   );
 });
 
@@ -364,9 +363,9 @@ app.put('/api/categories/:category_id', (req: Request, res: Response) => {
 });
 
 app.delete('/api/categories/:category_id', (req: Request, res: Response) => {
-    return Category.destroy({
-        where: { category_id: Number(req.params.category_id) }
-    }).then(category => (category ? res.send() : res.status(500).send()));
+  return Category.destroy({
+    where: { category_id: Number(req.params.category_id) }
+  }).then(category => (category ? res.send() : res.status(500).send()));
 });
 
 // Hot reload application when not in production environment
