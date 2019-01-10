@@ -2,8 +2,6 @@
 import axios from 'axios';
 import Case from '../classes/Case.js';
 
-axios.interceptors.response.use(response => response.data);
-
 class CaseService {
   //Get all cases
   getAllCases(): Promise<Case[]> {

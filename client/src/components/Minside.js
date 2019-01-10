@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Component } from 'react-simplified';
+import { MyCases } from './MyCases.js';
 
 export class Minside extends Component {
 

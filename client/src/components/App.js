@@ -14,6 +14,9 @@ import Navbar from './Navbar.js';
 import Content from './Content.js';
 //import NewCase from './NewCase.js';
 import { BrowserRouter, Route } from 'react-router-dom';
+import axios from 'axios';
+
+axios.interceptors.response.use(response => response.data);
 
 class App extends Component {
     render() {
