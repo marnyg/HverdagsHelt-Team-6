@@ -13,7 +13,7 @@ class CaseItem extends Component {
 
     render() {
         return (
-            <div className="item">
+            <div key={this.props.case.case_id} className="item">
                 <NavLink to={"/case/" + this.props.case.case_id} className="preview">
                     {this.images.length > 0 ?
                         <div className="thumb"
@@ -38,7 +38,7 @@ class CaseItem extends Component {
         this.images = [
             {path: 'https://res.cloudinary.com/simpleview/image/upload/v1504558184/clients/norway/6d185cb5_1903_43a6_bd2b_9771c44d25bc_3c270880-a51d-4199-a673-021a21c8d2a9.jpg'}
         ];
-        console.log(this.images.length);
+        //console.log(this.images.length);
         /* REMOVE COMMENTS WHEN SERVICES DONE
         let pictureService = new PictureService();
 

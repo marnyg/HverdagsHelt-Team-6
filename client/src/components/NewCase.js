@@ -1,10 +1,13 @@
+import ReactDOM from 'react-dom';
+import * as React from 'react';
 import { Component } from 'react-simplified';
+import { NavLink } from 'react-router-dom';
 import { countyService } from '../services/CountyService';
 import { regionService } from '../services/RegionService';
 import { categoryService } from '../services/CategoryService';
-import { Notify } from 'Notify';
+import { Notify } from './Notify';
 
-export class NewCase extends Component {
+class NewCase extends Component {
   form = null;
   counties = [
     { county_id: 11, name: 'Trøndelag' },
@@ -19,19 +22,11 @@ export class NewCase extends Component {
     { region_id: 5, name: 'Fet', lat: 63.9, lon: 10.1 },
     { region_id: 6, name: 'Singsaker', lat: 63.8, lon: 10.1 }
   ];
-  categories = [
-    { category_id: 1, name: 'Helse og oppvekst' },
-    { category_id: 2, name: 'Vei og transport' },
-    { category_id: 3, name: 'Kultur og fritid' },
-    { category_id: 4, name: 'Skatt og avgifter' },
-    { category_id: 5, name: 'Skader og herverk' },
-    { category_id: 6, name: 'Administrasjon' },
-    { category_id: 7, name: 'Annet' }
-  ];
+  categories = [];
   list1 = null;
   list2 = null;
   lastResortAddress = null;
-  pos = { lat: 59.9138688, lon: 10.752245399999993 };
+  pos = { lat: 59.9138688, lon: 10.752245399999993 }; // Last resort position OSLO
 
   render() {
     return (
@@ -118,15 +113,37 @@ export class NewCase extends Component {
     this.list1 = document.getElementById('last-resort-county');
     this.list2 = document.getElementById('last-resort-municipality');
     this.lastResortAddress = document.getElementById('last-resort-address');
+
+    // Fetching logic
+    console.log('Fetchng categories.');
+    categoryService
+      .getAllCategories()
+      .then(e => (this.categories = e))
+      .then(e => console.log('Received ' + e.length + ' categories from server.'))
+      .catch((err: Error) => {
+        console.alert('FEIL!' + err.toString());
+        Notify.danger(
+          'Det oppstod en feil under lasting av kategorier. ' +
+            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+            '\n\nFeilmelding: ' +
+            err.toString()
+        );
+      });
+    console.log('Fetchng counties.');
+    countyService
+      .getAllCounties()
+      .then(e => (this.counties = e))
+      .then(e => console.log('Received ' + e.length + ' counties from server.'))
+      .catch((err: Error) => {
+        console.alert('FEIL!' + err.toString());
+        Notify.danger(
+          'Det oppstod en feil under lasting av fylker. ' +
+            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+            '\n\nFeilmelding: ' +
+            err.toString()
+        );
+      });
     console.log('Mounted!');
-    // Fetching counties logic here
-      categoryService.getAllCategories()
-        .then(console.log("Received categories from server."))
-        .then(cat => this.categories = cat)
-        .catch((err: Error) => {
-          console.alert(err.toString());
-          
-        });
   }
 
   radioListener(event: SyntheticInputEvent<HTMLInputElement>) {
@@ -233,6 +250,16 @@ export class NewCase extends Component {
         ').'
     );
     // Fetching logic here
+    /*regionService.getAll()
+        .then(e => this.municipalities = e)
+        .then(e => console.log("Received " + e.length + " municipalities from server."))
+        .catch((err: Error) => {
+            console.alert(err.toString());
+            Notify.danger("Det oppstod en feil under lasting av kommuner fra fylke " +
+	            this.list1.options[this.list1.selectedIndex].text + ". " +
+                "Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig." +
+                "\n\nFeilmelding: " + err.toString());
+        });*/
   }
 
   submit() {
@@ -278,3 +305,5 @@ export class NewCase extends Component {
     console.log('Position is ' + JSON.stringify(this.pos));
   }
 }
+
+export default NewCase;

@@ -3,7 +3,6 @@ import * as React from 'react';
 import { Component } from 'react-simplified';
 import { Minside } from './Minside'
 import { Footer } from './Footer'
-import { NewCase } from './NewCase'
 
 import '../styles/styles.css';
 import '../styles/loginmodal.css';
@@ -13,7 +12,7 @@ import '../styles/simple-sidebar.css';
 
 import Navbar from './Navbar.js';
 import Content from './Content.js';
-//import NewCase from './NewCase.js';
+import NewCase from './NewCase.js';
 import { BrowserRouter, Route } from 'react-router-dom';
 
 class App extends Component {
@@ -24,6 +23,7 @@ class App extends Component {
                     <Navbar/>
                     <div className="content-wrapper">
                         <Route exact path="/" render={() => (<Content/>)}/>
+	                    <Route path="/new-case" render={() => (<NewCase/>)}/>
                     </div>
                 </div>
             </BrowserRouter>
