@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { Component } from 'react-simplified';
+import { withRouter } from 'react-router-dom';
+
 
 class LoginModal extends Component {
     constructor(){
@@ -15,8 +17,8 @@ class LoginModal extends Component {
                 <div className="modal-dialog">
                     <div className="loginmodal-container modal-content">
                         <h1>Logg inn</h1><br/>
-                        <input type="text" name="user" placeholder="Epost" onChange={this.emailChange}></input>
-                        <input type="password" name="pass" placeholder="Passord" onChange={this.pwChange}></input>
+                        <input type="text" name="user" placeholder="Epost" onKeyPress={this.keyCheck} onChange={this.emailChange}></input>
+                        <input type="password" name="pass" placeholder="Passord" onKeyPress={this.keyCheck} onChange={this.pwChange}></input>
                         <input name="login" className="btn btn-primary" value="Login" onChange={this.submit} onClick={this.submit}></input>
                         <div className="login-help">
                             <a href="#">Glemt passordet ditt?</a>
@@ -33,16 +35,19 @@ class LoginModal extends Component {
             email: this.email,
             password: this.password
         };
+        //window.location = '/';
+        this.props.onLogin();
+        $('#login-modal').modal('hide');
 
         /*
 
         if(this.valid(data)){
             let userService = new UserService();
-
             userService.login(data)
                 .then((user: User) => {
                     //document.getElementsByClassName("loading")[0].style.display = "none";
-                    localStorage.setItem('token': user.token);
+                    //localStorage.setItem('token': user.token); Mulig UserService ordner denne?
+                    this.props.history.push('/');
                 })
                 .catch((error: Error) => console.error(error.message));
         } else {
@@ -51,18 +56,31 @@ class LoginModal extends Component {
         */
     }
 
+    keyCheck(event){
+        console.log(event.key);
+        if(event.key === 'Enter'){
+            console.log('Key was enter');
+            this.submit(event);
+        }
+    }
+
     pwChange(event){
         this.password = event.target.value;
-        console.log("PW changed");
     }
 
     emailChange(event){
         this.email = event.target.value;
-        console.log("Email changed");
     }
 
     valid(data){
-        return true;
+        if(data.email && data.password){
+            if(data.email !== undefined && data.email !== ''){
+                if(data.password !== undefined && data.password !== ''){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
-export default LoginModal;
+export default withRouter(LoginModal);

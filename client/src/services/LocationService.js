@@ -11,15 +11,17 @@ class LocationService{
                         this.geocodeLatLng(latlng.lat, latlng.lng)
                             .then(locationdata => {
                                 //console.log('Got location by browser navigator');
-                                //console.log(locationdata);
-                                if(locationdata.data.results){
-                                    if(locationdata.data.results.length > 0){
+                                //console.log('Line 14: nodata', locationdata.results[0]);
+                                if(locationdata.results){
+                                    if(locationdata.results.length > 0){
                                         //console.log('found a location!');
-                                        let lat = locationdata.data.results[0].geometry.location.lat;
-                                        let long = locationdata.data.results[0].geometry.location.lng;
-                                        let city = locationdata.data.results[0].address_components[3].long_name;
-                                        let region = locationdata.data.results[0].address_components[4].long_name;
-                                        let country = locationdata.data.results[0].address_components[5].long_name;
+                                        //console.log('Line 18: ', location.data);
+                                        let lat = locationdata.results[0].geometry.location.lat;
+                                        let long = locationdata.results[0].geometry.location.lng;
+                                        let city = locationdata.results[0].address_components[3].long_name;
+                                        let region = locationdata.results[0].address_components[4].long_name;
+                                        let country = locationdata.results[0].address_components[5].long_name;
+                                        console.log(lat, long, city, region, country);
                                         resolve(new Location(lat, long, city, region, country));
                                     } else {
                                         reject({message: 'Navigator received no results on location query'});
@@ -37,11 +39,13 @@ class LocationService{
                         this.getLocationByIP()
                             .then(location => {
                                 //console.log(location);
-                                let city = location.data.city;
-                                let region = location.data.regionName;
-                                let country = location.data.country;
-                                let lat = location.data.lat;
-                                let long = location.data.lon;
+                                //console.log('Line 41: ', location.city);
+                                let city = location.city;
+                                let region = location.regionName;
+                                let country = location.country;
+                                let lat = location.lat;
+                                let long = location.lon;
+                                console.log(lat, long, city, region, country);
                                 resolve(new Location(lat, long, city, region, country));
                             })
                             .catch((error: Error) => reject(error));
@@ -51,6 +55,7 @@ class LocationService{
                 this.getLocationByIP()
                     .then(location => {
                         //console.log(location);
+                        console.log('Line 56: ', location.data);
                         let city = location.data.city;
                         let region = location.data.regionName;
                         let country = location.data.country;
