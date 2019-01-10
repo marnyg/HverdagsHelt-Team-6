@@ -204,13 +204,6 @@ app.delete('/api/users/:user_id', (req: Request, res: Response) => {
   );
 });
 
-app.get('/api/users/:user_id/salt',(req: Request, res: Response) => {
-    return User.findOne({
-        where: { user_id: Number(req.params.user_id) },
-        attributes: ['salt']
-    }).then(user => res.send(user));
-});
-
 app.put('/api/users/:user_id/password', async (req: Request, res: Response) => {
   if (
     !req.body ||
@@ -226,9 +219,6 @@ app.put('/api/users/:user_id/password', async (req: Request, res: Response) => {
 
     let salt = user.salt;
     let old = user.hashed_password;
-
-    console.log(salt);
-    console.log(old);
 
     let oldHashedPassword = hashPassword(req.body.old_password,salt);
     let old_password = oldHashedPassword['passwordHash'];
