@@ -1,20 +1,6 @@
 // @flow
 import axios from 'axios';
-axios.interceptors.response.use(response => response.data);
-
-export class Case {
-  case_id: number;
-  region_id: number;
-  user_id: number;
-  category_id: number;
-  status_id: number;
-  title: string;
-  description: string;
-  created_at: any;
-  updated_at: any;
-  lat: number;
-  lon: number;
-}
+import Case from '../classes/Case.js';
 
 class CaseService {
   //Get all cases
@@ -45,6 +31,11 @@ class CaseService {
   //Get all cases given user
   getAllCasesGivenUser(user_id: number): Promise<Case[]> {
     return axios.get('/api/cases/user_cases/' + user_id);
+  }
+
+  //Get all cases given location
+  getLocationByLoc(l: Location): Promise<Case[]> {
+    return axios.get('endepunkt', l);
   }
 }
 

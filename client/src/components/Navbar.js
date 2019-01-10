@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { Component } from 'react-simplified';
+import { NavLink } from 'react-router-dom';
+
 import LoginModal from "./LoginModal";
 import RegisterModal from "./RegisterModal";
 
@@ -7,7 +9,9 @@ class Navbar extends Component {
     render() {
         return(
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
-                <a className="navbar-brand" href="#">HverdagsHelt</a>
+                <NavLink to="/" className="navbar-brand">
+                    HverdagsHelt
+                </NavLink>
                 <button className="navbar-toggler" type="button" data-toggle="collapse"
                         data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -17,14 +21,21 @@ class Navbar extends Component {
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav mr-auto">
                         <li className="nav-item active">
-                            <a className="nav-link" href="#">Hjem <span className="sr-only">(current)</span></a>
+                            <NavLink to="/" className="nav-link" >
+                                Hjem
+                                <span className="sr-only">(current)</span>
+                            </NavLink>
                         </li>
 
                         <li className="nav-item">
-                            <a className="nav-link" href="#">Registrer sak</a>
+                            <NavLink to="/new-case" className="nav-link">
+                                Registrer sak
+                            </NavLink>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link" href="#">Varsler</a>
+                            <NavLink to="/notifications" className="nav-link">
+                                Varsler
+                            </NavLink>
                         </li>
                     </ul>
                     <form className="form-inline my-2 my-lg-1">
@@ -34,12 +45,15 @@ class Navbar extends Component {
 
                     <ul className="navbar-nav">
                         <li className="nav-item">
-                            <a className="nav-link" data-toggle="modal" data-target="#register-modal" href="#">Ny
-                                bruker</a>
+                            <NavLink to="/" className="nav-link" data-toggle="modal" data-target="#register-modal">
+                                Ny bruker
+                            </NavLink>
                             <RegisterModal/>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link" href="#" data-toggle="modal" data-target="#login-modal">Logg inn</a>
+                            <NavLink to="/new-case" className="nav-link" href="#" data-toggle="modal" data-target="#login-modal">
+                                Logg inn
+                            </NavLink>
                             <LoginModal/>
                         </li>
                     </ul>

@@ -1,14 +1,6 @@
 // @flow
 import axios from 'axios';
-axios.interceptors.response.use(response => response.data);
-
-export class Region {
-  region_id: number;
-  county_id: number;
-  name: string;
-  lat: number;
-  lon: number;
-}
+import Region from '../classes/Region.js';
 
 class RegionService {
   //Get all regions
@@ -19,6 +11,11 @@ class RegionService {
   //Get one specific region, given id
   getRegionGivenId(region_id: number): Promise<Region> {
     return axios.get('/api/regions/' + region_id);
+  }
+
+  //Get all regions, given county
+  getAllRegionGivenCounty(county_id: number): Promise<Region[]> {
+    return axios.get('/api/counties/' + county_id '/regions');
   }
 
   //Create region

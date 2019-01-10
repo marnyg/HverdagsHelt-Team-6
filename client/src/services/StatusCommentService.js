@@ -1,15 +1,6 @@
 // @flow
 import axios from 'axios';
-axios.interceptors.response.use(response => response.data);
-
-export class StatusComment {
-  status_comment_id: number;
-  case_id: number;
-  status_id: number;
-  user_id: number;
-  comment: string;
-  created_at: any;
-}
+import StatusComment from '../classes/StatusComment.js';
 
 class StatusCommentService {
   //Get all status comments, given case
