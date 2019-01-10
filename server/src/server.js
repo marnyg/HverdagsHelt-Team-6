@@ -137,11 +137,9 @@ app.delete('/api/cases/:case_id', (req: Request, res: Response) => {
 });
 
 app.post('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
-  let case_id = Number(req.params.case_id);
   if (
     !req.body ||
     typeof req.body.user_id !== 'number' ||
-    typeof req.body.case_id !== 'number' ||
     typeof req.body.notify_by_email !== 'boolean' ||
     typeof req.body.is_up_to_date !== 'boolean'
   )
