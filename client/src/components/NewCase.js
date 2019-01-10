@@ -107,7 +107,13 @@ class NewCase extends Component {
             <GoogleApiWrapper userPos={{ lat: 60, lng: 10 }}></GoogleApiWrapper>
             <div>
               <label>Legg ved bilder</label>
-              <input id={'image-inpu'} type={'file'} accept={'.png, .jpg, .jpeg'} onChange={this.fileInputListener} />
+              <input
+                id={'image-inpu'}
+                type={'file'}
+                accept={'.png, .jpg, .jpeg'}
+                onChange={this.fileInputListener}
+                value={'Velg bilde'}
+              />
             </div>
           </form>
           <div>
@@ -120,14 +126,12 @@ class NewCase extends Component {
         <div id={'right'}>
           {this.images.map(e => (
             <div>
-              <button onClick={console.log("asd")
-              }></button>
+              <button onClick={this.fileInputDeleteImage}>Slett</button>
               <img src={e.src} alt={e.alt} />
             </div>
           ))}
         </div>
-
-      </div >
+      </div>
     );
   }
 
@@ -146,9 +150,9 @@ class NewCase extends Component {
         console.warn('FEIL!' + err.toString());
         Notify.danger(
           'Det oppstod en feil under lasting av kategorier. ' +
-          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-          '\n\nFeilmelding: ' +
-          err.toString()
+            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+            '\n\nFeilmelding: ' +
+            err.toString()
         );
       });
     console.log('Fetchng counties.');
@@ -160,9 +164,9 @@ class NewCase extends Component {
         console.warn('FEIL!' + err.toString());
         Notify.danger(
           'Det oppstod en feil under lasting av fylker. ' +
-          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-          '\n\nFeilmelding: ' +
-          err.toString()
+            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+            '\n\nFeilmelding: ' +
+            err.toString()
         );
       });
     console.log('Mounted!');
@@ -239,10 +243,10 @@ class NewCase extends Component {
     let county = event.target;
     console.log(
       'Slected ' +
-      county.options[county.selectedIndex].text +
-      ' with id = ' +
-      county.value +
-      ' as county from drop-down list.'
+        county.options[county.selectedIndex].text +
+        ' with id = ' +
+        county.value +
+        ' as county from drop-down list.'
     );
     this.list2.hidden = false;
     this.fetchMunicipalities(county.value);
@@ -256,10 +260,10 @@ class NewCase extends Component {
     let obj = this.municipalities.find(e => e.region_id === parseInt(muni.value));
     console.log(
       'Slected ' +
-      muni.options[muni.selectedIndex].text +
-      ' with id = ' +
-      muni.value +
-      ' as municipality from drop-down list.'
+        muni.options[muni.selectedIndex].text +
+        ' with id = ' +
+        muni.value +
+        ' as municipality from drop-down list.'
     );
     this.lastResortAddress.hidden = false;
     this.pos = { lat: obj.lat, lon: obj.lon };
@@ -268,10 +272,10 @@ class NewCase extends Component {
   fetchMunicipalities(county_id: number) {
     console.log(
       'Fetching municipalities for county: ' +
-      this.list1.options[this.list1.selectedIndex].text +
-      ' (county_id = ' +
-      county_id +
-      ').'
+        this.list1.options[this.list1.selectedIndex].text +
+        ' (county_id = ' +
+        county_id +
+        ').'
     );
     // Fetching logic here
     regionService
@@ -282,11 +286,11 @@ class NewCase extends Component {
         console.warn(err.toString());
         Notify.danger(
           'Det oppstod en feil under lasting av kommuner fra fylke ' +
-          this.list1.options[this.list1.selectedIndex].text +
-          '. ' +
-          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-          '\n\nFeilmelding: ' +
-          err.toString()
+            this.list1.options[this.list1.selectedIndex].text +
+            '. ' +
+            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+            '\n\nFeilmelding: ' +
+            err.toString()
         );
       });
   }
@@ -318,13 +322,15 @@ class NewCase extends Component {
       } else {
         // File type not accepted.
         console.warn('File type not accepted.');
+        Notify.warning('Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png.');
       }
     }
   }
 
   fileInputDeleteImage(event: SyntheticInputEvent<HTMLInputElement>) {
-    let image = event.target;
-    this.images.splice();
+    let image = event.target.parentNode.getElementsByTagName('img')[0];
+    this.images = this.images.filter(e => e.src !== image.src);
+    console.log('Deleting image file with src = ' + image.src);
   }
 
   submit() {
