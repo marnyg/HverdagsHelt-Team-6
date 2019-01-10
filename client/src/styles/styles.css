@@ -1,3 +1,11 @@
+.link-unstyled {
+    text-decoration: none;
+    color: inherit;
+}
+.link-unstyled:hover {
+    text-decoration: none;
+    color: inherit;
+}
 .toggle {
   padding-left: 10px;
   margin-left: 10px;

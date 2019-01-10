@@ -2,3 +2,5 @@ node_modules
 client/public/bundle.js
 .idea
 .env
+server/src/private.key
+server/src/public.key
