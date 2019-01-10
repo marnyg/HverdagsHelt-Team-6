@@ -1,6 +1,7 @@
 // @flow
 import axios from 'axios';
-axios.interceptors.response.use(response => response.data);
+
+axios.interceptors.response.use((response: any) => response.data);
 import Category from '../classes/Category.js';
 
 class CategoryService {

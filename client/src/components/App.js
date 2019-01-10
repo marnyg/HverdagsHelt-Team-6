@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import { Minside } from './Minside'
-import { Footer } from './Footer'
+import { Minside } from './Minside';
+import { Footer } from './Footer';
 
 import '../styles/styles.css';
 import '../styles/loginmodal.css';
@@ -16,18 +16,18 @@ import NewCase from './NewCase.js';
 import { BrowserRouter, Route } from 'react-router-dom';
 
 class App extends Component {
-    render() {
-        return (
-            <BrowserRouter>
-                <div>
-                    <Navbar/>
-                    <div className="content-wrapper">
-                        <Route exact path="/" render={() => (<Content/>)}/>
-	                    <Route path="/new-case" render={() => (<NewCase/>)}/>
-                    </div>
-                </div>
-            </BrowserRouter>
-        );
-    }
+  render() {
+    return (
+      <BrowserRouter>
+        <div>
+          <Navbar />
+          <div className="content-wrapper">
+            <Route exact path="/" render={() => <Content />} />
+            <Route path="/new-case" render={() => <NewCase />} />
+          </div>
+        </div>
+      </BrowserRouter>
+    );
+  }
 }
 export default App;

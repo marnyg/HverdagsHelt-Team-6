@@ -121,7 +121,7 @@ class NewCase extends Component {
       .then(e => (this.categories = e))
       .then(e => console.log('Received ' + e.length + ' categories from server.'))
       .catch((err: Error) => {
-        console.alert('FEIL!' + err.toString());
+        console.warn('FEIL!' + err.toString());
         Notify.danger(
           'Det oppstod en feil under lasting av kategorier. ' +
             'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
@@ -135,7 +135,7 @@ class NewCase extends Component {
       .then(e => (this.counties = e))
       .then(e => console.log('Received ' + e.length + ' counties from server.'))
       .catch((err: Error) => {
-        console.alert('FEIL!' + err.toString());
+        console.warn('FEIL!' + err.toString());
         Notify.danger(
           'Det oppstod en feil under lasting av fylker. ' +
             'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
@@ -254,7 +254,7 @@ class NewCase extends Component {
         .then(e => this.municipalities = e)
         .then(e => console.log("Received " + e.length + " municipalities from server."))
         .catch((err: Error) => {
-            console.alert(err.toString());
+            console.warn(err.toString());
             Notify.danger("Det oppstod en feil under lasting av kommuner fra fylke " +
 	            this.list1.options[this.list1.selectedIndex].text + ". " +
                 "Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig." +
