@@ -20,6 +20,9 @@ import {
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
 
+let tokens = {};
+
+
 type Request = express$Request;
 type Response = express$Response;
 
@@ -29,9 +32,55 @@ let app = express();
 
 app.use(express.static(public_path));
 app.use(express.json()); // For parsing application/json
+app.use(bearerToken()); // For easy access to token sent in 'Authorization' header.
 
 app.get('/api/cases', (req: Request, res: Response) => {
   return Case.findAll().then(cases => res.send(cases));
+});
+
+app.get('/api/verify', (req, res) => reqAccessLevel(req, res, 4,(req, res)=> {
+    let token = req.token;
+    if(token in tokens){
+        return res.sendStatus(200);
+    } else {
+        return res.sendStatus(400);
+    }
+}));
+
+
+app.post('/api/login', async (req: Request, res: Response) => {
+    if (
+        !req.body ||
+        typeof req.body.email != 'string' ||
+        typeof req.body.password != 'string'
+    ) {
+        return res.sendStatus(400);
+    }
+
+    let login = await loginOk(req.body.email, req.body.password);
+    if(login){
+        let token = createToken(login.access_level, login.user_id);
+        tokens[token] = req.body.email;
+        res.status(200);
+        res.send({
+            token: token
+        });
+        return res
+    }
+    else {
+        return res.sendStatus(403);
+    }
+});
+
+app.post('/api/logout', (req: Request, res: Response) => {
+    if ( !req.token){
+        return res.sendStatus(400)
+    } else {
+        let token = req.token;
+        delete tokens[token];
+        return res.sendStatus(200);
+    }
+
 });
 
 app.post('/api/cases', (req: Request, res: Response) => {
@@ -246,9 +295,9 @@ app.post('/api/users', (req: Request, res: Response) => {
   )
     return res.sendStatus(400);
 
-  let hashedPassword = hashPassword(req.body.password);
-  let password = hashedPassword['passwordHash'];
-  let salt = hashedPassword['salt'];
+    let hashedPassword = hashPassword(req.body.password);
+    let password = hashedPassword['passwordHash'];
+    let salt = hashedPassword['salt'];
 
   return User.create({
     firstname: req.body.firstname,

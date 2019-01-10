@@ -4,7 +4,7 @@ import Sequelize from 'sequelize';
 import type { Model } from 'sequelize';
 require('dotenv').config();
 
-let sequelize = new Sequelize(
+export let sequelize = new Sequelize(
   process.env.CI ? 'School' : process.env.DB_USER,
   process.env.CI ? 'root' : process.env.DB_USER,
   process.env.CI ? '' : process.env.DB_PW,
