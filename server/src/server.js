@@ -21,7 +21,7 @@ app.get('/api/cases', (req: Request, res: Response) => {
   return Case.findAll().then(cases => res.send(cases));
 });
 
-app.post('/api/cases', (req: Request, res: Response) => {
+app.post('/api/cases', (req: Request, res: Response) => {a
   if (
     !req.body ||
     typeof req.body.title !== 'string' ||
