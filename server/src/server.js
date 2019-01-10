@@ -238,6 +238,12 @@ app.get('/api/counties', (req: Request, res: Response) => {
   return County.findAll().then(counties => res.send(counties));
 });
 
+app.get('/api/counties/:county_id/regions', (req: Request, res: Response) => {
+  return Region.findAll({ where: { county_id: Number(req.params.county_id) } }).then(
+    regions => (regions ? res.send(regions) : res.sendStatus(404))
+  );
+});
+
 app.get('/api/regions', (req: Request, res: Response) => {
   return Region.findAll().then(regions => res.send(regions));
 });
