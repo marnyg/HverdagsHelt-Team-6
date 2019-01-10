@@ -97,25 +97,25 @@ app.post('/api/cases', (req: Request, res: Response) => {
   )
     return res.sendStatus(400);
 
-  return Case.create({
-    title: req.body.title,
-    description: req.body.description,
-    lat: req.body.lat,
-    lon: req.body.lon,
-    region_id: req.body.region_id,
-    user_id: req.body.user_id,
-    category_id: req.body.category_id,
-    status_id: req.body.status_id
-  }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+    return Case.create({
+        title: req.body.title,
+        description: req.body.description,
+        lat: req.body.lat,
+        lon: req.body.lon,
+        region_id: req.body.region_id,
+        user_id: req.body.user_id,
+        category_id: req.body.category_id,
+        status_id: req.body.status_id
+    }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
 });
 
 app.get('/api/cases/user_cases/:user_id', (req: Request, res: Response) => {
-  return Case.findAll({
-    where: {
-      user_id: req.params.user_id
-    },
-    order: [['createdAt', 'DESC']] //Order by updatedAt????
-  }).then(cases => res.send(cases));
+    return Case.findAll({
+        where: {
+            user_id: req.params.user_id
+        },
+        order: [['createdAt', 'DESC']] //Order by updatedAt????
+    }).then(cases => res.send(cases));
 });
 
 app.get('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
@@ -164,19 +164,19 @@ app.put('/api/cases/:case_id', (req: Request, res: Response) => {
   )
     return res.sendStatus(400);
 
-  return Case.update(
-    {
-      title: req.body.title,
-      description: req.body.description,
-      lat: req.body.lat,
-      lon: req.body.lon,
-      region_id: req.body.region_id,
-      user_id: req.body.user_id,
-      category_id: req.body.category_id,
-      status_id: req.body.status_id
-    },
-    { where: { case_id: req.params.case_id } }
-  ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+    return Case.update(
+        {
+            title: req.body.title,
+            description: req.body.description,
+            lat: req.body.lat,
+            lon: req.body.lon,
+            region_id: req.body.region_id,
+            user_id: req.body.user_id,
+            category_id: req.body.category_id,
+            status_id: req.body.status_id
+        },
+        { where: { case_id: req.params.case_id } }
+    ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
 });
 
 app.delete('/api/cases/:case_id', (req: Request, res: Response) => {
@@ -279,7 +279,7 @@ app.post('/api/roles', (req: Request, res: Response) => {
 });
 
 app.get('/api/users', (req: Request, res: Response) => {
-  return User.findAll().then(users => res.send(users));
+    return User.findAll().then(users => res.send(users));
 });
 
 app.post('/api/users', (req: Request, res: Response) => {
