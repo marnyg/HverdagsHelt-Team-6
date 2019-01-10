@@ -4,7 +4,8 @@ import express from 'express';
 import path from 'path';
 import reload from 'reload';
 import fs from 'fs';
-import { hashPassword } from './auth.js';
+import bearerToken from 'express-bearer-token';
+import { hashPassword, reqAccessLevel, createToken, loginOk } from './auth.js';
 import {
   User,
   Role,
@@ -43,7 +44,7 @@ app.get('/api/verify', (req, res) => reqAccessLevel(req, res, 4,(req, res)=> {
     if(token in tokens){
         return res.sendStatus(200);
     } else {
-        return res.sendStatus(400);
+        return res.sendStatus(403);
     }
 }));
 
