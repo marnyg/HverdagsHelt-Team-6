@@ -125,10 +125,16 @@ export let Case: Class<
   lon: { type: Sequelize.DOUBLE, allowNull: false }
 });
 
-export let Category: Class<Model<{ category_id?: number, name: string }>> = sequelize.define('Category', {
-  category_id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-  name: { type: Sequelize.STRING, allowNull: false, unique: true }
-});
+export let Category: Class<Model<{ category_id?: number, name: string }>> = sequelize.define(
+  'Category',
+  {
+    category_id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: Sequelize.STRING, allowNull: false, unique: true }
+  },
+  {
+    timestamps: false
+  }
+);
 
 export let Picture: Class<
   Model<{ picture_id?: number, path: string, alt: string, case_id?: number }>
