@@ -125,10 +125,16 @@ export let Case: Class<
   lon: { type: Sequelize.DOUBLE, allowNull: false }
 });
 
-export let Category: Class<Model<{ category_id?: number, name: string }>> = sequelize.define('Category', {
-  category_id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-  name: { type: Sequelize.STRING, allowNull: false, unique: true }
-});
+export let Category: Class<Model<{ category_id?: number, name: string }>> = sequelize.define(
+  'Category',
+  {
+    category_id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: Sequelize.STRING, allowNull: false, unique: true }
+  },
+  {
+    timestamps: false
+  }
+);
 
 export let Picture: Class<
   Model<{ picture_id?: number, path: string, alt: string, case_id?: number }>
@@ -193,6 +199,11 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(() =
       name: 'Trøndelag'
     })
       .then(() =>
+        County.create({
+          name: 'Akershus'
+        })
+      )
+      .then(() =>
         Region.create({
           name: 'Trondheim',
           lat: 63.42846459999999,
@@ -202,8 +213,26 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(() =
       )
       .then(() =>
         Role.create({
-          name: 'Bruker',
+          name: 'Admin',
           access_level: 1
+        })
+      )
+      .then(() =>
+        Role.create({
+          name: 'Kommune ansatt',
+          access_level: 2
+        })
+      )
+      .then(() =>
+        Role.create({
+          name: 'Bedrift bruker',
+          access_level: 3
+        })
+      )
+      .then(() =>
+        Role.create({
+          name: 'Privat bruker',
+          access_level: 4
         })
       )
       .then(() =>
