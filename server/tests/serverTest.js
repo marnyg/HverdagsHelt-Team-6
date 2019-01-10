@@ -1,10 +1,10 @@
 //
 const request = require('supertest');
-const server = require('../src/server.js');
+const server = require('../src/models.js');
 
 beforeAll(async () => {
     // do something before anything else runs
-    console.log('Jest starting!');
+    console.log('Testing endpoints');
 });
 /*
 // close the server after each test
@@ -14,8 +14,10 @@ afterAll(() => {
 });*/
 
 describe('/api/cases', () => {
-    test('GET /api/cases', async () => {
-        const response = await request(server).get('/api/cases');
-        expect(response.status).toEqual(200);
+    test('It should response the GET method', (done) => {
+        request(server).get('/api/cases').then((response) => {
+            expect(response.statusCode).toBe(200);
+            done();
+        });
     });
 });

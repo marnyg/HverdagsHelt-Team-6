@@ -5,7 +5,7 @@ import path from 'path';
 import reload from 'reload';
 import fs from 'fs';
 import { hashPassword } from './auth.js';
-import { User, Role, Region, County, Case_subscriptions, Case, Region_subscriptions } from './models.js';
+import { User, Role, Region, County, Case_subscriptions, Case, Region_subscriptions, Category, Status_comment, Status } from './models.js';
 
 type Request = express$Request;
 type Response = express$Response;
