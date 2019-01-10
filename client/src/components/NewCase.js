@@ -2,7 +2,7 @@ import { Component } from 'react-simplified';
 import { countyService } from '../services/CountyService';
 import { regionService } from '../services/RegionService';
 import { categoryService } from '../services/CategoryService';
-import { Notify } from 'Notify';
+import { Notify } from './Notify';
 
 export class NewCase extends Component {
   form = null;
@@ -120,13 +120,13 @@ export class NewCase extends Component {
     this.lastResortAddress = document.getElementById('last-resort-address');
     console.log('Mounted!');
     // Fetching counties logic here
-      categoryService.getAllCategories()
-        .then(console.log("Received categories from server."))
-        .then(cat => this.categories = cat)
-        .catch((err: Error) => {
-          console.alert(err.toString());
-          
-        });
+    categoryService.getAllCategories()
+      .then(console.log("Received categories from server."))
+      .then(cat => this.categories = cat)
+      .catch((err: Error) => {
+        console.alert(err.toString());
+
+      });
   }
 
   radioListener(event: SyntheticInputEvent<HTMLInputElement>) {
@@ -199,10 +199,10 @@ export class NewCase extends Component {
     let county = event.target;
     console.log(
       'Slected ' +
-        county.options[county.selectedIndex].text +
-        ' with id = ' +
-        county.value +
-        ' as county from drop-down list.'
+      county.options[county.selectedIndex].text +
+      ' with id = ' +
+      county.value +
+      ' as county from drop-down list.'
     );
     this.list2.hidden = false;
     this.fetchMunicipalities(county.value);
@@ -215,10 +215,10 @@ export class NewCase extends Component {
     let obj = this.municipalities.find(e => e.region_id === parseInt(muni.value));
     console.log(
       'Slected ' +
-        muni.options[muni.selectedIndex].text +
-        ' with id = ' +
-        muni.value +
-        ' as municipality from drop-down list.'
+      muni.options[muni.selectedIndex].text +
+      ' with id = ' +
+      muni.value +
+      ' as municipality from drop-down list.'
     );
     this.lastResortAddress.hidden = false;
     this.pos = { lat: obj.lat, lon: obj.lon };
@@ -227,10 +227,10 @@ export class NewCase extends Component {
   fetchMunicipalities(county_id: number) {
     console.log(
       'Fetching municipalities for county: ' +
-        this.list1.options[this.list1.selectedIndex].text +
-        ' (county_id = ' +
-        county_id +
-        ').'
+      this.list1.options[this.list1.selectedIndex].text +
+      ' (county_id = ' +
+      county_id +
+      ').'
     );
     // Fetching logic here
   }
