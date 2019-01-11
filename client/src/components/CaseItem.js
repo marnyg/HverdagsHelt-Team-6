@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { Component } from 'react-simplified';
 import { NavLink } from 'react-router-dom';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faBell} from "@fortawesome/free-solid-svg-icons/index";
+import { withRouter } from 'react-router-dom';
 //import PictureService from '../services/PictureService.js'; REMOVE COMMENTS WHEN SERVICES DONE
 //import Picture from '../classes/Picture.js'; REMOVE COMMENTS WHEN CLASSES DONE
 
@@ -22,11 +24,16 @@ class CaseItem extends Component {
                                  style={{backgroundImage: "url(/no-image.png)"}}
                             />
                         }
-                        <article>
-                            <div>{this.props.case.region}</div>
-                            <h2>{this.props.case.title}</h2>
-                        </article>
-                        <div>{this.props.case.date}</div>
+                        <div className="d-inline">
+                            <div className="card-body">
+                                <div className="card-text text-muted">{this.props.case.region}</div>
+                                <h2 className="card-title">{this.props.case.title}</h2>
+                                <div className=" d-inline">
+                                    <small className="text-muted">{this.props.case.date}</small>
+                                    <FontAwesomeIcon onClick={() => console.log('Icon clicked')} icon={faBell} alt="Klikk her for å få varsler om denne saken" className="float-right" style={{color: "#339aed"}}/>
+                                </div>
+                            </div>
+                        </div>
                     </NavLink>
                 </div>
             );
@@ -77,6 +84,16 @@ class CaseItem extends Component {
             })
             .catch((error: Error) => console.error(error));
         */
+    }
+
+    clicked(event){
+        event.preventDefault();
+        /*
+        if(Content.instance()) {
+            //Content.instance().mounted();
+        }
+        */
+        this.props.history.push('/search/' + this.search);
     }
 }
 export default CaseItem;
