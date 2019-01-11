@@ -18,21 +18,22 @@ class NewCase extends Component {
   list1 = null;
   list2 = null;
   lastResortAddress = null;
+  lastResortAddressLabel = null;
   pos = { lat: 59.9138688, lon: 10.752245399999993 }; // Last resort position OSLO
   fileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
   render() {
     return (
-      <div className={"d-flex justify-content-between"}>
+      <div className={'d-flex justify-content-between'}>
         <div id={'left'}>
           <form
             ref={e => {
               this.form = e;
             }}
           >
-            <div>
+            <div className={'form-group'}>
               <label htmlFor="category">Kategori</label>
-              <select id={'category'} required>
+              <select className={'form-control'} id={'category'} required>
                 <option selected disabled>
                   Kategori
                 </option>
@@ -44,13 +45,21 @@ class NewCase extends Component {
                 ))}
               </select>
             </div>
-            <div>
+            <div className={'form-group'}>
               <label htmlFor="title">Tittel</label>
-              <input id={'title'} type="text" pattern="^.{2,255}$" autoComplete="off" required />
+              <input
+                className={'form-control'}
+                id={'title'}
+                type="text"
+                pattern="^.{2,255}$"
+                autoComplete="off"
+                required
+              />
             </div>
-            <div>
+            <div className={'form-group'}>
               <label htmlFor="description">Beskrivelse</label>
               <textarea
+                className={'form-control'}
                 id={'description'}
                 maxLength={255}
                 placeholder="Skriv en kort beskrivelse her, så blir det enklere for oss å hjelpe deg."
@@ -58,29 +67,43 @@ class NewCase extends Component {
             </div>
             <div>
               Posisjon
-              <ul>
-                <li>
-                  <label>
-                    <input type="radio" name="pos" value="auto" onClick={this.radioListener} defaultChecked />
-                    Hent automatisk
-                  </label>
-                </li>
-                <li>
-                  <label>
-                    <input type="radio" name="pos" value="mapmarker" onClick={this.radioListener} />
-                    Marker på kart
-                  </label>
-                </li>
-                <li>
-                  <label>
-                    <input type="radio" name="pos" value="last-resort-selection" onClick={this.radioListener} />
-                    Velg fra liste
-                  </label>
-                </li>
-              </ul>
+              <div className={'form-check'}>
+                <input
+                  id={"radio1"}
+                  className={'form-check-input'}
+                  type="radio"
+                  name="pos"
+                  value="auto"
+                  onClick={this.radioListener}
+                  defaultChecked
+                />
+                <label htmlFor={"radio1"} className={'form-check-label'}>Hent automatisk</label>
+              </div>
+              <div className={'form-check'}>
+                <input
+                  id={"radio2"}
+                  className={'form-check-input'}
+                  type="radio"
+                  name="pos"
+                  value="mapmarker"
+                  onClick={this.radioListener}
+                />
+                <label htmlFor={"radio2"} className={'form-check-label'}>Marker på kart</label>
+              </div>
+              <div className={'form-check'}>
+                <input
+                  id={"radio3"}
+                  className={'form-check-input'}
+                  type="radio"
+                  name="pos"
+                  value="last-resort-selection"
+                  onClick={this.radioListener}
+                />
+                <label htmlFor={"radio3"} className={'form-check-label'}>Velg fra liste</label>
+              </div>
             </div>
-            <div>
-              <select id={'last-resort-county'} onChange={this.countyListener} hidden>
+            <div className={'form-group'}>
+              <select className={'form-control'} id={'last-resort-county'} onChange={this.countyListener} hidden>
                 <option selected disabled>
                   Velg fylke
                 </option>
@@ -91,7 +114,12 @@ class NewCase extends Component {
                   </option>
                 ))}
               </select>
-              <select id={'last-resort-municipality'} onChange={this.municipalityListener} hidden>
+              <select
+                className={'form-control'}
+                id={'last-resort-municipality'}
+                onChange={this.municipalityListener}
+                hidden
+              >
                 <option selected disabled>
                   Velg kommune
                 </option>
@@ -102,11 +130,21 @@ class NewCase extends Component {
                   </option>
                 ))}
               </select>
-              <input id={'last-resort-address'} type="text" placeholder={'Skriv inn eventuell adresse'} hidden />
-            </div>
-            <div>
-              <label>Legg ved bilder</label>
+              <label id={'last-resort-address-label'} htmlFor={'last-resort-address'} hidden>
+                Adresse
+              </label>
               <input
+                className={'form-control'}
+                id={'last-resort-address'}
+                type="text"
+                placeholder={'Skriv inn eventuell adresse'}
+                hidden
+              />
+            </div>
+            <div className={'form-group'}>
+              <label htmlFor={'image-input'}>Legg ved bilder</label>
+              <input
+                className={'form-control-file'}
                 id={'image-inpu'}
                 type={'file'}
                 accept={'.png, .jpg, .jpeg'}
@@ -115,20 +153,24 @@ class NewCase extends Component {
             </div>
           </form>
           <div>
-            <button onClick={this.submit}>Send sak</button>
-            <NavLink exact to={'/'}>
+            <button className={'btn btn-primary'} onClick={this.submit}>
+              Send sak
+            </button>
+            <NavLink className={'btn btn-secondary'} exact to={'/'}>
               Avbryt
             </NavLink>
           </div>
         </div>
         <div id={'right'}>
           <div>
-            <GoogleApiWrapper userPos={this.pos} />
+            <GoogleApiWrapper userPos={{lat: this.pos.lat, lng: this.pos.lon}} />
           </div>
           <div>
             {this.images.map(e => (
               <div>
-                <button onClick={this.fileInputDeleteImage}>Slett</button>
+                <button className={'btn btn-secondary'} onClick={this.fileInputDeleteImage}>
+                  Slett
+                </button>
                 <img src={e.src} alt={e.alt} />
               </div>
             ))}
@@ -142,6 +184,7 @@ class NewCase extends Component {
     this.list1 = document.getElementById('last-resort-county');
     this.list2 = document.getElementById('last-resort-municipality');
     this.lastResortAddress = document.getElementById('last-resort-address');
+    this.lastResortAddressLabel = document.getElementById('last-resort-address-label');
 
     // Fetching logic
     console.log('Fetchng categories.');
@@ -213,6 +256,7 @@ class NewCase extends Component {
     this.list1.hidden = true;
     this.list2.hidden = true;
     this.lastResortAddress.hidden = true;
+    this.lastResortAddressLabel.hidden = true;
     // let gpos = LocationService.getLocartion();
   }
 
@@ -221,6 +265,7 @@ class NewCase extends Component {
     this.list1.hidden = true;
     this.list2.hidden = true;
     this.lastResortAddress.hidden = true;
+    this.lastResortAddressLabel.hidden = true;
   }
 
   radio3() {
@@ -235,6 +280,7 @@ class NewCase extends Component {
         this.list1.hidden = false;
         this.list2.hidden = false;
         this.lastResortAddress.hidden = false;
+        this.lastResortAddressLabel.hidden = false;
       }
     } else {
       console.log('list1 eller list2 er null!');
@@ -269,6 +315,7 @@ class NewCase extends Component {
         ' as municipality from drop-down list.'
     );
     this.lastResortAddress.hidden = false;
+    this.lastResortAddressLabel.hidden = false;
     this.pos = { lat: obj.lat, lon: obj.lon };
   }
 
