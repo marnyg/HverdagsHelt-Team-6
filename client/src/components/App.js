@@ -16,9 +16,9 @@ library.add(faEnvelope, faKey, faTh, faCoffee, faListUl);
 import Navbar from './Navbar.js';
 import Content from './Content.js';
 import Footer from './Footer.js';
-import {MinSide} from './MinSide.js';
+import { Minside } from './MinSide.js';
+import { MyCases } from './MyCases.js';
 //import NewCase from './NewCase.js';
-import { BrowserRouter, Route } from 'react-router-dom';
 import axios from 'axios';
 
 axios.interceptors.response.use(response => response.data);
@@ -31,8 +31,9 @@ class App extends Component {
                     <Navbar/>
                     <div className="content-wrapper">
                         <Route exact path="/" render={() => (<Content/>)}/>
-                        <Route exact path="/my-page" render={() => (<MinSide/>)}/>
+                        <Route exact path="/my-page" render={() => (<Minside/>)}/>
                         <Route exact path="/search/:query" component={Content}/>
+                        <Route exact path="/mycases/:user_id" component={MyCases}/>
                     </div>
                     <Footer/>
                 </div>
