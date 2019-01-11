@@ -15,7 +15,7 @@ class RegionService {
 
   //Get all regions, given county
   getAllRegionGivenCounty(county_id: number): Promise<Region[]> {
-   return axios.get('/api/counties/' + county_id + '/regions');
+    return axios.get('/api/counties/' + county_id + '/regions');
   }
 
   //Create region
