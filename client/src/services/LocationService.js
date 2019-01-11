@@ -1,6 +1,5 @@
 import axios from 'axios';
 import Location from '../classes/Location.js';
-//key=AIzaSyBfY2sQ7ZU-o-npnt8Ua5RSdV9-5ZCoriM
 const key = 'AIzaSyBfY2sQ7ZU-o-npnt8Ua5RSdV9-5ZCoriM';
 class LocationService{
     getLocation(): Promise<Location>{
@@ -95,12 +94,12 @@ class LocationService{
         });
     }
 
-    geocodeLatLng(lat, lng){
+    geocodeLatLng(lat, lng): Promise<any>{
         //https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=YOUR_API_KEY
         return axios.get('https://maps.googleapis.com/maps/api/geocode/json?latlng='+ lat + ',' + lng + '&key=' + key);
     }
 
-    geocodeCityCounty(city, county){
+    geocodeCityCounty(city, county): Promise<any>{
         return axios.get('https://maps.googleapis.com/maps/api/geocode/json?address='+ city + ',region=' + county + '&key=' + key);
     }
 }
