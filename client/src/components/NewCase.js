@@ -173,7 +173,7 @@ class NewCase extends Component {
         </div>
         <div id={'right'}>
           <div>
-            <GoogleApiWrapper userPos={{ lat: this.pos.lat, lng: this.pos.lon }} />
+            <GoogleApiWrapper tst={this.updatePos} userPos={{ lat: this.pos.lat, lng: this.pos.lon }} />
           </div>
           <div>
             {this.images.map(e => (
@@ -206,9 +206,9 @@ class NewCase extends Component {
         console.warn('FEIL!' + err.toString());
         Notify.danger(
           'Det oppstod en feil under lasting av kategorier. ' +
-            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-            '\n\nFeilmelding: ' +
-            err.toString()
+          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+          '\n\nFeilmelding: ' +
+          err.toString()
         );
       });
     console.log('Fetchng counties.');
@@ -220,9 +220,9 @@ class NewCase extends Component {
         console.warn('FEIL!' + err.toString());
         Notify.danger(
           'Det oppstod en feil under lasting av fylker. ' +
-            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-            '\n\nFeilmelding: ' +
-            err.toString()
+          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+          '\n\nFeilmelding: ' +
+          err.toString()
         );
       });
     console.log('Mounted!');
@@ -302,10 +302,10 @@ class NewCase extends Component {
     let county = event.target;
     console.log(
       'Slected ' +
-        county.options[county.selectedIndex].text +
-        ' with id = ' +
-        county.value +
-        ' as county from drop-down list.'
+      county.options[county.selectedIndex].text +
+      ' with id = ' +
+      county.value +
+      ' as county from drop-down list.'
     );
     this.list2.hidden = false;
     this.fetchMunicipalities(county.value);
@@ -319,10 +319,10 @@ class NewCase extends Component {
     let obj = this.municipalities.find(e => e.region_id === parseInt(muni.value));
     console.log(
       'Slected ' +
-        muni.options[muni.selectedIndex].text +
-        ' with id = ' +
-        muni.value +
-        ' as municipality from drop-down list.'
+      muni.options[muni.selectedIndex].text +
+      ' with id = ' +
+      muni.value +
+      ' as municipality from drop-down list.'
     );
     this.lastResortAddress.hidden = false;
     this.lastResortAddressLabel.hidden = false;
@@ -332,10 +332,10 @@ class NewCase extends Component {
   fetchMunicipalities(county_id: number) {
     console.log(
       'Fetching municipalities for county: ' +
-        this.list1.options[this.list1.selectedIndex].text +
-        ' (county_id = ' +
-        county_id +
-        ').'
+      this.list1.options[this.list1.selectedIndex].text +
+      ' (county_id = ' +
+      county_id +
+      ').'
     );
     // Fetching logic here
     regionService
@@ -346,11 +346,11 @@ class NewCase extends Component {
         console.warn(err.toString());
         Notify.danger(
           'Det oppstod en feil under lasting av kommuner fra fylke ' +
-            this.list1.options[this.list1.selectedIndex].text +
-            '. ' +
-            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-            '\n\nFeilmelding: ' +
-            err.toString()
+          this.list1.options[this.list1.selectedIndex].text +
+          '. ' +
+          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+          '\n\nFeilmelding: ' +
+          err.toString()
         );
       });
   }
@@ -501,6 +501,11 @@ class NewCase extends Component {
         );
         console.warn('Error while transmitting form data to server with error message: ' + err.message);
       });
+  }
+
+  updatePos(newPos) {
+    this.pos = newPos;
+    console.log("how bout it", this.pos)
   }
 }
 
