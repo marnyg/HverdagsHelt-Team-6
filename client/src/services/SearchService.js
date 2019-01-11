@@ -7,5 +7,4 @@ class SearchService {
     return axios.get('endepunkt' + searchWord);
   }
 }
-
-export let searchService = new SearchService();
+export default SearchService;

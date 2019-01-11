@@ -30,13 +30,23 @@ class CaseService {
 
   //Get all cases given user
   getAllCasesGivenUser(user_id: number): Promise<Case[]> {
-    return axios.get('/api/cases/user_cases/' + user_id);
+    let token = localStorage.getItem('token');
+    axios.post('/api/login', {}, {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    }).then((response) => {
+      if(response.status = 200){
+        return axios.get('/api/cases/user_cases/' + user_id);
+      } else {
+        return response.sendStatus(403);;
+      }
+    }).catch((error: Error) => console.error(error));
   }
 
   //Get all cases given location
-  getLocationByLoc(county_name: string, region_name: string, l: Location): Promise<Case[]> {
-    return axios.get('/api/cases/region_cases/' + county_name + '/' + region_name, l);
+  getCasesByLoc(county_name: string, region_name: string): Promise<Case[]> {
+    return axios.get('/api/cases/region_cases/' + county_name + '/' + region_name);
   }
 }
-
-export let caseService = new CaseService();
+export default CaseService;

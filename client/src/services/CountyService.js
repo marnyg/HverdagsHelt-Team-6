@@ -25,4 +25,4 @@ class CountyService {
 
 }
 
-export let countyService = new CountyService();
+export default CountyService;

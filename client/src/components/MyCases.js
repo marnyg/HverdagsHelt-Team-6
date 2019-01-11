@@ -5,8 +5,6 @@ import * as React from 'react';
 import { Component } from 'react-simplified';
 import { HashRouter, Route, NavLink } from 'react-router-dom';
 import { caseService } from '../services/CaseService.js';
-//import { Alert } from './widgets';
-//import { studentService } from './services';
 
 export class MyCases extends Component <{ match: { params: { user_id: number } } }> {
   cases = [];
