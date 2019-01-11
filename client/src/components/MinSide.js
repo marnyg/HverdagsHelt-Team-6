@@ -8,13 +8,13 @@ export class Minside extends Component {
 
     render() {
         return (
-            <div class="wrapper">
-                <nav id="sidebar" class="bg-danger ">
-                    <div class="sidebar-header">
+            <div className="wrapper">
+                <nav id="sidebar" className="bg-danger ">
+                    <div className="sidebar-header">
                         <h2>Sidebar</h2>
                     </div>
 
-                    <ul class="list-unstyled components">
+                    <ul className="list-unstyled components">
                         <li>
                             <a href="#">Mine Saker</a>
                         </li>
@@ -26,7 +26,7 @@ export class Minside extends Component {
                         </li>
                     </ul>
                 </nav>
-                <div class="bg-warning">
+                <div className="bg-warning">
                     Velit aliquip tempor sint quis dolor amet cupidatat
                       quis cupidatat est sint officia tempor enim.
                        Id dolore sint aliqua in velit irure occaecat
