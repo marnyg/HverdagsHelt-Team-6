@@ -383,6 +383,18 @@ app.post('/api/counties', (req: Request, res: Response) => {
   }).then(counties => (counties ? res.send(counties) : res.sendStatus(404)));
 });
 
+app.put('/api/counties/:county_id', (req: Request, res: Response) => {
+  if (!req.body || typeof req.body.name !== 'string') return res.sendStatus(400);
+  return County.update(
+    {
+      name: req.body.name
+    },
+    {
+      where: { county_id: Number(req.params.county_id) }
+    }
+  ).then(counties => (counties ? res.send(counties) : res.sendStatus(404)));
+});
+
 app.delete('/api/counties/:county_id', (req: Request, res: Response) => {
   return County.destroy({ where: { county_id: Number(req.params.county_id) } }).then(counties =>
     counties ? res.send() : res.status(500).send()
@@ -530,3 +542,4 @@ export let listen = new Promise<void>((resolve, reject) => {
     resolve();
   });
 });
+
