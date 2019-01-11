@@ -7,7 +7,7 @@ import { regionService } from '../services/RegionService';
 import { categoryService } from '../services/CategoryService';
 import { Notify } from './Notify';
 import LocationService from '../services/LocationService';
-import GoogleApiWrapper from './GoogleApiWrapper'
+import GoogleApiWrapper from './GoogleApiWrapper';
 
 class NewCase extends Component {
   form = null;
@@ -23,7 +23,7 @@ class NewCase extends Component {
 
   render() {
     return (
-      <div>
+      <div className={"d-flex justify-content-between"}>
         <div id={'left'}>
           <form
             ref={e => {
@@ -104,7 +104,6 @@ class NewCase extends Component {
               </select>
               <input id={'last-resort-address'} type="text" placeholder={'Skriv inn eventuell adresse'} hidden />
             </div>
-            <GoogleApiWrapper userPos={{ lat: 60, lng: 10 }}></GoogleApiWrapper>
             <div>
               <label>Legg ved bilder</label>
               <input
@@ -112,7 +111,6 @@ class NewCase extends Component {
                 type={'file'}
                 accept={'.png, .jpg, .jpeg'}
                 onChange={this.fileInputListener}
-                value={'Velg bilde'}
               />
             </div>
           </form>
@@ -124,12 +122,17 @@ class NewCase extends Component {
           </div>
         </div>
         <div id={'right'}>
-          {this.images.map(e => (
-            <div>
-              <button onClick={this.fileInputDeleteImage}>Slett</button>
-              <img src={e.src} alt={e.alt} />
-            </div>
-          ))}
+          <div>
+            <GoogleApiWrapper userPos={this.pos} />
+          </div>
+          <div>
+            {this.images.map(e => (
+              <div>
+                <button onClick={this.fileInputDeleteImage}>Slett</button>
+                <img src={e.src} alt={e.alt} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );

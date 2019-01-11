@@ -40,7 +40,7 @@ export class GoogleMapsContainer extends Component {
                 initialCenter={this.props.userPos}
             >
                 <Marker
-                    onClick={this.onMarkerClick}
+                    //onClick={this.onMarkerClick}
                     title={'Changing Colors Garage'}
                     position={this.props.userPos}
                     name={'Changing Colors Garage'}
