@@ -8,27 +8,28 @@ import { Component } from 'react-simplified';
  * Renders alert messages using Bootstrap classes.
  * Original author: Ole Christian Eidheim.
  */
-export class Notify extends Component {
+class Notify extends Component {
   alerts: { text: React.Node, type: string }[] = [];
 
   render() {
     return (
       <>
         {this.alerts.map((alert, i) => (
-          <div key={i} className = {'alert alert-' + alert.type} role = "alert">
-              <p> { alert.text } </p>
-            <button
-              className = "close"
-              onClick={() => {
-                this.alerts.splice(i, 1);
-              }}
-            >
-              &times;
-            </button>
-          </div>
+            <div key={i} className={"alert alert-" + alert.type + " alert-dismissible fade show"} role="alert">
+                <button type="button" className="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                {alert.text}
+            </div>
         ))}
       </>
     );
+  }
+
+  static flush(){
+      setTimeout(() => {
+          for (let instance of Notify.instances()) instance.alerts = [];
+      });
   }
 
   static success(text: React.Node) {
@@ -59,3 +60,4 @@ export class Notify extends Component {
     });
   }
 }
+export default Notify;

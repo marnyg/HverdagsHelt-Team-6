@@ -31,7 +31,7 @@ class UserService {
         Authorization: 'Bearer ' + token
       }
     });
-    if(res = 200){
+    if(res === 200){
       return axios.put('/api/users/' + user_id, u);
     } else {
       return res.sendStatus(400);

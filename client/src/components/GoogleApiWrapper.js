@@ -26,8 +26,8 @@ export class GoogleMapsContainer extends Component {
   }
   render() {
     const style = {
-      width: '90%',
-      height: '75vh'
+      width: '100%',
+      height: '100%'
     };
     return (
       <Map
