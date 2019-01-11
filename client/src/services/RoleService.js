@@ -8,5 +8,4 @@ class RoleService {
     return axios.get('/api/roles');
   }
 }
-
-export let roleService = new RoleService();
+export default RoleService;

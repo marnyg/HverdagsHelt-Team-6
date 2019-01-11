@@ -24,4 +24,4 @@ class RegionSubscriptionService {
   }
 }
 
-export let regionSubscriptionService = new RegionSubscriptionService();
+export default RegionSubscriptionService;

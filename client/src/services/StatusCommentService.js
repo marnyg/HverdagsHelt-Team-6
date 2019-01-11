@@ -19,4 +19,4 @@ class StatusCommentService {
   }*/
 }
 
-export let statusCommentService = new StatusCommentService();
+export default StatusCommentService;

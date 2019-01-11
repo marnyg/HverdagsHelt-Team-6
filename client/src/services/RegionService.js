@@ -39,4 +39,4 @@ class RegionService {
   }
 }
 
-export let regionService = new RegionService();
+export default RegionService;
