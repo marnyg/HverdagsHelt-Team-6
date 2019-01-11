@@ -7,27 +7,12 @@ import fs from 'fs';
 import bearerToken from 'express-bearer-token';
 import { hashPassword, reqAccessLevel, login, logout, createToken, loginOk } from './auth.js';
 import Users from './routes/Users.js';
-import { getAllCategories, addCategory, updateCategory, delCategory } from './routes/Categories.js';
-import {
-  User,
-  Role,
-  Region,
-  County,
-  Case_subscriptions,
-  Case,
-  Region_subscriptions,
-  Category,
-  Status,
-  Status_comment
-} from './models.js';
-import { hashPassword, reqAccessLevel, createToken, loginOk } from './auth.js';
-import { getAllUsers } from './routes/Users.js';
 import Category from './routes/Categories.js';
 import Region_subscriptions from './routes/Region_subscriptions.js';
 import Region from './routes/Region.js';
 import County from './routes/Counties.js';
 import Role from './routes/Roles.js';
-import { User, Case_subscriptions, Case, Status, Status_comment } from './models.js';
+import { Case_subscriptions, Case, Status, Status_comment } from './models.js';
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
 
