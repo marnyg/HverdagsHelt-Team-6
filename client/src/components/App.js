@@ -17,26 +17,27 @@ import Navbar from './Navbar.js';
 import Content from './Content.js';
 import Footer from './Footer.js';
 import MinSide from './MinSide.js';
-//import NewCase from './NewCase.js';
+import NewCase from './NewCase.js';
+import axios from 'axios';
 
-import { NavLink } from 'react-router-dom';
+axios.interceptors.response.use(response => response.data);
 
 class App extends Component {
-    render() {
-        return (
-            <BrowserRouter>
-                <div>
-                    <Navbar/>
-                    <div className="content-wrapper">
-                        <Route exact path="/" render={() => (<Content/>)}/>
-                        <Route exact path="/subscribe" render={() => (<Content/>)}/>
-                        <Route exact path="/my-page" render={() => (<MinSide/>)}/>
-                        <Route exact path="/search/:query" component={Content}/>
-                    </div>
-                    <Footer/>
-                </div>
-            </BrowserRouter>
-        );
-    }
+  render() {
+    return (
+      <BrowserRouter>
+        <div>
+          <Navbar />
+          <div className="content-wrapper">
+            <Route exact path="/" render={() => <Content />} />
+            <Route exact path="/my-page" render={() => <MinSide />} />
+            <Route exact path="/new-case" render={() => <NewCase />} />
+            <Route exact path="/search/:query" component={Content} />
+          </div>
+          <Footer />
+        </div>
+      </BrowserRouter>
+    );
+  }
 }
 export default App;

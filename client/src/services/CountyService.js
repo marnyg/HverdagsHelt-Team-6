@@ -1,16 +1,11 @@
 // @flow
 import axios from 'axios';
-axios.interceptors.response.use(response => response.data);
-
-export class County {
-  county_id: number;
-  name: string;
-}
+import County from '../classes/County.js';
 
 class CountyService {
   //Get all counties
   getAllCounties(): Promise<County[]> {
-    return axios.get('/api/counties/');
+    return axios.get('/api/counties');
   }
   /*
   //Update county

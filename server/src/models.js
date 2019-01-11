@@ -4,7 +4,7 @@ import Sequelize from 'sequelize';
 import type { Model } from 'sequelize';
 require('dotenv').config();
 
-let sequelize = new Sequelize(
+export let sequelize = new Sequelize(
   process.env.CI ? 'School' : process.env.DB_USER,
   process.env.CI ? 'root' : process.env.DB_USER,
   process.env.CI ? '' : process.env.DB_PW,
@@ -199,6 +199,11 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(() =
       name: 'Trøndelag'
     })
       .then(() =>
+        County.create({
+          name: 'Akershus'
+        })
+      )
+      .then(() =>
         Region.create({
           name: 'Trondheim',
           lat: 63.42846459999999,
@@ -208,8 +213,26 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(() =
       )
       .then(() =>
         Role.create({
-          name: 'Bruker',
+          name: 'Admin',
           access_level: 1
+        })
+      )
+      .then(() =>
+        Role.create({
+          name: 'Kommune ansatt',
+          access_level: 2
+        })
+      )
+      .then(() =>
+        Role.create({
+          name: 'Bedrift bruker',
+          access_level: 3
+        })
+      )
+      .then(() =>
+        Role.create({
+          name: 'Privat bruker',
+          access_level: 4
         })
       )
       .then(() =>

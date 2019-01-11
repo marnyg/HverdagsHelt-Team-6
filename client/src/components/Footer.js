@@ -1,10 +1,8 @@
 // @flow
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import {faCoffee} from "@fortawesome/free-solid-svg-icons/index";
+import { faCoffee } from '@fortawesome/free-solid-svg-icons/index';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-
 
 class Footer extends Component {
     render() {

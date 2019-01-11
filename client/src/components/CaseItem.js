@@ -8,7 +8,7 @@ import { withRouter } from 'react-router-dom';
 //import Picture from '../classes/Picture.js'; REMOVE COMMENTS WHEN CLASSES DONE
 
 class CaseItem extends Component {
-    images = [];
+  images = [];
 
     render() {
         if (this.props.grid){
@@ -73,17 +73,23 @@ class CaseItem extends Component {
                         </div>
                     </div>
                 </div>
-                </NavLink>
-            );
-        }
+              </div>
+            </div>
+          </div>
+        </NavLink>
+      );
     }
+  }
 
-    mounted(){
-        this.images = [
-            {path: 'https://res.cloudinary.com/simpleview/image/upload/v1504558184/clients/norway/6d185cb5_1903_43a6_bd2b_9771c44d25bc_3c270880-a51d-4199-a673-021a21c8d2a9.jpg'}
-        ];
-        //console.log(this.images.length);
-        /* REMOVE COMMENTS WHEN SERVICES DONE
+  mounted() {
+    this.images = [
+      {
+        path:
+          'https://res.cloudinary.com/simpleview/image/upload/v1504558184/clients/norway/6d185cb5_1903_43a6_bd2b_9771c44d25bc_3c270880-a51d-4199-a673-021a21c8d2a9.jpg'
+      }
+    ];
+    //console.log(this.images.length);
+    /* REMOVE COMMENTS WHEN SERVICES DONE
         let pictureService = new PictureService();
 
         pictureService.get(this.props.case.case_id)
@@ -100,4 +106,3 @@ class CaseItem extends Component {
     }
 }
 export default CaseItem;
-
