@@ -19,3 +19,4 @@ class LoginService {
         .catch((error: Error) => console.error(error));
   }
 }
+export default LoginService;

@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom';
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import { NavLink } from 'react-router-dom';
+import { NavLink, withRouter } from 'react-router-dom';
 import { countyService } from '../services/CountyService';
 import { regionService } from '../services/RegionService';
 import { categoryService } from '../services/CategoryService';
@@ -10,6 +10,7 @@ import LocationService from '../services/LocationService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons/index';
 import GoogleApiWrapper from './GoogleApiWrapper';
+import Case from '../classes/Case';
 
 class NewCase extends Component {
   form = null;
@@ -21,7 +22,8 @@ class NewCase extends Component {
   list2 = null;
   lastResortAddress = null;
   lastResortAddressLabel = null;
-  pos = { lat: 59.9138688, lon: 10.752245399999993 }; // Last resort position OSLO
+  lastResortPos = { lat: 59.9138688, lon: 10.752245399999993 }; // Last resort position OSLO
+  pos = this.lastResortPos;
   fileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
   constructor(){
@@ -406,48 +408,120 @@ class NewCase extends Component {
     console.log('Deleting image file with src = ' + src);
   }
 
+  validate(index: number) {
+    switch (index) {
+      case 0:
+        // Validate automatic position
+        return true;
+      case 1:
+        // Validate map marker position
+        return true;
+      case 2:
+        // Validate last resort list selection
+        if (this.list1.selectedIndex !== 0 && this.list2.selectedIndex !== 0) {
+          return true;
+        } else {
+          Notify.danger('Vennligst velg et fylke og en kommune hvor saken finner sted og prøv igjen.');
+          console.warn('County or municipality has not been set.');
+          return false;
+        }
+    }
+  }
+
   submit() {
     console.log('Validating form input.');
     if (this.form.checkValidity() && this.pos) {
       // Basic Built-in HTML5 form validation succeeded. Proceeding to validate using JavaScript.
       let index = this.radioSelector();
-      switch (index) {
-        case 0:
-          // Automatic location discovery
-          console.log(
-            'Using automatic location discovery using IP-address and GPS if available to determine position.'
-          );
-          break;
-        case 1:
-          // Map marker
-          console.log('Using a map marker to determine position.');
-          if (this.pos != null) {
-          } else {
-            Notify.warning('Vennligst velg et fylke og en kommune hvor saken finner sted og prøv igjen.');
-          }
-          break;
-        case 2:
-          // Last resort list
-          console.log('Using list selection to determine position.');
-          console.log(this.list1.selectedIndex);
-          if (this.list1.selectedIndex !== 0 && this.list2.selectedIndex !== 0) {
-            this.send();
-          } else {
-            Notify.warning('Vennligst velg et fylke og en kommune hvor saken finner sted og prøv igjen.');
-          }
-          break;
+      let region_id = null;
+      if (this.validate(index)) {
+        switch (index) {
+          case 0:
+            // Automatic location discovery
+            console.log(
+              'Using automatic location discovery using IP-address and GPS if available to determine position.'
+            );
+            break;
+          case 1:
+            // Map marker
+            console.log('Using a map marker to determine position.');
+            if (this.pos != null) {
+            } else {
+              Notify.warning('Vennligst trykk på en kommune på kartet hvor saken finner sted og prøv igjen.');
+            }
+            break;
+          case 2:
+            // Last resort list
+            console.log('Using list selection to determine position.');
+            console.log(
+              'Selected options are county = ' +
+                this.counties[this.list1.selectedIndex - 1].name +
+                ' with id = ' +
+                this.counties[this.list1.selectedIndex - 1].county_id +
+                ' and municipality = ' +
+                this.municipalities[this.list2.selectedIndex - 1].name +
+                ' with id = ' +
+                this.municipalities[this.list2.selectedIndex - 1].region_id +
+                '. Custom message is: "' +
+                this.lastResortAddress.value +
+                '".'
+            );
+            this.pos = {
+              lat: this.municipalities[this.list2.selectedIndex - 1].lat,
+              lon: this.municipalities[this.list2.selectedIndex - 1].lon
+            };
+            region_id = this.municipalities[this.list2.selectedIndex - 1].region_id;
+            break;
+        }
+        let user_id = null;
+        let newcase = new Case(
+          null,
+          region_id,
+          user_id,
+          this.categories[this.form.querySelector('#category').selectedIndex - 1].category_id,
+          null,
+          this.form.querySelector('#title').value,
+          this.form.querySelector('#description').value,
+          null,
+          null,
+          this.pos.lat,
+          this.pos.lon
+        );
+        this.send(newcase);
+      } else {
+        console.log('Secondary validation failed.');
       }
     } else {
-      // Basic Built-in HTML5 form validation failed. Cannot send.
+      // Basic built-in HTML5 form validation failed. Cannot send form data.
       console.log('Failed basic validation.');
-      Notify.warning('Vennligst fyll inn de pålagte feltene i kontaktskjemaet og prøv igjen.');
+      Notify.warning('Vennligst fyll inn de pålagte feltene i skjemaet og prøv igjen.');
     }
   }
 
-  send() {
+  send(obj: Case) {
     console.log('Sending form data to server.');
-    console.log('Position is ' + JSON.stringify(this.pos));
+    console.log('Case is ' + JSON.stringify(obj));
+    caseService
+      .createCase(obj)
+      .then(e => {
+        Notify.success('Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id);
+        console.log('Form data transmission success! Case ID: ' + e.case_id);
+        this.props.history.push('/');
+      })
+      .catch((err: Error) => {
+        Notify.danger(
+          'Det oppstod en feil ved sending av saken til oss. Sørg for at alle felter er fyllt ut korrekt. ' +
+            'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
+            err.message
+        );
+        console.warn('Error while transmitting form data to server with error message: ' + err.message);
+      });
+  }
+
+  updatePos(newPos) {
+    this.pos = newPos;
+    console.log('how bout it', this.pos);
   }
 }
 
-export default NewCase;
+export default withRouter(NewCase);

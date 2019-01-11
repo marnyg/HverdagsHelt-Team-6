@@ -21,6 +21,7 @@ import Content from './Content.js';
 import Footer from './Footer.js';
 import MinSide from './MinSide.js';
 import NewCase from './NewCase.js';
+import MyCases from './MyCases.js';
 import axios from 'axios';
 
 axios.interceptors.response.use(response => response.data);
@@ -38,6 +39,7 @@ class App extends Component {
             <Route exact path="/new-case" render={() => <NewCase />} />
             <Route exact path="/search/:query" component={Content} />
           </div>
+          {/*<MyCases />*/}
           <Footer />
         </div>
       </BrowserRouter>

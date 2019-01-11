@@ -39,4 +39,4 @@ class CaseSubscriptionService {
   }
 }
 
-export let caseSubscriptionService = new CaseSubscriptionService();
+export default CaseSubscriptionService;

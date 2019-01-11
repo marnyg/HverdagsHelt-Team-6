@@ -11,7 +11,7 @@ class Case {
   updated_at: any;
   lat: number;
   lon: number;
-  images: Picture[];
+  picture: Picture[];
 
   constructor(case_id, region_id, user_id, category_id, status_id, title, description, created_at, updated_at, lat, lon){
     this.case_id = case_id;

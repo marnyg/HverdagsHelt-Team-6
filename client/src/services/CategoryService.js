@@ -24,4 +24,4 @@ class CategoryService {
   }
 }
 
-export let categoryService = new CategoryService();
+export default CategoryService;
