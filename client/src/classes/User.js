@@ -15,7 +15,7 @@ class User {
     this.role_id = role_id;
     this.region_id = region_id;
     this.firstname = firstname;
-    this.lastname = lastname:
+    this.lastname = lastname;
     this.tlf = tlf;
     this.email = email;
     this.hash_password = hash_password;

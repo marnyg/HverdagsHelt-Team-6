@@ -1,6 +1,5 @@
 // @flow
 import axios from 'axios';
-axios.interceptors.response.use(response => response.data);
 import County from '../classes/County.js';
 
 class CountyService {
