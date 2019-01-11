@@ -8,18 +8,8 @@ import bearerToken from 'express-bearer-token';
 import { hashPassword, reqAccessLevel, createToken, loginOk } from './auth.js';
 import { getAllUsers } from './routes/Users.js';
 import { getAllCategories, addCategory, updateCategory, delCategory } from './routes/Categories.js';
-import {
-  User,
-  Role,
-  Region,
-  County,
-  Case_subscriptions,
-  Case,
-  Region_subscriptions,
-  Category,
-  Status,
-  Status_comment
-} from './models.js';
+import Region_subscriptions from './routes/Region_subscriptions.js';
+import { User, Role, Region, County, Case_subscriptions, Case, Category, Status, Status_comment } from './models.js';
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
 
@@ -463,47 +453,19 @@ app.delete('/api/regions/:region_id', (req: Request, res: Response) => {
 });
 
 app.get('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
-  return Region_subscriptions.findAll().then(subs => res.send(subs));
+  reqAccessLevel(req, res, 1, Region_subscriptions.getAllRegion_subscriptions);
 });
 
 app.post('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
-  let region_id = Number(req.params.region_id);
-  if (
-    !req.body ||
-    typeof req.body.user_id !== 'number' ||
-    typeof region_id !== 'number' ||
-    typeof req.body.notify !== 'boolean'
-  )
-    return res.sendStatus(400);
-
-  return Region_subscriptions.create({
-    user_id: req.body.user_id,
-    region_id: Number(req.params.region_id),
-    notify: req.body.notify
-  }).then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)));
+  reqAccessLevel(req, res, 4, Region_subscriptions.addRegion_subscriptions);
 });
 
 app.put('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
-  let region_id = Number(req.params.region_id);
-  if (
-    !req.body ||
-    typeof req.body.user_id !== 'number' ||
-    typeof region_id !== 'number' ||
-    typeof req.body.notify !== 'boolean'
-  )
-    return res.sendStatus(400);
-  return Region_subscriptions.update(
-    {
-      notify: req.body.notify
-    },
-    { where: { region_id: region_id, user_id: req.body.user_id } }
-  ).then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)));
+  reqAccessLevel(req, res, 4, Region_subscriptions.updateRegion_subscriptions);
 });
 
 app.delete('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
-  return Region_subscriptions.destroy({
-    where: { region_id: Number(req.params.region_id), user_id: req.body.user_id }
-  }).then(region => (region ? res.send() : res.status(500).send()));
+  reqAccessLevel(req, res, 4, Region_subscriptions.delRegion_subscriptions);
 });
 
 app.get('/api/email_available', (req: Request, res: Response) => {
@@ -542,4 +504,3 @@ export let listen = new Promise<void>((resolve, reject) => {
     resolve();
   });
 });
-
