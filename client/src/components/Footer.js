@@ -13,7 +13,7 @@ class Footer extends Component {
                 <div className="container-fluid text-center text-md-left">
                     <div className="row">
                         <div className="col-md-6 mt-md-0 mt-3">
-                            <h5 className="text-uppercase">Kontakt oss
+                            <h5 className="text-uppercase">Kontakt oss&ensp;
                                 <FontAwesomeIcon icon={faCoffee} />
                             </h5>
                             <p>

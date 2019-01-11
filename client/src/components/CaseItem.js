@@ -30,8 +30,13 @@ class CaseItem extends Component {
                                 <h2 className="card-title">{this.props.case.title}</h2>
                                 <div className=" d-inline">
                                     <small className="text-muted">{this.props.case.date}</small>
-                                    <FontAwesomeIcon onClick={() => console.log('Icon clicked')} icon={faBell} alt="Klikk her for å få varsler om denne saken" className="float-right" style={{color: "#339aed"}}/>
                                 </div>
+                                <button onClick={this.subscribe.bind(this)} className="btn btn-primary float-right">
+                                    <FontAwesomeIcon id={"subscribe"}
+                                                     icon={faBell} alt="Klikk her for å få varsler om denne saken"
+                                                     className="float-right"
+                                                     />
+                                </button>
                             </div>
                         </div>
                     </NavLink>
@@ -59,7 +64,10 @@ class CaseItem extends Component {
                                         <p className="card-text text-justify">{this.props.case.description}</p>
                                         <p className="card-text">
                                             <small className="text-muted">Dato: {this.props.case.date}</small>
-                                    </p>
+                                        </p>
+                                        <button className="btn btn-primary float-right" onClick={this.subscribe.bind(this)}>
+                                            Abonner på denne saken
+                                        </button>
                                 </div>
                             </div>
                         </div>
@@ -85,15 +93,10 @@ class CaseItem extends Component {
             .catch((error: Error) => console.error(error));
         */
     }
-
-    clicked(event){
+    subscribe(event){
         event.preventDefault();
-        /*
-        if(Content.instance()) {
-            //Content.instance().mounted();
-        }
-        */
-        this.props.history.push('/search/' + this.search);
+        console.log("Subscribe");
+
     }
 }
 export default CaseItem;

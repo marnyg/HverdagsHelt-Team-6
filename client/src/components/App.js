@@ -29,6 +29,7 @@ class App extends Component {
                     <Navbar/>
                     <div className="content-wrapper">
                         <Route exact path="/" render={() => (<Content/>)}/>
+                        <Route exact path="/subscribe" render={() => (<Content/>)}/>
                         <Route exact path="/my-page" render={() => (<MinSide/>)}/>
                         <Route exact path="/search/:query" component={Content}/>
                     </div>

@@ -11,7 +11,7 @@ import {faListUl, faTh} from "@fortawesome/free-solid-svg-icons/index";
 
 class Content extends Component {
     cases = null;
-    grid = true;
+    grid = false;
 
     render() {
         if(!this.cases) return null;

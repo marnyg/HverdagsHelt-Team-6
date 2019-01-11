@@ -84,7 +84,10 @@ class Navbar extends Component {
             //Content.instance().mounted();
         }
         */
-        this.props.history.push('/search/' + this.search);
+        console.log(this.search);
+        if(this.search !== undefined && this.search !== ""){
+            this.props.history.push('/search/' + this.search);
+        }
     }
 
     logincheck(){
