@@ -19,10 +19,15 @@ export class GoogleMapsContainer extends Component {
     });
   };
   onClick(t, map, coord) {
+
     console.log(this.props.userPos);
 
-    const latLng = coord.pa;
+    const latLng = { lat: coord.latLng.lat(), lng: coord.latLng.lng() };
+    this.state.clickPos = latLng
+    // this.props.userPos = latLng;
+    this.props.tst(latLng)
     console.log(latLng);
+    this.render()
   }
   render() {
     const style = {
@@ -38,11 +43,14 @@ export class GoogleMapsContainer extends Component {
         onClick={this.onClick}
         zoom={14}
         initialCenter={this.props.userPos}
+        disableDefaultUI={true}
+
+
       >
         <Marker
           //onClick={this.onMarkerClick}
           title={'Changing Colors Garage'}
-          position={this.props.userPos}
+          position={this.state.clickPos}
           name={'Changing Colors Garage'}
         />
       </Map>
