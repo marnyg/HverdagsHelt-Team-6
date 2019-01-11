@@ -90,9 +90,9 @@ export async function loginOk(email, password) {
   return userObj;
 }
 
-export function reqAccessLevel(req, res, accessLevel = 2, wrappedFunction) {
+export function reqAccessLevel(req, res, accessLevel = 4, wrappedFunction) {
   let token = verifyToken(req.token);
-  if (token && token.accesslevel === accessLevel) {
+  if (token && (token.accesslevel <= accessLevel)) {
     console.log(token);
     return wrappedFunction(req, res);
   } else {

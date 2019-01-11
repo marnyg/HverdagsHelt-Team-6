@@ -6,6 +6,7 @@ import reload from 'reload';
 import fs from 'fs';
 import bearerToken from 'express-bearer-token';
 import { hashPassword, reqAccessLevel, createToken, loginOk } from './auth.js';
+import { getAllUsers } from './routes/Users.js';
 import {
   User,
   Role,
@@ -39,7 +40,7 @@ app.get('/api/cases', (req: Request, res: Response) => {
   return Case.findAll().then(cases => res.send(cases));
 });
 
-app.get('/api/verify', (req, res) => reqAccessLevel(req, res, 4,(req, res)=> {
+app.get('/api/verify', (req, res) => reqAccessLevel(req, res, 3,(req, res)=> {
     let token = req.token;
     if(token in tokens){
         return res.sendStatus(200);
@@ -277,8 +278,8 @@ app.post('/api/roles', (req: Request, res: Response) => {
   }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
 });
 
-app.get('/api/users', (req: Request, res: Response) => {
-    return User.findAll().then(users => res.send(users));
+app.get('/api/users', (req, res) =>{
+    reqAccessLevel(req, res, 1, getAllUsers);
 });
 
 app.post('/api/users', (req: Request, res: Response) => {
@@ -305,7 +306,7 @@ app.post('/api/users', (req: Request, res: Response) => {
     email: req.body.email,
     hashed_password: password,
     salt: salt,
-    role_id: 1,
+    role_id: 4,
     region_id: req.body.region_id
   }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
 });
