@@ -8,6 +8,7 @@ const privatePath = path.join(__dirname, 'private.key');
 const publicPath = path.join(__dirname, 'public.key');
 const privateKEY = fs.readFileSync(privatePath, 'utf-8');
 const publicKEY = fs.readFileSync(publicPath, 'utf-8');
+let tokens = {};
 
 /**
  * generates random string of characters i.e salt
@@ -66,9 +67,6 @@ export function verifyToken(token) {
 }
 
 export async function loginOk(email, password) {
-  /*let user = User.findOne(
-        {where: {email: String(email) }}
-    );*/
   let user = sequelize.query(
     'Select * FROM Users natural join Roles WHERE email = ?',
     { replacements: [email] },
@@ -85,17 +83,49 @@ export async function loginOk(email, password) {
   let givenPassword = hashPassword(password, salt);
   if (givenPassword.passwordHash !== password_hash) {
     return null;
+  } else {
+    return userObj;
   }
-  console.log('--------- SALT ----------' + salt + ' hash: ' + password_hash);
-  return userObj;
 }
 
 export function reqAccessLevel(req, res, accessLevel = 4, wrappedFunction) {
-  let token = verifyToken(req.token);
-  if (token && (token.accesslevel <= accessLevel)) {
+  if (!req.token) return res.sendStatus(400);
+  let token = req.token;
+  let decoded = verifyToken(token);
+  console.log(token in tokens);
+  console.log(tokens);
+  if (decoded && decoded.accesslevel <= accessLevel && token in tokens) {
     console.log(token);
     return wrappedFunction(req, res);
   } else {
     return res.sendStatus(403);
+  }
+}
+
+export async function login(req: Request, res: Response) {
+  if (!req.body || typeof req.body.email !== 'string' || typeof req.body.password !== 'string')
+    return res.sendStatus(400);
+
+  let login = await loginOk(req.body.email, req.body.password);
+  if (login) {
+    let token = createToken(login.access_level, login.user_id);
+    tokens[token] = req.body.email;
+    res.status(200);
+    res.send({
+      token: token
+    });
+    return res;
+  } else {
+    return res.sendStatus(403);
+  }
+}
+
+export function logout(req: Request, res: Response) {
+  if (!req.token) {
+    return res.sendStatus(400);
+  } else {
+    let token = req.token;
+    delete tokens[token];
+    return res.sendStatus(200);
   }
 }
