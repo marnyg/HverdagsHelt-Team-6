@@ -1,6 +1,5 @@
 // @flow
 import axios from 'axios';
-axios.interceptors.response.use(response => response.data);
 import User from '../classes/User.js';
 
 class UserService {
@@ -27,6 +26,11 @@ class UserService {
   //Create user
   createUser(u: User): Promise<User> {
     return axios.post('/api/users', u);
+  }
+
+  //Update user password
+  updatePassword(user_id: number, u: User): Promise<void> {
+    return axios.put('/api/users/' + user_id + '/password', u);
   }
 }
 
