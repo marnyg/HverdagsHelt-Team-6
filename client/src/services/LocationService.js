@@ -1,6 +1,7 @@
 import axios from 'axios';
 import Location from '../classes/Location.js';
 //key=AIzaSyBfY2sQ7ZU-o-npnt8Ua5RSdV9-5ZCoriM
+//require('dotenv').config();
 const key = 'AIzaSyBfY2sQ7ZU-o-npnt8Ua5RSdV9-5ZCoriM';
 class LocationService{
     getLocation(): Promise<Location>{
