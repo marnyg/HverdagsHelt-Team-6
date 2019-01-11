@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Component } from 'react-simplified';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faBell} from "@fortawesome/free-solid-svg-icons/index";
+import { faBell } from '@fortawesome/free-solid-svg-icons/index';
 import { withRouter } from 'react-router-dom';
 //import PictureService from '../services/PictureService.js'; REMOVE COMMENTS WHEN SERVICES DONE
 //import Picture from '../classes/Picture.js'; REMOVE COMMENTS WHEN CLASSES DONE
@@ -10,73 +10,71 @@ import { withRouter } from 'react-router-dom';
 class CaseItem extends Component {
   images = [];
 
-    render() {
-        if (this.props.grid){
-            return(
-                <div className="item">
-                    <NavLink to={"/case/" + this.props.case.case_id} className="preview">
-                        {this.images.length > 0 ?
-                            <div className="thumb"
-                                 style={{backgroundImage: "url(" + this.images[0].path + ")"}}
-                            />
-                            :
-                            <div className="thumb"
-                                 style={{backgroundImage: "url(/no-image.png)"}}
-                            />
-                        }
-                        <div className="d-inline">
-                            <div className="card-body">
-                                <div className="card-text text-muted">{this.props.case.region}</div>
-                                <h2 className="card-title">{this.props.case.title}</h2>
-                                <div className=" d-inline">
-                                    <small className="text-muted">{this.props.case.date}</small>
-                                </div>
-                                <button onClick={this.subscribe.bind(this)} className="btn btn-primary float-right">
-                                    <FontAwesomeIcon id={"subscribe"}
-                                                     icon={faBell} alt="Klikk her for å få varsler om denne saken"
-                                                     className="float-right"
-                                                     />
-                                </button>
-                            </div>
-                        </div>
-                    </NavLink>
+  render() {
+    if (this.props.grid) {
+      return (
+        <div className="item">
+          <NavLink to={'/case/' + this.props.case.case_id} className="preview">
+            {this.images.length > 0 ? (
+              <div className="thumb" style={{ backgroundImage: 'url(' + this.images[0].path + ')' }} />
+            ) : (
+              <div className="thumb" style={{ backgroundImage: 'url(/no-image.png)' }} />
+            )}
+            <div className="d-inline">
+              <div className="card-body">
+                <div className="card-text text-muted">{this.props.case.region}</div>
+                <h2 className="card-title">{this.props.case.title}</h2>
+                <div className=" d-inline">
+                  <small className="text-muted">{this.props.case.date}</small>
                 </div>
-            );
-        } else {
-            return(
-                <NavLink exact to={"/case/" + this.props.case.case_id} className="link-unstyled">
-                    <div className="row my-2">
-                        <div className="card col-md-12 p-3">
-                            <div className="row ">
-                                <div className="col-md-4">
-                                    {this.images.length > 0 ?
-                                        <img className="w-100" src={this.images[0].path}/>
-                                        :
-                                        <img className="w-100" src={'/no-image.png'}/>
-                                    }
-                                </div>
-                                <div className="col-md-8">
-                                    <div className="card-block">
-                                        <h6 className="card-title">{this.props.case.title}</h6>
-                                        <p className="card-text">
-                                            <small className="text-muted">{this.props.case.region}</small>
-                                        </p>
-                                        <p className="card-text text-justify">{this.props.case.description}</p>
-                                        <p className="card-text">
-                                            <small className="text-muted">Dato: {this.props.case.date}</small>
-                                        </p>
-                                        <button className="btn btn-primary float-right" onClick={this.subscribe.bind(this)}>
-                                            Abonner på denne saken
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </NavLink>
-            );
-        }
+                <button onClick={this.subscribe.bind(this)} className="btn btn-primary float-right">
+                  <FontAwesomeIcon
+                    id={'subscribe'}
+                    icon={faBell}
+                    alt="Klikk her for å få varsler om denne saken"
+                    className="float-right"
+                  />
+                </button>
+              </div>
+            </div>
+          </NavLink>
+        </div>
+      );
+    } else {
+      return (
+        <NavLink exact to={'/case/' + this.props.case.case_id} className="link-unstyled">
+          <div className="row my-2">
+            <div className="card col-md-12 p-3">
+              <div className="row ">
+                <div className="col-md-4">
+                  {this.images.length > 0 ? (
+                    <img className="w-100" src={this.images[0].path} />
+                  ) : (
+                    <img className="w-100" src={'/no-image.png'} />
+                  )}
+                </div>
+                <div className="col-md-8">
+                  <div className="card-block">
+                    <h6 className="card-title">{this.props.case.title}</h6>
+                    <p className="card-text">
+                      <small className="text-muted">{this.props.case.region}</small>
+                    </p>
+                    <p className="card-text text-justify">{this.props.case.description}</p>
+                    <p className="card-text">
+                      <small className="text-muted">Dato: {this.props.case.date}</small>
+                    </p>
+                    <button className="btn btn-primary float-right" onClick={this.subscribe.bind(this)}>
+                      Abonner på denne saken
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </NavLink>
+      );
     }
+  }
 
   mounted() {
     this.images = [
@@ -95,11 +93,10 @@ class CaseItem extends Component {
             })
             .catch((error: Error) => console.error(error));
         */
-    }
-    subscribe(event){
-        event.preventDefault();
-        console.log("Subscribe");
-
-    }
+  }
+  subscribe(event) {
+    event.preventDefault();
+    console.log('Subscribe');
+  }
 }
 export default CaseItem;
