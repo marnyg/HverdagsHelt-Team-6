@@ -16,7 +16,7 @@ library.add(faEnvelope, faKey, faTh, faCoffee, faListUl);
 import Navbar from './Navbar.js';
 import Content from './Content.js';
 import Footer from './Footer.js';
-import MinSide from './MinSide.js';
+import {MinSide} from './MinSide.js';
 //import NewCase from './NewCase.js';
 import { BrowserRouter, Route } from 'react-router-dom';
 import axios from 'axios';
