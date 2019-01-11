@@ -1,8 +1,11 @@
 // @flow
+//
 import * as React from 'react';
 import { Component } from 'react-simplified';
+import { MyCases } from './MyCases.js';
 
-export class MinSide extends Component {
+export class Minside extends Component {
+
     render() {
         return (
             <div className="wrapper">
@@ -33,4 +36,3 @@ export class MinSide extends Component {
         );
     }
 }
-export default MinSide;
