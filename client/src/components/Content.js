@@ -11,7 +11,7 @@ import { faListUl, faTh } from '@fortawesome/free-solid-svg-icons/index';
 
 class Content extends Component {
   cases = null;
-  grid = false;
+  grid = true;
 
     render() {
         if(!this.cases) return null;
@@ -39,12 +39,7 @@ class Content extends Component {
                     }
                 </div>
             </div>
-          ) : (
-            this.cases.map(e => <CaseItem case={e} key={e.case_id} grid={false} />)
-          )}
-        </div>
-      </div>
-    );
+        );
   }
 
   mounted() {
