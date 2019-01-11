@@ -11,7 +11,8 @@ import Category from './routes/Categories.js';
 import Region_subscriptions from './routes/Region_subscriptions.js';
 import Region from './routes/Region.js';
 import County from './routes/Counties.js';
-import { User, Role, Case_subscriptions, Case, Status, Status_comment } from './models.js';
+import Role from './routes/Roles.js';
+import { User, Case_subscriptions, Case, Status, Status_comment } from './models.js';
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
 
@@ -239,30 +240,15 @@ app.post('/api/statuses', (req: Request, res: Response) => {
 });
 
 app.get('/api/roles', (req: Request, res: Response) => {
-  return Role.findAll().then(roles => res.send(roles));
-});
-
-app.put('/api/roles/:role_id', (req: Request, res: Response) => {
-  if (!req.body || typeof req.body.name !== 'string' || typeof req.body.access_level !== 'number')
-    return res.sendStatus(400);
-
-  return Role.update(
-    {
-      name: req.body.name,
-      access_level: req.body.access_level
-    },
-    { where: { role_id: req.params.role_id } }
-  ).then(roles => (roles ? res.send(roles) : res.sendStatus(404)));
+  reqAccessLevel(req, res, 1, Role.getAllRoles);
 });
 
 app.post('/api/roles', (req: Request, res: Response) => {
-  if (!req.body || typeof req.body.name !== 'string' || typeof req.body.access_level !== 'number')
-    return res.sendStatus(400);
+  reqAccessLevel(req, res, 1, Role.addRole);
+});
 
-  return Role.create({
-    name: req.body.name,
-    access_level: req.body.access_level
-  }).then(roles => (roles ? res.send(roles) : res.sendStatus(404)));
+app.put('/api/roles/:role_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Role.updateRole);
 });
 
 app.get('/api/users', (req, res) => {
