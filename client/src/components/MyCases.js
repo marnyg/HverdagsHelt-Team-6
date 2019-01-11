@@ -69,8 +69,8 @@ class MyCases extends Component<{ match: { params: { user_id: number } } }> {
   }
 
   dateFormat(date: string) {
-    console.log(date.split('\.')[0].replace('T', ' '));
-    return date.split('\.')[0].replace('T', ' ');
+    console.log(date.split('.')[0].replace('T', ' '));
+    return date.split('.')[0].replace('T', ' ');
   }
 }
 

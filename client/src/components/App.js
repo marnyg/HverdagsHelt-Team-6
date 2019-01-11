@@ -35,7 +35,7 @@ class App extends Component {
             <Route exact path="/new-case" render={() => <NewCase />} />
             <Route exact path="/search/:query" component={Content} />
           </div>
-          <MyCases />
+          {/*<MyCases />*/}
           <Footer />
         </div>
       </BrowserRouter>

@@ -112,7 +112,13 @@ class NewCase extends Component {
               </div>
             </div>
             <div className={'form-group'}>
-              <select defaultValue={'.null'} className={'form-control'} id={'last-resort-county'} onChange={this.countyListener} hidden>
+              <select
+                defaultValue={'.null'}
+                className={'form-control'}
+                id={'last-resort-county'}
+                onChange={this.countyListener}
+                hidden
+              >
                 <option value={'.null'} disabled>
                   Velg fylke
                 </option>
@@ -206,9 +212,9 @@ class NewCase extends Component {
         console.warn('FEIL!' + err.toString());
         Notify.danger(
           'Det oppstod en feil under lasting av kategorier. ' +
-          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-          '\n\nFeilmelding: ' +
-          err.toString()
+            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+            '\n\nFeilmelding: ' +
+            err.toString()
         );
       });
     console.log('Fetchng counties.');
@@ -220,9 +226,9 @@ class NewCase extends Component {
         console.warn('FEIL!' + err.toString());
         Notify.danger(
           'Det oppstod en feil under lasting av fylker. ' +
-          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-          '\n\nFeilmelding: ' +
-          err.toString()
+            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+            '\n\nFeilmelding: ' +
+            err.toString()
         );
       });
     console.log('Mounted!');
@@ -302,10 +308,10 @@ class NewCase extends Component {
     let county = event.target;
     console.log(
       'Slected ' +
-      county.options[county.selectedIndex].text +
-      ' with id = ' +
-      county.value +
-      ' as county from drop-down list.'
+        county.options[county.selectedIndex].text +
+        ' with id = ' +
+        county.value +
+        ' as county from drop-down list.'
     );
     this.list2.hidden = false;
     this.fetchMunicipalities(county.value);
@@ -319,10 +325,10 @@ class NewCase extends Component {
     let obj = this.municipalities.find(e => e.region_id === parseInt(muni.value));
     console.log(
       'Slected ' +
-      muni.options[muni.selectedIndex].text +
-      ' with id = ' +
-      muni.value +
-      ' as municipality from drop-down list.'
+        muni.options[muni.selectedIndex].text +
+        ' with id = ' +
+        muni.value +
+        ' as municipality from drop-down list.'
     );
     this.lastResortAddress.hidden = false;
     this.lastResortAddressLabel.hidden = false;
@@ -332,10 +338,10 @@ class NewCase extends Component {
   fetchMunicipalities(county_id: number) {
     console.log(
       'Fetching municipalities for county: ' +
-      this.list1.options[this.list1.selectedIndex].text +
-      ' (county_id = ' +
-      county_id +
-      ').'
+        this.list1.options[this.list1.selectedIndex].text +
+        ' (county_id = ' +
+        county_id +
+        ').'
     );
     // Fetching logic here
     regionService
@@ -346,11 +352,11 @@ class NewCase extends Component {
         console.warn(err.toString());
         Notify.danger(
           'Det oppstod en feil under lasting av kommuner fra fylke ' +
-          this.list1.options[this.list1.selectedIndex].text +
-          '. ' +
-          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-          '\n\nFeilmelding: ' +
-          err.toString()
+            this.list1.options[this.list1.selectedIndex].text +
+            '. ' +
+            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+            '\n\nFeilmelding: ' +
+            err.toString()
         );
       });
   }
@@ -419,7 +425,7 @@ class NewCase extends Component {
       // Basic Built-in HTML5 form validation succeeded. Proceeding to validate using JavaScript.
       let index = this.radioSelector();
       let region_id = null;
-      if(this.validate(index)){
+      if (this.validate(index)) {
         switch (index) {
           case 0:
             // Automatic location discovery
@@ -440,16 +446,16 @@ class NewCase extends Component {
             console.log('Using list selection to determine position.');
             console.log(
               'Selected options are county = ' +
-              this.counties[this.list1.selectedIndex - 1].name +
-              ' with id = ' +
-              this.counties[this.list1.selectedIndex - 1].county_id +
-              ' and municipality = ' +
-              this.municipalities[this.list2.selectedIndex - 1].name +
-              ' with id = ' +
-              this.municipalities[this.list2.selectedIndex - 1].region_id +
-              '. Custom message is: "' +
-              this.lastResortAddress.value +
-              '".'
+                this.counties[this.list1.selectedIndex - 1].name +
+                ' with id = ' +
+                this.counties[this.list1.selectedIndex - 1].county_id +
+                ' and municipality = ' +
+                this.municipalities[this.list2.selectedIndex - 1].name +
+                ' with id = ' +
+                this.municipalities[this.list2.selectedIndex - 1].region_id +
+                '. Custom message is: "' +
+                this.lastResortAddress.value +
+                '".'
             );
             this.pos = {
               lat: this.municipalities[this.list2.selectedIndex - 1].lat,
@@ -473,8 +479,8 @@ class NewCase extends Component {
           this.pos.lon
         );
         this.send(newcase);
-      }else{
-        console.log("Secondary validation failed.");
+      } else {
+        console.log('Secondary validation failed.');
       }
     } else {
       // Basic built-in HTML5 form validation failed. Cannot send form data.
@@ -505,8 +511,8 @@ class NewCase extends Component {
 
   updatePos(newPos) {
     this.pos = newPos;
-    console.log("how bout it", this.pos)
+    console.log('how bout it', this.pos);
   }
 }
 
-export default  withRouter(NewCase);
+export default withRouter(NewCase);
