@@ -8,15 +8,15 @@ import { caseService } from '../services/CaseService.js';
 //import { Alert } from './widgets';
 //import { studentService } from './services';
 
-export class MyCases extends Component <{ match: { params: { user_id: number } } }> {
+export class MyCases extends Component<{ match: { params: { user_id: number } } }> {
   cases = [];
 
   render() {
-    if(!this.cases) {
-      return null;
+    if (!this.cases) {
+      return <div>loool</div>;
     }
 
-    return(
+    return (
       <table className="table">
         <thead>
           <tr>
@@ -44,8 +44,8 @@ export class MyCases extends Component <{ match: { params: { user_id: number } }
   }
 
   mounted() {
-    caseService
-    .getAllCasesGivenUser(this.props.match.params.user_id)
-    .then(cases => (this.cases = cases));
+    // caseService
+    //   .getAllCasesGivenUser(this.props.match.params.user_id)
+    //   .then(cases => (this.cases = cases));
   }
 }
