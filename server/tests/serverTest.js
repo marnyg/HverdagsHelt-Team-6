@@ -11,17 +11,17 @@ describe('GET /api/cases', () => {
         done();
       });
   });
-  test('GET method returns a list', done => {
+  /*  test('GET method returns a list', done => {
     request(application)
       .get('/api/cases')
       .then(response => {
         expect(response.data).toEqual();
         done();
       });
-  });
+  });*/
 });
 
-/*
+let caseid;
 describe('POST /api/cases', async () => {
   let data = {
     title: 'Glatt vei',
@@ -38,11 +38,14 @@ describe('POST /api/cases', async () => {
       .post('/api/cases')
       .send(data)
       .then(response => {
+        //console.log(response.body.case_id);
+        caseid = response.body.case_id;
         expect(response.statusCode).toBe(200);
+        expect(caseid).toBeGreaterThan(10);
+        done();
       });
   });
 });
-*/
 
 describe('GET /api/cases/user_cases/{user_id}', () => {
   test('200 status code for GET case with case_id = 1', done => {
@@ -66,12 +69,10 @@ describe('GET /api/cases/region_cases/{county_name}/{region_name}', () => {
   });
 });
 
-let case_id = 13;
-
 describe('GET /api/cases/{case_id}', () => {
-  test('200 status code for GET with case id = ' + case_id, done => {
+  test('200 status code for GET with case id = ' + caseid, done => {
     request(application)
-      .get('/api/cases/user_cases/' + case_id)
+      .get('/api/cases/user_cases/' + caseid)
       .then(response => {
         expect(response.statusCode).toBe(200);
         done();
@@ -90,9 +91,9 @@ describe('PUT /api/cases/{case_id}', () => {
     category_id: 1,
     status_id: 1
   };
-  test('200 status code for PUT with case_id = ' + case_id, done => {
+  test('200 status code for PUT with case_id = ' + caseid, done => {
     request(application)
-      .put('/api/cases/' + case_id)
+      .put('/api/cases/' + caseid)
       .send(data)
       .then(response => {
         expect(response.statusCode).toBe(200);
@@ -102,9 +103,9 @@ describe('PUT /api/cases/{case_id}', () => {
 });
 
 describe('DELETE /api/cases/{case_id}', () => {
-  test('200 status code for GET with case_id = ' + case_id, done => {
+  test('200 status code for GET with case_id = ' + caseid, done => {
     request(application)
-      .delete('/api/cases/' + case_id)
+      .delete('/api/cases/' + caseid)
       .then(response => {
         expect(response.statusCode).toBe(200);
         done();
@@ -143,3 +144,62 @@ describe('DELETE /api/cases/{case_id}/subscribe', () => {
       });
   });
 });
+
+// ***************************** USERS **************************************
+
+describe('GET /api/users', () => {
+  test('200 status code for GET', done => {
+    request(application)
+      .get('/api/users')
+      .then(response => {
+        expect(response.statusCode).toBe(200);
+        done();
+      });
+  });
+});
+
+let user_id;
+describe('POST /api/users', async () => {
+  let data = {
+    firstname: 'Bob',
+    lastname: 'Larseen',
+    tlf: 40099200,
+    email: 'bobjensen@helt.com',
+    password: '123999',
+    region_id: 1
+  };
+  test('200 status code for POST user', function(done) {
+    request(application)
+      .post('/api/users')
+      .send(data)
+      .then(response => {
+        user_id = response.body.user_id;
+        expect(response.statusCode).toBe(200);
+        expect(user_id).toBeGreaterThan(0);
+        done();
+      });
+  });
+});
+
+describe('GET /api/users/{user_id}', () => {
+  test('200 status code for GET user with user_id = ' + user_id, done => {
+    request(application)
+      .get('/api/users/' + user_id)
+      .then(response => {
+        expect(response.statusCode).toBe(200);
+        done();
+      });
+  });
+});
+
+describe('DELETE /api/users/{user_id}', () => {
+  test('200 status code for DELETE with user_id = ' + user_id, done => {
+    request(application)
+      .delete('/api/users/' + user_id)
+      .then(response => {
+        expect(response.statusCode).toBe(200);
+        done();
+      });
+  });
+});
+

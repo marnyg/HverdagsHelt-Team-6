@@ -1,10 +1,8 @@
 // @flow
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import {faCoffee} from "@fortawesome/free-solid-svg-icons/index";
+import { faCoffee } from '@fortawesome/free-solid-svg-icons/index';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-
 
 class Footer extends Component {
     render() {
@@ -13,7 +11,7 @@ class Footer extends Component {
                 <div className="container-fluid text-center text-md-left">
                     <div className="row">
                         <div className="col-md-6 mt-md-0 mt-3">
-                            <h5 className="text-uppercase">Kontakt oss
+                            <h5 className="text-uppercase">Kontakt oss&ensp;
                                 <FontAwesomeIcon icon={faCoffee} />
                             </h5>
                             <p>
