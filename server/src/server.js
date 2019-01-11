@@ -6,6 +6,7 @@ import reload from 'reload';
 import fs from 'fs';
 import bearerToken from 'express-bearer-token';
 import { hashPassword, reqAccessLevel, createToken, loginOk } from './auth.js';
+import { getAllUsers } from './routes/Users.js';
 import {
   User,
   Role,
@@ -176,7 +177,7 @@ app.put('/api/cases/:case_id', (req: Request, res: Response) => {
 
 app.delete('/api/cases/:case_id', (req: Request, res: Response) => {
   return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(
-    cases => (cases ? res.send(cases) : res.status(500).send())
+    cases => (cases ? res.send() : res.status(500).send())
   );
 });
 
@@ -271,8 +272,8 @@ app.post('/api/roles', (req: Request, res: Response) => {
   }).then(roles => (roles ? res.send(roles) : res.sendStatus(404)));
 });
 
-app.get('/api/users', (req: Request, res: Response) => {
-  return User.findAll().then(users => res.send(users));
+app.get('/api/users', (req, res) =>{
+    reqAccessLevel(req, res, 1, getAllUsers);
 });
 
 app.post('/api/users', (req: Request, res: Response) => {
@@ -299,7 +300,7 @@ app.post('/api/users', (req: Request, res: Response) => {
     email: req.body.email,
     hashed_password: password,
     salt: salt,
-    role_id: 1,
+    role_id: 4,
     region_id: req.body.region_id
   }).then(users => (users ? res.send(users) : res.sendStatus(404)));
 });
