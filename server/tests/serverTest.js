@@ -11,7 +11,7 @@ describe('GET /api/cases', () => {
         done();
       });
   });
-/*  test('GET method returns a list', done => {
+  /*  test('GET method returns a list', done => {
     request(application)
       .get('/api/cases')
       .then(response => {
@@ -145,6 +145,8 @@ describe('DELETE /api/cases/{case_id}/subscribe', () => {
   });
 });
 
+// ***************************** USERS **************************************
+
 describe('GET /api/users', () => {
   test('200 status code for GET', done => {
     request(application)
@@ -156,30 +158,33 @@ describe('GET /api/users', () => {
   });
 });
 
-describe('POST /api/users', () => {
+let user_id;
+describe('POST /api/users', async () => {
   let data = {
     firstname: 'Bob',
     lastname: 'Larseen',
     tlf: 40099200,
-    email: 'boblarsen@helt.com',
+    email: 'bobjensen@helt.com',
     password: '123999',
     region_id: 1
   };
-  test('200 status code for POST user', done => {
+  test('200 status code for POST user', function(done) {
     request(application)
       .post('/api/users')
       .send(data)
       .then(response => {
+        user_id = response.body.user_id;
         expect(response.statusCode).toBe(200);
+        expect(user_id).toBeGreaterThan(0);
         done();
       });
   });
 });
 
 describe('GET /api/users/{user_id}', () => {
-  test('200 status code for GET user with user_id = 1', done => {
+  test('200 status code for GET user with user_id = ' + user_id, done => {
     request(application)
-      .get('/api/users/1')
+      .get('/api/users/' + user_id)
       .then(response => {
         expect(response.statusCode).toBe(200);
         done();
@@ -187,10 +192,8 @@ describe('GET /api/users/{user_id}', () => {
   });
 });
 
-let user_id = 9;
-
 describe('DELETE /api/users/{user_id}', () => {
-  test('200 status code for GET with user_id = ' + user_id, done => {
+  test('200 status code for DELETE with user_id = ' + user_id, done => {
     request(application)
       .delete('/api/users/' + user_id)
       .then(response => {
@@ -199,4 +202,3 @@ describe('DELETE /api/users/{user_id}', () => {
       });
   });
 });
-
