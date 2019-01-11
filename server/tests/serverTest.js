@@ -144,10 +144,54 @@ describe('DELETE /api/cases/{case_id}/subscribe', () => {
   });
 });
 
-describe('app.get(/api/users)', () => {
-  test('', done => {
+describe('GET /api/users', () => {
+  test('200 status code for GET', done => {
     request(application)
       .get('/api/users')
+      .then(response => {
+        expect(response.statusCode).toBe(200);
+        done();
+      });
+  });
+});
+
+describe('POST /api/users', () => {
+  let data = {
+    firstname: 'Bob',
+    lastname: 'Larseen',
+    tlf: 40099200,
+    email: 'boblarsen@helt.com',
+    password: '123999',
+    region_id: 1
+  };
+  test('200 status code for POST user', done => {
+    request(application)
+      .post('/api/users')
+      .send(data)
+      .then(response => {
+        expect(response.statusCode).toBe(200);
+        done();
+      });
+  });
+});
+
+describe('GET /api/users/{user_id}', () => {
+  test('200 status code for GET user with user_id = 1', done => {
+    request(application)
+      .get('/api/users/1')
+      .then(response => {
+        expect(response.statusCode).toBe(200);
+        done();
+      });
+  });
+});
+
+let user_id = 9;
+
+describe('DELETE /api/users/{user_id}', () => {
+  test('200 status code for GET with user_id = ' + user_id, done => {
+    request(application)
+      .delete('/api/users/' + user_id)
       .then(response => {
         expect(response.statusCode).toBe(200);
         done();
