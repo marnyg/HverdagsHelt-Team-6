@@ -23,7 +23,6 @@ import Sequelize from 'sequelize';
 
 let tokens = {};
 
-
 type Request = express$Request;
 type Response = express$Response;
 
@@ -39,49 +38,44 @@ app.get('/api/cases', (req: Request, res: Response) => {
   return Case.findAll().then(cases => res.send(cases));
 });
 
-app.get('/api/verify', (req, res) => reqAccessLevel(req, res, 4,(req, res)=> {
+app.get('/api/verify', (req, res) =>
+  reqAccessLevel(req, res, 4, (req, res) => {
     let token = req.token;
-    if(token in tokens){
-        return res.sendStatus(200);
+    if (token in tokens) {
+      return res.sendStatus(200);
     } else {
-        return res.sendStatus(403);
+      return res.sendStatus(403);
     }
-}));
-
+  })
+);
 
 app.post('/api/login', async (req: Request, res: Response) => {
-    if (
-        !req.body ||
-        typeof req.body.email != 'string' ||
-        typeof req.body.password != 'string'
-    ) {
-        return res.sendStatus(400);
-    }
+  if (!req.body || typeof req.body.email !== 'string' || typeof req.body.password !== 'string') {
+    return res.sendStatus(400);
+  }
 
-    let login = await loginOk(req.body.email, req.body.password);
-    if(login){
-        let token = createToken(login.access_level, login.user_id);
-        tokens[token] = req.body.email;
-        res.status(200);
-        res.send({
-            token: token
-        });
-        return res
-    }
-    else {
-        return res.sendStatus(403);
-    }
+  let login = await loginOk(req.body.email, req.body.password);
+  if (login) {
+    let token = createToken(login.access_level, login.user_id);
+    tokens[token] = req.body.email;
+    res.status(200);
+    res.send({
+      token: token
+    });
+    return res;
+  } else {
+    return res.sendStatus(403);
+  }
 });
 
 app.post('/api/logout', (req: Request, res: Response) => {
-    if ( !req.token){
-        return res.sendStatus(400)
-    } else {
-        let token = req.token;
-        delete tokens[token];
-        return res.sendStatus(200);
-    }
-
+  if (!req.token) {
+    return res.sendStatus(400);
+  } else {
+    let token = req.token;
+    delete tokens[token];
+    return res.sendStatus(200);
+  }
 });
 
 app.post('/api/cases', (req: Request, res: Response) => {
@@ -98,25 +92,25 @@ app.post('/api/cases', (req: Request, res: Response) => {
   )
     return res.sendStatus(400);
 
-    return Case.create({
-        title: req.body.title,
-        description: req.body.description,
-        lat: req.body.lat,
-        lon: req.body.lon,
-        region_id: req.body.region_id,
-        user_id: req.body.user_id,
-        category_id: req.body.category_id,
-        status_id: req.body.status_id
-    }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+  return Case.create({
+    title: req.body.title,
+    description: req.body.description,
+    lat: req.body.lat,
+    lon: req.body.lon,
+    region_id: req.body.region_id,
+    user_id: req.body.user_id,
+    category_id: req.body.category_id,
+    status_id: req.body.status_id
+  }).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
 });
 
 app.get('/api/cases/user_cases/:user_id', (req: Request, res: Response) => {
-    return Case.findAll({
-        where: {
-            user_id: req.params.user_id
-        },
-        order: [['createdAt', 'DESC']] //Order by updatedAt????
-    }).then(cases => res.send(cases));
+  return Case.findAll({
+    where: {
+      user_id: req.params.user_id
+    },
+    order: [['createdAt', 'DESC']] //Order by updatedAt????
+  }).then(cases => res.send(cases));
 });
 
 app.get('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
@@ -142,7 +136,7 @@ app.post('/api/cases/:case_id/status_comments', (req: Request, res: Response) =>
     case_id: Number(req.params.case_id),
     status_id: req.body.status_id,
     user_id: req.body.user_id
-  }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+  }).then(comment => (comment ? res.send(comment) : res.sendStatus(404)));
 });
 
 app.get('/api/cases/:case_id', (req: Request, res: Response) => {
@@ -165,24 +159,24 @@ app.put('/api/cases/:case_id', (req: Request, res: Response) => {
   )
     return res.sendStatus(400);
 
-    return Case.update(
-        {
-            title: req.body.title,
-            description: req.body.description,
-            lat: req.body.lat,
-            lon: req.body.lon,
-            region_id: req.body.region_id,
-            user_id: req.body.user_id,
-            category_id: req.body.category_id,
-            status_id: req.body.status_id
-        },
-        { where: { case_id: req.params.case_id } }
-    ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+  return Case.update(
+    {
+      title: req.body.title,
+      description: req.body.description,
+      lat: req.body.lat,
+      lon: req.body.lon,
+      region_id: req.body.region_id,
+      user_id: req.body.user_id,
+      category_id: req.body.category_id,
+      status_id: req.body.status_id
+    },
+    { where: { case_id: req.params.case_id } }
+  ).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
 });
 
 app.delete('/api/cases/:case_id', (req: Request, res: Response) => {
   return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(
-    cases => (cases ? res.send() : res.status(500).send())
+    cases => (cases ? res.send(cases) : res.status(500).send())
   );
 });
 
@@ -200,7 +194,7 @@ app.post('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
     case_id: Number(req.params.case_id),
     notify_by_email: req.body.notify_by_email,
     is_up_to_date: req.body.is_up_to_date
-  }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+  }).then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)));
 });
 
 app.delete('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
@@ -264,7 +258,7 @@ app.put('/api/roles/:role_id', (req: Request, res: Response) => {
       access_level: req.body.access_level
     },
     { where: { role_id: req.params.role_id } }
-  ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+  ).then(roles => (roles ? res.send(roles) : res.sendStatus(404)));
 });
 
 app.post('/api/roles', (req: Request, res: Response) => {
@@ -274,11 +268,11 @@ app.post('/api/roles', (req: Request, res: Response) => {
   return Role.create({
     name: req.body.name,
     access_level: req.body.access_level
-  }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+  }).then(roles => (roles ? res.send(roles) : res.sendStatus(404)));
 });
 
 app.get('/api/users', (req: Request, res: Response) => {
-    return User.findAll().then(users => res.send(users));
+  return User.findAll().then(users => res.send(users));
 });
 
 app.post('/api/users', (req: Request, res: Response) => {
@@ -294,9 +288,9 @@ app.post('/api/users', (req: Request, res: Response) => {
   )
     return res.sendStatus(400);
 
-    let hashedPassword = hashPassword(req.body.password);
-    let password = hashedPassword['passwordHash'];
-    let salt = hashedPassword['salt'];
+  let hashedPassword = hashPassword(req.body.password);
+  let password = hashedPassword['passwordHash'];
+  let salt = hashedPassword['salt'];
 
   return User.create({
     firstname: req.body.firstname,
@@ -307,7 +301,7 @@ app.post('/api/users', (req: Request, res: Response) => {
     salt: salt,
     role_id: 1,
     region_id: req.body.region_id
-  }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+  }).then(users => (users ? res.send(users) : res.sendStatus(404)));
 });
 
 app.get('/api/users/:user_id', (req: Request, res: Response) => {
@@ -336,7 +330,7 @@ app.put('/api/users/:user_id', (req: Request, res: Response) => {
       region_id: req.body.region_id
     },
     { where: { user_id: req.params.user_id } }
-  ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+  ).then(users => (users ? res.send(users) : res.sendStatus(404)));
 });
 
 app.delete('/api/users/:user_id', (req: Request, res: Response) => {
@@ -370,7 +364,7 @@ app.put('/api/users/:user_id/password', async (req: Request, res: Response) => {
         salt: new_salt
       },
       { where: { user_id: Number(req.params.user_id) } }
-    ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+    ).then(user => (user ? res.send(user) : res.sendStatus(404)));
   } else {
     return res.sendStatus(403);
   }
@@ -384,7 +378,7 @@ app.post('/api/counties', (req: Request, res: Response) => {
   if (!req.body || typeof req.body.name !== 'string') return res.sendStatus(400);
   return County.create({
     name: req.body.name
-  }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+  }).then(counties => (counties ? res.send(counties) : res.sendStatus(404)));
 });
 
 app.delete('/api/counties/:county_id', (req: Request, res: Response) => {
@@ -417,7 +411,7 @@ app.post('/api/regions', (req: Request, res: Response) => {
     lat: req.body.lat,
     lon: req.body.lon,
     county_id: req.body.county_id
-  }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+  }).then(regions => (regions ? res.send(regions) : res.sendStatus(404)));
 });
 
 app.get('/api/regions/:region_id', (req: Request, res: Response) => {
@@ -445,7 +439,7 @@ app.put('/api/regions/:region_id', (req: Request, res: Response) => {
       county_id: req.body.county_id
     },
     { where: { region_id: Number(req.params.region_id) } }
-  ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+  ).then(regions => (regions ? res.send(regions) : res.sendStatus(404)));
 });
 
 app.delete('/api/regions/:region_id', (req: Request, res: Response) => {
@@ -472,7 +466,7 @@ app.post('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
     user_id: req.body.user_id,
     region_id: Number(req.params.region_id),
     notify: req.body.notify
-  }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+  }).then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)));
 });
 
 app.put('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
@@ -489,7 +483,7 @@ app.put('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
       notify: req.body.notify
     },
     { where: { region_id: region_id, user_id: req.body.user_id } }
-  ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+  ).then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)));
 });
 
 app.delete('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
@@ -510,7 +504,7 @@ app.post('/api/categories', (req: Request, res: Response) => {
   if (!req.body || typeof req.body.name != 'string') return res.sendStatus(400);
   return Category.create({
     name: req.body.name
-  }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+  }).then(categories => (categories ? res.send(categories) : res.sendStatus(404)));
 });
 
 app.put('/api/categories/:category_id', (req: Request, res: Response) => {
@@ -520,7 +514,7 @@ app.put('/api/categories/:category_id', (req: Request, res: Response) => {
       name: req.body.name
     },
     { where: { category_id: Number(req.params.category_id) } }
-  ).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+  ).then(categories => (categories ? res.send(categories) : res.sendStatus(404)));
 });
 
 app.delete('/api/categories/:category_id', (req: Request, res: Response) => {
