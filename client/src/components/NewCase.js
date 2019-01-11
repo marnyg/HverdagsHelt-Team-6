@@ -69,7 +69,7 @@ class NewCase extends Component {
               Posisjon
               <div className={'form-check'}>
                 <input
-                  id={"radio1"}
+                  id={'radio1'}
                   className={'form-check-input'}
                   type="radio"
                   name="pos"
@@ -77,29 +77,35 @@ class NewCase extends Component {
                   onClick={this.radioListener}
                   defaultChecked
                 />
-                <label htmlFor={"radio1"} className={'form-check-label'}>Hent automatisk</label>
+                <label htmlFor={'radio1'} className={'form-check-label'}>
+                  Hent automatisk
+                </label>
               </div>
               <div className={'form-check'}>
                 <input
-                  id={"radio2"}
+                  id={'radio2'}
                   className={'form-check-input'}
                   type="radio"
                   name="pos"
                   value="mapmarker"
                   onClick={this.radioListener}
                 />
-                <label htmlFor={"radio2"} className={'form-check-label'}>Marker på kart</label>
+                <label htmlFor={'radio2'} className={'form-check-label'}>
+                  Marker på kart
+                </label>
               </div>
               <div className={'form-check'}>
                 <input
-                  id={"radio3"}
+                  id={'radio3'}
                   className={'form-check-input'}
                   type="radio"
                   name="pos"
                   value="last-resort-selection"
                   onClick={this.radioListener}
                 />
-                <label htmlFor={"radio3"} className={'form-check-label'}>Velg fra liste</label>
+                <label htmlFor={'radio3'} className={'form-check-label'}>
+                  Velg fra liste
+                </label>
               </div>
             </div>
             <div className={'form-group'}>
@@ -163,7 +169,7 @@ class NewCase extends Component {
         </div>
         <div id={'right'}>
           <div>
-            <GoogleApiWrapper userPos={{lat: this.pos.lat, lng: this.pos.lon}} />
+            <GoogleApiWrapper userPos={{ lat: this.pos.lat, lng: this.pos.lon }} />
           </div>
           <div>
             {this.images.map(e => (
