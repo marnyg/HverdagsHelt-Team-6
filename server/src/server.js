@@ -7,9 +7,9 @@ import fs from 'fs';
 import bearerToken from 'express-bearer-token';
 import { hashPassword, reqAccessLevel, createToken, loginOk } from './auth.js';
 import { getAllUsers } from './routes/Users.js';
-import { getAllCategories, addCategory, updateCategory, delCategory } from './routes/Categories.js';
+import Category from './routes/Categories.js';
 import Region_subscriptions from './routes/Region_subscriptions.js';
-import { User, Role, Region, County, Case_subscriptions, Case, Category, Status, Status_comment } from './models.js';
+import { User, Role, Region, County, Case_subscriptions, Case, Status, Status_comment } from './models.js';
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
 
@@ -473,19 +473,19 @@ app.get('/api/email_available', (req: Request, res: Response) => {
 });
 
 app.get('/api/categories', (req: Request, res: Response) => {
-  getAllCategories(req, res);
+    Category.getAllCategories(req, res);
 });
 
 app.post('/api/categories', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, addCategory);
+  reqAccessLevel(req, res, 1, Category.addCategory);
 });
 
 app.put('/api/categories/:category_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, updateCategory);
+  reqAccessLevel(req, res, 1, Category.updateCategory);
 });
 
 app.delete('/api/categories/:category_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, delCategory);
+  reqAccessLevel(req, res, 1, Category.delCategory);
 });
 
 // Hot reload application when not in production environment
