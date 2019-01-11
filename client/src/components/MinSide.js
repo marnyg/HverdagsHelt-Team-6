@@ -3,9 +3,13 @@
 import * as React from 'react';
 import { Component } from 'react-simplified';
 import { MyCases } from './MyCases.js';
+import MinProfil from './MinProfil'
+import MiProfileEdit from './MiProfileEdit'
 import NewCase from './NewCase';
+import { NavLink } from 'react-router-dom';
 
 class MinSide extends Component {
+  comp = <MinProfil />
   render() {
     return (
       <div className="wrapper">
@@ -16,20 +20,22 @@ class MinSide extends Component {
 
           <ul className="list-unstyled components">
             <li>
-              <a href="#">Mine Saker</a>
+              <button onClick={() => { this.comp = <MinProfil /> }} className={'btn btn-secondary'}>
+                Min Profil
+            </button>
             </li>
             <li>
-              <a href="#">Kommuner</a>
+              <button onClick={() => { this.comp = <MiProfileEdit /> }} className={'btn btn-secondary'}>
+                Kommuner
+            </button>
             </li>
-            <li>
-              <a href="#">Contact</a>
+            <li> <button onClick={() => { this.comp = <MyCases user_id={1} /> }} className={'btn btn-secondary'}>
+              Mine Saker
+            </button>
             </li>
           </ul>
         </nav>
-        <div className="bg-warning">
-          Velit aliquip tempor sint quis dolor amet cupidatat quis cupidatat est sint officia tempor enim. Id dolore
-          sint aliqua in velit irure occaecat ullamco reprehenderit.
-        </div>
+        {this.comp}
       </div>
     );
   }
