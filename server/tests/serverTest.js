@@ -143,3 +143,14 @@ describe('DELETE /api/cases/{case_id}/subscribe', () => {
       });
   });
 });
+
+describe('app.get(/api/users)', () => {
+  test('', done => {
+    request(application)
+      .get('/api/users')
+      .then(response => {
+        expect(response.statusCode).toBe(200);
+        done();
+      });
+  });
+});
