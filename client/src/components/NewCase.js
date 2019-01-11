@@ -463,7 +463,7 @@ class NewCase extends Component {
           null,
           region_id,
           user_id,
-          this.categories[this.form.querySelector('#category').selectedIndex - 1].id,
+          this.categories[this.form.querySelector('#category').selectedIndex - 1].category_id,
           null,
           this.form.querySelector('#title').value,
           this.form.querySelector('#description').value,
@@ -477,7 +477,7 @@ class NewCase extends Component {
         console.log("Secondary validation failed.");
       }
     } else {
-      // Basic Built-in HTML5 form validation failed. Cannot send.
+      // Basic built-in HTML5 form validation failed. Cannot send form data.
       console.log('Failed basic validation.');
       Notify.warning('Vennligst fyll inn de pålagte feltene i skjemaet og prøv igjen.');
     }
