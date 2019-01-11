@@ -13,33 +13,39 @@ class Content extends Component {
   cases = null;
   grid = true;
 
-    render() {
-        if(!this.cases) return null;
-        return (
-            <div>
-                <div className="d-none d-sm-block">
-                    <div className="btn-toolbar my-3 mx-2" role="toolbar">
-                        <div className="btn-group mr-2" role="group">
-                            <button type="button" className={this.grid ? "btn btn-secondary focus" : "btn btn-secondary"} onClick={() => (this.grid = true)}>
-                                <FontAwesomeIcon icon={faTh}/> Grid
-                            </button>
-                            <button type="button" className="btn btn-secondary" onClick={() => (this.grid = false)}>
-                                <FontAwesomeIcon icon={faListUl}/> List
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    {this.grid ?
-                        <div className="content">
-                            {this.cases.map(e => (<CaseItem case={e} key={e.case_id} grid={this.grid}/>))}
-                        </div>
-                        :
-                        this.cases.map(e => (<CaseItem case={e} key={e.case_id} grid={this.grid}/>))
-                    }
-                </div>
+  render() {
+    if (!this.cases) return null;
+    return (
+      <div>
+        <div className="d-none d-sm-block">
+          <div className="btn-toolbar my-3 mx-2" role="toolbar">
+            <div className="btn-group mr-2" role="group">
+              <button
+                type="button"
+                className={this.grid ? 'btn btn-secondary focus' : 'btn btn-secondary'}
+                onClick={() => (this.grid = true)}
+              >
+                <FontAwesomeIcon icon={faTh} /> Grid
+              </button>
+              <button type="button" className="btn btn-secondary" onClick={() => (this.grid = false)}>
+                <FontAwesomeIcon icon={faListUl} /> List
+              </button>
             </div>
-        );
+          </div>
+        </div>
+        <div>
+          {this.grid ? (
+            <div className="content">
+              {this.cases.map(e => (
+                <CaseItem case={e} key={e.case_id} grid={this.grid} />
+              ))}
+            </div>
+          ) : (
+            this.cases.map(e => <CaseItem case={e} key={e.case_id} grid={this.grid} />)
+          )}
+        </div>
+      </div>
+    );
   }
 
   mounted() {
