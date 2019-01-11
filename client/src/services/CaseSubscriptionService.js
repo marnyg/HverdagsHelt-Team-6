@@ -10,12 +10,32 @@ class CaseSubscriptionService {
 
   //Delete subscription, given case
   deleteCaseSubscription(case_id: number): Promise<void> {
-    return axios.delete('/api/cases/' + case_id + '/subscribe');
+    let token = localStorage.getItem('token');
+    let res = axios.post('/api/login', {}, {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    });
+    if(res = 200){
+      return axios.delete('/api/cases/' + case_id + '/subscribe');
+    } else {
+      return res.sendStatus(400);
+    }
   }
 
   //Create subscription, given case
   createCaseSubscription(s: CaseSubscription, case_id: number): Promise<CaseSubscription> {
-    return axios.post('/api/cases/' + case_id + '/subscribe', s);
+    let token = localStorage.getItem('token');
+    let res = axios.post('/api/login', {}, {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    });
+    if(res = 200){
+      return axios.post('/api/cases/' + case_id + '/subscribe', s);
+    } else {
+      return res.sendStatus(400);
+    }
   }
 }
 
