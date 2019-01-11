@@ -9,7 +9,8 @@ import { hashPassword, reqAccessLevel, createToken, loginOk } from './auth.js';
 import { getAllUsers } from './routes/Users.js';
 import Category from './routes/Categories.js';
 import Region_subscriptions from './routes/Region_subscriptions.js';
-import { User, Role, Region, County, Case_subscriptions, Case, Status, Status_comment } from './models.js';
+import Region from './routes/Region.js';
+import { User, Role, County, Case_subscriptions, Case, Status, Status_comment } from './models.js';
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
 
@@ -392,64 +393,27 @@ app.delete('/api/counties/:county_id', (req: Request, res: Response) => {
 });
 
 app.get('/api/counties/:county_id/regions', (req: Request, res: Response) => {
-  return Region.findAll({ where: { county_id: Number(req.params.county_id) } }).then(regions =>
-    regions ? res.send(regions) : res.sendStatus(404)
-  );
+  Region.getAllRegionsInCounty(req, res);
 });
 
 app.get('/api/regions', (req: Request, res: Response) => {
-  return Region.findAll().then(regions => res.send(regions));
+  Region.getAllRegions(req, res);
 });
 
 app.post('/api/regions', (req: Request, res: Response) => {
-  if (
-    !req.body ||
-    typeof req.body.name !== 'string' ||
-    typeof req.body.lat !== 'number' ||
-    typeof req.body.lon !== 'number' ||
-    typeof req.body.county_id !== 'number'
-  )
-    return res.sendStatus(400);
-  return Region.create({
-    name: req.body.name,
-    lat: req.body.lat,
-    lon: req.body.lon,
-    county_id: req.body.county_id
-  }).then(regions => (regions ? res.send(regions) : res.sendStatus(404)));
+  reqAccessLevel(req, res, 1, Region.addRegion);
 });
 
 app.get('/api/regions/:region_id', (req: Request, res: Response) => {
-  return Region.findOne({ where: { region_id: Number(req.params.region_id) } }).then(region =>
-    region ? res.send(region) : res.sendStatus(404)
-  );
+  Region.getRegion(req, res);
 });
 
 app.put('/api/regions/:region_id', (req: Request, res: Response) => {
-  if (
-    !req.body ||
-    typeof req.body.region_id !== 'number' ||
-    typeof req.body.name !== 'string' ||
-    typeof req.body.lat !== 'number' ||
-    typeof req.body.lon !== 'number' ||
-    typeof req.body.county_id !== 'number'
-  )
-    return res.sendStatus(400);
-
-  return Region.update(
-    {
-      name: req.body.name,
-      lat: req.body.lat,
-      lon: req.body.lon,
-      county_id: req.body.county_id
-    },
-    { where: { region_id: Number(req.params.region_id) } }
-  ).then(regions => (regions ? res.send(regions) : res.sendStatus(404)));
+  reqAccessLevel(req, res, 1, Region.updateRegion);
 });
 
 app.delete('/api/regions/:region_id', (req: Request, res: Response) => {
-  return Region.destroy({ where: { region_id: Number(req.params.region_id) } }).then(regions =>
-    regions ? res.send() : res.status(500).send()
-  );
+  reqAccessLevel(req, res, 1, Region.delRegion);
 });
 
 app.get('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
@@ -473,7 +437,7 @@ app.get('/api/email_available', (req: Request, res: Response) => {
 });
 
 app.get('/api/categories', (req: Request, res: Response) => {
-    Category.getAllCategories(req, res);
+  Category.getAllCategories(req, res);
 });
 
 app.post('/api/categories', (req: Request, res: Response) => {
