@@ -10,7 +10,8 @@ import { getAllUsers } from './routes/Users.js';
 import Category from './routes/Categories.js';
 import Region_subscriptions from './routes/Region_subscriptions.js';
 import Region from './routes/Region.js';
-import { User, Role, County, Case_subscriptions, Case, Status, Status_comment } from './models.js';
+import County from './routes/Counties.js';
+import { User, Role, Case_subscriptions, Case, Status, Status_comment } from './models.js';
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
 
@@ -364,32 +365,19 @@ app.put('/api/users/:user_id/password', async (req: Request, res: Response) => {
 });
 
 app.get('/api/counties', (req: Request, res: Response) => {
-  return County.findAll().then(counties => res.send(counties));
+  County.getAllCounties(req, res);
 });
 
 app.post('/api/counties', (req: Request, res: Response) => {
-  if (!req.body || typeof req.body.name !== 'string') return res.sendStatus(400);
-  return County.create({
-    name: req.body.name
-  }).then(counties => (counties ? res.send(counties) : res.sendStatus(404)));
+  reqAccessLevel(req, res, 1, County.addCounty);
 });
 
 app.put('/api/counties/:county_id', (req: Request, res: Response) => {
-  if (!req.body || typeof req.body.name !== 'string') return res.sendStatus(400);
-  return County.update(
-    {
-      name: req.body.name
-    },
-    {
-      where: { county_id: Number(req.params.county_id) }
-    }
-  ).then(counties => (counties ? res.send(counties) : res.sendStatus(404)));
+  reqAccessLevel(req, res, 1, County.updateCounty);
 });
 
 app.delete('/api/counties/:county_id', (req: Request, res: Response) => {
-  return County.destroy({ where: { county_id: Number(req.params.county_id) } }).then(counties =>
-    counties ? res.send() : res.status(500).send()
-  );
+  reqAccessLevel(req, res, 1, County.delCounty);
 });
 
 app.get('/api/counties/:county_id/regions', (req: Request, res: Response) => {
