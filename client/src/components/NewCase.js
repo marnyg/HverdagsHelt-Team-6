@@ -394,6 +394,7 @@ class NewCase extends Component {
     if (this.form.checkValidity() && this.pos) {
       // Basic Built-in HTML5 form validation succeeded. Proceeding to validate using JavaScript.
       let index = this.radioSelector();
+      // DERP!
       switch (index) {
         case 0:
           // Automatic location discovery
