@@ -1,6 +1,7 @@
 // @flow
 
 import { Role } from '../models.js';
+import {County} from "../models";
 
 type Request = express$Request;
 type Response = express$Response;
@@ -29,5 +30,10 @@ module.exports = {
       },
       { where: { role_id: req.params.role_id } }
     ).then(roles => (roles ? res.send(roles) : res.sendStatus(404)));
+  },
+  delRole: function (req: Request, res: Response) {
+      return Role.destroy({ where: { role_id: Number(req.params.role_id) } }).then(role =>
+          role ? res.send() : res.status(500).send()
+      );
   }
 };

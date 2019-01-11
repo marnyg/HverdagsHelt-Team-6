@@ -251,6 +251,10 @@ app.put('/api/roles/:role_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, Role.updateRole);
 });
 
+app.delete('/api/roles/:role_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Role.delRole);
+});
+
 app.get('/api/users', (req, res) => {
   reqAccessLevel(req, res, 1, getAllUsers);
 });
