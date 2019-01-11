@@ -7,7 +7,7 @@ import fs from 'fs';
 import bearerToken from 'express-bearer-token';
 import { hashPassword, reqAccessLevel, login, logout, createToken, loginOk } from './auth.js';
 import Users from './routes/Users.js';
-// import { getAllUsers, createUser, getOneUser } from './routes/Users.js';
+import { getAllCategories, addCategory, updateCategory, delCategory } from './routes/Categories.js';
 import {
   User,
   Role,
@@ -117,8 +117,8 @@ app.post('/api/cases/:case_id/status_comments', (req: Request, res: Response) =>
 });
 
 app.get('/api/cases/:case_id', (req: Request, res: Response) => {
-  return Case.findOne({ where: { case_id: Number(req.params.case_id) } }).then(
-    cases => (cases ? res.send(cases) : res.sendStatus(404))
+  return Case.findOne({ where: { case_id: Number(req.params.case_id) } }).then(cases =>
+    cases ? res.send(cases) : res.sendStatus(404)
   );
 });
 
@@ -152,8 +152,8 @@ app.put('/api/cases/:case_id', (req: Request, res: Response) => {
 });
 
 app.delete('/api/cases/:case_id', (req: Request, res: Response) => {
-  return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(
-    cases => (cases ? res.send() : res.status(500).send())
+  return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(cases =>
+    cases ? res.send() : res.status(500).send()
   );
 });
 
@@ -310,15 +310,27 @@ app.post('/api/counties', (req: Request, res: Response) => {
   }).then(counties => (counties ? res.send(counties) : res.sendStatus(404)));
 });
 
+app.put('/api/counties/:county_id', (req: Request, res: Response) => {
+  if (!req.body || typeof req.body.name !== 'string') return res.sendStatus(400);
+  return County.update(
+    {
+      name: req.body.name
+    },
+    {
+      where: { county_id: Number(req.params.county_id) }
+    }
+  ).then(counties => (counties ? res.send(counties) : res.sendStatus(404)));
+});
+
 app.delete('/api/counties/:county_id', (req: Request, res: Response) => {
-  return County.destroy({ where: { county_id: Number(req.params.county_id) } }).then(
-    counties => (counties ? res.send() : res.status(500).send())
+  return County.destroy({ where: { county_id: Number(req.params.county_id) } }).then(counties =>
+    counties ? res.send() : res.status(500).send()
   );
 });
 
 app.get('/api/counties/:county_id/regions', (req: Request, res: Response) => {
-  return Region.findAll({ where: { county_id: Number(req.params.county_id) } }).then(
-    regions => (regions ? res.send(regions) : res.sendStatus(404))
+  return Region.findAll({ where: { county_id: Number(req.params.county_id) } }).then(regions =>
+    regions ? res.send(regions) : res.sendStatus(404)
   );
 });
 
@@ -344,8 +356,8 @@ app.post('/api/regions', (req: Request, res: Response) => {
 });
 
 app.get('/api/regions/:region_id', (req: Request, res: Response) => {
-  return Region.findOne({ where: { region_id: Number(req.params.region_id) } }).then(
-    region => (region ? res.send(region) : res.sendStatus(404))
+  return Region.findOne({ where: { region_id: Number(req.params.region_id) } }).then(region =>
+    region ? res.send(region) : res.sendStatus(404)
   );
 });
 
@@ -372,8 +384,8 @@ app.put('/api/regions/:region_id', (req: Request, res: Response) => {
 });
 
 app.delete('/api/regions/:region_id', (req: Request, res: Response) => {
-  return Region.destroy({ where: { region_id: Number(req.params.region_id) } }).then(
-    regions => (regions ? res.send() : res.status(500).send())
+  return Region.destroy({ where: { region_id: Number(req.params.region_id) } }).then(regions =>
+    regions ? res.send() : res.status(500).send()
   );
 });
 
@@ -426,30 +438,19 @@ app.get('/api/email_available', (req: Request, res: Response) => {
 });
 
 app.get('/api/categories', (req: Request, res: Response) => {
-  return Category.findAll().then(categories => res.send(categories));
+  getAllCategories(req, res);
 });
 
 app.post('/api/categories', (req: Request, res: Response) => {
-  if (!req.body || typeof req.body.name != 'string') return res.sendStatus(400);
-  return Category.create({
-    name: req.body.name
-  }).then(categories => (categories ? res.send(categories) : res.sendStatus(404)));
+  reqAccessLevel(req, res, 1, addCategory);
 });
 
 app.put('/api/categories/:category_id', (req: Request, res: Response) => {
-  if (!req.body || typeof req.body.name != 'string') return res.sendStatus(400);
-  return Category.update(
-    {
-      name: req.body.name
-    },
-    { where: { category_id: Number(req.params.category_id) } }
-  ).then(categories => (categories ? res.send(categories) : res.sendStatus(404)));
+  reqAccessLevel(req, res, 1, updateCategory);
 });
 
 app.delete('/api/categories/:category_id', (req: Request, res: Response) => {
-  return Category.destroy({
-    where: { category_id: Number(req.params.category_id) }
-  }).then(category => (category ? res.send() : res.status(500).send()));
+  reqAccessLevel(req, res, 1, delCategory);
 });
 
 // Hot reload application when not in production environment
@@ -468,3 +469,4 @@ export let listen = new Promise<void>((resolve, reject) => {
     resolve();
   });
 });
+
