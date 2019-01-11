@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import { GoogleApiWrapper, InfoWindow, Map, Marker } from 'google-maps-react';
+import { GoogleApiWrapper, InfoWindow, Map, Marker, SearchBox } from 'google-maps-react';
 
 export class GoogleMapsContainer extends Component {
   constructor(props) {
@@ -44,9 +44,10 @@ export class GoogleMapsContainer extends Component {
         zoom={14}
         initialCenter={this.props.userPos}
         disableDefaultUI={true}
-
-
       >
+        {/* <SearchBox
+          controlPosition={google.maps.ControlPosition.TOP_LEFT}
+        /> */}
         <Marker
           //onClick={this.onMarkerClick}
           title={'Changing Colors Garage'}
