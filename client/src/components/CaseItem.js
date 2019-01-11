@@ -68,18 +68,15 @@ class CaseItem extends Component {
                                         <button className="btn btn-primary float-right" onClick={this.subscribe.bind(this)}>
                                             Abonner på denne saken
                                         </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </NavLink>
-      );
+                </NavLink>
+            );
+        }
     }
-  }
 
   mounted() {
     this.images = [

@@ -39,12 +39,7 @@ class Content extends Component {
                     }
                 </div>
             </div>
-          ) : (
-            this.cases.map(e => <CaseItem case={e} key={e.case_id} grid={false} />)
-          )}
-        </div>
-      </div>
-    );
+        );
   }
 
   mounted() {
