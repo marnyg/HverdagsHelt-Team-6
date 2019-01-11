@@ -46,8 +46,9 @@ class LoginModal extends Component {
             userService.login(data)
                 .then((user: User) => {
                     //document.getElementsByClassName("loading")[0].style.display = "none";
-                    //localStorage.setItem('token': user.token); Mulig UserService ordner denne?
                     this.props.history.push('/');
+                    this.props.onLogin();
+                    $('#login-modal').modal('hide');
                 })
                 .catch((error: Error) => console.error(error.message));
         } else {
