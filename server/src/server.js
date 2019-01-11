@@ -5,8 +5,8 @@ import path from 'path';
 import reload from 'reload';
 import fs from 'fs';
 import bearerToken from 'express-bearer-token';
-import { hashPassword, reqAccessLevel, createToken, loginOk } from './auth.js';
-import { getAllUsers } from './routes/Users.js';
+import { hashPassword, reqAccessLevel, login, logout, createToken, loginOk } from './auth.js';
+import Users from './routes/Users.js';
 import { getAllCategories, addCategory, updateCategory, delCategory } from './routes/Categories.js';
 import {
   User,
@@ -41,43 +41,18 @@ app.get('/api/cases', (req: Request, res: Response) => {
 });
 
 app.get('/api/verify', (req, res) =>
-  reqAccessLevel(req, res, 4, (req, res) => {
-    let token = req.token;
-    if (token in tokens) {
-      return res.sendStatus(200);
-    } else {
-      return res.sendStatus(403);
-    }
+  reqAccessLevel(req, res, 1, (req, res) => {
+    console.log('------Token Verified!-------');
+    return res.sendStatus(200);
   })
 );
 
-app.post('/api/login', async (req: Request, res: Response) => {
-  if (!req.body || typeof req.body.email !== 'string' || typeof req.body.password !== 'string') {
-    return res.sendStatus(400);
-  }
-
-  let login = await loginOk(req.body.email, req.body.password);
-  if (login) {
-    let token = createToken(login.access_level, login.user_id);
-    tokens[token] = req.body.email;
-    res.status(200);
-    res.send({
-      token: token
-    });
-    return res;
-  } else {
-    return res.sendStatus(403);
-  }
+app.post('/api/login', (req: Request, res: Response) => {
+  return login(req, res);
 });
 
 app.post('/api/logout', (req: Request, res: Response) => {
-  if (!req.token) {
-    return res.sendStatus(400);
-  } else {
-    let token = req.token;
-    delete tokens[token];
-    return res.sendStatus(200);
-  }
+  return logout(req, res);
 });
 
 app.post('/api/cases', (req: Request, res: Response) => {
@@ -273,72 +248,24 @@ app.post('/api/roles', (req: Request, res: Response) => {
   }).then(roles => (roles ? res.send(roles) : res.sendStatus(404)));
 });
 
-app.get('/api/users', (req, res) => {
-  reqAccessLevel(req, res, 1, getAllUsers);
+app.get('/api/users', (req: Request, res: Response) =>{
+  reqAccessLevel(req, res, 1, Users.getAllUsers);
 });
 
 app.post('/api/users', (req: Request, res: Response) => {
-  console.log('Recieved post request for /api/users');
-  if (
-    !req.body ||
-    typeof req.body.firstname !== 'string' ||
-    typeof req.body.lastname !== 'string' ||
-    typeof req.body.tlf !== 'number' ||
-    typeof req.body.email !== 'string' ||
-    typeof req.body.password !== 'string' ||
-    typeof req.body.region_id !== 'number'
-  )
-    return res.sendStatus(400);
-
-  let hashedPassword = hashPassword(req.body.password);
-  let password = hashedPassword['passwordHash'];
-  let salt = hashedPassword['salt'];
-
-  return User.create({
-    firstname: req.body.firstname,
-    lastname: req.body.lastname,
-    tlf: req.body.tlf,
-    email: req.body.email,
-    hashed_password: password,
-    salt: salt,
-    role_id: 4,
-    region_id: req.body.region_id
-  }).then(users => (users ? res.send(users) : res.sendStatus(404)));
+  Users.createUser(req, res);
 });
 
 app.get('/api/users/:user_id', (req: Request, res: Response) => {
-  return User.findOne({ where: { user_id: Number(req.params.user_id) } }).then(user =>
-    user ? res.send(user) : res.sendStatus(404)
-  );
+  reqAccessLevel(req, res, 4, Users.getOneUser)
 });
 
 app.put('/api/users/:user_id', (req: Request, res: Response) => {
-  if (
-    !req.body ||
-    typeof req.body.firstname !== 'string' ||
-    typeof req.body.lastname !== 'string' ||
-    typeof req.body.tlf !== 'number' ||
-    typeof req.body.email !== 'string' ||
-    typeof req.body.region_id !== 'number'
-  )
-    return res.sendStatus(400);
-
-  return User.update(
-    {
-      firstname: req.body.firstname,
-      lastname: req.body.lastname,
-      tlf: req.body.tlf,
-      email: req.body.email,
-      region_id: req.body.region_id
-    },
-    { where: { user_id: req.params.user_id } }
-  ).then(users => (users ? res.send(users) : res.sendStatus(404)));
+  reqAccessLevel(req, res, 4, Users.updateOneUser)
 });
 
 app.delete('/api/users/:user_id', (req: Request, res: Response) => {
-  return User.destroy({ where: { user_id: Number(req.params.user_id) } }).then(user =>
-    user ? res.send() : res.status(500).send()
-  );
+  reqAccessLevel(req, res, 4, Users.deleteOneUser)
 });
 
 app.put('/api/users/:user_id/password', async (req: Request, res: Response) => {
