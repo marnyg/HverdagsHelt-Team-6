@@ -272,8 +272,8 @@ app.post('/api/roles', (req: Request, res: Response) => {
   }).then(roles => (roles ? res.send(roles) : res.sendStatus(404)));
 });
 
-app.get('/api/users', (req, res) =>{
-    reqAccessLevel(req, res, 1, getAllUsers);
+app.get('/api/users', (req, res) => {
+  reqAccessLevel(req, res, 1, getAllUsers);
 });
 
 app.post('/api/users', (req: Request, res: Response) => {
@@ -380,6 +380,18 @@ app.post('/api/counties', (req: Request, res: Response) => {
   return County.create({
     name: req.body.name
   }).then(counties => (counties ? res.send(counties) : res.sendStatus(404)));
+});
+
+app.put('/api/counties/:county_id', (req: Request, res: Response) => {
+  if (!req.body || typeof req.body.name !== 'string') return res.sendStatus(400);
+  return County.update(
+    {
+      name: req.body.name
+    },
+    {
+      where: { county_id: Number(req.params.county_id) }
+    }
+  ).then(counties => (counties ? res.send(counties) : res.sendStatus(404)));
 });
 
 app.delete('/api/counties/:county_id', (req: Request, res: Response) => {
