@@ -18,8 +18,10 @@ import Content from './Content.js';
 import Footer from './Footer.js';
 import MinSide from './MinSide.js';
 //import NewCase from './NewCase.js';
+import { BrowserRouter, Route } from 'react-router-dom';
+import axios from 'axios';
 
-import { NavLink } from 'react-router-dom';
+axios.interceptors.response.use(response => response.data);
 
 class App extends Component {
     render() {
