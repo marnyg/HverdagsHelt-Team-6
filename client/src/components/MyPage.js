@@ -2,13 +2,19 @@
 //
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import { MyCases } from './MyCases.js';
+import MyCases from './MyCases.js';
 import MyProfile from './MyProfile';
 import MyProfileEdit from './MyProfileEdit';
 import NewCase from './NewCase';
 import { NavLink } from 'react-router-dom';
 
 class MyPage extends Component {
+  menuItems = [
+    { name: 'Min Profil', component: <MyProfile /> },
+    { name: 'Komuner', component: <MyProfileEdit /> },
+    { name: 'Mine Saker', component: <MyCases /> }
+  ];
+
   comp = <MyProfile />;
   render() {
     return (
@@ -19,37 +25,20 @@ class MyPage extends Component {
           </div>
 
           <ul className="list-unstyled components">
-            <li>
-              <button
-                onClick={() => {
-                  this.comp = <MyProfile />;
-                }}
-                className={'btn btn-secondary'}
-              >
-                Min Profil
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => {
-                  this.comp = <MyProfileEdit />;
-                }}
-                className={'btn btn-secondary'}
-              >
-                Kommuner
-              </button>
-            </li>
-            <li>
-              {' '}
-              <button
-                onClick={() => {
-                  this.comp = <MyCases user_id={1} />;
-                }}
-                className={'btn btn-secondary'}
-              >
-                Mine Saker
-              </button>
-            </li>
+            {this.menuItems.map(e => {
+              return (
+                <li>
+                  <button
+                    className={'btn btn-secondary'}
+                    onClick={() => {
+                      this.comp = e.component;
+                    }}
+                  >
+                    {e.name}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </nav>
         {this.comp}
