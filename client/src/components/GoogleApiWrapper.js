@@ -19,15 +19,9 @@ export class GoogleMapsContainer extends Component {
     });
   };
   onClick(t, map, coord) {
-
-    console.log(this.props.userPos);
-
     const latLng = { lat: coord.latLng.lat(), lng: coord.latLng.lng() };
-    this.state.clickPos = latLng
-    // this.props.userPos = latLng;
-    this.props.tst(latLng)
-    console.log(latLng);
-    this.render()
+    this.props.updatePos(latLng);
+    this.render();
   }
   render() {
     const style = {
