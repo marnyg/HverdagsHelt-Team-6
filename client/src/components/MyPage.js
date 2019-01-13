@@ -4,14 +4,15 @@ import * as React from 'react';
 import { Component } from 'react-simplified';
 import MyCases from './MyCases.js';
 import MyProfile from './MyProfile';
-import MyProfileEdit from './MyProfileEdit';
 import NewCase from './NewCase';
 import { NavLink } from 'react-router-dom';
 
 class MyPage extends Component {
   menuItems = [
     { name: 'Min Profil', component: <MyProfile /> },
-    { name: 'Komuner', component: <MyProfileEdit /> },
+    { name: 'Min Profil', component: <MyProfile /> },
+    { name: 'Min Profil', component: <MyProfile /> },
+    { name: 'Min Profil', component: <MyProfile /> },
     { name: 'Mine Saker', component: <MyCases /> }
   ];
 
