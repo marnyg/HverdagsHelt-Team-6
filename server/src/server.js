@@ -39,10 +39,10 @@ app.get('/api/cases', (req: Request, res: Response) => {
 */
 
 app.post('/api/verify', (req, res) => {
-      reqAccessLevel(req, res, 1, (req, res) => {
-          console.log('------Token Verified!-------');
-          return res.sendStatus(200);
-      });
+  reqAccessLevel(req, res, 1, (req, res) => {
+    console.log('------Token Verified!-------');
+    return res.sendStatus(200);
+  });
 });
 
 app.post('/api/login', (req: Request, res: Response) => {
@@ -115,8 +115,8 @@ app.post('/api/cases/:case_id/status_comments', (req: Request, res: Response) =>
 });
 
 app.get('/api/cases/:case_id', (req: Request, res: Response) => {
-  return Case.findOne({ where: { case_id: Number(req.params.case_id) } }).then(cases =>
-    cases ? res.send(cases) : res.sendStatus(404)
+  return Case.findOne({ where: { case_id: Number(req.params.case_id) } }).then(
+    cases => (cases ? res.send(cases) : res.sendStatus(404))
   );
 });
 
@@ -150,8 +150,8 @@ app.put('/api/cases/:case_id', (req: Request, res: Response) => {
 });
 
 app.delete('/api/cases/:case_id', (req: Request, res: Response) => {
-  return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(cases =>
-    cases ? res.send() : res.status(500).send()
+  return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(
+    cases => (cases ? res.send() : res.status(500).send())
   );
 });
 
@@ -172,7 +172,7 @@ app.delete('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
 });
 
 app.get('/api/cases/region_cases/:county_name/:region_name', async (req: Request, res: Response) => {
-  let region = await Region.getOneRegionByNameAndCounty(req,res);
+  let region = await Region.getOneRegionByNameAndCounty(req, res);
   let regionId = region ? region : res.sendStatus(404);
   let cases = await Case.findAll({ where: { region_id: Number(regionId.region_id) }, order: [['updatedAt', 'DESC']] });
   cases = cases.map(c => c.toJSON());
@@ -180,7 +180,7 @@ app.get('/api/cases/region_cases/:county_name/:region_name', async (req: Request
     c.img = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
     return c;
   });
-  return Promise.all(out).then(cases => cases ? res.send(cases) : res.sendStatus(404));
+  return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
 });
 
 app.get('/api/statuses', (req: Request, res: Response) => {
