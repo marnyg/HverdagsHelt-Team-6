@@ -10,60 +10,57 @@ import Location from '../classes/Location.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faListUl, faTh } from '@fortawesome/free-solid-svg-icons/index';
 import Notify from './Notify.js';
+import CaseSubscriptionService from "../services/CaseSubscriptionService";
 
 class Content extends Component {
   cases = null;
   grid = true;
 
-    constructor(){
-        super();
-        Notify.flush();
-    }
+  constructor() {
+    super();
+    Notify.flush();
+  }
 
-    render() {
-        if(!this.cases) return null;
-        return (
-            <div>
-                <div className="d-none d-sm-block">
-                    <div className="btn-toolbar my-3 mx-2" role="toolbar">
-                        <div className="btn-group mr-2" role="group">
-                            <button type="button" className={this.grid ? "btn btn-secondary" : "btn btn-secondary"} onClick={() => (this.grid = true)}>
-                                <FontAwesomeIcon icon={faTh}/> Grid
-                            </button>
-                            <button type="button" className="btn btn-secondary" onClick={() => (this.grid = false)}>
-                                <FontAwesomeIcon icon={faListUl}/> List
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    {this.grid ?
-                        <div className="content">
-                            {this.cases.map(e => (<CaseItem case={e} key={e.case_id} grid={this.grid}/>))}
-                        </div>
-                        :
-                        this.cases.map(e => (<CaseItem case={e} key={e.case_id} grid={this.grid}/>))
-                    }
-                </div>
+  render() {
+    if (!this.cases) return null;
+    return (
+      <div>
+        <div>
+          <div className="d-none d-sm-block">
+            <div className="btn-toolbar my-3 mx-2" role="toolbar">
+              <div className="btn-group mr-2" role="group">
+                <button
+                  type="button"
+                  className={this.grid ? 'btn btn-secondary' : 'btn btn-secondary'}
+                  onClick={() => (this.grid = true)}
+                >
+                  <FontAwesomeIcon icon={faTh} /> Grid
+                </button>
+                <button type="button" className="btn btn-secondary" onClick={() => (this.grid = false)}>
+                  <FontAwesomeIcon icon={faListUl} /> List
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-        <div>
-          {this.grid ? (
-            <div className="content">
-              {this.cases.map(e => (
-                <CaseItem case={e} key={e.case_id} grid={this.grid} />
-              ))}
-            </div>
-          ) : (
-            this.cases.map(e => <CaseItem case={e} key={e.case_id} grid={this.grid} />)
-          )}
+          <div>
+            {this.grid ? (
+              <div className="content">
+                {this.cases.map(e => (
+                  <CaseItem case={e} key={e.case_id} grid={this.grid} />
+                ))}
+              </div>
+            ) : (
+              this.cases.map(e => <CaseItem case={e} key={e.case_id} grid={this.grid} />)
+            )}
+          </div>
         </div>
       </div>
     );
   }
 
   mounted() {
+    console.log('Using token:', localStorage.getItem('token'));
+
     if (this.props.match && this.props.match.params) {
       // Redirected from search
       // Must render only search results
@@ -80,7 +77,7 @@ class Content extends Component {
       locationService
         .getLocation()
         .then((location: Location) => {
-            /*
+          /*
             console.log("Location", location);
             let caseService = new CaseService();
             caseService.getCasesByLoc(location.city, location.region)
@@ -131,7 +128,6 @@ class Content extends Component {
         description: 'Dårlig måking ved NTNU Kalvskinnget. Kommunen må få ut fingeren før noen slår seg.'
       }
     ];
-
   }
 }
 export default Content;

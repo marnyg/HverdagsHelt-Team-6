@@ -1,26 +1,95 @@
 // @flow
 import axios from 'axios';
 import RegionSubscription from '../classes/RegionSubscription.js';
+import LoginService from './LoginService.js';
 
 class RegionSubscriptionService {
-  //Get all subscribers, given region
   getAllRegionSubscribers(region_id: number): Promise<RegionSubscription[]> {
-    return axios.get('/api/regions/' + region_id + '/subscribe');
+    return new Promise((resolve, reject) => {
+         let loginService = new LoginService();
+         loginService.isLoggedIn()
+             .then((logged_in: Boolean) => {
+                 if(logged_in === true){
+                     let token = localStorage.getItem('token');
+                     axios.get('/api/regions/' + region_id + '/subscribe', {
+                         headers: {
+                             Authorization: 'Bearer ' + token
+                         }
+                     })
+                         .then(response => resolve(response))
+                         .catch((error: Error) => reject(error));
+                 } else {
+                     reject('User is not registered and/or not logged in.');
+                 }
+             })
+             .catch((error: Error) => reject(error));
+     });
   }
 
-  //Delete subscription, given case
   deleteRegionSubscription(case_id: number): Promise<void> {
-    return axios.delete('/api/cases/' + case_id + '/subscribe');
+    return new Promise((resolve, reject) => {
+         let loginService = new LoginService();
+         loginService.isLoggedIn()
+             .then((logged_in: Boolean) => {
+                 if(logged_in === true){
+                     let token = localStorage.getItem('token');
+                     axios.delete('/api/cases/' + case_id + '/subscribe', {
+                         headers: {
+                             Authorization: 'Bearer ' + token
+                         }
+                     })
+                         .then(response => resolve(response))
+                         .catch((error: Error) => reject(error));
+                 } else {
+                     reject('User is not registered and/or not logged in.');
+                 }
+             })
+             .catch((error: Error) => reject(error));
+     });
   }
 
-  //Create subscription, given region
   createRegionSubscription(r: RegionSubscription, region_id: number): Promise<RegionSubscription> {
-    return axios.post('/api/regions/' + region_id + '/subscribe', r);
+    return new Promise((resolve, reject) => {
+         let loginService = new LoginService();
+         loginService.isLoggedIn()
+             .then((logged_in: Boolean) => {
+                 if(logged_in === true){
+                     let token = localStorage.getItem('token');
+                     axios.post('/api/regions/' + region_id + '/subscribe', r, {
+                         headers: {
+                             Authorization: 'Bearer ' + token
+                         }
+                     })
+                         .then(response => resolve(response))
+                         .catch((error: Error) => reject(error));
+                 } else {
+                     reject('User is not registered and/or not logged in.');
+                 }
+             })
+             .catch((error: Error) => reject(error));
+     });
   }
 
-  //Update subscription, given region
   updateRegionSubscription(r: RegionSubscription, region_id: number): Promise<void> {
-    return axios.put('/api/regions/' + region_id + '/subscribe', r);
+    return new Promise((resolve, reject) => {
+         let loginService = new LoginService();
+         loginService.isLoggedIn()
+             .then((logged_in: Boolean) => {
+                 if(logged_in === true){
+                     let token = localStorage.getItem('token');
+                     axios.put('/api/regions/' + region_id + '/subscribe', r, {
+                         headers: {
+                             Authorization: 'Bearer ' + token
+                         }
+                     })
+                         .then(response => resolve(response))
+                         .catch((error: Error) => reject(error));
+                 } else {
+                     reject('User is not registered and/or not logged in.');
+                 }
+             })
+             .catch((error: Error) => reject(error));
+     });
   }
 }
 

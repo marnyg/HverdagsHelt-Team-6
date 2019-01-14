@@ -1,88 +1,163 @@
 // @flow
 import axios from 'axios';
 import User from '../classes/User.js';
+import LoginService from './LoginService.js';
 
 class UserService {
-  //Get all users
   getAllUsers(): Promise<User[]> {
-    return axios.get('/api/users');
+    return new Promise((resolve, reject) => {
+         let loginService = new LoginService();
+         loginService.isLoggedIn()
+             .then((logged_in: Boolean) => {
+                 if(logged_in === true){
+                     let token = localStorage.getItem('token');
+                     axios.get('/api/users', {
+                         headers: {
+                             Authorization: 'Bearer ' + token
+                         }
+                     })
+                         .then(response => resolve(response))
+                         .catch((error: Error) => reject(error));
+                 } else {
+                     reject('User is not registered and/or not logged in.');
+                 }
+             })
+             .catch((error: Error) => reject(error));
+     });
   }
 
-  //Get one specific user
-  getUser(user_id: number): Promise<User> { // Trenger token i header her
-    let token = localStorage.getItem('token');
-    axios.post('/api/login', {}, {
-      headers: {
-        Authorization: 'Bearer ' + token
-      }
-    }).then((response) => {
-      if(response.status = 200){
-        return axios.get('/api/users/' + user_id);
-      } else {
-        return response.sendStatus(403);
-      }
-    }).catch((error: Error) => console.error(error));
+  getUser(user_id: number): Promise<User> {
+    return new Promise((resolve, reject) => {
+         let loginService = new LoginService();
+         loginService.isLoggedIn()
+             .then((logged_in: Boolean) => {
+                 if(logged_in === true){
+                     let token = localStorage.getItem('token');
+                     axios.get('/api/users/' + user_id, {
+                         headers: {
+                             Authorization: 'Bearer ' + token
+                         }
+                     })
+                         .then(response => resolve(response))
+                         .catch((error: Error) => reject(error));
+                 } else {
+                     reject('User is not registered and/or not logged in.');
+                 }
+             })
+             .catch((error: Error) => reject(error));
+     });
   }
 
-  //Update one specific user
-  updateUser(user_id: number, u: User): Promise<void> { // Trenger token i header her
-    let token = localStorage.getItem('token');
-    axios.post('/api/login', {}, {
-      headers: {
-        Authorization: 'Bearer ' + token
-      }
-    }).then((response) => {
-    if(response.status = 200){
-      axios.put('/api/users/' + user_id, u);
-    } else {
-      response.sendStatus(403);
-    }
-    }).catch((error: Error) => console.error(error));
+  updateUser(user_id: number, u: User): Promise<any> {
+    return new Promise((resolve, reject) => {
+         let loginService = new LoginService();
+         loginService.isLoggedIn()
+             .then((logged_in: Boolean) => {
+                 if(logged_in === true){
+                     let token = localStorage.getItem('token');
+                     axios.put('/api/users/' + user_id, u, {
+                         headers: {
+                             Authorization: 'Bearer ' + token
+                         }
+                     })
+                         .then(response => resolve(response))
+                         .catch((error: Error) => reject(error));
+                 } else {
+                     reject('User is not registered and/or not logged in.');
+                 }
+             })
+             .catch((error: Error) => reject(error));
+     });
   }
 
-  //Delete one specific user
-  deleteUser(user_id: number): Promise<void> { // Trenger token i header her
-    let token = localStorage.getItem('token');
-    axios.post('/api/login', {}, {
-      headers: {
-        Authorization: 'Bearer ' + token
-      }
-    }).then((response) => {
-      if(response.status = 200){
-        axios.delete('/api/users/' + user_id);
-      } else {
-
-      }
-    }).catch((error: Error) => console.error(error));
+  deleteUser(user_id: number): Promise<any> {
+    return new Promise((resolve, reject) => {
+         let loginService = new LoginService();
+         loginService.isLoggedIn()
+             .then((logged_in: Boolean) => {
+                 if(logged_in === true){
+                     let token = localStorage.getItem('token');
+                     axios.delete('/api/users/' + user_id, {
+                         headers: {
+                             Authorization: 'Bearer ' + token
+                         }
+                     })
+                         .then(response => resolve(response))
+                         .catch((error: Error) => reject(error));
+                 } else {
+                     reject('User is not registered and/or not logged in.');
+                 }
+             })
+             .catch((error: Error) => reject(error));
+     });
   }
 
-  //Create user
+  //Create user(RIKTIGE PARAMETERE?)
   createUser(u: User): Promise<User> {
-    return axios.post('/api/users', u);
+      console.log(u);
+    return axios.post('/api/users', u, {
+        headers: {'Content-Type': 'application/json'},
+    });
   }
 
-  //Update user password
-  updatePassword(user_id: number, u: User): Promise<void> { // Trenger token i header her
-    let token = localStorage.getItem('token');
-    let res = axios.post('/api/login', {}, {
-      headers: {
-        Authorization: 'Bearer ' + token
-      }
-    });
-    if(res = 200){
-      return axios.put('/api/users/' + user_id + '/password', u);
-    } else {
-      return res.sendStatus(400);
-    }
+  updatePassword(user_id: number, old_password: string, new_password: string): Promise<void> { // Trenger token i header her
+    return new Promise((resolve, reject) => {
+         let loginService = new LoginService();
+         loginService.isLoggedIn()
+             .then((logged_in: Boolean) => {
+                 if(logged_in === true){
+                     let token = localStorage.getItem('token');
+                     axios.post('/api/users/' + user_id, {
+                       body: {
+                         old_password: old_password,
+                         new_password: new_password
+                       }
+                     }, {
+                         headers: {
+                             Authorization: 'Bearer ' + token
+                         }
+                     })
+                         .then(response => resolve(response))
+                         .catch((error: Error) => reject(error));
+                 } else {
+                     reject('User is not registered and/or not logged in.');
+                 }
+             })
+             .catch((error: Error) => reject(error));
+     });
   }
 
   //Check if e-mail is available
-  emailAvailable(): Promise<User> {   //SKAL DENNE RETURNERE EN BOOLEAN ELLER BRUKER OBJEKT??
-    return axios.get('/api/email_available');
+  emailAvailable(email: string): Promise<User> {   //SKAL DENNE RETURNERE EN BOOLEAN ELLER BRUKER OBJEKT??
+    return axios.get('/api/email_available', email);
   }
 
-  login(email: string, password: string): Promise<void> {
-    return axios.post('/api/login');
+  login(email: string, password: string): Promise<any> {
+      return new Promise(((resolve, reject) => {
+          axios.post('/api/login', { email: email, password: password })
+              .then(token => {
+                  console.log('UserService login received this token:', token.token);
+                  localStorage.setItem('token', token.token);
+                  resolve('Logged in');
+              })
+              .catch((error: Error) => reject(error));
+      }));
+  }
+
+  logout(): Promise<any>{
+        let token = localStorage.getItem('token');
+        return new Promise(((resolve, reject) => {
+            axios.post('/api/logout', {}, {
+                headers: {
+                    Authorization: 'Bearer ' + token
+                }
+            })
+                .then(res => {
+                    localStorage.removeItem('token');
+                    resolve(res);
+                })
+                .catch((error: Error) => reject(error));
+        }));
   }
 }
 
