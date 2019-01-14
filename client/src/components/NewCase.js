@@ -6,7 +6,7 @@ import { CountyService } from '../services/CountyService';
 import { RegionService } from '../services/RegionService';
 import { CategoryService } from '../services/CategoryService';
 import { CaseService } from '../services/CaseService';
-import { Notify } from './Notify';
+import Notify from './Notify';
 import LocationService from '../services/LocationService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons/index';
