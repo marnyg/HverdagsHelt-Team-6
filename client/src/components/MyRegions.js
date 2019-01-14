@@ -3,39 +3,52 @@
 //
 import * as React from 'react';
 import { Component } from 'react-simplified';
+import CountyService from '../services/CountyService'
+import RegionService from '../services/RegionService'
+import RegionSubscriptionService from '../services/RegionSubscriptionService'
 
 class MyProfile extends Component<{}, { isEditing: boolean }> {
     // state = { isEditing: false };
-    reagion = [];
+    region = [];
     county = [];
-    subscribedCountis = [];
+    followedRegions = [];
 
     user = null
     render() {
         return <div>
-            {this.getListEllement("Dine Komuner", this.subscribedCountis, <button onClick={this.handleDelete}>remove</button>)}
-            {this.getFilterListEllement("Fylker", this.reagion)}
-            {this.getListEllement("Komuner", this.county, <button onClick={this.handleAdd}>add</button>)}
+            {this.getYourRegionListEllement("Dine Komuner", this.followedRegions, <button onClick={this.handleDelete}>remove</button>)}
+            {this.getCountyListEllement("Fylker", this.county)}
+            {this.getRegionListEllement("Komuner", this.region, <button onClick={this.handleAdd}>add</button>)}
         </div>
 
     }
-    getListEllement(headline: string, listItems: Array<{ name: string, id: number }>, button) {
+    getYourRegionListEllement(headline: string, listItems: Array<{ name: string, id: number }>, button) {
         return <div>
             {headline}
             <ul>
                 {listItems.map(e => {
-                    return <li id={e.id}>{e.name} {button}</li>
+                    return <li id={e.region_id}>{e.name} {button}</li>
                 })}
             </ul>
         </div>
     }
-    getFilterListEllement(headline: string, listItems: Array<{ name: string, id: number }>) {
+    getCountyListEllement(headline: string, listItems: Array<{ name: string, id: number }>, button) {
+        return <div>
+            {headline}
+            <ul>
+                {listItems.map(e => {
+                    return <li id={e.county_id} onClick={this.filterKomuner}>{e.name} {button}</li>
+                })}
+            </ul>
+        </div>
+    }
+    getRegionListEllement(headline: string, listItems: Array<{ name: string, id: number }>, button) {
         return <div>
             {headline}
             < ul >
                 {
                     listItems.map(e => {
-                        return <li id={e.id} onClick={this.filterKomuner}>{e.name}</li>
+                        return <li id={e.region_id}> {e.name} {button}</li>
                     })
                 }
             </ul >
@@ -43,7 +56,7 @@ class MyProfile extends Component<{}, { isEditing: boolean }> {
     }
     filterKomuner(e) {
         let all = Array.prototype.slice.call(e.target.parentNode.children, 0);
-        console.log(all.map(e => e.removeAttribute("class", "bg-dark")));
+        all.map(e => e.removeAttribute("class", "bg-dark"));
         e.target.setAttribute("class", "bg-dark")
         console.log("finltering on region with id " + e.target.id);
 
@@ -52,16 +65,23 @@ class MyProfile extends Component<{}, { isEditing: boolean }> {
     handleDelete(e) {
         console.log(e);
         console.log("delete " + e.target.parentNode.id);
+
+        console.log("delete " + e.target.parentNode.id);
     }
 
     handleAdd(e) {
-        console.log(e);
+        console.log(e.target.parentNode);
         console.log("add " + e.target.parentNode.id);
     }
     mounted() {
-        this.county = [{ name: "aa", id: 1 }, { name: "ba", id: 2 }, { name: "ab", id: 3 }, { name: "bb", id: 4 },]
-        this.subscribedCountis = [{ name: "aa", id: 1 }, { name: "bc", id: 4 }];
-        this.reagion = [{ name: "a", id: 1 }, { name: "b", id: 2 }];
+        let b = new RegionService()
+        let a = new CountyService()
+
+
+        a.getAllCounties().then(res => this.county = res).catch()
+        b.getAllRegions().then(res => this.region = res).catch()
+
+
     }
 }
 
