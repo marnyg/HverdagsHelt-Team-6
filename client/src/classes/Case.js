@@ -7,8 +7,8 @@ class Case {
   status_id: number;
   title: string;
   description: string;
-  created_at: any;
-  updated_at: any;
+  createdAt: any;
+  updatedAt: any;
   lat: number;
   lon: number;
   picture: Picture[];

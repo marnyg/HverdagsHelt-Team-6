@@ -5,7 +5,7 @@ import LoginService from './LoginService.js';
 
 class CaseService {
   //Get all cases
-  getAllCases(): Promise<Case[]> {
+  static getAllCases(): Promise<Case[]> {
     return axios.get('/api/cases');
   }
 

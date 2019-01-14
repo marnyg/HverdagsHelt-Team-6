@@ -1,103 +1,41 @@
 // @flow
 import axios from 'axios';
 import CaseSubscription from '../classes/CaseSubscription.js';
-import LoginService from './LoginService.js';
 
 class CaseSubscriptionService {
   //Get all subscriotions, given user
-  getAllCaseSubscriptions(user_id: number): Promise<CaseSubscription[]> {
-    //return axios.get('/api/cases/subscription/' + user_id);
-      return new Promise((resolve, reject) => {
-          let loginService = new LoginService();
-          loginService.isLoggedIn()
-              .then((logged_in: Boolean) => {
-                  if(logged_in === true){
-                      let token = localStorage.getItem('token');
-                      axios.get('/api/cases/subscriptions/' + user_id, {}, {
-                          headers: {
-                              Authorization: 'Bearer ' + token
-                          }
-                      })
-                          .then((subscriptions: CaseSubscription[]) => resolve(subscriptions))
-                          .catch((error: Error) => reject(error));
-                  } else {
-                      reject('User is not logged in');
-                  }
-              })
-              .catch((error: Error) => reject(error));
-      });
+  static getAllCaseSubscriptions(user_id: number): Promise<CaseSubscription[]> {
+    return axios.get('/api/cases/subscription/' + user_id);
   }
 
   //Delete subscription, given case
-  deleteCaseSubscription(case_id: number): Promise<any> {
-      return new Promise((resolve, reject) => {
-          let loginService = new LoginService();
-          loginService.isLoggedIn()
-              .then((logged_in: Boolean) => {
-                  if(logged_in === true){
-                      let token = localStorage.getItem('token');
-                      ///api/cases/:case_id/subscribe
-                      axios.delete('/api/cases/' + case_id + '/subscribe', {}, {
-                          headers: {
-                              Authorization: 'Bearer ' + token
-                          }
-                      })
-                          .then(response => resolve(response))
-                          .catch((error: Error) => reject(error));
-                  } else {
-                      reject('User is not logged in');
-                  }
-              })
-              .catch((error: Error) => reject(error));
-      });
+  static deleteCaseSubscription(case_id: number): Promise<void> {
+    let token = localStorage.getItem('token');
+    let res = axios.post('/api/login', {}, {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    });
+    if(res = 200){
+      return axios.delete('/api/cases/' + case_id + '/subscribe');
+    } else {
+      return res.sendStatus(400);
+    }
   }
 
   //Create subscription, given case
-  createCaseSubscription(subscription: CaseSubscription): Promise<CaseSubscription> {
-      return new Promise((resolve, reject) => {
-          let loginService = new LoginService();
-          loginService.isLoggedIn()
-              .then((logged_in: Boolean) => {
-                  if(logged_in === true){
-                      let token = localStorage.getItem('token');
-                      //'/api/cases/:case_id/subscribe'
-                      axios.post('/api/cases/' + subscription.case_id + '/subscribe', subscription, {
-                          headers: {
-                              Authorization: 'Bearer ' + token
-                          }
-                      })
-                          .then(response => resolve(response))
-                          .catch((error: Error) => reject(error));
-                  } else {
-                      reject('User is not logged in');
-                  }
-              })
-              .catch((error: Error) => reject(error));
-      });
-  }
-
-  updateCaseSubscription(subscription: CaseSubscription): Promise<any> {
-    //axios.put('/api/cases/' + case_id + '/subscribe');
-      return new Promise((resolve, reject) => {
-          let loginService = new LoginService();
-          loginService.isLoggedIn()
-              .then((logged_in: Boolean) => {
-                  if(logged_in === true){
-                      let token = localStorage.getItem('token');
-                      //'/api/cases/:case_id/subscribe'
-                      axios.put('/api/cases/' + subscription.case_id + '/subscribe', subscription, {
-                          headers: {
-                              Authorization: 'Bearer ' + token
-                          }
-                      })
-                          .then(response => resolve(response))
-                          .catch((error: Error) => reject(error));
-                  } else {
-                      reject('User is not logged in');
-                  }
-              })
-              .catch((error: Error) => reject(error));
-      });
+  static createCaseSubscription(s: CaseSubscription, case_id: number): Promise<CaseSubscription> {
+    let token = localStorage.getItem('token');
+    let res = axios.post('/api/login', {}, {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    });
+    if(res = 200){
+      return axios.post('/api/cases/' + case_id + '/subscribe', s);
+    } else {
+      return res.sendStatus(400);
+    }
   }
 }
 
