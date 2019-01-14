@@ -9,11 +9,11 @@ import { hashPassword, reqAccessLevel, login, logout, createToken, loginOk } fro
 import Users from './routes/Users.js';
 import Category from './routes/Categories.js';
 import Region_subscriptions from './routes/Region_subscriptions.js';
-import Region from './routes/Region.js';
+import Region from './routes/Regions.js';
 import County from './routes/Counties.js';
 import Role from './routes/Roles.js';
 import Status from './routes/Statuses.js';
-import { Case_subscriptions, Case, Status_comment } from './models.js';
+import { Case_subscriptions, Status_comment, Picture } from './models.js';
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
 
@@ -30,9 +30,12 @@ app.use(express.static(public_path));
 app.use(express.json()); // For parsing application/json
 app.use(bearerToken()); // For easy access to token sent in 'Authorization' header.
 
+// Depreciated
+/*
 app.get('/api/cases', (req: Request, res: Response) => {
-  return Case.findAll().then(cases => res.send(cases));
+  return Case.getAllCases(req,res);
 });
+*/
 
 app.get('/api/verify', (req, res) =>
   reqAccessLevel(req, res, 1, (req, res) => {

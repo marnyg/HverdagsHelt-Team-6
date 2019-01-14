@@ -12,6 +12,11 @@ module.exports = {
       regions ? res.send(regions) : res.sendStatus(404)
     );
   },
+  getRegionName: function(req: Request, res: Response) {
+    return Region.findOne({where: {region_id: res.body.region_id}, attributes: ['name']}).then(name =>
+      name ? res.send(name) : res.sendStatus(404)
+    );
+  },
   getOneRegionByNameAndCounty: async function(req: Request, res: Response) {
     let c_id = await County.getOneCountyByName(req,res);
     let countyId = c_id ? c_id : res.sendStatus(404);
