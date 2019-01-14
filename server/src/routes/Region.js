@@ -1,6 +1,7 @@
 // @flow
 
 import { Region } from '../models.js';
+import County from './Counties';
 
 type Request = express$Request;
 type Response = express$Response;
@@ -10,6 +11,12 @@ module.exports = {
     return Region.findAll({ where: { county_id: Number(req.params.county_id) } }).then(regions =>
       regions ? res.send(regions) : res.sendStatus(404)
     );
+  },
+  getOneRegionByNameAndCounty: async function(req: Request, res: Response) {
+    let c_id = await County.getOneCountyByName(req,res);
+    let countyId = c_id ? c_id : res.sendStatus(404);
+    return Region.findOne({where: {name: req.params.region_name, county_id: Number(countyId.county_id) }, attributes: ['region_id']}).then(regions =>
+      regions ? regions : res.sendStatus(404));
   },
   getAllRegions: function(req: Request, res: Response) {
     return Region.findAll().then(regions => res.send(regions));

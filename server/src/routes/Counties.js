@@ -9,6 +9,10 @@ module.exports = {
   getAllCounties: function(req: Request, res: Response) {
     return County.findAll().then(counties => res.send(counties));
   },
+  getOneCountyByName: function(req: Request, res: Response) {
+    return County.findOne({where: {name: req.params.county_name}, attributes: ['county_id']}).then(counties =>
+      counties ? counties : res.sendStatus(404));
+  },
   addCounty: function(req: Request, res: Response) {
     if (!req.body || typeof req.body.name !== 'string') return res.sendStatus(400);
     return County.create({

@@ -169,46 +169,15 @@ app.delete('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
 });
 
 app.get('/api/cases/region_cases/:county_name/:region_name', async (req: Request, res: Response) => {
-  let countyId = await County.findOne({
-    where: { name: req.params.county_name }
+  let region = await Region.getOneRegionByNameAndCounty(req,res);
+  let regionId = region ? region : res.sendStatus(404);
+  let cases = await Case.findAll({ where: { region_id: Number(regionId.region_id) }, order: [['updatedAt', 'DESC']] });
+  cases = cases.map(c => c.toJSON());
+  const out = cases.map(async c => {
+    c.img = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+    return c;
   });
-
-  if (countyId !== null) {
-    countyId = countyId.county_id;
-  } else {
-    return res.sendStatus(404);
-  }
-  let regionId = await Region.findOne({
-    where: { name: req.params.region_name, county_id: countyId }
-  });
-  if (regionId !== null) {
-    regionId = regionId.region_id;
-  } else {
-    return res.sendStatus(404);
-  }
-  /*
-  let out = null;
-  return Case.findAll({
-    where: {
-      region_id: regionId
-    },
-    order: [['updatedAt', 'DESC']]
-  }).then(cases => cases.map(c => {
-    let img = Picture.findAll({ where: { case_id: c.case_id } }).then(img => {
-      out = c.toJSON();
-      out.img = img;
-      console.log(out);
-      cases = out; // out inneholder nå også bilde-array
-    });
-  })).then(cases =>res.send(cases));
-});
-*/
-  return Case.findAll({
-    where: {
-      region_id: regionId
-    },
-    order: [['updatedAt', 'DESC']]
-  }).then(cases => res.send(cases)); //works for returning cases
+  Promise.all(out).then(cases => cases ? res.send(cases) : res.sendStatus(404));
 });
 
 app.get('/api/statuses', (req: Request, res: Response) => {
