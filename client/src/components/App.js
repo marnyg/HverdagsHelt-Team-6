@@ -18,6 +18,7 @@ import Navbar from './Navbar.js';
 import Content from './Content.js';
 import Footer from './Footer.js';
 import MyPage from './MyPage.js';
+import ViewCase from './ViewCase.js';
 import NewCase from './NewCase.js';
 import MyCases from './CaseList.js';
 import axios from 'axios';
@@ -30,7 +31,6 @@ class App extends Component {
       <BrowserRouter>
         <div>
           <Navbar />
-          <MyCases />
           <div className="content-wrapper">
             <Notify />
             <Route exact path="/" render={() => <Content />} />
