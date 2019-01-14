@@ -97,27 +97,31 @@ class UserService {
     return axios.post('/api/users', u);
   }
 
-  //Update user password(SKAL TOKEN BRUKES HER?, riktige parametere?)
   updatePassword(user_id: number, old_password: string, new_password: string): Promise<void> { // Trenger token i header her
-    let token = localStorage.getItem('token');
-    let loginService = new LoginService();
-
-    loginService.isLoggedIn().then(loggedIn => {
-      if(loggedIn === true){
-        return axios.post('/api/users/' + user_id + '/password', {
-          body: {
-            old_password: old_password,
-            new_password: new_password
-          }
-        }, {
-          headers: {
-            Authorization: 'Bearer ' + token
-          }
-        })
-      } else {
-        //Returner status-melding her om bruker ikke er riktig
-      }
-    }).catch((error: Error) => console.error(error));
+    return new Promise((resolve, reject) => {
+         let loginService = new LoginService();
+         loginService.isLoggedIn()
+             .then((logged_in: Boolean) => {
+                 if(logged_in === true){
+                     let token = localStorage.getItem('token');
+                     axios.post('/api/users/' + user_id, {
+                       body: {
+                         old_password: old_password,
+                         new_password: new_password
+                       }
+                     }, {
+                         headers: {
+                             Authorization: 'Bearer ' + token
+                         }
+                     })
+                         .then(response => resolve(response))
+                         .catch((error: Error) => reject(error));
+                 } else {
+                     reject('User is not registered and/or not logged in.');
+                 }
+             })
+             .catch((error: Error) => reject(error));
+     });
   }
 
   //Check if e-mail is available
