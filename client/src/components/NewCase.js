@@ -2,9 +2,10 @@ import ReactDOM from 'react-dom';
 import * as React from 'react';
 import { Component } from 'react-simplified';
 import { NavLink, withRouter } from 'react-router-dom';
-import { countyService } from '../services/CountyService';
-import { regionService } from '../services/RegionService';
-import { categoryService } from '../services/CategoryService';
+import CountyService from '../services/CountyService';
+import CaseService from '../services/CaseService';
+import RegionService from '../services/RegionService';
+import CategoryService from '../services/CategoryService';
 import Notify from './Notify.js';
 import LocationService from '../services/LocationService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -44,8 +45,8 @@ class NewCase extends Component {
               >
                 <div className={'form-group'}>
                   <label htmlFor="category">Kategori</label>
-                  <select className={'form-control'} id={'category'} required>
-                    <option selected disabled>
+                  <select defaultValue={'.null'} className={'form-control'} id={'category'} required>
+                    <option value={'.null'} disabled>
                       Kategori
                     </option>
                     {this.categories.map(e => (
@@ -121,12 +122,13 @@ class NewCase extends Component {
                 </div>
                 <div className={'form-group ml-3 my-3'}>
                   <select
+                    defaultValue={'.null'}
                     className={'form-control mb-3'}
                     id={'last-resort-county'}
                     onChange={this.countyListener}
                     hidden
                   >
-                    <option selected disabled>
+                    <option value={'.null'} disabled>
                       Velg fylke
                     </option>
                     {this.counties.map(e => (
@@ -137,12 +139,13 @@ class NewCase extends Component {
                     ))}
                   </select>
                   <select
+                    defaultValue={'.null'}
                     className={'form-control mb-3'}
                     id={'last-resort-municipality'}
                     onChange={this.municipalityListener}
                     hidden
                   >
-                    <option selected disabled>
+                    <option value={'.null'} disabled>
                       Velg kommune
                     </option>
                     {this.municipalities.map(e => (
@@ -215,40 +218,42 @@ class NewCase extends Component {
   }
 
   mounted() {
-    // this.list1 = document.getElementById('last-resort-county');
-    // this.list2 = document.getElementById('last-resort-municipality');
-    // this.lastResortAddress = document.getElementById('last-resort-address');
-    // this.lastResortAddressLabel = document.getElementById('last-resort-address-label');
+    this.list1 = document.getElementById('last-resort-county');
+    this.list2 = document.getElementById('last-resort-municipality');
+    this.lastResortAddress = document.getElementById('last-resort-address');
+    this.lastResortAddressLabel = document.getElementById('last-resort-address-label');
 
     // Fetching logic
-    // console.log('Fetchng categories.');
-    // categoryService
-    //   .getAllCategories()
-    //   .then(e => (this.categories = e))
-    //   .then(e => console.log('Received ' + e.length + ' categories from server.'))
-    //   .catch((err: Error) => {
-    //     console.warn('FEIL!' + err.toString());
-    //     Notify.danger(
-    //       'Det oppstod en feil under lasting av kategorier. ' +
-    //         'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-    //         '\n\nFeilmelding: ' +
-    //         err.toString()
-    //     );
-    //   });
-    // console.log('Fetchng counties.');
-    // countyService
-    //   .getAllCounties()
-    //   .then(e => (this.counties = e))
-    //   .then(e => console.log('Received ' + e.length + ' counties from server.'))
-    //   .catch((err: Error) => {
-    //     console.warn('FEIL!' + err.toString());
-    //     Notify.danger(
-    //       'Det oppstod en feil under lasting av fylker. ' +
-    //         'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-    //         '\n\nFeilmelding: ' +
-    //         err.toString()
-    //     );
-    //   });
+    console.log('Fetchng categories.');
+    let cat = new CategoryService();
+    let cout = new CountyService();
+    cat
+      .getAllCategories()
+      .then(e => (this.categories = e))
+      .then(e => console.log('Received ' + e.length + ' categories from server.'))
+      .catch((err: Error) => {
+        console.warn('FEIL!' + err.toString());
+        Notify.danger(
+          'Det oppstod en feil under lasting av kategorier. ' +
+            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+            '\n\nFeilmelding: ' +
+            err.toString()
+        );
+      });
+    console.log('Fetchng counties.');
+    cout
+      .getAllCounties()
+      .then(e => (this.counties = e))
+      .then(e => console.log('Received ' + e.length + ' counties from server.'))
+      .catch((err: Error) => {
+        console.warn('FEIL!' + err.toString());
+        Notify.danger(
+          'Det oppstod en feil under lasting av fylker. ' +
+            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+            '\n\nFeilmelding: ' +
+            err.toString()
+        );
+      });
     console.log('Mounted!');
   }
 
@@ -362,21 +367,22 @@ class NewCase extends Component {
         ').'
     );
     // Fetching logic here
-    // regionService
-    //   .getAllRegionGivenCounty(county_id)
-    //   .then(e => (this.municipalities = e))
-    //   .then(e => console.log('Received ' + e.length + ' municipalities from server.'))
-    //   .catch((err: Error) => {
-    //     console.warn(err.toString());
-    //     Notify.danger(
-    //       'Det oppstod en feil under lasting av kommuner fra fylke ' +
-    //         this.list1.options[this.list1.selectedIndex].text +
-    //         '. ' +
-    //         'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-    //         '\n\nFeilmelding: ' +
-    //         err.toString()
-    //     );
-    //   });
+    let reg = new RegionService();
+    reg
+      .getAllRegionGivenCounty(county_id)
+      .then(e => (this.municipalities = e))
+      .then(e => console.log('Received ' + e.length + ' municipalities from server.'))
+      .catch((err: Error) => {
+        console.warn(err.toString());
+        Notify.danger(
+          'Det oppstod en feil under lasting av kommuner fra fylke ' +
+            this.list1.options[this.list1.selectedIndex].text +
+            '. ' +
+            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+            '\n\nFeilmelding: ' +
+            err.toString()
+        );
+      });
   }
 
   resetMunicipalityList() {
@@ -509,26 +515,27 @@ class NewCase extends Component {
   send(obj: Case) {
     console.log('Sending form data to server.');
     console.log('Case is ' + JSON.stringify(obj));
-    // caseService
-    //   .createCase(obj)
-    //   .then(e => {
-    //     Notify.success('Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id);
-    //     console.log('Form data transmission success! Case ID: ' + e.case_id);
-    //     this.props.history.push('/');
-    //   })
-    //   .catch((err: Error) => {
-    //     Notify.danger(
-    //       'Det oppstod en feil ved sending av saken til oss. Sørg for at alle felter er fyllt ut korrekt. ' +
-    //         'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
-    //         err.message
-    //     );
-    //     console.warn('Error while transmitting form data to server with error message: ' + err.message);
-    //   });
+    /*let cas = new CaseService();
+    cas
+      .createCase(obj)
+      .then(e => {
+        Notify.success('Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id);
+        console.log('Form data transmission success! Case ID: ' + e.case_id);
+        this.props.history.push('/');
+      })
+      .catch((err: Error) => {
+        Notify.danger(
+          'Det oppstod en feil ved sending av saken til oss. Sørg for at alle felter er fyllt ut korrekt. ' +
+            'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
+            err.message
+        );
+        console.warn('Error while transmitting form data to server with error message: ' + err.message);
+      });*/
   }
 
   updatePos(newPos) {
     this.pos = newPos;
-    console.log('got pos from map:', this.pos);
+    console.log('got pos from map: ', this.pos);
   }
 }
 

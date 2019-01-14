@@ -4,12 +4,12 @@ import CaseSubscription from '../classes/CaseSubscription.js';
 
 class CaseSubscriptionService {
   //Get all subscriotions, given user
-  getAllCaseSubscriptions(user_id: number): Promise<CaseSubscription[]> {
+  static getAllCaseSubscriptions(user_id: number): Promise<CaseSubscription[]> {
     return axios.get('/api/cases/subscription/' + user_id);
   }
 
   //Delete subscription, given case
-  deleteCaseSubscription(case_id: number): Promise<void> {
+  static deleteCaseSubscription(case_id: number): Promise<void> {
     let token = localStorage.getItem('token');
     let res = axios.post('/api/login', {}, {
       headers: {
@@ -24,7 +24,7 @@ class CaseSubscriptionService {
   }
 
   //Create subscription, given case
-  createCaseSubscription(s: CaseSubscription, case_id: number): Promise<CaseSubscription> {
+  static createCaseSubscription(s: CaseSubscription, case_id: number): Promise<CaseSubscription> {
     let token = localStorage.getItem('token');
     let res = axios.post('/api/login', {}, {
       headers: {

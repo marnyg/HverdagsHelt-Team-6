@@ -19,12 +19,12 @@ class RegionService {
   }
 
   //Create region
-  createRegion(r: Region): Promise<Region> {
+   createRegion(r: Region): Promise<Region> {
     return axios.post('/api/regions/', r);
   }
 
   //Get region, given id
-  getRegion(region_id: number): Promise<Region> {
+   getRegion(region_id: number): Promise<Region> {
     return axios.get('api/regions/' + region_id);
   }
 
