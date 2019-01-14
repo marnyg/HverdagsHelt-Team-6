@@ -5,4 +5,8 @@ import { withRouter } from 'react-router-dom';
 
 class CaseSubscription extends Component {
   subscriptions = [];
+//Her
+  render() {
+
+  }
 }
