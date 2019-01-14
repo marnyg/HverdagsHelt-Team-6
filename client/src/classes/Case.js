@@ -1,5 +1,4 @@
 import Picture from './Picture.js';
-
 class Case {
   case_id: number;
   region_id: number;
