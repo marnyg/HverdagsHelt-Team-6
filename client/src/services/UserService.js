@@ -39,6 +39,7 @@ class UserService {
   }
 
   //Get one specific user(RIKTIG?)
+  /*
   getUser(user_id: number): Promise<User> { // Trenger token i header her
     let token = localStorage.getItem('token');
     axios.get('/api/users/' + user_id, {
@@ -49,6 +50,7 @@ class UserService {
       console.log(response);
     }).catch((error: Error) => console.error(error));
   }
+  */
 
   getUser(user_id: number): Promise<User> {
     return new Promise((resolve, reject) => {
@@ -126,6 +128,7 @@ class UserService {
       }
     }).catch((error: Error) => console.error(error));
   }
+  */
 
   //Create user(RIKTIGE PARAMETERE?)
   createUser(u: User): Promise<User> {
@@ -160,6 +163,7 @@ class UserService {
     return axios.get('/api/email_available', email);
   }
 
+  /*
   //For login (RIKTIG?)
   login(email: string, password: string): Promise<void> {
     let token = localStorage.getItem('token');
@@ -176,6 +180,7 @@ class UserService {
       console.log(response);
     }).catch((error: Error) => console.error(error));
   }
+  */
 }
 
 export default UserService;
