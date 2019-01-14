@@ -10,6 +10,7 @@ import Location from '../classes/Location.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faListUl, faTh } from '@fortawesome/free-solid-svg-icons/index';
 import Notify from './Notify.js';
+import CaseSubscriptionService from "../services/CaseSubscriptionService";
 
 class Content extends Component {
   cases = null;
@@ -58,6 +59,13 @@ class Content extends Component {
   }
 
   mounted() {
+    //localStorage.setItem('token', 'mytokentest1234');
+    console.log('Using token:', localStorage.getItem('token'));
+    let subsSercvice = new CaseSubscriptionService();
+    subsSercvice.getAllCaseSubscriptions(1)
+        .then(res => {console.log('Got a response')})
+        .catch(error => console.error(error));
+
     if (this.props.match && this.props.match.params) {
       // Redirected from search
       // Must render only search results
