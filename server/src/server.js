@@ -180,7 +180,7 @@ app.get('/api/cases/region_cases/:county_name/:region_name', async (req: Request
     c.img = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
     return c;
   });
-  Promise.all(out).then(cases => cases ? res.send(cases) : res.sendStatus(404));
+  return Promise.all(out).then(cases => cases ? res.send(cases) : res.sendStatus(404));
 });
 
 app.get('/api/statuses', (req: Request, res: Response) => {
@@ -236,34 +236,7 @@ app.delete('/api/users/:user_id', (req: Request, res: Response) => {
 });
 
 app.put('/api/users/:user_id/password', async (req: Request, res: Response) => {
-  if (!req.body || typeof req.body.old_password !== 'string' || typeof req.body.new_password !== 'string')
-    return res.sendStatus(400);
-
-  let user = await User.findOne({
-    where: { user_id: Number(req.params.user_id) }
-  });
-
-  let salt = user.salt;
-  let old = user.hashed_password;
-
-  let oldHashedPassword = hashPassword(req.body.old_password, salt);
-  let old_password = oldHashedPassword['passwordHash'];
-
-  if (old_password === old) {
-    let newHashedPassword = hashPassword(req.body.new_password);
-    let new_password = newHashedPassword['passwordHash'];
-    let new_salt = newHashedPassword['salt'];
-
-    return User.update(
-      {
-        hashed_password: new_password,
-        salt: new_salt
-      },
-      { where: { user_id: Number(req.params.user_id) } }
-    ).then(user => (user ? res.send(user) : res.sendStatus(404)));
-  } else {
-    return res.sendStatus(403);
-  }
+  reqAccessLevel(req, res, 4, Users.changePassword);
 });
 
 app.get('/api/counties', (req: Request, res: Response) => {
