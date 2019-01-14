@@ -12,7 +12,8 @@ import Region_subscriptions from './routes/Region_subscriptions.js';
 import Region from './routes/Region.js';
 import County from './routes/Counties.js';
 import Role from './routes/Roles.js';
-import { Case_subscriptions, Case, Status, Status_comment } from './models.js';
+import Status from './routes/Statuses.js';
+import { Case_subscriptions, Case, Status_comment } from './models.js';
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
 
@@ -225,15 +226,19 @@ app.get('/api/cases/region_cases/:county_name/:region_name', async (req: Request
 });
 
 app.get('/api/statuses', (req: Request, res: Response) => {
-  return Status.findAll().then(statuses => res.send(statuses));
+  Status.getAllStatuses(req, res);
 });
 
 app.post('/api/statuses', (req: Request, res: Response) => {
-  if (!req.body || typeof req.body.name !== 'string') return res.sendStatus(400);
+  reqAccessLevel(req, res, 1, Status.addStatus);
+});
 
-  return Status.create({
-    name: req.body.name
-  }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+app.put('/api/statuses/:status_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Status.updateStatus);
+});
+
+app.delete('/api/statuses/:status_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Status.delStatus);
 });
 
 app.get('/api/roles', (req: Request, res: Response) => {

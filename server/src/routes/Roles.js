@@ -1,7 +1,6 @@
 // @flow
 
 import { Role } from '../models.js';
-import {County} from "../models";
 
 type Request = express$Request;
 type Response = express$Response;

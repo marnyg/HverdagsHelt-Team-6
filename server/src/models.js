@@ -193,110 +193,140 @@ Case_subscriptions.belongsTo(Case, { foreignKey: { name: 'case_id', allowNull: f
 let production = process.env.NODE_ENV === 'production';
 production = true; // Gjør at databasen er statisk
 // The sync promise can be used to wait for the database to be ready (for instance in your tests)
-export let sync = sequelize.sync({ force: production ? false : true }).then(() => {
-  if (!production)
-    return County.create({
-      name: 'Trøndelag'
-    })
-      .then(() =>
-        County.create({
-          name: 'Akershus'
-        })
-      )
-      .then(() =>
-        Region.create({
-          name: 'Trondheim',
-          lat: 63.42846459999999,
-          lon: 10.388523800000002,
-          county_id: 1
-        })
-      )
-      .then(() =>
-        Role.create({
-          name: 'Admin',
-          access_level: 1
-        })
-      )
-      .then(() =>
-        Role.create({
-          name: 'Kommune ansatt',
-          access_level: 2
-        })
-      )
-      .then(() =>
-        Role.create({
-          name: 'Bedrift bruker',
-          access_level: 3
-        })
-      )
-      .then(() =>
-        Role.create({
-          name: 'Privat bruker',
-          access_level: 4
-        })
-      )
-      .then(() =>
-        User.create({
-          firstname: 'Ola',
-          lastname: 'Nordmann',
-          tlf: 12345678,
-          email: 'ola.nordmann@gmail.com',
-          hashed_password: 'passord123',
-          salt: 'a12b',
-          role_id: 1,
-          region_id: 1
-        })
-      )
-      .then(() =>
-        Status.create({
-          name: 'Under behandling'
-        })
-      )
-      .then(() =>
-        Category.create({
-          name: 'Måking'
-        })
-      )
-      .then(() =>
-        Case.create({
-          title: 'Trenger måking!',
-          description: 'Veldig dårlig måkt i gata mi',
-          lat: 63.42846459999999,
-          lon: 10.388523800000002,
-          region_id: 1,
-          user_id: 1,
-          category_id: 1,
-          status_id: 1
-        })
-      )
-      .then(() =>
-        Status_comment.create({
-          comment: 'Starter behandling',
-          case_id: 1,
-          status_id: 1,
-          user_id: 1
-        })
-      )
-      .then(() =>
-        Picture.create({
-          case_id: 1,
-          path: 'asdflkjasdfkljasdflkjsdf',
-          alt: 'et bilde'
-        })
-      )
-      .then(() =>
-        Region_subscriptions.create({
-          user_id: 1,
-          region_id: 1,
-          notify: true
-        })
-      )
-      .then(() =>
-        Case_subscriptions.create({
-          user_id: 1,
-          case_id: 1,
-          notify_by_email: true,
-          is_up_to_date: false
-        })
-      );
-});
+export let sync = sequelize.sync({ force: production ? false : true }).then(
+  () => {
+    if (!production)
+      return County.create({
+        name: 'Trøndelag'
+      })
+        .then(() =>
+          County.create({
+            name: 'Akershus'
+          })
+        )
+        .then(() =>
+          Region.create({
+            name: 'Trondheim',
+            lat: 63.42846459999999,
+            lon: 10.388523800000002,
+            county_id: 1
+          })
+        )
+        .then(() =>
+          Role.create({
+            name: 'Admin',
+            access_level: 1
+          })
+        )
+        .then(() =>
+          Role.create({
+            name: 'Kommune ansatt',
+            access_level: 2
+          })
+        )
+        .then(() =>
+          Role.create({
+            name: 'Bedrift bruker',
+            access_level: 3
+          })
+        )
+        .then(() =>
+          Role.create({
+            name: 'Privat bruker',
+            access_level: 4
+          })
+        )
+        .then(() =>
+          User.create({
+            firstname: 'Ola',
+            lastname: 'Nordmann',
+            tlf: 12345678,
+            email: 'ola.nordmann@gmail.com',
+            hashed_password:
+              'f467d3db9a56b771a9dd014100263ad809cf14c30a54182b0bd50a276b1b3946745249b767563f9844b1a44adde05b6bc8d0647e081418c38cb7b5d65b85ff16',
+            salt: '1e8ee0239cf86be6dc29e01dffa665cc',
+            role_id: 4,
+            region_id: 1
+          })
+        )
+        .then(() =>
+          User.create({
+            firstname: 'Admin',
+            lastname: 'Adminsen',
+            tlf: 13376942,
+            email: 'admin@admin.com',
+            hashed_password:
+              'f467d3db9a56b771a9dd014100263ad809cf14c30a54182b0bd50a276b1b3946745249b767563f9844b1a44adde05b6bc8d0647e081418c38cb7b5d65b85ff16',
+            salt: '1e8ee0239cf86be6dc29e01dffa665cc',
+            role_id: 1,
+            region_id: 1
+          })
+        )
+        .then(() =>
+          Status.create({
+            name: 'Åpen'
+          })
+        )
+        .then(() =>
+          Status.create({
+            name: 'Under behandling'
+          })
+        )
+        .then(() =>
+          Status.create({
+            name: 'Lukket'
+          })
+        )
+        .then(() =>
+          Category.create({
+            name: 'Måking'
+          })
+        )
+        .then(() =>
+          Case.create({
+            title: 'Trenger måking!',
+            description: 'Veldig dårlig måkt i gata mi',
+            lat: 63.42846459999999,
+            lon: 10.388523800000002,
+            region_id: 1,
+            user_id: 1,
+            category_id: 1,
+            status_id: 1
+          })
+        )
+        .then(() =>
+          Status_comment.create({
+            comment: 'Starter behandling',
+            case_id: 1,
+            status_id: 1,
+            user_id: 1
+          })
+        )
+        .then(() =>
+          Picture.create({
+            case_id: 1,
+            path: 'asdflkjasdfkljasdflkjsdf',
+            alt: 'et bilde'
+          })
+        )
+        .then(() =>
+          Region_subscriptions.create({
+            user_id: 1,
+            region_id: 1,
+            notify: true
+          })
+        )
+        .then(() =>
+          Case_subscriptions.create({
+            user_id: 1,
+            case_id: 1,
+            notify_by_email: true,
+            is_up_to_date: false
+          })
+        );
+  },
+  err => {
+    console.log(err);
+    console.log('Database connection failed');
+  }
+);
