@@ -2,6 +2,7 @@
 import axios from 'axios';
 import Case from '../classes/Case.js';
 import LoginService from './LoginService.js';
+import FormData from 'form-data';
 
 class CaseService {
   //Get all cases
@@ -62,17 +63,25 @@ class CaseService {
   }
 
   //Create case
-  createCase(c: Case): Promise<Case> {
+  createCase(c: Case, pictures): Promise<Case> {
     //return axios.post('/api/cases', c);
+      let formData = new FormData();
       return new Promise((resolve, reject) => {
           let loginService = new LoginService();
           loginService.isLoggedIn()
               .then((logged_in: Boolean) => {
                   if(logged_in === true){
                       let token = localStorage.getItem('token');
-                      axios.post('/api/cases', c, {
+                      let images = [];
+                      for (let i = 0; i < pictures.length; i++) {
+                          images.append('image', pictures[i]);
+                      }
+                      formData.append(images);
+                      formData.append(c);
+                      axios.post('/api/cases', formData, {
                           headers: {
-                              Authorization: 'Bearer ' + token
+                              Authorization: 'Bearer ' + token,
+                              'Content-Type': 'multipart/form-data'
                           }
                       })
                           .then(response => resolve(response))
