@@ -12,7 +12,9 @@ import Region_subscriptions from './routes/Region_subscriptions.js';
 import Region from './routes/Region.js';
 import County from './routes/Counties.js';
 import Role from './routes/Roles.js';
-import { Case_subscriptions, Case, Status, Status_comment } from './models.js';
+import Status from './routes/Statuses.js';
+import Case_subscription from './routes/Case_subscriptions.js';
+import { Case, Status_comment } from './models.js';
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
 
@@ -33,12 +35,12 @@ app.get('/api/cases', (req: Request, res: Response) => {
   return Case.findAll().then(cases => res.send(cases));
 });
 
-app.get('/api/verify', (req, res) =>
-  reqAccessLevel(req, res, 4, (req, res) => {
+app.post('/api/verify', (req, res) =>
+  reqAccessLevel(req, res, 1, (req, res) => {
     console.log('------Token Verified!-------');
     return res.sendStatus(200);
-  })
-);
+  });
+});
 
 app.post('/api/login', (req: Request, res: Response) => {
   return login(req, res);
@@ -150,68 +152,48 @@ app.delete('/api/cases/:case_id', (req: Request, res: Response) => {
   );
 });
 
-app.post('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
-  if (
-    !req.body ||
-    typeof req.body.user_id !== 'number' ||
-    typeof req.body.notify_by_email !== 'boolean' ||
-    typeof req.body.is_up_to_date !== 'boolean'
-  )
-    return res.sendStatus(400);
+app.get('/api/cases/subscriptions/:user_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptions);
+});
 
-  return Case_subscriptions.create({
-    user_id: req.body.user_id,
-    case_id: Number(req.params.case_id),
-    notify_by_email: req.body.notify_by_email,
-    is_up_to_date: req.body.is_up_to_date
-  }).then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)));
+app.post('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Case_subscription.addCase_subscriptions);
+});
+
+app.put('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Case_subscription.updateCase_subscriptions);
 });
 
 app.delete('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
-  return Case_subscriptions.destroy({
-    where: { case_id: Number(req.params.case_id), user_id: Number(req.body.user_id) }
-  }).then(cases => (cases ? res.send() : res.status(500).send()));
-});
-
-app.get('/api/cases/subscriptions/:user_id', (req: Request, res: Response) => {
-  return Case_subscriptions.findAll({
-    where: {
-      user_id: req.params.user_id
-    }
-  }).then(cases => res.send(cases));
+  reqAccessLevel(req, res, 4, Case_subscription.delCase_subscriptions);
 });
 
 app.get('/api/cases/region_cases/:county_name/:region_name', async (req: Request, res: Response) => {
-  let countyId = await County.findOne({
-    where: { name: req.params.county_name }
+  let region = await Region.getOneRegionByNameAndCounty(req,res);
+  let regionId = region ? region : res.sendStatus(404);
+  let cases = await Case.findAll({ where: { region_id: Number(regionId.region_id) }, order: [['updatedAt', 'DESC']] });
+  cases = cases.map(c => c.toJSON());
+  const out = cases.map(async c => {
+    c.img = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+    return c;
   });
-
-  countyId = countyId.county_id;
-
-  let regionId = await Region.findOne({
-    where: { name: req.params.region_name, county_id: countyId }
-  });
-
-  regionId = regionId.region_id;
-
-  return Case.findAll({
-    where: {
-      region_id: regionId
-    },
-    order: [['updatedAt', 'DESC']]
-  }).then(cases => res.send(cases));
+  Promise.all(out).then(cases => cases ? res.send(cases) : res.sendStatus(404));
 });
 
 app.get('/api/statuses', (req: Request, res: Response) => {
-  return Status.findAll().then(statuses => res.send(statuses));
+  Status.getAllStatuses(req, res);
 });
 
 app.post('/api/statuses', (req: Request, res: Response) => {
-  if (!req.body || typeof req.body.name !== 'string') return res.sendStatus(400);
+  reqAccessLevel(req, res, 1, Status.addStatus);
+});
 
-  return Status.create({
-    name: req.body.name
-  }).then(count => (count ? res.sendStatus(200) : res.sendStatus(404)));
+app.put('/api/statuses/:status_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Status.updateStatus);
+});
+
+app.delete('/api/statuses/:status_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Status.delStatus);
 });
 
 app.get('/api/roles', (req: Request, res: Response) => {
@@ -230,7 +212,7 @@ app.delete('/api/roles/:role_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, Role.delRole);
 });
 
-app.get('/api/users', (req: Request, res: Response) =>{
+app.get('/api/users', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, Users.getAllUsers);
 });
 
@@ -239,15 +221,15 @@ app.post('/api/users', (req: Request, res: Response) => {
 });
 
 app.get('/api/users/:user_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Users.getOneUser)
+  reqAccessLevel(req, res, 4, Users.getOneUser);
 });
 
 app.put('/api/users/:user_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Users.updateOneUser)
+  reqAccessLevel(req, res, 4, Users.updateOneUser);
 });
 
 app.delete('/api/users/:user_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Users.deleteOneUser)
+  reqAccessLevel(req, res, 4, Users.deleteOneUser);
 });
 
 app.put('/api/users/:user_id/password', async (req: Request, res: Response) => {

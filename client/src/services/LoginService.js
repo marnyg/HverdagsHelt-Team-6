@@ -2,27 +2,27 @@
 import axios from 'axios';
 
 class LoginService {
-  isLoggedIn(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-        let token = localStorage.getItem('token');
-        if(token){
-          // User has registered before
-          // Must check if token is still active
-          axios.post('/api/verify', {}, {
-              headers: {
-                  Authorization: 'Bearer ' + token
-              }
-          }).then((response) => {
-              if(response.status = 200){
-                  resolve(true);
-              } else {
-                  resolve(false);
-              }
-          }).catch((error: Error) => reject(error));
-        } else {
-            resolve(false);
-        }
-    });
+  isLoggedIn(): Promise<Boolean> {
+      return new Promise((resolve, reject) => {
+          let token = localStorage.getItem('token');
+          if(token){
+              axios.post('/api/verify', {}, {
+                  headers: {
+                      Authorization: 'Bearer ' + token
+                  }
+              })
+                  .then((response) => {
+                      if(response.status = 200){
+                          resolve(true);
+                      } else {
+                          reject('LoginService: Token is no longer active');
+                      }
+                  })
+                  .catch((error: Error) => reject(error));
+          } else {
+              reject('LoginService: User has not registered before');
+          }
+      });
   }
 }
 export default LoginService;
