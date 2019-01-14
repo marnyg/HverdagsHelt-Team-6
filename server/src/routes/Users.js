@@ -38,7 +38,7 @@ module.exports = {
       salt: salt,
       role_id: 4,
       region_id: req.body.region_id
-    }).then(users => (users ? res.send({"user_id": users.user_id}) : res.sendStatus(404)));
+    }).then(users => (users ? res.send({ user_id: users.user_id }) : res.sendStatus(404)));
   },
 
   getOneUser: function(req: Request, res: Response) {
