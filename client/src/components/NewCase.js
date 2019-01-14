@@ -1,3 +1,5 @@
+//@flow
+
 import ReactDOM from 'react-dom';
 import * as React from 'react';
 import { Component } from 'react-simplified';
@@ -521,7 +523,8 @@ class NewCase extends Component {
       .then(e => {
         Notify.success('Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id);
         console.log('Form data transmission success! Case ID: ' + e.case_id);
-        this.props.history.push('/');
+        this.props.history.push('/'); // Placeholder
+        //this.props.history.push('/case/' + e.case_id);
       })
       .catch((err: Error) => {
         Notify.danger(

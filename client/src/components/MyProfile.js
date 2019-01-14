@@ -2,7 +2,7 @@
 //
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import MyCases from './MyCases.js';
+import MyCases from './CaseList.js';
 import NewCase from './NewCase';
 
 class MyProfile extends Component<{}, { isEditing: boolean }> {
