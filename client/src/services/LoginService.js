@@ -3,20 +3,26 @@ import axios from 'axios';
 
 class LoginService {
   isLoggedIn(): Promise<Boolean> {
-    let token = localStorage.getItem('token');
-    axios.post('/api/login', {}, {
-      headers: {
-        Authorization: 'Bearer ' + token
-      }
-    })
-        .then((response) => {
-            if(response.status = 200){
-                return true;
-            } else {
-                return false;
-            }
-        })
-        .catch((error: Error) => console.error(error));
+      return new Promise((resolve, reject) => {
+          let token = localStorage.getItem('token');
+          if(token){
+              axios.post('/api/verify', {}, {
+                  headers: {
+                      Authorization: 'Bearer ' + token
+                  }
+              })
+                  .then((response) => {
+                      if(response.status = 200){
+                          resolve(true);
+                      } else {
+                          reject('LoginService: Token is no longer active');
+                      }
+                  })
+                  .catch((error: Error) => reject(error));
+          } else {
+              reject('LoginService: User has not registered before');
+          }
+      });
   }
 }
 export default LoginService;

@@ -13,7 +13,8 @@ import Region from './routes/Regions.js';
 import County from './routes/Counties.js';
 import Role from './routes/Roles.js';
 import Status from './routes/Statuses.js';
-import { Case_subscriptions, Status_comment, Picture } from './models.js';
+import Case_subscription from './routes/Case_subscriptions.js';
+import { Case, Status_comment, Picture } from './models.js';
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
 
@@ -37,12 +38,12 @@ app.get('/api/cases', (req: Request, res: Response) => {
 });
 */
 
-app.get('/api/verify', (req, res) =>
-  reqAccessLevel(req, res, 1, (req, res) => {
-    console.log('------Token Verified!-------');
-    return res.sendStatus(200);
-  })
-);
+app.post('/api/verify', (req, res) => {
+      reqAccessLevel(req, res, 1, (req, res) => {
+          console.log('------Token Verified!-------');
+          return res.sendStatus(200);
+      });
+});
 
 app.post('/api/login', (req: Request, res: Response) => {
   return login(req, res);
@@ -114,8 +115,8 @@ app.post('/api/cases/:case_id/status_comments', (req: Request, res: Response) =>
 });
 
 app.get('/api/cases/:case_id', (req: Request, res: Response) => {
-  return Case.findOne({ where: { case_id: Number(req.params.case_id) } }).then(
-    cases => (cases ? res.send(cases) : res.sendStatus(404))
+  return Case.findOne({ where: { case_id: Number(req.params.case_id) } }).then(cases =>
+    cases ? res.send(cases) : res.sendStatus(404)
   );
 });
 
@@ -149,40 +150,25 @@ app.put('/api/cases/:case_id', (req: Request, res: Response) => {
 });
 
 app.delete('/api/cases/:case_id', (req: Request, res: Response) => {
-  return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(
-    cases => (cases ? res.send() : res.status(500).send())
+  return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(cases =>
+    cases ? res.send() : res.status(500).send()
   );
 });
 
-app.post('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
-  if (
-    !req.body ||
-    typeof req.body.user_id !== 'number' ||
-    typeof req.body.notify_by_email !== 'boolean' ||
-    typeof req.body.is_up_to_date !== 'boolean'
-  )
-    return res.sendStatus(400);
+app.get('/api/cases/subscriptions/:user_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptions);
+});
 
-  return Case_subscriptions.create({
-    user_id: req.body.user_id,
-    case_id: Number(req.params.case_id),
-    notify_by_email: req.body.notify_by_email,
-    is_up_to_date: req.body.is_up_to_date
-  }).then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)));
+app.post('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Case_subscription.addCase_subscriptions);
+});
+
+app.put('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Case_subscription.updateCase_subscriptions);
 });
 
 app.delete('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
-  return Case_subscriptions.destroy({
-    where: { case_id: Number(req.params.case_id), user_id: Number(req.body.user_id) }
-  }).then(cases => (cases ? res.send() : res.status(500).send()));
-});
-
-app.get('/api/cases/subscriptions/:user_id', (req: Request, res: Response) => {
-  return Case_subscriptions.findAll({
-    where: {
-      user_id: req.params.user_id
-    }
-  }).then(cases => res.send(cases));
+  reqAccessLevel(req, res, 4, Case_subscription.delCase_subscriptions);
 });
 
 app.get('/api/cases/region_cases/:county_name/:region_name', async (req: Request, res: Response) => {
