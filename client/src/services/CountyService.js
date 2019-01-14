@@ -10,17 +10,41 @@ class CountyService {
 
   //Create new county
   createCounty(c: County): Promise<County> {
-    return axios.post('/api/counties', c);
+    let token = localStorage.getItem('token');
+    axios.post('/api/counties', {
+      body: {
+        'name': c.name
+      }
+    }, {
+      Authorization: 'Bearer ' + token
+    }).then(function (response) {
+      console.log(response);
+    }).catch((error: Error) => console.error(error));
   }
 
   //Update county
   updateCounty(county_id: number, c: County): Promise<void> {
-    return axios.put('/api/counties/' + county_id, c);
+    let token = localStorage.getItem('token');
+    axios.put('/api/counties/' + county_id, {
+      body: {
+        'name': c.name
+      }
+    }, {
+      Authorization: 'Bearer ' + token
+    }).then(function (response) {
+      console.log(response);
+    }).catch((error: Error) => console.error(error));
   }
 
   //Delete one specific county
   deleteCounty(county_id: number): Promise<void> {
-    return axios.delete('/api/counties/' + county_id);
+    let token = localStorage.getItem('token');
+    axios.delete('/api/counties/' + county_id,
+    {
+      Authorization: 'Bearer ' + token
+    }).then(function (response) {
+      console.log(response);
+    }).catch((error: Error) => console.error(error));
   }
 
 }

@@ -10,17 +10,41 @@ class CategoryService {
 
   //Update one specific category
   updateCategory(category_id: number, c: Category): Promise<void> {
-    return axios.put('/api/categories/' + category_id, c);
+    let token = localStorage.getItem('token');
+    axios.put('/api/categories/' + category_id, {
+      body: {
+        name: c.name
+      }
+    }, {
+      Authorization: 'Bearer ' + token
+    }).then(function (response) {
+      console.log(response);
+    }).catch((error: Error) => console.error(error));
   }
 
   //Delete one specific category
   deleteCategory(category_id: number): Promise<void> {
-    return axios.delete('/api/categories/' + category_id);
+    let token = localStorage.getItem('token');
+    axios.delete('/api/categories/' + category_id,
+      {
+        Authorization: 'Bearer ' + token
+      }).then(function (response) {
+        console.log(response);
+    }).catch((error: Error) => console.error(error));
   }
 
   //Create category
   createCategory(c: Category): Promise<Category> {
-    return axios.post('/api/categories', c);
+    let token = localStorage.getItem('token');
+    axios.post('/api/categories', {
+      body: {
+        name: c.name
+      }
+    }, {
+      Authorization: 'Bearer ' + token
+    }).then(function (response) {
+      console.log(response);
+    }).catch((error: Error) => console.error(error));
   }
 }
 
