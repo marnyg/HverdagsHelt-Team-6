@@ -53,17 +53,6 @@ class Content extends Component {
             )}
           </div>
         </div>
-        <div>
-          {this.grid ? (
-            <div className="content">
-              {this.cases.map(e => (
-                <CaseItem case={e} key={e.case_id} grid={this.grid} />
-              ))}
-            </div>
-          ) : (
-            this.cases.map(e => <CaseItem case={e} key={e.case_id} grid={this.grid} />)
-          )}
-        </div>
       </div>
     );
   }
