@@ -2,13 +2,15 @@ import * as React from 'react';
 import { Component } from 'react-simplified';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBell } from '@fortawesome/free-solid-svg-icons/index';
+import { faBell, faCheck } from '@fortawesome/free-solid-svg-icons/index';
 import { withRouter } from 'react-router-dom';
 //import PictureService from '../services/PictureService.js'; REMOVE COMMENTS WHEN SERVICES DONE
 //import Picture from '../classes/Picture.js'; REMOVE COMMENTS WHEN CLASSES DONE
 
 class CaseItem extends Component {
   images = [];
+  subscribed = false;
+  button_type = "primary";
 
   render() {
     if (this.props.grid) {
@@ -27,10 +29,10 @@ class CaseItem extends Component {
                 <div className=" d-inline">
                   <small className="text-muted">{this.props.case.date}</small>
                 </div>
-                <button onClick={this.subscribe.bind(this)} className="btn btn-primary float-right">
+                <button onClick={this.subscribe.bind(this)} className={"btn btn-" + this.button_type + " float-right"}>
                   <FontAwesomeIcon
                     id={'subscribe'}
-                    icon={faBell}
+                    icon={this.subscribed ? faCheck:faBell }
                     alt="Klikk her for å få varsler om denne saken"
                     className="float-right"
                   />
@@ -96,6 +98,12 @@ class CaseItem extends Component {
   }
   subscribe(event) {
     event.preventDefault();
+    this.subscribed = !this.subscribed;
+    if(this.button_type === "primary") {
+        this.button_type = "success";
+    } else {
+        this.button_type = "primary";
+    }
     console.log('Subscribe');
   }
 }
