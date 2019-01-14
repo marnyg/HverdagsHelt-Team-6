@@ -160,6 +160,15 @@ class NewCase extends Component {
                     hidden
                   />
                 </div>
+                <div className={'form-group'}>
+                  <label htmlFor="description">Beskrivelse</label>
+                  <textarea
+                    className={'form-control'}
+                    id={'description'}
+                    maxLength={255}
+                    placeholder="Skriv en kort beskrivelse her, så blir det enklere for oss å hjelpe deg."
+                  />
+                </div>
                 {this.images.length < 3 ? (
                   <div className={'form-group'}>
                     <label htmlFor={'image-input'}>Legg ved bilder</label>
@@ -440,6 +449,7 @@ class NewCase extends Component {
         console.warn('File type not accepted.');
         Notify.warning('Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png.');
       }
+      console.log(this.images);
     }
   }
 
@@ -557,7 +567,7 @@ class NewCase extends Component {
   send(obj: Case) {
     console.log('Sending form data to server.');
     console.log('Case is ' + JSON.stringify(obj));
-    /*let cas = new CaseService();
+    let cas = new CaseService();
     cas
       .createCase(obj)
       .then(e => {
@@ -573,7 +583,7 @@ class NewCase extends Component {
             err.message
         );
         console.warn('Error while transmitting form data to server with error message: ' + err.message);
-      });*/
+      });
   }
 
   updatePos(newPos) {

@@ -5,6 +5,7 @@ import * as React from 'react';
 import { Component } from 'react-simplified';
 import { NavLink, withRouter } from 'react-router-dom';
 import CaseService from '../services/CaseService';
+import StatusCommentService from '../services/StatusCommentService';
 import Notify from './Notify';
 import GoogleApiWrapper from './GoogleApiWrapper';
 import Case from '../classes/Case';
@@ -52,7 +53,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       region_name: 'Trondheim',
       status_id: 2,
       status_name: 'Under behandling',
-      caseworker_id: 309,
+      user_id: 309,
       caseworker_name: 'Nils Arne Eggen',
       comment:
         'Kom igjen gutta, stå på! D va slagorde på RBK-plata æ va me på. Dæven døtte sykkelstøtte. Du må bruk gofoten, sjøl om æ har sagd av gofoten på St. Olavs. D har itj så my med vei å gjør, men d e nå arti å blæs ut litt skitprat ein gång i blant!',
@@ -66,7 +67,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       region_name: 'Trondheim',
       status_id: 2,
       status_name: 'Under behandling',
-      caseworker_id: 21,
+      user_id: 21,
       caseworker_name: 'Piers Morgan',
       comment: "I don't know what I'm doing here, but being the most disliked British TV anchor suits me very well!",
       createdAt: '2019-01-01T13:37:00.000Z',
@@ -84,37 +85,54 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     return (
       <div className={'modal-body row'}>
         <div className={'col-md-6'}>
-          <h1>{this.case.title}</h1>
-          <table className={'table'}>
-            <tbody>
-              <tr>
-                <td>Status</td>
-                <td style={this.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
-              </tr>
-              <tr>
-                <td>Sak sendt av</td>
-                <td>{this.case.user_name}</td>
-              </tr>
-              <tr>
-                <td>Sak opprettet</td>
-                <td>{this.dateFormat(this.case.createdAt)}</td>
-              </tr>
-              <tr>
-                <td>Sist oppdatert</td>
-                <td>{this.dateFormat(this.case.updatedAt)}</td>
-              </tr>
-            </tbody>
-          </table>
-          <p>{this.case.description}</p>
-          <h2>Sett saksstatus</h2>
-          <select defaultValue={this.getInitialStatus()} className={'form-control'} id={'category'} required>
-            {this.statuses.map(e => (
-              <option key={e.status_id} value={e.status_id}>
-                {' '}
-                {e.status_name}{' '}
-              </option>
-            ))}
-          </select>
+          <form
+            ref={e => {
+              this.messageForm = e;
+            }}
+          >
+            <h1>{this.case.title}</h1>
+            <table className={'table'}>
+              <tbody>
+                <tr>
+                  <td>Status</td>
+                  <td style={this.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
+                </tr>
+                <tr>
+                  <td>Sak sendt av</td>
+                  <td>{this.case.user_name}</td>
+                </tr>
+                <tr>
+                  <td>Sak opprettet</td>
+                  <td>{this.dateFormat(this.case.createdAt)}</td>
+                </tr>
+                <tr>
+                  <td>Sist oppdatert</td>
+                  <td>{this.dateFormat(this.case.updatedAt)}</td>
+                </tr>
+              </tbody>
+            </table>
+            <p>{this.case.description}</p>
+            <h2>Sett saksstatus</h2>
+            <select defaultValue={this.getInitialStatus()} className={'form-control'} id={'category'} required>
+              {this.statuses.map(e => (
+                <option key={e.status_id} value={e.status_id}>
+                  {' '}
+                  {e.status_name}{' '}
+                </option>
+              ))}
+            </select>
+            <div className={'form-group'}>
+              <label htmlFor="description">Melding</label>
+              <textarea
+                className={'form-control'}
+                id={'description'}
+                maxLength={255}
+                minLength={2}
+                placeholder="Melding"
+                required
+              />
+            </div>
+          </form>
           <button className={'btn btn-primary mr-2'} onClick={this.submit}>
             Oppdater
           </button>
@@ -128,7 +146,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             {this.statusMessage.map(e => (
               <li className={'list-group-item'} key={e.status_comment_id}>
                 <div>
-                  <h4>{e.caseworker_name}</h4>
+                  <h4>{e.user_name}</h4>
                   <p>{this.dateFormat(e.createdAt)}</p>
                   <p>{e.comment}</p>
                   <p style={this.getStatusColour(e.status_id)}>{e.status_name}</p>
@@ -136,26 +154,6 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               </li>
             ))}
           </ul>
-          <form
-            ref={e => {
-              this.messageForm = e;
-            }}
-          >
-            <div className={'form-group'}>
-              <label htmlFor="description">Melding</label>
-              <textarea
-                className={'form-control'}
-                id={'description'}
-                maxLength={255}
-                minLength={2}
-                placeholder="Skriv en kort beskrivelse her, så blir det enklere for oss å hjelpe deg."
-                required
-              />
-            </div>
-          </form>
-          <button className={'btn btn-primary mr-2'} onClick={this.sendMessage}>
-            Send
-          </button>
         </div>
       </div>
     );
@@ -173,9 +171,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   }
 
   mounted() {
-    let id = 1; // Placeholder!!!
+    this.props.match.params.case_id = 1; // Placeholder!!!
     let cas = new CaseService();
-    let stat = new StatusService();
+    let cascom = new StatusCommentService();
+    // let stat = new StatusService();
     let token = localStorage.getItem('token');
     cas
       .getCase(this.props.match.params.case_id)
@@ -191,19 +190,34 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             err.message
         );
       });
-    stat
-      .getAllCategories()
+    cascom
+      .getAllStatusComments(this.props.match.params.case_id)
+      .then(e => {
+        this.statusMessage = e;
+        console.log(this.statusMessage);
+      })
+      .catch((err: Error) => {
+        console.log('Could not load case comments for case with id ' + this.props.match.params.case_id);
+        Notify.danger(
+          'Klarte ikke å hente kommentarer til sak med id ' +
+            this.props.match.params.case_id +
+            '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+            err.message
+        );
+      });
+    /*stat
+      .getAllStatuses()
       .then(e => {
         this.statuses = e;
       })
       .catch((err: Error) => {
-        console.log('Could not load categories.');
+        console.log('Could not load statuses.');
         Notify.danger(
-          'Klarte ikke å hente kategorier. ' +
+          'Klarte ikke å hente statuser. ' +
             'Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
             err.message
         );
-      });
+      });*/
   }
 
   getStatusColour(status_id: number) {
