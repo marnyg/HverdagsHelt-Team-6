@@ -5,41 +5,67 @@ import { Component } from 'react-simplified';
 import CaseItem from './CaseItem.js';
 //import CaseService from '../services/CaseServices.js'; REMOVE COMMENT WHEN SERVICES DONE
 import LocationService from '../services/LocationService.js';
+import CaseService from '../services/CaseService.js';
 import Location from '../classes/Location.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faListUl, faTh } from '@fortawesome/free-solid-svg-icons/index';
+import Notify from './Notify.js';
 
 class Content extends Component {
   cases = null;
   grid = true;
 
-    render() {
-        if(!this.cases) return null;
-        return (
-            <div>
-                <div className="d-none d-sm-block">
-                    <div className="btn-toolbar my-3 mx-2" role="toolbar">
-                        <div className="btn-group mr-2" role="group">
-                            <button type="button" className={this.grid ? "btn btn-secondary focus" : "btn btn-secondary"} onClick={() => (this.grid = true)}>
-                                <FontAwesomeIcon icon={faTh}/> Grid
-                            </button>
-                            <button type="button" className="btn btn-secondary" onClick={() => (this.grid = false)}>
-                                <FontAwesomeIcon icon={faListUl}/> List
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    {this.grid ?
-                        <div className="content">
-                            {this.cases.map(e => (<CaseItem case={e} key={e.case_id} grid={this.grid}/>))}
-                        </div>
-                        :
-                        this.cases.map(e => (<CaseItem case={e} key={e.case_id} grid={this.grid}/>))
-                    }
-                </div>
+  constructor() {
+    super();
+    Notify.flush();
+  }
+
+  render() {
+    if (!this.cases) return null;
+    return (
+      <div>
+        <div>
+          <div className="d-none d-sm-block">
+            <div className="btn-toolbar my-3 mx-2" role="toolbar">
+              <div className="btn-group mr-2" role="group">
+                <button
+                  type="button"
+                  className={this.grid ? 'btn btn-secondary' : 'btn btn-secondary'}
+                  onClick={() => (this.grid = true)}
+                >
+                  <FontAwesomeIcon icon={faTh} /> Grid
+                </button>
+                <button type="button" className="btn btn-secondary" onClick={() => (this.grid = false)}>
+                  <FontAwesomeIcon icon={faListUl} /> List
+                </button>
+              </div>
             </div>
-        );
+          </div>
+          <div>
+            {this.grid ? (
+              <div className="content">
+                {this.cases.map(e => (
+                  <CaseItem case={e} key={e.case_id} grid={this.grid} />
+                ))}
+              </div>
+            ) : (
+              this.cases.map(e => <CaseItem case={e} key={e.case_id} grid={this.grid} />)
+            )}
+          </div>
+        </div>
+        <div>
+          {this.grid ? (
+            <div className="content">
+              {this.cases.map(e => (
+                <CaseItem case={e} key={e.case_id} grid={this.grid} />
+              ))}
+            </div>
+          ) : (
+            this.cases.map(e => <CaseItem case={e} key={e.case_id} grid={this.grid} />)
+          )}
+        </div>
+      </div>
+    );
   }
 
   mounted() {
@@ -59,14 +85,16 @@ class Content extends Component {
       locationService
         .getLocation()
         .then((location: Location) => {
-          /* REMOVE COMMENT WHEN SERVICE DONE
-                    let caseService = new CaseService();
-                    caseService.getCasesByLoc(location)
-                        .then((cases: Case[]) => {
-                            this.cases = cases;
-                        })
-                        .catch((error: Error) => console.error(error));
-                    */
+          /*
+            console.log("Location", location);
+            let caseService = new CaseService();
+            caseService.getCasesByLoc(location.city, location.region)
+                .then((cases: Case[]) => {
+                    console.log("Retreived cases");
+                    this.cases = cases;
+                })
+                .catch((error: Error) => console.error(error));
+                */
         })
         .catch(error => console.error(error));
     }

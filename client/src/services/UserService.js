@@ -11,46 +11,49 @@ class UserService {
   //Get one specific user
   getUser(user_id: number): Promise<User> { // Trenger token i header her
     let token = localStorage.getItem('token');
-    let res = axios.post('/api/login', {}, {
+    axios.post('/api/login', {}, {
       headers: {
         Authorization: 'Bearer ' + token
       }
-    });
-    if(res = 200){
-      return axios.get('/api/users/' + user_id);
-    } else {
-      return res.sendStatus(400);
-    }
+    }).then((response) => {
+      if(response.status = 200){
+        return axios.get('/api/users/' + user_id);
+      } else {
+        return response.sendStatus(403);
+      }
+    }).catch((error: Error) => console.error(error));
   }
 
   //Update one specific user
   updateUser(user_id: number, u: User): Promise<void> { // Trenger token i header her
     let token = localStorage.getItem('token');
-    let res = axios.post('/api/login', {}, {
+    axios.post('/api/login', {}, {
       headers: {
         Authorization: 'Bearer ' + token
       }
-    });
-    if(res = 200){
-      return axios.put('/api/users/' + user_id, u);
+    }).then((response) => {
+    if(response.status = 200){
+      axios.put('/api/users/' + user_id, u);
     } else {
-      return res.sendStatus(400);
+      response.sendStatus(403);
     }
+    }).catch((error: Error) => console.error(error));
   }
 
   //Delete one specific user
   deleteUser(user_id: number): Promise<void> { // Trenger token i header her
     let token = localStorage.getItem('token');
-    let res = axios.post('/api/login', {}, {
+    axios.post('/api/login', {}, {
       headers: {
         Authorization: 'Bearer ' + token
       }
-    });
-    if(res = 200){
-      return axios.delete('/api/users/' + user_id);
-    } else {
-      return res.sendStatus(400);
-    }
+    }).then((response) => {
+      if(response.status = 200){
+        axios.delete('/api/users/' + user_id);
+      } else {
+
+      }
+    }).catch((error: Error) => console.error(error));
   }
 
   //Create user
@@ -77,6 +80,10 @@ class UserService {
   emailAvailable(): Promise<User> {   //SKAL DENNE RETURNERE EN BOOLEAN ELLER BRUKER OBJEKT??
     return axios.get('/api/email_available');
   }
+
+  login(email: string, password: string): Promise<void> {
+    return axios.post('/api/login');
+  }
 }
 
-export let userService = new UserService();
+export default UserService;

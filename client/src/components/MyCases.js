@@ -3,49 +3,75 @@
 import ReactDOM from 'react-dom';
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import { HashRouter, Route, NavLink } from 'react-router-dom';
+import { HashRouter, Route, NavLink, withRouter } from 'react-router-dom';
 import { caseService } from '../services/CaseService.js';
-//import { Alert } from './widgets';
-//import { studentService } from './services';
+import { Notify } from './Notify';
 
-export class MyCases extends Component <{ match: { params: { user_id: number } } }> {
-  cases = [];
+class MyCases extends Component<{ match: { params: { user_id: number } } }> {
+  cases = [
+    {
+      user_id: 100,
+      case_id: 1,
+      title: 'Elendig vei!!!',
+      name: 'Åpen',
+      created_at: '2019-01-01',
+      updated_at: '2019-01-01'
+    }
+  ];
+  user_id = null;
 
   render() {
-    if(!this.cases) {
+    if (!this.cases) {
       return null;
     }
 
-    return(
-      <table className="table">
+    return (
+      <table className="table table-hover">
         <thead>
           <tr>
-            <th scope="col">Title</th>
-            <th scope="col">Case status</th>
-            <th scope="col">Region</th>
-            <th scope="col">Date created</th>
-            <th scope="col">Last updated</th>
-            <th scope="col">User</th> //hente ut navnet på bruker
+            <th scope="col">Tittel</th>
+            <th scope="col">Status</th>
+            <th scope="col">Kommune</th>
+            <th scope="col">Dato opprettet</th>
+            <th scope="col">Siste oppdatering</th>
+            <th scope="col">Oppdatert av</th>
           </tr>
         </thead>
         <tbody>
-          {this.cases.map((c, i) => (
-            <tr key={i}>
+          {this.cases.map(c => (
+            <tr key={c.case_id} style={{ cursor: 'pointer' }} onClick={this.onClickTableRow}>
               <td>{c.title}</td>
-              <td>{c.status_id}</td> //hente ut navnet til en status gitt id.
-              <td>{c.created_at}</td>
-              <td>{c.updated_at}</td>
-              <td>{c.user_id}</td>
+              <td>{c.name}</td> {/* c.name = navnet på statusen som ligger i SQL-tabellen Statuses. */}
+              <td>{'Kommune'}</td>
+              <td>{this.dateFormat(c.createdAt)}</td>
+              <td>{this.dateFormat(c.updatedAt)}</td>
+              <td>{c.user_id}</td> {/* Saksbehandler???? */}
             </tr>
           ))}
         </tbody>
       </table>
-    )
+    );
   }
 
   mounted() {
-    caseService
-    .getAllCasesGivenUser(this.props.match.params.user_id)
-    .then(cases => (this.cases = cases));
+    // this.user_id = this.props.match.params.user_id;
+    this.user_id = 1;
+    caseService.getAllCasesGivenUser(this.user_id).then(cases => {
+      this.cases = cases;
+      console.log(this.cases);
+    });
+  }
+
+  onClickTableRow(event: SyntheticInputEvent<HTMLInputElement>) {
+    //let case_id = event.target.parentElement.key;
+    //console.log(case_id);
+    // this.props.history.push('/case/' + case_id);
+  }
+
+  dateFormat(date: string) {
+    console.log(date.split('.')[0].replace('T', ' '));
+    return date.split('.')[0].replace('T', ' ');
   }
 }
+
+export default withRouter(MyCases);

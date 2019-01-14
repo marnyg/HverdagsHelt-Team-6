@@ -2,17 +2,21 @@
 import axios from 'axios';
 
 class LoginService {
-  isLoggedIn() {
+  isLoggedIn(): Promise<Boolean> {
     let token = localStorage.getItem('token');
-    let res = axios.post('/api/login', {}, {
+    axios.post('/api/login', {}, {
       headers: {
         Authorization: 'Bearer ' + token
       }
-    });
-    if(res = 200){
-      return true;
-    } else {
-      return false;
-    }
+    })
+        .then((response) => {
+            if(response.status = 200){
+                return true;
+            } else {
+                return false;
+            }
+        })
+        .catch((error: Error) => console.error(error));
   }
 }
+export default LoginService;
