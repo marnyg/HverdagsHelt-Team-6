@@ -20,19 +20,16 @@ describe('POST /api/login', async () => {
   });
 });
 
-if (loginToken!==null) loginToken = "Bearer "+loginToken;
-
 describe('GET /api/users', () => {
   test('200 status code for GET', done => {
     request(application)
       .get('/api/users')
-      .setHeader({Authorization: loginToken})
+      .set('Authorization', 'Bearer ' + loginToken)
       .then(response => {
         expect(response.statusCode).toBe(200);
         done();
       });
   });
-
 });
 
 describe('GET /api/cases', () => {
@@ -102,7 +99,7 @@ describe('GET /api/cases/:case_id/status_comments', () => {
   });
 });
 
-describe('GET /api/cases/:case_id/status_comments', () => {
+describe('POST /api/cases/:case_id/status_comments', () => {
   let data = {
     comment: "Venter på deler",
     status_id: 2,
@@ -110,7 +107,7 @@ describe('GET /api/cases/:case_id/status_comments', () => {
   };
   test('200 status code for POST comments for case_id = 1', done => {
     request(application)
-      .put('/api/cases/1/status_comments')
+      .post('/api/cases/1/status_comments')
       .send(data)
       .then(response => {
         expect(response.statusCode).toBe(200);
@@ -283,6 +280,8 @@ describe('PUT /api/roles/:role_id', () => {
       });
   });
 });
+
+/*
 // ***************************** USERS **************************************
 
 describe('GET /api/users', () => {
@@ -340,4 +339,4 @@ describe('DELETE /api/users/{user_id}', () => {
       });
   });
 });
-
+*/
