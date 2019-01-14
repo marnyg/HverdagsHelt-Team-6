@@ -1,6 +1,7 @@
 // @flow
 import axios from 'axios';
 import Case from '../classes/Case.js';
+import LoginService from './LoginService.js';
 
 class CaseService {
   //Get all cases
@@ -14,34 +15,97 @@ class CaseService {
   }
 
   //Update one specific case
-  updateCase(case_id: number, c: Case): Promise<void> {
-    return axios.put('/api/cases/' + case_id, c);
+  updateCase(case_id: number, c: Case): Promise<any> {
+      return new Promise((resolve, reject) => {
+          let loginService = new LoginService();
+          loginService.isLoggedIn()
+              .then((logged_in: Boolean) => {
+                if(logged_in === true){
+                  let token = localStorage.getItem('token');
+                  axios.get('/api/cases/' + case_id, c, {
+                      headers: {
+                          Authorization: 'Bearer ' + token
+                      }
+                  })
+                      .then(response => resolve(response))
+                      .catch((error: Error) => reject(error));
+                } else {
+                  reject('User is not logged in');
+                }
+              })
+              .catch((error: Error) => reject(error));
+      });
   }
 
   //Delete one specific case
   deleteCase(case_id: number): Promise<void> {
-    return axios.delete('/api/cases/' + case_id);
+    //return axios.delete('/api/cases/' + case_id);
+      return new Promise((resolve, reject) => {
+          let loginService = new LoginService();
+          loginService.isLoggedIn()
+              .then((logged_in: Boolean) => {
+                  if(logged_in === true){
+                      let token = localStorage.getItem('token');
+                      axios.delete('/api/cases' + case_id, {}, {
+                          headers: {
+                              Authorization: 'Bearer ' + token
+                          }
+                      })
+                          .then(response => resolve(response))
+                          .catch((error: Error) => reject(error));
+                  } else {
+                      reject('User is not logged in');
+                  }
+              })
+              .catch((error: Error) => reject(error));
+      });
   }
 
   //Create case
   createCase(c: Case): Promise<Case> {
-    return axios.post('/api/cases', c);
+    //return axios.post('/api/cases', c);
+      return new Promise((resolve, reject) => {
+          let loginService = new LoginService();
+          loginService.isLoggedIn()
+              .then((logged_in: Boolean) => {
+                  if(logged_in === true){
+                      let token = localStorage.getItem('token');
+                      axios.post('/api/cases', c, {
+                          headers: {
+                              Authorization: 'Bearer ' + token
+                          }
+                      })
+                          .then(response => resolve(response))
+                          .catch((error: Error) => reject(error));
+                  } else {
+                      reject('User is not logged in');
+                  }
+              })
+              .catch((error: Error) => reject(error));
+      });
   }
 
   //Get all cases given user
   getAllCasesGivenUser(user_id: number): Promise<Case[]> {
-    let token = localStorage.getItem('token');
-    axios.post('/api/login', {}, {
-      headers: {
-        Authorization: 'Bearer ' + token
-      }
-    }).then((response) => {
-      if(response.status = 200){
-        return axios.get('/api/cases/user_cases/' + user_id);
-      } else {
-        return response.sendStatus(403);;
-      }
-    }).catch((error: Error) => console.error(error));
+      return new Promise((resolve, reject) => {
+          let loginService = new LoginService();
+          loginService.isLoggedIn()
+              .then((logged_in: Boolean) => {
+                  if(logged_in === true){
+                      let token = localStorage.getItem('token');
+                      axios.get('/api/cases/user_cases/' + user_id, {}, {
+                          headers: {
+                              Authorization: 'Bearer ' + token
+                          }
+                      })
+                          .then((cases: Case[]) => resolve(cases))
+                          .catch((error: Error) => reject(error));
+                  } else {
+                      reject('User is not logged in');
+                  }
+              })
+              .catch((error: Error) => reject(error));
+      });
   }
 
   //Get all cases given location
