@@ -35,11 +35,11 @@ app.get('/api/cases', (req: Request, res: Response) => {
   return Case.findAll().then(cases => res.send(cases));
 });
 
-app.post('/api/verify', (req, res) =>
-  reqAccessLevel(req, res, 1, (req, res) => {
-    console.log('------Token Verified!-------');
-    return res.sendStatus(200);
-  });
+app.post('/api/verify', (req, res) => {
+      reqAccessLevel(req, res, 1, (req, res) => {
+          console.log('------Token Verified!-------');
+          return res.sendStatus(200);
+      });
 });
 
 app.post('/api/login', (req: Request, res: Response) => {
