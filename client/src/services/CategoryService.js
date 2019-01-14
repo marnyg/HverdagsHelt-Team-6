@@ -1,50 +1,78 @@
 // @flow
 import axios from 'axios';
 import Category from '../classes/Category.js';
+import LoginService from "./LoginService";
 
 class CategoryService {
-  //Get all categories
+
   getAllCategories(): Promise<Category[]> {
     return axios.get('/api/categories');
   }
 
-  //Update one specific category
-  updateCategory(category_id: number, c: Category): Promise<void> {
-    let token = localStorage.getItem('token');
-    axios.put('/api/categories/' + category_id, {
-      body: {
-        name: c.name
-      }
-    }, {
-      Authorization: 'Bearer ' + token
-    }).then(function (response) {
-      console.log(response);
-    }).catch((error: Error) => console.error(error));
+  updateCategory(category_id: number, c: Category): Promise<any> {
+    return new Promise((resolve, reject) => {
+         let loginService = new LoginService();
+         loginService.isLoggedIn()
+             .then((logged_in: Boolean) => {
+                 if(logged_in === true){
+                     let token = localStorage.getItem('token');
+                     axios.put('/api/categories/' + category_id, c, {
+                         headers: {
+                             Authorization: 'Bearer ' + token
+                         }
+                     })
+                         .then(response => resolve(response))
+                         .catch((error: Error) => reject(error));
+                 } else {
+                     reject('User is not registered and/or not logged in.');
+                 }
+             })
+             .catch((error: Error) => reject(error));
+     });
   }
 
-  //Delete one specific category
-  deleteCategory(category_id: number): Promise<void> {
-    let token = localStorage.getItem('token');
-    axios.delete('/api/categories/' + category_id,
-      {
-        Authorization: 'Bearer ' + token
-      }).then(function (response) {
-        console.log(response);
-    }).catch((error: Error) => console.error(error));
+  deleteCategory(category_id: number): Promise<any> {
+    return new Promise((resolve, reject) => {
+         let loginService = new LoginService();
+         loginService.isLoggedIn()
+             .then((logged_in: Boolean) => {
+                 if(logged_in === true){
+                     let token = localStorage.getItem('token');
+                     axios.delete('/api/categories/' + category_id, {
+                         headers: {
+                             Authorization: 'Bearer ' + token
+                         }
+                     })
+                         .then(response => resolve(response))
+                         .catch((error: Error) => reject(error));
+                 } else {
+                     reject('User is not registered and/or not logged in.');
+                 }
+             })
+             .catch((error: Error) => reject(error));
+     });
   }
 
-  //Create category
   createCategory(c: Category): Promise<Category> {
-    let token = localStorage.getItem('token');
-    axios.post('/api/categories', {
-      body: {
-        name: c.name
-      }
-    }, {
-      Authorization: 'Bearer ' + token
-    }).then(function (response) {
-      console.log(response);
-    }).catch((error: Error) => console.error(error));
+    return new Promise((resolve, reject) => {
+         let loginService = new LoginService();
+         loginService.isLoggedIn()
+             .then((logged_in: Boolean) => {
+                 if(logged_in === true){
+                     let token = localStorage.getItem('token');
+                     axios.post('/api/categories', c, {
+                         headers: {
+                             Authorization: 'Bearer ' + token
+                         }
+                     })
+                         .then(response => resolve(response))
+                         .catch((error: Error) => reject(error));
+                 } else {
+                     reject('User is not registered and/or not logged in.');
+                 }
+             })
+             .catch((error: Error) => reject(error));
+     });
   }
 }
 

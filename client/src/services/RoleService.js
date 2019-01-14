@@ -1,18 +1,29 @@
 // @flow
 import axios from 'axios';
 import Role from '../classes/Role.js';
+import LoginService from './LoginService.js';
 
 class RoleService {
-  //Get all cases
   getAllRoles(): Promise<Role[]> {
-    let token = localStorage.getItem('token');
-    axios.get('/api/roles', {
-      headers: {
-        Authorization: 'Bearer ' + token
-      }
-    }).then(function (response) {
-      console.log(response);
-    }).catch((error: Error) => console.error(error));
+    return new Promise((resolve, reject) => {
+         let loginService = new LoginService();
+         loginService.isLoggedIn()
+             .then((logged_in: Boolean) => {
+                 if(logged_in === true){
+                     let token = localStorage.getItem('token');
+                     axios.get('/api/roles', {
+                         headers: {
+                             Authorization: 'Bearer ' + token
+                         }
+                     })
+                         .then(response => resolve(response))
+                         .catch((error: Error) => reject(error));
+                 } else {
+                     reject('User is not registered and/or not logged in.');
+                 }
+             })
+             .catch((error: Error) => reject(error));
+     });
   }
 
   createRole(r: Role): Promise<void> {

@@ -1,50 +1,77 @@
 // @flow
 import axios from 'axios';
 import County from '../classes/County.js';
+import LoginService from './LoginService.js';
 
 class CountyService {
-  //Get all counties
   getAllCounties(): Promise<County[]> {
     return axios.get('/api/counties');
   }
 
-  //Create new county
   createCounty(c: County): Promise<County> {
-    let token = localStorage.getItem('token');
-    axios.post('/api/counties', {
-      body: {
-        'name': c.name
-      }
-    }, {
-      Authorization: 'Bearer ' + token
-    }).then(function (response) {
-      console.log(response);
-    }).catch((error: Error) => console.error(error));
+    return new Promise((resolve, reject) => {
+         let loginService = new LoginService();
+         loginService.isLoggedIn()
+             .then((logged_in: Boolean) => {
+                 if(logged_in === true){
+                     let token = localStorage.getItem('token');
+                     axios.post('/api/counties', c, {
+                         headers: {
+                             Authorization: 'Bearer ' + token
+                         }
+                     })
+                         .then(response => resolve(response))
+                         .catch((error: Error) => reject(error));
+                 } else {
+                     reject('User is not registered and/or not logged in.');
+                 }
+             })
+             .catch((error: Error) => reject(error));
+     });
   }
 
-  //Update county
-  updateCounty(county_id: number, c: County): Promise<void> {
-    let token = localStorage.getItem('token');
-    axios.put('/api/counties/' + county_id, {
-      body: {
-        'name': c.name
-      }
-    }, {
-      Authorization: 'Bearer ' + token
-    }).then(function (response) {
-      console.log(response);
-    }).catch((error: Error) => console.error(error));
+  updateCounty(county_id: number, c: County): Promise<any> {
+    return new Promise((resolve, reject) => {
+           let loginService = new LoginService();
+           loginService.isLoggedIn()
+               .then((logged_in: Boolean) => {
+                   if(logged_in === true){
+                       let token = localStorage.getItem('token');
+                       axios.put('/api/counties/' + county_id, c, {
+                           headers: {
+                               Authorization: 'Bearer ' + token
+                           }
+                       })
+                           .then(response => resolve(response))
+                           .catch((error: Error) => reject(error));
+                   } else {
+                       reject('User is not registered and/or not logged in.');
+                   }
+               })
+               .catch((error: Error) => reject(error));
+       });
   }
 
-  //Delete one specific county
-  deleteCounty(county_id: number): Promise<void> {
-    let token = localStorage.getItem('token');
-    axios.delete('/api/counties/' + county_id,
-    {
-      Authorization: 'Bearer ' + token
-    }).then(function (response) {
-      console.log(response);
-    }).catch((error: Error) => console.error(error));
+  deleteCounty(county_id: number): Promise<any> {
+    return new Promise((resolve, reject) => {
+         let loginService = new LoginService();
+         loginService.isLoggedIn()
+             .then((logged_in: Boolean) => {
+                 if(logged_in === true){
+                     let token = localStorage.getItem('token');
+                     axios.delete('/api/counties/' + county_id, {
+                         headers: {
+                             Authorization: 'Bearer ' + token
+                         }
+                     })
+                         .then(response => resolve(response))
+                         .catch((error: Error) => reject(error));
+                 } else {
+                     reject('User is not registered and/or not logged in.');
+                 }
+             })
+             .catch((error: Error) => reject(error));
+     });
   }
 
 }
