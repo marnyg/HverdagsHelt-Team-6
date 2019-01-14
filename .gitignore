@@ -4,3 +4,4 @@ client/public/bundle.js
 .env
 server/src/private.key
 server/src/public.key
+clienc/public/uploads
