@@ -2,8 +2,6 @@
 //
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import MyCases from './MyCases.js';
-import NewCase from './NewCase';
 
 class MyProfile extends Component<{}, { isEditing: boolean }> {
   state = { isEditing: false };
@@ -85,12 +83,12 @@ class MyProfile extends Component<{}, { isEditing: boolean }> {
     let form = event.target.parentNode
     let children = Array.prototype.slice.call(form.children, 0);
 
-    if (this.arePasswordsEqual(children)) {
+    if (this.arePasswordsEqual(children) && form.validity.valid) {
 
       console.log("form is valid, this is where you send the data to te server");
       console.log("you also get the newest profile data from the server");
 
-      this.setState({ isEditing: false })
+      this.setState({ isEditing: true })
       console.log(this.state);
 
     } else {
