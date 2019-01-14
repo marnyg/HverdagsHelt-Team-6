@@ -110,8 +110,8 @@ app.post('/api/cases/:case_id/status_comments', (req: Request, res: Response) =>
 });
 
 app.get('/api/cases/:case_id', (req: Request, res: Response) => {
-  return Case.findOne({ where: { case_id: Number(req.params.case_id) } }).then(cases =>
-    cases ? res.send(cases) : res.sendStatus(404)
+  return Case.findOne({ where: { case_id: Number(req.params.case_id) } }).then(
+    cases => (cases ? res.send(cases) : res.sendStatus(404))
   );
 });
 
@@ -145,8 +145,8 @@ app.put('/api/cases/:case_id', (req: Request, res: Response) => {
 });
 
 app.delete('/api/cases/:case_id', (req: Request, res: Response) => {
-  return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(cases =>
-    cases ? res.send() : res.status(500).send()
+  return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(
+    cases => (cases ? res.send() : res.status(500).send())
   );
 });
 
@@ -186,20 +186,42 @@ app.get('/api/cases/region_cases/:county_name/:region_name', async (req: Request
     where: { name: req.params.county_name }
   });
 
-  countyId = countyId.county_id;
-
+  if (countyId !== null) {
+    countyId = countyId.county_id;
+  } else {
+    return res.sendStatus(404);
+  }
   let regionId = await Region.findOne({
     where: { name: req.params.region_name, county_id: countyId }
   });
-
-  regionId = regionId.region_id;
-
+  if (regionId !== null) {
+    regionId = regionId.region_id;
+  } else {
+    return res.sendStatus(404);
+  }
+  /*
+  let out = null;
   return Case.findAll({
     where: {
       region_id: regionId
     },
     order: [['updatedAt', 'DESC']]
-  }).then(cases => res.send(cases));
+  }).then(cases => cases.map(c => {
+    let img = Picture.findAll({ where: { case_id: c.case_id } }).then(img => {
+      out = c.toJSON();
+      out.img = img;
+      console.log(out);
+      cases = out; // out inneholder nå også bilde-array
+    });
+  })).then(cases =>res.send(cases));
+});
+*/
+  return Case.findAll({
+    where: {
+      region_id: regionId
+    },
+    order: [['updatedAt', 'DESC']]
+  }).then(cases => res.send(cases)); //works for returning cases
 });
 
 app.get('/api/statuses', (req: Request, res: Response) => {
@@ -230,7 +252,7 @@ app.delete('/api/roles/:role_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, Role.delRole);
 });
 
-app.get('/api/users', (req: Request, res: Response) =>{
+app.get('/api/users', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, Users.getAllUsers);
 });
 
@@ -239,15 +261,15 @@ app.post('/api/users', (req: Request, res: Response) => {
 });
 
 app.get('/api/users/:user_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Users.getOneUser)
+  reqAccessLevel(req, res, 4, Users.getOneUser);
 });
 
 app.put('/api/users/:user_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Users.updateOneUser)
+  reqAccessLevel(req, res, 4, Users.updateOneUser);
 });
 
 app.delete('/api/users/:user_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Users.deleteOneUser)
+  reqAccessLevel(req, res, 4, Users.deleteOneUser);
 });
 
 app.put('/api/users/:user_id/password', async (req: Request, res: Response) => {
