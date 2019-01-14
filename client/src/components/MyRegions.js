@@ -65,7 +65,6 @@ class MyProfile extends Component<{}, { isEditing: boolean }> {
     handleDelete(e) {
         console.log(e);
         console.log("delete " + e.target.parentNode.id);
-
         console.log("delete " + e.target.parentNode.id);
     }
 
