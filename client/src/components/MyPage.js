@@ -5,12 +5,13 @@ import { Component } from 'react-simplified';
 import MyCases from './MyCases.js';
 import MyProfile from './MyProfile';
 import NewCase from './NewCase';
+import MyRegions from './MyRegions'
 import { NavLink } from 'react-router-dom';
 
 class MyPage extends Component {
   menuItems = [
     { name: 'Min Profil', component: <MyProfile /> },
-    { name: 'Min Profil', component: <MyProfile /> },
+    { name: 'Mine Komuner', component: <MyRegions /> },
     { name: 'Min Profil', component: <MyProfile /> },
     { name: 'Min Profil', component: <MyProfile /> },
     { name: 'Mine Saker', component: <MyCases /> }
