@@ -23,14 +23,19 @@ let rawQueryCases =
 
 module.exports = {
   getAllCases: async function(req: Request, res: Response) {
-    sequelize.query(rawQueryCases, { type: sequelize.QueryTypes.SELECT }).then(async cases => {
-      const out = cases.map(async c => {
-        let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
-        c.img = pictures.map(img => img.path);
-        return c;
+    sequelize
+      .query(rawQueryCases, { type: sequelize.QueryTypes.SELECT })
+      .then(async cases => {
+        const out = cases.map(async c => {
+          let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+          c.img = pictures.map(img => img.path);
+          return c;
+        });
+        return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+      })
+      .catch(err => {
+        return res.status(500).send(err);
       });
-      return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
-    });
   },
 
   createNewCase: function(req: Request, res: Response) {
@@ -94,7 +99,7 @@ module.exports = {
               });
         })
         .catch(error => {
-          return res.status(400).send(error);
+          return res.status(500).send(error);
         });
     }
   },
@@ -110,19 +115,17 @@ module.exports = {
     })
     */
     sequelize
-      .query(
-        rawQueryCases + ' WHERE c.case_id = ?;',
-        {
-          replacements: [req.params.case_id],
-          type: sequelize.QueryTypes.SELECT
-        }
-      )
+      .query(rawQueryCases + ' WHERE c.case_id = ?;', {
+        replacements: [req.params.case_id],
+        type: sequelize.QueryTypes.SELECT
+      })
       .then(async result => {
-        let pictures = Picture.findAll({ where: { case_id: req.params.case_id } });
-        let images = await pictures.map(img => img.path);
-        let data = result[0][0];
-        data['images'] = images;
-        return res.send(data);
+        let pictures = await Picture.findAll({ where: { case_id: req.params.case_id } });
+        result[0].img = pictures.map(img => img.path);
+        return result ? res.send(result) : res.sendStatus(404);
+      })
+      .catch(err => {
+        return res.status(500).send(err);
       });
   },
   getAllCasesInRegionByName: async function(req: Request, res: Response) {
@@ -130,39 +133,39 @@ module.exports = {
       return res.sendStatus(400);
 
     return sequelize
-      .query(
-        rawQueryCases + ' WHERE r.name = ? AND co.name = ?;',
-        {
-          replacements: [req.params.case_id],
-          type: sequelize.QueryTypes.SELECT
-        }
-      )
+      .query(rawQueryCases + ' WHERE r.name = ? AND co.name = ?;', {
+        replacements: [req.params.region_name, req.params.county_name],
+        type: sequelize.QueryTypes.SELECT
+      })
       .then(async cases => {
-        const out = cases[0].map(async c => {
+        const out = cases.map(async c => {
           let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
           c.img = pictures.map(img => img.path);
           return c;
         });
         return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+      })
+      .catch(err => {
+        return res.status(500).send(err);
       });
   },
   getAllCasesInRegionById: async function(req: Request, res: Response) {
     if (!req.params || typeof Number(req.params.region_id) != 'number') return res.sendStatus(400);
     sequelize
-      .query(
-        rawQueryCases + ' WHERE c.region_id = ?;',
-        {
-          replacements: [req.params.case_id],
-          type: sequelize.QueryTypes.SELECT
-        }
-      )
+      .query(rawQueryCases + ' WHERE c.region_id = ?;', {
+        replacements: [Number(req.params.region_id)],
+        type: sequelize.QueryTypes.SELECT
+      })
       .then(async cases => {
-        const out = cases[0].map(async c => {
+        const out = cases.map(async c => {
           let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
           c.img = pictures.map(img => img.path);
           return c;
         });
         return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+      })
+      .catch(err => {
+        return res.status(500).send(err);
       });
   },
   getAllCasesForUser: async function(req: Request, res: Response) {
@@ -181,21 +184,20 @@ module.exports = {
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
 
     sequelize
-      .query(
-        rawQueryCases + ' WHERE c.user_id = ?;',
-        {
-          replacements: [req.params.case_id],
-          type: sequelize.QueryTypes.SELECT
-        }
-      )
+      .query(rawQueryCases + ' WHERE c.user_id = ?;', {
+        replacements: [Number(req.params.user_id)],
+        type: sequelize.QueryTypes.SELECT
+      })
       .then(async cases => {
-        const out = cases[0].map(async c => {
+        const out = cases.map(async c => {
           let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
           c.img = pictures.map(img => img.path);
           return c;
         });
         return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+      })
+      .catch(err => {
+        return res.status(500).send(err);
       });
   }
 };
-
