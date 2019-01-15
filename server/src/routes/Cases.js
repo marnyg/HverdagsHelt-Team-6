@@ -2,8 +2,7 @@
 
 import { Case, sequelize } from '../models.js';
 import { reqAccessLevel, verifyToken } from '../auth';
-import { Category, Picture, Status, Region } from '../models';
-import Regions from './Regions';
+import { Picture } from '../models';
 
 type Request = express$Request;
 type Response = express$Response;
@@ -115,8 +114,10 @@ module.exports = {
           'JOIN Statuses s ON c.status_id = s.status_id ' +
           'JOIN Categories ca ON c.category_id = ca.category_id ' +
           'WHERE c.case_id = ?;',
-        { replacements: [req.params.case_id] },
-        { type: sequelize.QueryTypes.SELECT }
+        {
+          replacements: [req.params.case_id],
+          type: sequelize.QueryTypes.SELECT
+        }
       )
       .then(async result => {
         let pictures = Picture.findAll({ where: { case_id: req.params.case_id } });
@@ -133,16 +134,19 @@ module.exports = {
     return sequelize
       .query(
         'Select c.case_id, c.title, c.description, c.lat, c.lon, r.name as region_name, co.name as county_name, s.name as status_name, cg.name as category_name, ' +
-        "CONCAT(u.firstname, ' ', u.lastname) as createdBy, u.tlf, u.email, c.createdAt, c.updatedAt " +
-        'FROM Cases c JOIN Regions r ON c.region_id = r.region_id ' +
-        'JOIN Counties co ON r.county_id = co.county_id ' +
-        'JOIN Users u ON c.user_id = u.user_id ' +
-        'JOIN Statuses s ON c.status_id = s.status_id ' +
-        'JOIN Categories cg ON c.category_id = cg.category_id ' +
-        'WHERE r.name = ? AND co.name = ?;',
-        { replacements: [req.params.region_name, req.params.county_name] },
-        { type: sequelize.QueryTypes.SELECT }
-      ).then(async cases => {
+          "CONCAT(u.firstname, ' ', u.lastname) as createdBy, u.tlf, u.email, c.createdAt, c.updatedAt " +
+          'FROM Cases c JOIN Regions r ON c.region_id = r.region_id ' +
+          'JOIN Counties co ON r.county_id = co.county_id ' +
+          'JOIN Users u ON c.user_id = u.user_id ' +
+          'JOIN Statuses s ON c.status_id = s.status_id ' +
+          'JOIN Categories cg ON c.category_id = cg.category_id ' +
+          'WHERE r.name = ? AND co.name = ?;',
+        {
+          replacements: [req.params.region_name, req.params.county_name],
+          type: sequelize.QueryTypes.SELECT
+        }
+      )
+      .then(async cases => {
         const out = cases[0].map(async c => {
           let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
           c.img = pictures.map(img => img.path);
@@ -152,20 +156,22 @@ module.exports = {
       });
   },
   getAllCasesInRegionById: async function(req: Request, res: Response) {
-    if (!req.params || typeof Number(req.params.region_id) != 'number')
-      return res.sendStatus(400);
+    if (!req.params || typeof Number(req.params.region_id) != 'number') return res.sendStatus(400);
     sequelize
       .query(
         'Select c.case_id, c.title, c.description, c.lat, c.lon, r.name as region_name, s.name as status_name, cg.name as category_name, ' +
-        "CONCAT(u.firstname, ' ', u.lastname) as createdBy, u.tlf, u.email, c.createdAt, c.updatedAt " +
-        'FROM Cases c JOIN Regions r ON c.region_id = r.region_id ' +
-        'JOIN Users u ON c.user_id = u.user_id ' +
-        'JOIN Statuses s ON c.status_id = s.status_id ' +
-        'JOIN Categories cg ON c.category_id = cg.category_id ' +
-        'WHERE c.region_id = ?;',
-        { replacements: [Number(req.params.region_id)] },
-        { type: sequelize.QueryTypes.SELECT }
-      ).then(async cases => {
+          "CONCAT(u.firstname, ' ', u.lastname) as createdBy, u.tlf, u.email, c.createdAt, c.updatedAt " +
+          'FROM Cases c JOIN Regions r ON c.region_id = r.region_id ' +
+          'JOIN Users u ON c.user_id = u.user_id ' +
+          'JOIN Statuses s ON c.status_id = s.status_id ' +
+          'JOIN Categories cg ON c.category_id = cg.category_id ' +
+          'WHERE c.region_id = ?;',
+        {
+          replacements: [Number(req.params.region_id)],
+          type: sequelize.QueryTypes.SELECT
+        }
+      )
+      .then(async cases => {
         const out = cases[0].map(async c => {
           let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
           c.img = pictures.map(img => img.path);
@@ -192,22 +198,24 @@ module.exports = {
     sequelize
       .query(
         'Select c.case_id, c.title, c.description, c.lat, c.lon, r.name as region_name, s.name as status_name, cg.name as category_name, ' +
-        "CONCAT(u.firstname, ' ', u.lastname) as createdBy, u.tlf, u.email, c.createdAt, c.updatedAt " +
-        'FROM Cases c JOIN Regions r ON c.region_id = r.region_id ' +
-        'JOIN Users u ON c.user_id = u.user_id ' +
-        'JOIN Statuses s ON c.status_id = s.status_id ' +
-        'JOIN Categories cg ON c.category_id = cg.category_id ' +
-        'WHERE c.user_id = ?;',
-        { replacements: [Number(req.params.user_id)] },
-        { type: sequelize.QueryTypes.SELECT }
-      ).then(async cases => {
-      const out = cases[0].map(async c => {
-        let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
-        c.img = pictures.map(img => img.path);
-        return c;
+          "CONCAT(u.firstname, ' ', u.lastname) as createdBy, u.tlf, u.email, c.createdAt, c.updatedAt " +
+          'FROM Cases c JOIN Regions r ON c.region_id = r.region_id ' +
+          'JOIN Users u ON c.user_id = u.user_id ' +
+          'JOIN Statuses s ON c.status_id = s.status_id ' +
+          'JOIN Categories cg ON c.category_id = cg.category_id ' +
+          'WHERE c.user_id = ?;',
+        {
+          replacements: [Number(req.params.user_id)],
+          type: sequelize.QueryTypes.SELECT
+        }
+      )
+      .then(async cases => {
+        const out = cases[0].map(async c => {
+          let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+          c.img = pictures.map(img => img.path);
+          return c;
+        });
+        return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
       });
-      return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
-    });
   }
 };
-
