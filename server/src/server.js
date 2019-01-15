@@ -162,7 +162,7 @@ app.put('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Case_subscription.updateCase_subscriptions);
 });
 
-app.delete('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
+app.delete('/api/cases/:case_id/subscribe/:user_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Case_subscription.delCase_subscriptions);
 });
 
