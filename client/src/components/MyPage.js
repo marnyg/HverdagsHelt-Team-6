@@ -23,7 +23,7 @@ class MyPage extends Component {
       <div className="wrapper">
         <nav id="sidebar" className="bg-danger ">
           <div className="sidebar-header">
-            <h2>Sidebar</h2>
+            <h2>Meny</h2>
           </div>
 
           <ul className="list-unstyled components">
