@@ -17,7 +17,8 @@ import County from './routes/Counties.js';
 import Role from './routes/Roles.js';
 import Status from './routes/Statuses.js';
 import Case_subscription from './routes/Case_subscriptions.js';
-import { Case, Status_comment, Picture } from './models.js';
+import Status_comment from './routes/Status_comments.js';
+import { Case, Picture, Statuses, Categories } from './models.js';
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
 import {verifyToken} from "./auth";
@@ -75,7 +76,7 @@ app.get('/api/cases', (req: Request, res: Response) => {
   return Case.getAllCases(req,res);
 });
 
-app.post('/api/verify', (req, res) => {
+app.post('/api/verify', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, (req, res) => {
     console.log('------Token Verified!-------');
     return res.sendStatus(200);
@@ -102,29 +103,19 @@ app.get('/api/cases/user_cases/:user_id', (req: Request, res: Response) => {
 });
 
 app.get('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
-  return Status_comment.findAll({
-    where: {
-      case_id: req.params.case_id
-    },
-    order: [['updatedAt', 'DESC']] //Order by updatedAt????
-  }).then(comments => res.send(comments));
+  Status_comment.getAllStatus_comment(req, res);
 });
 
 app.post('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
-  if (
-    !req.body ||
-    typeof req.body.user_id !== 'number' ||
-    typeof req.body.comment !== 'string' ||
-    typeof req.body.status_id !== 'number'
-  )
-    return res.sendStatus(400);
+  reqAccessLevel(req, res, 2, Status_comment.addStatus_comment);
+});
 
-  return Status_comment.create({
-    comment: req.body.comment,
-    case_id: Number(req.params.case_id),
-    status_id: req.body.status_id,
-    user_id: req.body.user_id
-  }).then(comment => (comment ? res.send(comment) : res.sendStatus(404)));
+app.put('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Status_comment.updateStatus_comment);
+});
+
+app.delete('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Status_comment.delStatus_comment);
 });
 
 app.put('/api/cases/:case_id', (req: Request, res: Response) => {
