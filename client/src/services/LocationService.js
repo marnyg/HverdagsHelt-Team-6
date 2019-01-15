@@ -88,6 +88,9 @@ class LocationService{
                     clearTimeout(location_timeout);
                     reject(error);
                 });
+                function geolocFail() {
+                    reject('Could not get location');
+                }
             } else {
                 reject({message: 'Navigator is not enabled in the browser'});
             }

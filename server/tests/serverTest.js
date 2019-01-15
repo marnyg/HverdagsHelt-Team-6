@@ -2,11 +2,11 @@
 import { application } from '../src/server';
 import request from 'supertest';
 
-let loginToken=null;
+let loginToken = null;
 describe('POST /api/login', async () => {
   let data = {
-    email:"test@gmail.com",
-    password:"password123"
+    email: 'test@gmail.com',
+    password: 'password123'
   };
   test('200 status code for POST', function(done) {
     request(application)
@@ -101,7 +101,7 @@ describe('GET /api/cases/:case_id/status_comments', () => {
 
 describe('POST /api/cases/:case_id/status_comments', () => {
   let data = {
-    comment: "Venter på deler",
+    comment: 'Venter på deler',
     status_id: 2,
     user_id: 1
   };
@@ -227,7 +227,7 @@ describe('GET /api/statuses', () => {
 
 describe('POST /api/statuses', () => {
   let data = {
-    name: "Ugyldig"
+    name: 'Ugyldig'
   };
   test('200 status code for POST', done => {
     request(application)
@@ -253,7 +253,7 @@ describe('GET /api/roles', () => {
 
 describe('POST /api/roles/', () => {
   let data = {
-    name: "Test bruker"
+    name: 'Test bruker'
   };
   test('200 status code', done => {
     request(application)
@@ -268,7 +268,7 @@ describe('POST /api/roles/', () => {
 
 describe('PUT /api/roles/:role_id', () => {
   let data = {
-    name: "Test bruker"
+    name: 'Test bruker'
   };
   test('200 status code', done => {
     request(application)

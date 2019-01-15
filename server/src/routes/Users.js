@@ -8,10 +8,12 @@ type Response = express$Response;
 
 module.exports = {
   getAllUsers: function(req: Request, res: Response) {
-    return User.findAll().then(users => res.send(users));
+    return User.findAll({ attributes: ['user_id', 'firstname', 'lastname', 'email', 'tlf', 'region_id'] }).then(users =>
+      res.send(users)
+    );
   },
 
-  createUser: function(req: Request, res: Response) {
+  createUser: async function(req: Request, res: Response) {
     if (
       !req.body ||
       typeof req.body.firstname !== 'string' ||
@@ -27,7 +29,7 @@ module.exports = {
     let password = hashedPassword['passwordHash'];
     let salt = hashedPassword['salt'];
 
-    return User.create({
+    return await User.create({
       firstname: req.body.firstname,
       lastname: req.body.lastname,
       tlf: req.body.tlf,
@@ -36,7 +38,7 @@ module.exports = {
       salt: salt,
       role_id: 4,
       region_id: req.body.region_id
-    }).then(users => (users ? res.send(users) : res.sendStatus(404)));
+    }).then(users => (users ? res.send({ user_id: users.user_id }) : res.sendStatus(404)));
   },
 
   getOneUser: function(req: Request, res: Response) {
@@ -54,9 +56,10 @@ module.exports = {
 
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
 
-    return User.findOne({ where: { user_id: user_id_param } }).then(user =>
-      user ? res.send(user) : res.sendStatus(404)
-    );
+    return User.findOne({
+      where: { user_id: user_id_param },
+      attributes: ['user_id', 'firstname', 'lastname', 'email', 'tlf', 'region_id']
+    }).then(user => (user ? res.send(user) : res.sendStatus(404)));
   },
 
   updateOneUser: function(req: Request, res: Response) {
@@ -108,7 +111,51 @@ module.exports = {
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
 
     return User.destroy({ where: { user_id: Number(req.params.user_id) } }).then(
-        user => (user ? res.send() : res.status(400).send())
+      user => (user ? res.send() : res.status(400).send())
     );
+  },
+  changePassword: async function(req: Request, res: Response) {
+    if (
+      !req.token ||
+      !req.params.user_id ||
+      !req.body ||
+      typeof Number(req.params.user_id) !== 'number' ||
+      typeof req.token !== 'string' ||
+      typeof req.body.old_password !== 'string' ||
+      typeof req.body.new_password !== 'string'
+    )
+      return res.sendStatus(400);
+
+    let decoded_token = verifyToken(req.token);
+    let user_id_token = decoded_token.user_id;
+    let user_id_param = Number(req.params.user_id);
+
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+
+    let user = await User.findOne({
+      where: { user_id: Number(req.params.user_id) }
+    });
+
+    let salt = user.salt;
+    let old = user.hashed_password;
+
+    let oldHashedPassword = hashPassword(req.body.old_password, salt);
+    let old_password = oldHashedPassword['passwordHash'];
+
+    if (old_password === old) {
+      let newHashedPassword = hashPassword(req.body.new_password);
+      let new_password = newHashedPassword['passwordHash'];
+      let new_salt = newHashedPassword['salt'];
+
+      return User.update(
+        {
+          hashed_password: new_password,
+          salt: new_salt
+        },
+        { where: { user_id: Number(req.params.user_id) } }
+      ).then(count => (count ? res.send(count) : res.sendStatus(404)));
+    } else {
+      return res.sendStatus(403);
+    }
   }
 };
