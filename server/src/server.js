@@ -4,8 +4,11 @@ import express from 'express';
 import path from 'path';
 import reload from 'reload';
 import fs from 'fs';
+const multer = require('multer');
+import crypto from 'crypto';
 import bearerToken from 'express-bearer-token';
 import { hashPassword, reqAccessLevel, login, logout, createToken, loginOk } from './auth.js';
+import Cases from './routes/Cases.js';
 import Users from './routes/Users.js';
 import Category from './routes/Categories.js';
 import Region_subscriptions from './routes/Region_subscriptions.js';
@@ -17,8 +20,7 @@ import Case_subscription from './routes/Case_subscriptions.js';
 import { Case, Status_comment, Picture } from './models.js';
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
-
-let tokens = {};
+import {verifyToken} from "./auth";
 
 type Request = express$Request;
 type Response = express$Response;
@@ -31,12 +33,42 @@ app.use(express.static(public_path));
 app.use(express.json()); // For parsing application/json
 app.use(bearerToken()); // For easy access to token sent in 'Authorization' header.
 
-// Depreciated
-/*
+const storage = multer.diskStorage({
+  destination: public_path + '/' + 'uploads',
+  filename: function (req, file, callback) {
+    crypto.pseudoRandomBytes(16, (err, raw) => {
+      console.log('crypto firing!!!');
+      if (err) return callback(err);
+      console.log(file.originalname);
+      callback(null, raw.toString('hex') + path.extname(file.originalname));
+
+    })
+  }
+});
+
+let upload = multer({storage: storage});
+
+app.post('/api/uploads', upload.single('avatar'), (req, res) => {
+  if (!req.file) {
+    console.log("No file received");
+    return res.send({
+      success: false
+    });
+  } else {
+    console.log('file received');
+    console.log(req.files);
+    console.log(req.body.alt);
+    return res.send({
+      success: true
+    });
+  }
+});
+
+app.post('/api/cases', upload.array('images', 3), Cases.createNewCase);
+
 app.get('/api/cases', (req: Request, res: Response) => {
   return Case.getAllCases(req,res);
 });
-*/
 
 app.post('/api/verify', (req, res) => {
   reqAccessLevel(req, res, 1, (req, res) => {
@@ -53,31 +85,7 @@ app.post('/api/logout', (req: Request, res: Response) => {
   return logout(req, res);
 });
 
-app.post('/api/cases', (req: Request, res: Response) => {
-  if (
-    !req.body ||
-    typeof req.body.title !== 'string' ||
-    typeof req.body.description !== 'string' ||
-    typeof req.body.lat !== 'number' ||
-    typeof req.body.lon !== 'number' ||
-    typeof req.body.region_id !== 'number' ||
-    typeof req.body.user_id !== 'number' ||
-    typeof req.body.category_id !== 'number' ||
-    typeof req.body.status_id !== 'number'
-  )
-    return res.sendStatus(400);
-
-  return Case.create({
-    title: req.body.title,
-    description: req.body.description,
-    lat: req.body.lat,
-    lon: req.body.lon,
-    region_id: req.body.region_id,
-    user_id: req.body.user_id,
-    category_id: req.body.category_id,
-    status_id: req.body.status_id
-  }).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
-});
+app.get('/api/cases/:case_id', (req: Request, res: Response) => Cases.getOneCase(req, res));
 
 app.get('/api/cases/user_cases/:user_id', (req: Request, res: Response) => {
   return Case.findAll({
@@ -112,12 +120,6 @@ app.post('/api/cases/:case_id/status_comments', (req: Request, res: Response) =>
     status_id: req.body.status_id,
     user_id: req.body.user_id
   }).then(comment => (comment ? res.send(comment) : res.sendStatus(404)));
-});
-
-app.get('/api/cases/:case_id', (req: Request, res: Response) => {
-  return Case.findOne({ where: { case_id: Number(req.params.case_id) } }).then(
-    cases => (cases ? res.send(cases) : res.sendStatus(404))
-  );
 });
 
 app.put('/api/cases/:case_id', (req: Request, res: Response) => {
