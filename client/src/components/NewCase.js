@@ -29,6 +29,7 @@ class NewCase extends Component {
   pos = this.lastResortPos;
   markerPos = this.lastResortPos;
   fileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+  isMapClickable = false
 
   constructor() {
     super();
@@ -197,7 +198,7 @@ class NewCase extends Component {
                 centerPos={{ lat: this.pos.lat, lng: this.pos.lon }}
                 updatePos={this.updatePos}
                 markerPos={{ lat: this.markerPos.lat, lng: this.markerPos.lon }}
-                isClickable={'false'}
+                isClickable={this.isMapClickable}
               />
             </div>
           </div>
@@ -254,9 +255,9 @@ class NewCase extends Component {
         console.warn('FEIL!' + err.toString());
         Notify.danger(
           'Det oppstod en feil under lasting av kategorier. ' +
-            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-            '\n\nFeilmelding: ' +
-            err.toString()
+          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+          '\n\nFeilmelding: ' +
+          err.toString()
         );
       });
     console.log('Fetchng counties.');
@@ -268,9 +269,9 @@ class NewCase extends Component {
         console.warn('FEIL!' + err.toString());
         Notify.danger(
           'Det oppstod en feil under lasting av fylker. ' +
-            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-            '\n\nFeilmelding: ' +
-            err.toString()
+          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+          '\n\nFeilmelding: ' +
+          err.toString()
         );
       });
     console.log('Mounted!');
@@ -324,9 +325,11 @@ class NewCase extends Component {
       this.list2.hidden = true;
       this.lastResortAddress.hidden = true;
       this.lastResortAddressLabel.hidden = true;
+      this.isMapClickable = false;
     }
     let locator = new LocationService();
     this.pos = locator.getLocation();
+    this.isMapClickable = false;
   }
 
   radio2() {
@@ -336,6 +339,7 @@ class NewCase extends Component {
       this.list2.hidden = true;
       this.lastResortAddress.hidden = true;
       this.lastResortAddressLabel.hidden = true;
+      this.isMapClickable = true;
     }
   }
 
@@ -361,6 +365,7 @@ class NewCase extends Component {
         this.lastResortAddress.hidden = false;
         this.lastResortAddressLabel.hidden = false;
       }
+      this.isMapClickable = false;
     } else {
       console.log('list1 eller list2 er null!');
     }
@@ -372,10 +377,10 @@ class NewCase extends Component {
       let county = event.target;
       console.log(
         'Slected ' +
-          county.options[county.selectedIndex].text +
-          ' with id = ' +
-          county.value +
-          ' as county from drop-down list.'
+        county.options[county.selectedIndex].text +
+        ' with id = ' +
+        county.value +
+        ' as county from drop-down list.'
       );
       this.list2.hidden = false;
       this.fetchMunicipalities(county.value);
@@ -392,10 +397,10 @@ class NewCase extends Component {
       if (muni instanceof HTMLSelectElement) {
         console.log(
           'Slected ' +
-            muni.options[muni.selectedIndex].text +
-            ' with id = ' +
-            muni.value +
-            ' as municipality from drop-down list.'
+          muni.options[muni.selectedIndex].text +
+          ' with id = ' +
+          muni.value +
+          ' as municipality from drop-down list.'
         );
       }
       this.lastResortAddress.hidden = false;
@@ -410,10 +415,10 @@ class NewCase extends Component {
     if (this.list1 && this.list1 instanceof HTMLSelectElement) {
       console.log(
         'Fetching municipalities for county: ' +
-          this.list1.options[this.list1.selectedIndex].text +
-          ' (county_id = ' +
-          county_id +
-          ').'
+        this.list1.options[this.list1.selectedIndex].text +
+        ' (county_id = ' +
+        county_id +
+        ').'
       );
       // Fetching logic here
       let reg = new RegionService();
@@ -426,11 +431,11 @@ class NewCase extends Component {
           if (this.list1 instanceof HTMLSelectElement) {
             Notify.danger(
               'Det oppstod en feil under lasting av kommuner fra fylke ' +
-                this.list1.options[this.list1.selectedIndex].text +
-                '. ' +
-                'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-                '\n\nFeilmelding: ' +
-                err.toString()
+              this.list1.options[this.list1.selectedIndex].text +
+              '. ' +
+              'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+              '\n\nFeilmelding: ' +
+              err.toString()
             );
           }
         });
@@ -536,16 +541,16 @@ class NewCase extends Component {
               console.log('Using list selection to determine position.');
               console.log(
                 'Selected options are county = ' +
-                  this.counties[this.list1.selectedIndex - 1].name +
-                  ' with id = ' +
-                  this.counties[this.list1.selectedIndex - 1].county_id +
-                  ' and municipality = ' +
-                  this.municipalities[this.list2.selectedIndex - 1].name +
-                  ' with id = ' +
-                  this.municipalities[this.list2.selectedIndex - 1].region_id +
-                  '. Custom message is: "' +
-                  this.lastResortAddress.value +
-                  '".'
+                this.counties[this.list1.selectedIndex - 1].name +
+                ' with id = ' +
+                this.counties[this.list1.selectedIndex - 1].county_id +
+                ' and municipality = ' +
+                this.municipalities[this.list2.selectedIndex - 1].name +
+                ' with id = ' +
+                this.municipalities[this.list2.selectedIndex - 1].region_id +
+                '. Custom message is: "' +
+                this.lastResortAddress.value +
+                '".'
               );
               this.pos = {
                 lat: this.municipalities[this.list2.selectedIndex - 1].lat,
@@ -554,7 +559,7 @@ class NewCase extends Component {
               region_id = this.municipalities[this.list2.selectedIndex - 1].region_id;
               break;
           }
-          let user_id = null;
+          let user_id = JSON.parse(localStorage.getItem('user')).user_id;
           let newcase = new Case(
             null,
             region_id,
@@ -585,7 +590,7 @@ class NewCase extends Component {
     console.log('Case is ' + JSON.stringify(obj));
     let cas = new CaseService();
     cas
-      .createCase(obj)
+      .createCase(obj, this.images)
       .then(e => {
         Notify.success('Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id);
         console.log('Form data transmission success! Case ID: ' + e.case_id);
@@ -595,8 +600,8 @@ class NewCase extends Component {
       .catch((err: Error) => {
         Notify.danger(
           'Det oppstod en feil ved sending av saken til oss. Sørg for at alle felter er fyllt ut korrekt. ' +
-            'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
-            err.message
+          'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
+          err.message
         );
         console.warn('Error while transmitting form data to server with error message: ' + err.message);
       });

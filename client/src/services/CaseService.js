@@ -71,6 +71,8 @@ class CaseService {
 
   //Create case
   createCase(c: Case, pictures): Promise<Case> {
+      console.log('Case:', c);
+      console.log('Pictures:', pictures);
     //return axios.post('/api/cases', c);
     let formData = new FormData();
     return new Promise((resolve, reject) => {
@@ -162,7 +164,7 @@ class CaseService {
   //Get all cases given location
   getCasesByLoc(county_name: string, region_name: string): Promise<Case[]> {
     return axios.get(
-      '/api/cases/region_cases/' + county_name + '/' + region_name,
+      '/api/cases/region_cases/' + region_name + '/' + county_name,
       {},
       {
         headers: { 'Content-Type': 'application/json' }
