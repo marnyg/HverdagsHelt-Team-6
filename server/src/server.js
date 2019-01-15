@@ -17,18 +17,11 @@ import County from './routes/Counties.js';
 import Role from './routes/Roles.js';
 import Status from './routes/Statuses.js';
 import Case_subscription from './routes/Case_subscriptions.js';
-<<<<<<< HEAD
-import { Case, Status_comment, Picture } from './models.js';
-import type { Model } from 'sequelize';
-import Sequelize from 'sequelize';
-import {verifyToken} from "./auth";
-=======
 import Status_comment from './routes/Status_comments.js';
 import { Case } from './models.js';
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
 import { verifyToken } from './auth';
->>>>>>> master
 
 let os = require('os');
 let hostname = os.hostname();
@@ -46,50 +39,12 @@ app.use(bearerToken()); // For easy access to token sent in 'Authorization' head
 
 const storage = multer.diskStorage({
   destination: public_path + '/' + 'uploads',
-<<<<<<< HEAD
-  filename: function (req, file, callback) {
-=======
   filename: function(req, file, callback) {
->>>>>>> master
     crypto.pseudoRandomBytes(16, (err, raw) => {
       console.log('crypto firing!!!');
       if (err) return callback(err);
       console.log(file.originalname);
       callback(null, raw.toString('hex') + path.extname(file.originalname));
-<<<<<<< HEAD
-
-    })
-  }
-});
-
-let upload = multer({storage: storage});
-
-app.post('/api/uploads', upload.single('avatar'), (req, res) => {
-  if (!req.file) {
-    console.log("No file received");
-    return res.send({
-      success: false
-    });
-  } else {
-    console.log('file received');
-    console.log(req.files);
-    console.log(req.body.alt);
-    return res.send({
-      success: true
-    });
-  }
-});
-
-app.get('/', (req: Request, res: Response) => res.sendFile(public_path + '/index.html'));
-
-app.post('/api/cases', upload.array('images', 3), Cases.createNewCase);
-
-app.get('/api/cases', (req: Request, res: Response) => {
-  return Case.getAllCases(req,res);
-});
-
-app.post('/api/verify', (req, res) => {
-=======
     });
   }
 });
@@ -119,7 +74,6 @@ app.post('/api/cases', upload.array('images', 3), Cases.createNewCase);
 app.get('/api/cases', (req: Request, res: Response) => Cases.getAllCases(req, res));
 
 app.post('/api/verify', (req: Request, res: Response) => {
->>>>>>> master
   reqAccessLevel(req, res, 4, (req, res) => {
     console.log('------Token Verified!-------');
     return res.sendStatus(200);
@@ -152,13 +106,10 @@ app.put('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request,
   reqAccessLevel(req, res, 2, Status_comment.updateStatus_comment);
 });
 
-<<<<<<< HEAD
-=======
 app.delete('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 2, Status_comment.delStatus_comment);
 });
 
->>>>>>> master
 app.put('/api/cases/:case_id', (req: Request, res: Response) => {
   if (
     !req.body ||
@@ -217,23 +168,11 @@ app.delete('/api/cases/:case_id/subscribe/:user_id', (req: Request, res: Respons
 });
 
 app.get('/api/cases/region_cases/:county_name/:region_name', async (req: Request, res: Response) => {
-<<<<<<< HEAD
-  let region = await Region.getOneRegionByNameAndCounty(req, res);
-  let regionId = region ? region : res.sendStatus(404);
-  let cases = await Case.findAll({ where: { region_id: Number(regionId.region_id) }, order: [['updatedAt', 'DESC']] });
-  cases = cases.map(c => c.toJSON());
-  const out = cases.map(async c => {
-    c.img = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
-    return c;
-  });
-  return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
-=======
   return Cases.getAllCasesInRegionByName(req, res);
 });
 
 app.get('/api/cases/region_cases/:region_id', async (req: Request, res: Response) => {
   return Cases.getAllCasesInRegionById(req, res);
->>>>>>> master
 });
 
 app.get('/api/statuses', (req: Request, res: Response) => {
@@ -291,13 +230,10 @@ app.delete('/api/users/:user_id', (req: Request, res: Response) => {
 
 app.put('/api/users/:user_id/password', async (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Users.changePassword);
-<<<<<<< HEAD
-=======
 });
 
 app.get('/api/users/:user_id/region_subscriptions', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Users.getRegionSubscriptionsForUser);
->>>>>>> master
 });
 
 app.get('/api/counties', (req: Request, res: Response) => {
