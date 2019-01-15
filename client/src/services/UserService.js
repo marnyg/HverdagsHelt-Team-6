@@ -126,15 +126,9 @@ class UserService {
 
   //Create user(RIKTIGE PARAMETERE?)
   createUser(u: User): Promise<User> {
-<<<<<<< HEAD
-      console.log(u);
-    return axios.post('/api/users', u, {
-        headers: {'Content-Type': 'application/json'},
-=======
     console.log(u);
     return axios.post('/api/users', u, {
       headers: { 'Content-Type': 'application/json' }
->>>>>>> master
     });
   }
 
@@ -179,33 +173,6 @@ class UserService {
   }
 
   login(email: string, password: string): Promise<any> {
-<<<<<<< HEAD
-      return new Promise(((resolve, reject) => {
-          axios.post('/api/login', { email: email, password: password })
-              .then(token => {
-                  console.log('UserService login received this token:', token.token);
-                  localStorage.setItem('token', token.token);
-                  resolve('Logged in');
-              })
-              .catch((error: Error) => reject(error));
-      }));
-  }
-
-  logout(): Promise<any>{
-        let token = localStorage.getItem('token');
-        return new Promise(((resolve, reject) => {
-            axios.post('/api/logout', {}, {
-                headers: {
-                    Authorization: 'Bearer ' + token
-                }
-            })
-                .then(res => {
-                    localStorage.removeItem('token');
-                    resolve(res);
-                })
-                .catch((error: Error) => reject(error));
-        }));
-=======
     return new Promise((resolve, reject) => {
       axios
         .post('/api/login', { email: email, password: password })
@@ -241,7 +208,6 @@ class UserService {
         })
         .catch((error: Error) => reject(error));
     });
->>>>>>> master
   }
 }
 
