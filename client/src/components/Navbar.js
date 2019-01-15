@@ -7,9 +7,14 @@ import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
 import Content from './Content.js';
 import UserService from '../services/UserService.js';
+import LoginService from "../services/LoginService";
+import CaseSubscriptionService from "../services/CaseSubscriptionService";
+import CaseSubscription from "../classes/CaseSubscription";
 
 class Navbar extends Component {
   logged_in = false;
+  notification_count = 1;
+  notifications = [];
   constructor() {
     super();
     this.submitSearch = this.submitSearch.bind(this);
@@ -21,7 +26,7 @@ class Navbar extends Component {
     return (
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <NavLink to="/" className="navbar-brand">
-          HverdagsHelt
+          HverdagsHelt<span className="badge badge-primary mobile-notification">{this.notification_count > 0 ? this.notification_count:null}</span>
         </NavLink>
         <button
           className="navbar-toggler"
@@ -51,7 +56,7 @@ class Navbar extends Component {
             <li className="nav-item">
               {this.logged_in ? (
                 <NavLink to="/notifications" className="nav-link">
-                  Varsler
+                  Varsler <span className="badge badge-primary fullbar-notification">{this.notification_count > 0 ? this.notification_count:null}</span>
                 </NavLink>
               ) : null}
             </li>
@@ -76,24 +81,33 @@ class Navbar extends Component {
 
   mounted() {
     // Check if user is logged in
-    console.log('Navbar mounted');
-    /*
-        let userService = new UserService();
-        userService.checkLogin()
-            .then((logged_in: Boolean) => {
-                this.logged_in = logged_in;
-            })
-            .catch((error: Error) => console.error(error));
-            */
+    //console.log('Navbar mounted');
+    let loginService = new LoginService();
+    loginService.isLoggedIn()
+        .then((logged_in: Boolean) => {
+          this.logged_in = logged_in;
+          if(logged_in === true){
+              // get notifications
+              let subscriptionService = new CaseSubscriptionService();
+              //let user = localStorage.getItem('user');
+              let user = {user_id: 1};
+              subscriptionService.getAllCaseSubscriptions(user.user_id)
+                  .then((cs: CaseSubscription[]) => {
+                      for (let i = 0; i < cs.length; i++) {
+                        if(cs[i].is_up_to_date === true){
+                            this.notification_count++;
+                        }
+                      }
+                      this.notifications = cs;
+                  })
+                  .catch((error: Error) => console.error(error));
+          }
+        })
+        .catch((error: Error) => console.error(error));
   }
 
   submitSearch(event) {
     event.preventDefault();
-    /*
-        if(Content.instance()) {
-            //Content.instance().mounted();
-        }
-        */
     console.log(this.search);
     if (this.search !== undefined && this.search !== '') {
       this.props.history.push('/search/' + this.search);
@@ -124,7 +138,7 @@ class Navbar extends Component {
             <div className="nav-link" data-toggle="modal" data-target="#register-modal">
               Ny bruker
             </div>
-            <RegisterModal />
+            <RegisterModal onLogin={() => this.onLogin()}/>
           </li>
           <li className="nav-item">
             <div className="nav-link" data-toggle="modal" data-target="#login-modal">
@@ -139,7 +153,14 @@ class Navbar extends Component {
 
   logout(event) {
     console.log('Logging out');
-    this.logged_in = false;
+    let userService = new UserService();
+    userService.logout()
+        .then(res => {
+            console.log('Logout response:', res);
+            this.logged_in = false;
+            this.props.history.push('/');
+        })
+        .catch((error: Error) => console.error(error));
   }
 
   onLogin = () => {

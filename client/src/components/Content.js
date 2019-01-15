@@ -59,12 +59,7 @@ class Content extends Component {
   }
 
   mounted() {
-    //localStorage.setItem('token', 'mytokentest1234');
-    console.log('Using token:', localStorage.getItem('token'));
-    let subsSercvice = new CaseSubscriptionService();
-    subsSercvice.getAllCaseSubscriptions(1)
-        .then(res => {console.log('Got a response')})
-        .catch(error => console.error(error));
+    //console.log('Using token:', localStorage.getItem('token'));
 
     if (this.props.match && this.props.match.params) {
       // Redirected from search

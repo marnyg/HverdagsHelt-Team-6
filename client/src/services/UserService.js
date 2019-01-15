@@ -94,49 +94,24 @@ class UserService {
 
   //Create user(RIKTIGE PARAMETERE?)
   createUser(u: User): Promise<User> {
-    return axios.post('/api/users', u);
+      console.log(u);
+    return axios.post('/api/users', u, {
+        headers: {'Content-Type': 'application/json'},
+    });
   }
 
-  //Update user password(SKAL TOKEN BRUKES HER?, riktige parametere?)
   updatePassword(user_id: number, old_password: string, new_password: string): Promise<void> { // Trenger token i header her
-    let token = localStorage.getItem('token');
-    let loginService = new LoginService();
-
-    loginService.isLoggedIn().then(loggedIn => {
-      if(loggedIn === true){
-        return axios.post('/api/users/' + user_id + '/password', {
-          body: {
-            old_password: old_password,
-            new_password: new_password
-          }
-        }, {
-          headers: {
-            Authorization: 'Bearer ' + token
-          }
-        })
-      } else {
-        //Returner status-melding her om bruker ikke er riktig
-      }
-    }).catch((error: Error) => console.error(error));
-  }
-
-  //Check if e-mail is available
-  emailAvailable(email: string): Promise<User> {   //SKAL DENNE RETURNERE EN BOOLEAN ELLER BRUKER OBJEKT??
-    return axios.get('/api/email_available', email);
-  }
-
-  login(email: string, password: string): Promise<any> {
     return new Promise((resolve, reject) => {
          let loginService = new LoginService();
          loginService.isLoggedIn()
              .then((logged_in: Boolean) => {
                  if(logged_in === true){
                      let token = localStorage.getItem('token');
-                     axios.post('/api/login', {
-                         body: {
-                           email: email,
-                           password: password
-                         }
+                     axios.post('/api/users/' + user_id, {
+                       body: {
+                         old_password: old_password,
+                         new_password: new_password
+                       }
                      }, {
                          headers: {
                              Authorization: 'Bearer ' + token
@@ -150,6 +125,42 @@ class UserService {
              })
              .catch((error: Error) => reject(error));
      });
+  }
+
+  //Check if e-mail is available
+  emailAvailable(email: string): Promise<User> {   //SKAL DENNE RETURNERE EN BOOLEAN ELLER BRUKER OBJEKT??
+    return axios.get('/api/email_available', email);
+  }
+
+  login(email: string, password: string): Promise<any> {
+      return new Promise(((resolve, reject) => {
+          axios.post('/api/login', { email: email, password: password })
+              .then(data => {
+                  console.log('UserService reveived this on login:', data);
+                  //console.log('UserService login received this token:', data.token);
+                  localStorage.setItem('token', data.token);
+                  localStorage.setItem('user', data.user);
+                  resolve('Logged in');
+              })
+              .catch((error: Error) => reject(error));
+      }));
+  }
+
+  logout(): Promise<any>{
+        let token = localStorage.getItem('token');
+        return new Promise(((resolve, reject) => {
+            axios.post('/api/logout', {}, {
+                headers: {
+                    Authorization: 'Bearer ' + token
+                }
+            })
+                .then(res => {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    resolve(res);
+                })
+                .catch((error: Error) => reject(error));
+        }));
   }
 }
 

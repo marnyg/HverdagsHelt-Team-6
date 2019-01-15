@@ -110,11 +110,13 @@ export async function login(req: Request, res: Response) {
   if (login) {
     let token = createToken(login.access_level, login.user_id);
     tokens[token] = req.body.email;
-    res.status(200);
-    res.send({
-      token: token
-    });
-    return res;
+    let user_obj = {...login};
+    ['hashed_password', 'salt'].forEach(e => delete user_obj[e]);
+    let return_data = {
+      token: token,
+      user: user_obj
+    };
+    return res.status(200).send(return_data);
   } else {
     return res.sendStatus(403);
   }
