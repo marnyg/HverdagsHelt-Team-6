@@ -2,7 +2,7 @@
 //
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import MyCases from './MyCases.js';
+import MyCases from './CaseList.js';
 import MyProfile from './MyProfile';
 import NewCase from './NewCase';
 import MyRegions from './MyRegions'

@@ -18,8 +18,10 @@ import Navbar from './Navbar.js';
 import Content from './Content.js';
 import Footer from './Footer.js';
 import MyPage from './MyPage.js';
+import ViewCase from './ViewCase.js';
+import CaseList from './CaseList.js';
 import NewCase from './NewCase.js';
-import MyCases from './MyCases.js';
+import MyCases from './CaseList.js';
 import axios from 'axios';
 
 axios.interceptors.response.use(response => response.data);
@@ -37,7 +39,6 @@ class App extends Component {
             <Route exact path="/new-case" render={() => <NewCase />} />
             <Route exact path="/search/:query" component={Content} />
           </div>
-          {/*<MyCases />*/}
           <Footer />
         </div>
       </BrowserRouter>

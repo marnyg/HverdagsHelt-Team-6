@@ -7,7 +7,6 @@ import { withRouter } from 'react-router-dom';
 import CaseSubscriptionService from "../services/CaseSubscriptionService";
 import CaseSubscription from "../classes/CaseSubscription";
 import LoginService from "../services/LoginService";
-import * as utils from "../services/global.js";
 //import PictureService from '../services/PictureService.js'; REMOVE COMMENTS WHEN SERVICES DONE
 //import Picture from '../classes/Picture.js'; REMOVE COMMENTS WHEN CLASSES DONE
 
@@ -140,5 +139,24 @@ class CaseItem extends Component {
             .catch((error: Error) => console.error(error));
     }
   }
+
+  getTimeString(dateobject){
+        if(dateobject){
+            var basedate = dateobject.split("T")[0];
+            var basetime = dateobject.split("T")[1].slice(0, -8);
+            var YYYYMMDD = basedate.split("-");
+            var outtime = basetime + " ";
+            for(var i = YYYYMMDD.length-1; i >= 0; i--){
+                if(i === 0){
+                    outtime += YYYYMMDD[i] + "";
+                } else {
+                    outtime += YYYYMMDD[i] + "-";
+                }
+            }
+            return outtime;
+        } else {
+            return "Could not calculate date"
+        }
+    }
 }
 export default CaseItem;
