@@ -13,7 +13,7 @@ import CaseSubscription from "../classes/CaseSubscription";
 
 class Navbar extends Component {
   logged_in = false;
-  notification_count = 1;
+  notification_count = 0;
   notifications = [];
   constructor() {
     super();
@@ -89,12 +89,11 @@ class Navbar extends Component {
           if(logged_in === true){
               // get notifications
               let subscriptionService = new CaseSubscriptionService();
-              //let user = localStorage.getItem('user');
-              let user = {user_id: 1};
+              let user = JSON.parse(localStorage.getItem('user'));
               subscriptionService.getAllCaseSubscriptions(user.user_id)
                   .then((cs: CaseSubscription[]) => {
                       for (let i = 0; i < cs.length; i++) {
-                        if(cs[i].is_up_to_date === true){
+                        if(cs[i].is_up_to_date === false){
                             this.notification_count++;
                         }
                       }

@@ -13,7 +13,7 @@ class CaseSubscriptionService {
               .then((logged_in: Boolean) => {
                   if(logged_in === true){
                       let token = localStorage.getItem('token');
-                      axios.get('/api/cases/subscriptions/' + user_id, {}, {
+                      axios.get('/api/cases/subscriptions/' + user_id, {
                           headers: {
                               Authorization: 'Bearer ' + token
                           }

@@ -77,57 +77,17 @@ class Content extends Component {
       locationService
         .getLocation()
         .then((location: Location) => {
-          /*
             console.log("Location", location);
             let caseService = new CaseService();
             caseService.getCasesByLoc(location.city, location.region)
                 .then((cases: Case[]) => {
-                    console.log("Retreived cases");
+                    console.log("Retreived cases:", cases);
                     this.cases = cases;
                 })
                 .catch((error: Error) => console.error(error));
-                */
         })
         .catch(error => console.error(error));
     }
-
-    this.cases = [
-      {
-        case_id: 1,
-        title: 'Dårlig måking',
-        region: 'Trondheim',
-        date: '10.01.2019',
-        description: 'Dårlig måking ved NTNU Kalvskinnget. Kommunen må få ut fingeren før noen slår seg.'
-      },
-      {
-        case_id: 2,
-        title: 'Dårlig måking',
-        region: 'Trondheim',
-        date: '10.01.2019',
-        description: 'Dårlig måking ved NTNU Kalvskinnget. Kommunen må få ut fingeren før noen slår seg.'
-      },
-      {
-        case_id: 3,
-        title: 'Dårlig måking',
-        region: 'Trondheim',
-        date: '10.01.2019',
-        description: 'Dårlig måking ved NTNU Kalvskinnget. Kommunen må få ut fingeren før noen slår seg.'
-      },
-      {
-        case_id: 4,
-        title: 'Dårlig måking',
-        region: 'Trondheim',
-        date: '10.01.2019',
-        description: 'Dårlig måking ved NTNU Kalvskinnget. Kommunen må få ut fingeren før noen slår seg.'
-      },
-      {
-        case_id: 5,
-        title: 'Dårlig måking',
-        region: 'Trondheim',
-        date: '10.01.2019',
-        description: 'Dårlig måking ved NTNU Kalvskinnget. Kommunen må få ut fingeren før noen slår seg.'
-      }
-    ];
   }
 }
 export default Content;
