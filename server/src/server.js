@@ -72,12 +72,10 @@ app.get('/', (req: Request, res: Response) => res.sendFile(public_path + '/index
 
 app.post('/api/cases', upload.array('images', 3), Cases.createNewCase);
 
-app.get('/api/cases', (req: Request, res: Response) => {
-  return Case.getAllCases(req,res);
-});
+app.get('/api/cases', (req: Request, res: Response) => Cases.getAllCases(req, res));
 
 app.post('/api/verify', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, (req, res) => {
+  reqAccessLevel(req, res, 4, (req, res) => {
     console.log('------Token Verified!-------');
     return res.sendStatus(200);
   });

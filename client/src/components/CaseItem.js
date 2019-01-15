@@ -104,9 +104,11 @@ class CaseItem extends Component {
     event.preventDefault();
     let subscriptionService = new CaseSubscriptionService();
     //user_id, case_id, notify_by_email, is_up_to_date
-    let user = localStorage.getItem('user');
+    let user = JSON.parse(localStorage.getItem('user'));
+    console.log('CaseItem:', user);
     if(!this.subscribed === true) {
         // Clicked subscribe for the first time, create subscription
+        console.log('Subscribing');
         let subscription = new CaseSubscription(user.user_id, this.props.case.case_id, true, true);
         console.log('Sending sub:', subscription);
         subscriptionService.createCaseSubscription(subscription)
@@ -119,11 +121,11 @@ class CaseItem extends Component {
 
     } else {
         // Clicked subscribe for the second time, delete subscription
+        console.log('Deleting subscription');
         let loginService = new LoginService();
         loginService.isLoggedIn()
             .then((logged_in: Boolean) => {
               if(logged_in === true){
-                let user = localStorage.getItem('user');
                   subscriptionService.deleteCaseSubscription(this.props.case.case_id, user.user_id)
                       .then(response => {
                           this.button_type = "primary";

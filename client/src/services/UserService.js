@@ -137,6 +137,7 @@ class UserService {
           axios.post('/api/login', { email: email, password: password })
               .then(data => {
                   console.log('UserService reveived this on login:', data);
+                  console.log('UserService reveived this user on login:', data.user);
                   //console.log('UserService login received this token:', data.token);
                   localStorage.setItem('token', data.token);
                   localStorage.setItem('user', data.user);

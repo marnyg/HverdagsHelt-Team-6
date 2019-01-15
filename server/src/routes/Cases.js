@@ -9,6 +9,28 @@ type Request = express$Request;
 type Response = express$Response;
 
 module.exports = {
+  getAllCases: async function(req: Request, res: Response) {
+    sequelize
+      .query(
+        'Select c.case_id, c.title, c.description, c.lat, c.lon, r.name as region_name, s.name as status_name, cg.name as category_name, ' +
+          "CONCAT(u.firstname, ' ', u.lastname) as createdBy, c.createdAt, c.updatedAt " +
+          'FROM Cases c JOIN Regions r ON c.region_id = r.region_id ' +
+          'JOIN Users u ON c.user_id = u.user_id ' +
+          'JOIN Statuses s ON c.status_id = s.status_id ' +
+          'JOIN Categories cg ON c.category_id = cg.category_id',
+        { type: sequelize.QueryTypes.SELECT }
+      )
+      .then(async cases => {
+        const out = cases.map(async c => {
+          let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+          let images = await pictures.map(img => img.path);
+          c.img = images;
+          return c;
+        });
+        return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+      });
+  },
+
   createNewCase: function(req: Request, res: Response) {
     reqAccessLevel(req, res, 4, () => true);
     if (!req.files) {
@@ -163,3 +185,4 @@ module.exports = {
     return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
   }
 };
+
