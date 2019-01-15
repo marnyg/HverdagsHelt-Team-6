@@ -40,7 +40,7 @@ class CaseSubscriptionService {
                       console.log('/api/cases/' + case_id + '/subscribe');
                       console.log('user_id:', user_id);
                       console.log('token:', token);
-                      axios.delete('/api/cases/' + case_id + '/subscribe/' + user_id, {}, {
+                      axios.delete('/api/cases/' + case_id + '/subscribe/' + user_id, {
                           headers: {
                               Authorization: 'Bearer ' + token
                           }

@@ -562,7 +562,7 @@ class NewCase extends Component {
               region_id = this.municipalities[this.list2.selectedIndex - 1].region_id;
               break;
           }
-          let user_id = null;
+          let user_id = JSON.parse(localStorage.getItem('user')).user_id;
           let newcase = new Case(
             null,
             region_id,
@@ -593,7 +593,7 @@ class NewCase extends Component {
     console.log('Case is ' + JSON.stringify(obj));
     let cas = new CaseService();
     cas
-      .createCase(obj)
+      .createCase(obj, this.images)
       .then(e => {
         Notify.success('Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id);
         console.log('Form data transmission success! Case ID: ' + e.case_id);
