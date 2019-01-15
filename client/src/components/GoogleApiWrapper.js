@@ -7,10 +7,19 @@ export class GoogleMapsContainer extends Component {
     const latLng = { lat: coord.latLng.lat(), lon: coord.latLng.lng() };
     this.props.updatePos(latLng);
     this.render();
+    console.log(this.marker)
   }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.params.centerPos !== this.props.params.centerPos) {
+      this.Gmap.setCenter(this.props.centerPos);
+    }
+  }
+
   render() {
     return (
       <Map
+        ref="Gmap"
         item
         xs={12}
         google={this.props.google}
@@ -22,9 +31,14 @@ export class GoogleMapsContainer extends Component {
         {/* <SearchBox
           controlPosition={google.maps.ControlPosition.TOP_LEFT}
         /> */}
-        <Marker position={this.props.userPos} />
+        <Marker ref="marker" position={this.props.userPos} />
       </Map>
     );
+  }
+  mounted() {
+
+    this.gmap = this.refs.Gmap.map
+    this.marker = this.refs.marker
   }
 }
 export default GoogleApiWrapper({

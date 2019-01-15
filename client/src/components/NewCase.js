@@ -4,7 +4,7 @@ import { Component } from 'react-simplified';
 import { NavLink, withRouter } from 'react-router-dom';
 import { CountyService } from '../services/CountyService';
 import { RegionService } from '../services/RegionService';
-import { CategoryService } from '../services/CategoryService';
+import CategoryService from '../services/CategoryService';
 import { CaseService } from '../services/CaseService';
 import Notify from './Notify';
 import LocationService from '../services/LocationService';

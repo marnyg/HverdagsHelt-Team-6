@@ -4,21 +4,27 @@ import express from 'express';
 import path from 'path';
 import reload from 'reload';
 import fs from 'fs';
+const multer = require('multer');
+import crypto from 'crypto';
 import bearerToken from 'express-bearer-token';
 import { hashPassword, reqAccessLevel, login, logout, createToken, loginOk } from './auth.js';
+import Cases from './routes/Cases.js';
 import Users from './routes/Users.js';
 import Category from './routes/Categories.js';
 import Region_subscriptions from './routes/Region_subscriptions.js';
-import Region from './routes/Region.js';
+import Region from './routes/Regions.js';
 import County from './routes/Counties.js';
 import Role from './routes/Roles.js';
 import Status from './routes/Statuses.js';
 import Case_subscription from './routes/Case_subscriptions.js';
-import { Case, Status_comment } from './models.js';
+import Status_comment from './routes/Status_comments.js';
+import { Case, Picture } from './models.js';
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
+import {verifyToken} from "./auth";
 
-let tokens = {};
+let os = require('os');
+let hostname = os.hostname();
 
 type Request = express$Request;
 type Response = express$Response;
@@ -31,15 +37,50 @@ app.use(express.static(public_path));
 app.use(express.json()); // For parsing application/json
 app.use(bearerToken()); // For easy access to token sent in 'Authorization' header.
 
-app.get('/api/cases', (req: Request, res: Response) => {
-  return Case.findAll().then(cases => res.send(cases));
+const storage = multer.diskStorage({
+  destination: public_path + '/' + 'uploads',
+  filename: function (req, file, callback) {
+    crypto.pseudoRandomBytes(16, (err, raw) => {
+      console.log('crypto firing!!!');
+      if (err) return callback(err);
+      console.log(file.originalname);
+      callback(null, raw.toString('hex') + path.extname(file.originalname));
+
+    })
+  }
 });
 
-app.post('/api/verify', (req, res) => {
-      reqAccessLevel(req, res, 4, (req, res) => {
-          console.log('------Token Verified!-------');
-          return res.sendStatus(200);
-      });
+let upload = multer({storage: storage});
+
+app.post('/api/uploads', upload.single('avatar'), (req, res) => {
+  if (!req.file) {
+    console.log("No file received");
+    return res.send({
+      success: false
+    });
+  } else {
+    console.log('file received');
+    console.log(req.files);
+    console.log(req.body.alt);
+    return res.send({
+      success: true
+    });
+  }
+});
+
+app.get('/', (req: Request, res: Response) => res.sendFile(public_path + '/index.html'));
+
+app.post('/api/cases', upload.array('images', 3), Cases.createNewCase);
+
+app.get('/api/cases', (req: Request, res: Response) => {
+  return Case.getAllCases(req,res);
+});
+
+app.post('/api/verify', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, (req, res) => {
+    console.log('------Token Verified!-------');
+    return res.sendStatus(200);
+  });
 });
 
 app.post('/api/login', (req: Request, res: Response) => {
@@ -50,71 +91,26 @@ app.post('/api/logout', (req: Request, res: Response) => {
   return logout(req, res);
 });
 
-app.post('/api/cases', (req: Request, res: Response) => {
-  if (
-    !req.body ||
-    typeof req.body.title !== 'string' ||
-    typeof req.body.description !== 'string' ||
-    typeof req.body.lat !== 'number' ||
-    typeof req.body.lon !== 'number' ||
-    typeof req.body.region_id !== 'number' ||
-    typeof req.body.user_id !== 'number' ||
-    typeof req.body.category_id !== 'number' ||
-    typeof req.body.status_id !== 'number'
-  )
-    return res.sendStatus(400);
-
-  return Case.create({
-    title: req.body.title,
-    description: req.body.description,
-    lat: req.body.lat,
-    lon: req.body.lon,
-    region_id: req.body.region_id,
-    user_id: req.body.user_id,
-    category_id: req.body.category_id,
-    status_id: req.body.status_id
-  }).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
-});
+app.get('/api/cases/:case_id', (req: Request, res: Response) => Cases.getOneCase(req, res));
 
 app.get('/api/cases/user_cases/:user_id', (req: Request, res: Response) => {
-  return Case.findAll({
-    where: {
-      user_id: req.params.user_id
-    },
-    order: [['createdAt', 'DESC']] //Order by updatedAt????
-  }).then(cases => res.send(cases));
+  reqAccessLevel(req, res, 4, Cases.getAllCasesForUser);
 });
 
 app.get('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
-  return Status_comment.findAll({
-    where: {
-      case_id: req.params.case_id
-    },
-    order: [['updatedAt', 'DESC']] //Order by updatedAt????
-  }).then(comments => res.send(comments));
+  Status_comment.getAllStatus_comment(req, res);
 });
 
 app.post('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
-  if (
-    !req.body ||
-    typeof req.body.user_id !== 'number' ||
-    typeof req.body.comment !== 'string' ||
-    typeof req.body.status_id !== 'number'
-  )
-    return res.sendStatus(400);
-
-  return Status_comment.create({
-    comment: req.body.comment,
-    case_id: Number(req.params.case_id),
-    status_id: req.body.status_id,
-    user_id: req.body.user_id
-  }).then(comment => (comment ? res.send(comment) : res.sendStatus(404)));
+  reqAccessLevel(req, res, 2, Status_comment.addStatus_comment);
 });
 
-app.get('/api/cases/:case_id', (req: Request, res: Response) => {
-  return Case.findOne({ where: { case_id: Number(req.params.case_id) } }).then(cases =>
-    cases ? res.send(cases) : res.sendStatus(404)
-  );
+app.put('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Status_comment.updateStatus_comment);
+});
+
+app.delete('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Status_comment.delStatus_comment);
 });
 
 app.put('/api/cases/:case_id', (req: Request, res: Response) => {
@@ -147,8 +143,8 @@ app.put('/api/cases/:case_id', (req: Request, res: Response) => {
 });
 
 app.delete('/api/cases/:case_id', (req: Request, res: Response) => {
-  return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(cases =>
-    cases ? res.send() : res.status(500).send()
+  return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(
+    cases => (cases ? res.send() : res.status(500).send())
   );
 });
 
@@ -169,15 +165,7 @@ app.delete('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
 });
 
 app.get('/api/cases/region_cases/:county_name/:region_name', async (req: Request, res: Response) => {
-  let region = await Region.getOneRegionByNameAndCounty(req,res);
-  let regionId = region ? region : res.sendStatus(404);
-  let cases = await Case.findAll({ where: { region_id: Number(regionId.region_id) }, order: [['updatedAt', 'DESC']] });
-  cases = cases.map(c => c.toJSON());
-  const out = cases.map(async c => {
-    c.img = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
-    return c;
-  });
-  Promise.all(out).then(cases => cases ? res.send(cases) : res.sendStatus(404));
+  return Cases.getAllCasesInRegion(req,res);
 });
 
 app.get('/api/statuses', (req: Request, res: Response) => {
@@ -234,34 +222,7 @@ app.delete('/api/users/:user_id', (req: Request, res: Response) => {
 });
 
 app.put('/api/users/:user_id/password', async (req: Request, res: Response) => {
-  if (!req.body || typeof req.body.old_password !== 'string' || typeof req.body.new_password !== 'string')
-    return res.sendStatus(400);
-
-  let user = await User.findOne({
-    where: { user_id: Number(req.params.user_id) }
-  });
-
-  let salt = user.salt;
-  let old = user.hashed_password;
-
-  let oldHashedPassword = hashPassword(req.body.old_password, salt);
-  let old_password = oldHashedPassword['passwordHash'];
-
-  if (old_password === old) {
-    let newHashedPassword = hashPassword(req.body.new_password);
-    let new_password = newHashedPassword['passwordHash'];
-    let new_salt = newHashedPassword['salt'];
-
-    return User.update(
-      {
-        hashed_password: new_password,
-        salt: new_salt
-      },
-      { where: { user_id: Number(req.params.user_id) } }
-    ).then(user => (user ? res.send(user) : res.sendStatus(404)));
-  } else {
-    return res.sendStatus(403);
-  }
+  reqAccessLevel(req, res, 4, Users.changePassword);
 });
 
 app.get('/api/counties', (req: Request, res: Response) => {
@@ -338,6 +299,10 @@ app.put('/api/categories/:category_id', (req: Request, res: Response) => {
 
 app.delete('/api/categories/:category_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, Category.delCategory);
+});
+
+app.get('/*', (req, res) => {
+  res.redirect('/');
 });
 
 // Hot reload application when not in production environment
