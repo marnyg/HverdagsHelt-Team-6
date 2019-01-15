@@ -5,6 +5,7 @@ import * as React from 'react';
 import { Component } from 'react-simplified';
 import { NavLink, withRouter } from 'react-router-dom';
 import CaseService from '../services/CaseService';
+import StatusService from '../services/StatusService';
 import StatusCommentService from '../services/StatusCommentService';
 import Notify from './Notify';
 import GoogleApiWrapper from './GoogleApiWrapper';
@@ -20,60 +21,13 @@ const orange = { color: 'orange' };
 const red = { color: 'red' };
 
 class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
-  case = {
-    user_id: 1002,
-    caseworker_id: 100,
-    case_id: 1283921234,
-    region_id: 1006,
-    status_id: 1,
-    title: 'Elendig vei!!!',
-    description:
-      'Dette er totalt uakseptabelt. Nå har jeg kjørt på denne forbaska grusveien i 2 år, og nå er det samme mange hull at det ødelegger bilen min! Dere får 1 måned på å fikse dette ellers går jeg til sak mot kommunen. Jeg har en DYYYYYR Tesla som DERE udugelige politikere ødelegger med inkompetansen deres. Grønnt skifte MY ASS!!!!!!|||||oneone',
-    user_name: 'Mr. T',
-    caseworker_name: 'Anne B. Ragde',
-    region_name: 'Stjørdal',
-    status_name: 'Åpen',
-    createdAt: '2019-01-01T13:37:00.000Z',
-    updatedAt: '2019-01-01T13:37:00.000Z'
-  };
+  case = null;
 
-  statuses = [
-    { status_id: 0, status_name: 'Åpen' },
-    { status_id: 1, status_name: 'Under behandling' },
-    { status_id: 2, status_name: 'Lukket' }
-  ];
+  statuses = [{ status_id: 1, status_name: 'Under behandling' }, { status_id: 2, status_name: 'Lukket' }];
   images = [];
   lastResortPos = { lat: 59.9138688, lon: 10.752245399999993 }; // Last resort position OSLO
   pos = this.lastResortPos;
-  statusMessage = [
-    {
-      status_comment_id: 11,
-      case_id: 100,
-      region_id: 103,
-      region_name: 'Trondheim',
-      status_id: 2,
-      status_name: 'Under behandling',
-      user_id: 309,
-      caseworker_name: 'Nils Arne Eggen',
-      comment:
-        'Kom igjen gutta, stå på! D va slagorde på RBK-plata æ va me på. Dæven døtte sykkelstøtte. Du må bruk gofoten, sjøl om æ har sagd av gofoten på St. Olavs. D har itj så my med vei å gjør, men d e nå arti å blæs ut litt skitprat ein gång i blant!',
-      createdAt: '2019-01-01T13:37:00.000Z',
-      updatedAt: '2019-01-01T13:37:00.000Z'
-    },
-    {
-      status_comment_id: 12,
-      case_id: 100,
-      region_id: 103,
-      region_name: 'Trondheim',
-      status_id: 2,
-      status_name: 'Under behandling',
-      user_id: 21,
-      caseworker_name: 'Piers Morgan',
-      comment: "I don't know what I'm doing here, but being the most disliked British TV anchor suits me very well!",
-      createdAt: '2019-01-01T13:37:00.000Z',
-      updatedAt: '2019-01-01T13:37:00.000Z'
-    }
-  ];
+  statusMessage = [];
   statusForm = null;
   messageForm = null;
 
@@ -98,8 +52,12 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   <td style={this.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
                 </tr>
                 <tr>
+                  <td>Kategori</td>
+                  <td>{this.case.category_name}</td>
+                </tr>
+                <tr>
                   <td>Sak sendt av</td>
-                  <td>{this.case.user_name}</td>
+                  <td>{this.case.createdBy}</td>
                 </tr>
                 <tr>
                   <td>Sak opprettet</td>
@@ -142,6 +100,9 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
         </div>
         <div className={'col-md-6'}>
           <h2>Statusmeldinger</h2>
+          <p id={'noComments'} style={{ color: '#666' }} hidden>
+            Ingen har kommentert enda.
+          </p>
           <ul className={'list-group'}>
             {this.statusMessage.map(e => (
               <li className={'list-group-item'} key={e.status_comment_id}>
@@ -159,27 +120,18 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     );
   }
 
-  getInitialStatus() {
-    if (this.case) {
-      let status = this.statuses.find(e => parseInt(e.status_id) === this.case.status_id);
-      if (status) {
-        return status.status_id;
-      } else {
-        return -1;
-      }
-    }
-  }
-
   mounted() {
     this.props.match.params.case_id = 1; // Placeholder!!!
     let cas = new CaseService();
     let cascom = new StatusCommentService();
-    // let stat = new StatusService();
+    let stat = new StatusService();
     let token = localStorage.getItem('token');
     cas
       .getCase(this.props.match.params.case_id)
       .then(e => {
         this.case = e;
+        console.log('This.case:');
+        console.log(this.case);
       })
       .catch((err: Error) => {
         console.log('Could not load case with id ' + this.props.match.params.case_id);
@@ -195,6 +147,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       .then(e => {
         this.statusMessage = e;
         console.log(this.statusMessage);
+        if (this.statusMessage.length === 0) {
+          let p = document.querySelector('#noComments');
+          if(p)p.hidden = false
+        }
       })
       .catch((err: Error) => {
         console.log('Could not load case comments for case with id ' + this.props.match.params.case_id);
@@ -205,7 +161,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             err.message
         );
       });
-    /*stat
+    stat
       .getAllStatuses()
       .then(e => {
         this.statuses = e;
@@ -217,7 +173,18 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             'Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
             err.message
         );
-      });*/
+      });
+  }
+
+  getInitialStatus() {
+    if (this.case) {
+      let status = this.statuses.find(e => parseInt(e.status_id) === this.case.status_id);
+      if (status) {
+        return status.status_id;
+      } else {
+        return -1;
+      }
+    }
   }
 
   getStatusColour(status_id: number) {

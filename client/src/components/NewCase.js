@@ -71,6 +71,15 @@ class NewCase extends Component {
                     required
                   />
                 </div>
+                <div className={'form-group'}>
+                  <label htmlFor="description">Beskrivelse</label>
+                  <textarea
+                    className={'form-control'}
+                    id={'description'}
+                    maxLength={255}
+                    placeholder="Skriv en kort beskrivelse her, så blir det enklere for oss å hjelpe deg."
+                  />
+                </div>
                 <div>
                   Posisjon
                   <div className={'form-check'}>
@@ -160,15 +169,6 @@ class NewCase extends Component {
                     hidden
                   />
                 </div>
-                <div className={'form-group'}>
-                  <label htmlFor="description">Beskrivelse</label>
-                  <textarea
-                    className={'form-control'}
-                    id={'description'}
-                    maxLength={255}
-                    placeholder="Skriv en kort beskrivelse her, så blir det enklere for oss å hjelpe deg."
-                  />
-                </div>
                 {this.images.length < 3 ? (
                   <div className={'form-group'}>
                     <label htmlFor={'image-input'}>Legg ved bilder</label>
@@ -192,7 +192,7 @@ class NewCase extends Component {
               </div>
             </div>
             <div className="col-md-6 embed-responsive">
-              <GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.pos.lat, lng: this.pos.lon }} />
+              <GoogleApiWrapper centerPos={{ lat: this.pos.lat, lng: this.pos.lon }} updatePos={this.updatePos} userPos={{ lat: this.pos.lat, lng: this.pos.lon }} />
             </div>
           </div>
         </div>
@@ -225,7 +225,16 @@ class NewCase extends Component {
     this.list2 = document.getElementById('last-resort-municipality');
     this.lastResortAddress = document.getElementById('last-resort-address');
     this.lastResortAddressLabel = document.getElementById('last-resort-address-label');
-
+    let locationService = new LocationService();
+    locationService.getLocation()
+        .then((location: Location) => {
+          this.updatePos(location);
+        })
+        .catch((error: Error) => {
+          console.log(error);
+          this.pos = this.lastResortPos;
+        });
+    
     // Fetching logic
     console.log('Fetchng categories.');
     let cat = new CategoryService();
@@ -449,7 +458,6 @@ class NewCase extends Component {
         console.warn('File type not accepted.');
         Notify.warning('Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png.');
       }
-      console.log(this.images);
     }
   }
 

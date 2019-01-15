@@ -33,6 +33,7 @@ class App extends Component {
           <Navbar />
           <div className="content-wrapper">
             <Notify />
+            <ViewCase />
             <Route exact path="/" render={() => <Content />} />
             <Route exact path="/my-page" render={() => <MyPage />} />
             <Route exact path="/new-case" render={() => <NewCase />} />
