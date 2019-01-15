@@ -185,3 +185,4 @@ module.exports = {
     return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
   }
 };
+
