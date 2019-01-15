@@ -319,8 +319,7 @@ class NewCase extends Component {
 
   radio1() {
     // Automatic location discovery
-    let gmap = document.querySelector('GoogleApiWrapper');
-    if (gmap && this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
+    if (this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
       this.list1.hidden = true;
       this.list2.hidden = true;
       this.lastResortAddress.hidden = true;
@@ -328,26 +327,22 @@ class NewCase extends Component {
     }
     let locator = new LocationService();
     this.pos = locator.getLocation();
-    gmap.isClickable = false;
   }
 
   radio2() {
     // Map marker location discovery
-    let gmap = document.querySelector('GoogleApiWrapper');
-    if (gmap && this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
+    if (this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
       this.list1.hidden = true;
       this.list2.hidden = true;
       this.lastResortAddress.hidden = true;
       this.lastResortAddressLabel.hidden = true;
-      gmap.isClickable = true;
     }
   }
 
   radio3() {
     // Last resort list location selection
-    let gmap = document.querySelector('GoogleApiWrapper');
     if (
-      gmap &&
+      //gmap &&
       this.list1 &&
       this.list2 &&
       this.lastResortAddress &&
@@ -366,7 +361,6 @@ class NewCase extends Component {
         this.lastResortAddress.hidden = false;
         this.lastResortAddressLabel.hidden = false;
       }
-      gmap.isClickable = false;
     } else {
       console.log('list1 eller list2 er null!');
     }
