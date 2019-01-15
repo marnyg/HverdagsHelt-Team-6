@@ -94,7 +94,10 @@ class UserService {
 
   //Create user(RIKTIGE PARAMETERE?)
   createUser(u: User): Promise<User> {
-    return axios.post('/api/users', u);
+      console.log(u);
+    return axios.post('/api/users', u, {
+        headers: {'Content-Type': 'application/json'},
+    });
   }
 
   updatePassword(user_id: number, old_password: string, new_password: string): Promise<void> { // Trenger token i header her
@@ -130,30 +133,31 @@ class UserService {
   }
 
   login(email: string, password: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-         let loginService = new LoginService();
-         loginService.isLoggedIn()
-             .then((logged_in: Boolean) => {
-                 if(logged_in === true){
-                     let token = localStorage.getItem('token');
-                     axios.post('/api/login', {
-                         body: {
-                           email: email,
-                           password: password
-                         }
-                     }, {
-                         headers: {
-                             Authorization: 'Bearer ' + token
-                         }
-                     })
-                         .then(response => resolve(response))
-                         .catch((error: Error) => reject(error));
-                 } else {
-                     reject('User is not registered and/or not logged in.');
-                 }
-             })
-             .catch((error: Error) => reject(error));
-     });
+      return new Promise(((resolve, reject) => {
+          axios.post('/api/login', { email: email, password: password })
+              .then(token => {
+                  console.log('UserService login received this token:', token.token);
+                  localStorage.setItem('token', token.token);
+                  resolve('Logged in');
+              })
+              .catch((error: Error) => reject(error));
+      }));
+  }
+
+  logout(): Promise<any>{
+        let token = localStorage.getItem('token');
+        return new Promise(((resolve, reject) => {
+            axios.post('/api/logout', {}, {
+                headers: {
+                    Authorization: 'Bearer ' + token
+                }
+            })
+                .then(res => {
+                    localStorage.removeItem('token');
+                    resolve(res);
+                })
+                .catch((error: Error) => reject(error));
+        }));
   }
 }
 

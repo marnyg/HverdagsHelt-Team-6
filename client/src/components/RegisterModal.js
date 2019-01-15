@@ -1,7 +1,20 @@
 import * as React from 'react';
 import { Component } from 'react-simplified';
+import CountyService from "../services/CountyService.js";
+import County from '../classes/County.js';
+import RegionService from "../services/RegionService";
+import Region from '../classes/Region.js';
+import UserService from '../services/UserService.js';
+import User from '../classes/User.js';
+
 
 class RegisterModal extends Component {
+    counties = [];
+    regions = [];
+
+    region_id = null;
+
+
     constructor(){
         super();
         this.submit = this.submit.bind(this);
@@ -32,8 +45,34 @@ class RegisterModal extends Component {
                         <input type="text" name="lastname" placeholder="Etternavn" onChange={(event) => {this.ln = event.target.value}}/>
                         <input type="text" name="adress" placeholder="Adresse" onChange={(event) => {this.address= event.target.value}}/>
                         <input type="text" name="zip" placeholder="Postnummer" onChange={(event) => {this.zip = event.target.value}}/>
-                        <input type="text" name="city" placeholder="Sted" onChange={(event) => {this.city = event.target.value}}/>
-                        <input type="text" name="phone" placeholder="Telefonnummer"/>
+                        <select onChange={this.countyListener} className={'form-control mb-3'} id={'countySelector'}>
+                            <option selected disabled>
+                                Velg fylke
+                            </option>
+                            {this.counties.map(e => (
+                                <option key={e.county_id} value={e.county_id}>
+                                    {' '}
+                                    {e.name}{' '}
+                                </option>
+                            ))}
+                        </select>
+                        <select
+                            className={'form-control mb-3'}
+                            id={'regionSelector'}
+                            onChange={this.regionListener}
+                            hidden
+                        >
+                            <option selected disabled>
+                                Velg kommune
+                            </option>
+                            {this.regions.map(e => (
+                                <option key={e.region_id} value={e.region_id}>
+                                    {' '}
+                                    {e.name}{' '}
+                                </option>
+                            ))}
+                        </select>
+                        <input type="text" name="phone" placeholder="Telefonnummer" onChange={(event) => {this.phone = event.target.value}}/>
                         <input name="login" className="btn btn-primary" value="Register" onChange={this.submit} onClick={this.submit}/>
                     </div>
                 </div>
@@ -41,33 +80,53 @@ class RegisterModal extends Component {
         );
     }
 
-    submit(event){
-        var data = {
-            email: this.email,
-            pw1: this.password1,
-            pw2: this.password2,
-            fn: this.fn,
-            ln: this.ln,
-            address: this.address,
-            zip: this.zip,
-            city: this.city
-        };
-        console.log(data);
+    mounted(){
+        let countyService = new CountyService();
+        countyService.getAllCounties()
+            .then((counties: County[]) => this.counties = counties)
+            .catch((error: Error) => console.error(error));
+    }
 
-        if(this.notBlank(data)){
+    countyListener(event) {
+        let county = event.target.options[event.target.selectedIndex];
+        console.log('County selected:', county.value);
+        let regionService = new RegionService();
+        regionService.getAllRegionGivenCounty(county.value)
+            .then((regions: Region[]) => {
+                document.getElementById('regionSelector').hidden = false;
+
+                this.regions = regions
+            })
+            .catch((error: Error) => console.error(error));
+    }
+
+    regionListener(event){
+        console.log('Region selected');
+        this.region_id = event.target.options[event.target.selectedIndex].value;
+    }
+
+    submit(event){
+        //user_id, role_id, region_id, firstname, lastname, tlf, email, hash_password, salt){
+        let user = new User(null, null, Number(this.region_id), this.fn, this.ln, Number(this.phone), this.email, this.password1);
+
+        if(this.notBlank(user) && this.validPW(this.password1, this.password2)){
             // All required fields have been filled
-            console.log('Good to go');
             if(this.validPW(this.password1, this.password2)){
                 if(this.validEmail(this.email)){
-                    /*
                     let userService = new UserService();
 
-                    userService.register(data)
-                        .then((user: User) => {
-
+                    userService.createUser(user)
+                        .then((user_out: User) => {
+                            //email: string, password: string
+                            console.log('Registered');
+                            userService.login(this.email, this.password1)
+                                .then(res => {
+                                    $('#register-modal').modal('hide');
+                                    this.props.onLogin();
+                                })
+                                .catch((error: Error) => console.error(error));
                         })
                         .catch((error: Error) => {console.error(error)});
-                    */
                 } else {
                     alert('Epostadressen er ikke gyldig');
                 }
@@ -89,11 +148,9 @@ class RegisterModal extends Component {
     }
 
     validEmail(email){
-        return false;
-        /*
-        let re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return re.test(email);
-        */
+        return true;
+        //let re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        //return re.test(email);
     }
 
     notBlank(data){
