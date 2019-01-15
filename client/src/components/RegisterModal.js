@@ -45,13 +45,8 @@ class RegisterModal extends Component {
                         <input type="text" name="lastname" placeholder="Etternavn" onChange={(event) => {this.ln = event.target.value}}/>
                         <input type="text" name="adress" placeholder="Adresse" onChange={(event) => {this.address= event.target.value}}/>
                         <input type="text" name="zip" placeholder="Postnummer" onChange={(event) => {this.zip = event.target.value}}/>
-<<<<<<< HEAD
-                        <select onChange={this.countyListener} className={'form-control mb-3'} id={'countySelector'}>
-                            <option selected disabled>
-=======
                         <select defaultValue={'.null'} onChange={this.countyListener} className={'form-control mb-3'} id={'countySelector'}>
                             <option value={'.null'} disabled>
->>>>>>> master
                                 Velg fylke
                             </option>
                             {this.counties.map(e => (
@@ -65,16 +60,10 @@ class RegisterModal extends Component {
                             className={'form-control mb-3'}
                             id={'regionSelector'}
                             onChange={this.regionListener}
-<<<<<<< HEAD
-                            hidden
-                        >
-                            <option selected disabled>
-=======
                             defaultValue={'.null'}
                             hidden
                         >
                             <option value={'.null'} disabled>
->>>>>>> master
                                 Velg kommune
                             </option>
                             {this.regions.map(e => (
