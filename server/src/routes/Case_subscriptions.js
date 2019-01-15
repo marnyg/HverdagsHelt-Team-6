@@ -45,7 +45,20 @@ module.exports = {
 
     return sequelize
       .query(
-        'SELECT DISTINCT case_id, title, description, lat, lon, createdAt, updatedAt, region_id, user_id, category_id, status_id  FROM Case_subscriptions NATURAL JOIN Cases WHERE user_id = ?',
+        'Select distinct c.case_id, c.title, c.description, c.lat, c.lon, c.user_id, ' +
+          "CONCAT(u.firstname, ' ', u.lastname) as createdBy, u.tlf, u.email, " +
+          'co.county_id, co.name AS county_name, ' +
+          'c.region_id, r.name as region_name, ' +
+          'c.status_id, s.name as status_name, ' +
+          'c.category_id, cg.name as category_name, ' +
+          'c.createdAt, c.updatedAt ' +
+          'FROM Case_subscriptions csubs NATURAL JOIN Cases c ' +
+          'JOIN Regions r ON c.region_id = r.region_id ' +
+          'Join Counties co ON r.county_id = co.county_id ' +
+          'JOIN Users u ON c.user_id = u.user_id ' +
+          'JOIN Statuses s ON c.status_id = s.status_id ' +
+          'JOIN Categories cg ON c.category_id = cg.category_id ' +
+          'WHERE csubs.user_id = ?',
         { replacements: [req.params.user_id] },
         { type: sequelize.QueryTypes.SELECT }
       )
