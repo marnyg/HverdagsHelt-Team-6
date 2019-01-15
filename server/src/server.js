@@ -163,6 +163,7 @@ app.delete('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
 });
 
 app.get('/api/cases/region_cases/:county_name/:region_name', async (req: Request, res: Response) => {
+  console.error(decodeURI('Url:', req.url));
   return Cases.getAllCasesInRegion(req,res);
 });
 
