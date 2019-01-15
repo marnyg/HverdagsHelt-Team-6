@@ -75,7 +75,7 @@ app.post('/api/cases', upload.array('images', 3), Cases.createNewCase);
 app.get('/api/cases', (req: Request, res: Response) => Cases.getAllCases(req, res));
 
 app.post('/api/verify', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, (req, res) => {
+  reqAccessLevel(req, res, 4, (req, res) => {
     console.log('------Token Verified!-------');
     return res.sendStatus(200);
   });
