@@ -9,11 +9,16 @@ export class GoogleMapsContainer extends Component {
   }
 
   componentDidUpdate(prevProps) {
+<<<<<<< HEAD
+    if (prevProps.centerPos !== this.props.centerPos) {
+      this.Gmap.setCenter(this.props.centerPos);
+=======
     console.log(this.props);
 
     if (prevProps.centerPos !== this.props.centerPos) {
       this.gmap.setCenter(this.props.centerPos);
       this.marker.setPosition(this.props.centerPos)
+>>>>>>> 638c4a428fcd0a6cbd3105f7e8615005edc0c5b9
     }
   }
 
