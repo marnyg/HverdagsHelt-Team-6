@@ -320,7 +320,6 @@ class NewCase extends Component {
 
   radio1() {
     // Automatic location discovery
-    // let gmap = document.querySelector('GoogleApiWrapper');
     if (this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
       this.list1.hidden = true;
       this.list2.hidden = true;
@@ -335,7 +334,6 @@ class NewCase extends Component {
 
   radio2() {
     // Map marker location discovery
-    let gmap = document.querySelector('GoogleApiWrapper');
     if (this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
       this.list1.hidden = true;
       this.list2.hidden = true;
@@ -347,9 +345,8 @@ class NewCase extends Component {
 
   radio3() {
     // Last resort list location selection
-    // let gmap = document.querySelector('GoogleApiWrapper');
     if (
-      // gmap &&
+      //gmap &&
       this.list1 &&
       this.list2 &&
       this.lastResortAddress &&
@@ -562,7 +559,7 @@ class NewCase extends Component {
               region_id = this.municipalities[this.list2.selectedIndex - 1].region_id;
               break;
           }
-          let user_id = null;
+          let user_id = JSON.parse(localStorage.getItem('user')).user_id;
           let newcase = new Case(
             null,
             region_id,
@@ -593,7 +590,7 @@ class NewCase extends Component {
     console.log('Case is ' + JSON.stringify(obj));
     let cas = new CaseService();
     cas
-      .createCase(obj)
+      .createCase(obj, this.images)
       .then(e => {
         Notify.success('Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id);
         console.log('Form data transmission success! Case ID: ' + e.case_id);

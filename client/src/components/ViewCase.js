@@ -198,7 +198,8 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
 
   dateFormat(date: string) {
     if (date) {
-      return date.split('.')[0].replace('T', ' ');
+      let a = date.split('.')[0].replace('T', ' ');
+      return a.substr(0, a.length - 3);
     } else {
       return 'Fant ikke dato.';
     }

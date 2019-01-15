@@ -29,7 +29,7 @@ class CaseItem extends Component {
                 <div className="card-text text-muted">{this.props.case.region_name} {this.props.case.county_name}</div>
                 <h2 className="card-title">{this.props.case.title}</h2>
                 <div className=" d-inline">
-                  <small className="text-muted">{utils.getTimeString(this.props.case.createdAt)}</small>
+                  <small className="text-muted">{this.getTimeString(this.props.case.createdAt)}</small>
                 </div>
                 <button onClick={this.subscribe.bind(this)} className={"btn btn-" + this.button_type + " float-right"}>
                   <FontAwesomeIcon
@@ -65,7 +65,7 @@ class CaseItem extends Component {
                     </p>
                     <p className="card-text text-justify">{this.props.case.description}</p>
                     <p className="card-text">
-                      <small className="text-muted">{utils.getTimeString(this.props.case.createdAt)}</small>
+                      <small className="text-muted">{this.getTimeString(this.props.case.createdAt)}</small>
                     </p>
                     <button className={"btn btn-" + this.button_type + " float-right"} onClick={this.subscribe.bind(this)}>
                         {this.props.case.subscribed ? "Du abonnerer på denne saken":"Abonner på denne saken"}
