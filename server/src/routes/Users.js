@@ -168,6 +168,13 @@ module.exports = {
     ) {
       return res.sendStatus(400);
     }
+
+    let decoded_token = verifyToken(req.token);
+    let user_id_token = decoded_token.user_id;
+    let user_id_param = Number(req.params.user_id);
+
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+
     const subscr = { user_id: Number(req.params.user_id) };
     sequelize
       .query(

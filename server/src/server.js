@@ -231,7 +231,7 @@ app.put('/api/users/:user_id/password', async (req: Request, res: Response) => {
 });
 
 app.get('/api/users/:user_id/region_subscriptions', (req: Request, res: Response) => {
-  return Users.getRegionSubscriptionsForUser(req,res);
+  reqAccessLevel(req, res, 4, Users.getRegionSubscriptionsForUser);
 });
 
 app.get('/api/counties', (req: Request, res: Response) => {
