@@ -197,6 +197,7 @@ class NewCase extends Component {
                 centerPos={{ lat: this.pos.lat, lng: this.pos.lon }}
                 updatePos={this.updatePos}
                 markerPos={{ lat: this.markerPos.lat, lng: this.markerPos.lon }}
+                isClickable={'false'}
               />
             </div>
           </div>
@@ -204,12 +205,11 @@ class NewCase extends Component {
         <div className="container my-5">
           <div className="row">
             {this.images.map(e => (
-              <div className="col-md-3">
+              <div key={e.src} className="col-md-3">
                 <div className="card">
                   <img src={e.src} alt={e.alt} className="card-img-top" />
                   <div className="card-img-overlay">
                     <button
-                      key={e.src}
                       className={'btn btn-danger img-overlay float-right align-text-bottom'}
                       onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
                     >
@@ -319,7 +319,8 @@ class NewCase extends Component {
 
   radio1() {
     // Automatic location discovery
-    if (this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
+    let gmap = document.querySelector('GoogleApiWrapper');
+    if (gmap && this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
       this.list1.hidden = true;
       this.list2.hidden = true;
       this.lastResortAddress.hidden = true;
@@ -327,21 +328,26 @@ class NewCase extends Component {
     }
     let locator = new LocationService();
     this.pos = locator.getLocation();
+    gmap.isClickable = false;
   }
 
   radio2() {
     // Map marker location discovery
-    if (this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
+    let gmap = document.querySelector('GoogleApiWrapper');
+    if (gmap && this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
       this.list1.hidden = true;
       this.list2.hidden = true;
       this.lastResortAddress.hidden = true;
       this.lastResortAddressLabel.hidden = true;
+      gmap.isClickable = true;
     }
   }
 
   radio3() {
     // Last resort list location selection
+    let gmap = document.querySelector('GoogleApiWrapper');
     if (
+      gmap &&
       this.list1 &&
       this.list2 &&
       this.lastResortAddress &&
@@ -360,6 +366,7 @@ class NewCase extends Component {
         this.lastResortAddress.hidden = false;
         this.lastResortAddressLabel.hidden = false;
       }
+      gmap.isClickable = false;
     } else {
       console.log('list1 eller list2 er null!');
     }
