@@ -19,6 +19,7 @@ import Content from './Content.js';
 import Footer from './Footer.js';
 import MyPage from './MyPage.js';
 import ViewCase from './ViewCase.js';
+import CaseList from './CaseList.js';
 import NewCase from './NewCase.js';
 import MyCases from './CaseList.js';
 import axios from 'axios';
