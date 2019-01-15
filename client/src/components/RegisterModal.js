@@ -60,6 +60,7 @@ class RegisterModal extends Component {
                             className={'form-control mb-3'}
                             id={'regionSelector'}
                             onChange={this.regionListener}
+                            defaultValue={'Velg kommune'}
                             hidden
                         >
                             <option selected disabled>

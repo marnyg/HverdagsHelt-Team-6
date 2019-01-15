@@ -205,6 +205,7 @@ app.get('/api/users', (req: Request, res: Response) => {
 });
 
 app.post('/api/users', (req: Request, res: Response) => {
+  console.log(req.body);
   Users.createUser(req, res);
 });
 

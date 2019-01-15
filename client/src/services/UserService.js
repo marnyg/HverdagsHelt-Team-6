@@ -135,9 +135,11 @@ class UserService {
   login(email: string, password: string): Promise<any> {
       return new Promise(((resolve, reject) => {
           axios.post('/api/login', { email: email, password: password })
-              .then(token => {
-                  console.log('UserService login received this token:', token.token);
-                  localStorage.setItem('token', token.token);
+              .then(data => {
+                  console.log('UserService reveived this on login:', data);
+                  //console.log('UserService login received this token:', data.token);
+                  localStorage.setItem('token', data.token);
+                  localStorage.setItem('user', data.user);
                   resolve('Logged in');
               })
               .catch((error: Error) => reject(error));
@@ -154,6 +156,7 @@ class UserService {
             })
                 .then(res => {
                     localStorage.removeItem('token');
+                    localStorage.removeItem('user');
                     resolve(res);
                 })
                 .catch((error: Error) => reject(error));

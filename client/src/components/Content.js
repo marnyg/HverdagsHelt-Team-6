@@ -59,7 +59,7 @@ class Content extends Component {
   }
 
   mounted() {
-    console.log('Using token:', localStorage.getItem('token'));
+    //console.log('Using token:', localStorage.getItem('token'));
 
     if (this.props.match && this.props.match.params) {
       // Redirected from search

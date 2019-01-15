@@ -23,7 +23,7 @@ class NewCase extends Component {
   list2 = null;
   lastResortAddress = null;
   lastResortAddressLabel = null;
-  lastResortPos = { lat: 59.9138688, lon: 10.752245399999993 }; // Last resort position OSLO
+  lastResortPos = { latitude: 59.9138688, longitude: 10.752245399999993 }; // Last resort position OSLO
   pos = this.lastResortPos;
   fileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
@@ -187,7 +187,7 @@ class NewCase extends Component {
               </div>
             </div>
             <div className="col-md-6 embed-responsive">
-              <GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.pos.lat, lng: this.pos.lon }} />
+              <GoogleApiWrapper centerPos={{ lat: this.pos.latitude, lng: this.pos.longitude }} updatePos={this.updatePos} userPos={{ lat: this.pos.latitude, lng: this.pos.longitude }} />
             </div>
           </div>
         </div>
@@ -216,6 +216,15 @@ class NewCase extends Component {
   }
 
   mounted() {
+    let locationService = new LocationService();
+    locationService.getLocation()
+        .then((location: Location) => {
+          this.updatePos(location);
+        })
+        .catch((error: Error) => {
+          console.log(error);
+          this.pos = this.lastResortPos;
+        });
     // this.list1 = document.getElementById('last-resort-county');
     // this.list2 = document.getElementById('last-resort-municipality');
     // this.lastResortAddress = document.getElementById('last-resort-address');
