@@ -76,7 +76,7 @@ app.get('/api/cases', (req: Request, res: Response) => {
 });
 
 app.post('/api/verify', (req, res) => {
-  reqAccessLevel(req, res, 1, (req, res) => {
+  reqAccessLevel(req, res, 4, (req, res) => {
     console.log('------Token Verified!-------');
     return res.sendStatus(200);
   });

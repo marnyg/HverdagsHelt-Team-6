@@ -114,6 +114,8 @@ class RegionService {
              .catch((error: Error) => reject(error));
      });
   }
+
+  
 }
 
 export default RegionService;

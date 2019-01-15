@@ -35,10 +35,10 @@ class App extends Component {
             <Notify />
             <Route exact path="/" render={() => <Content />} />
             <Route exact path="/my-page" render={() => <MyPage />} />
-            <Route exact path="/new-case" render={() => <NewCase />} />
+            <Route exact path="/new-case" render={() => <Subscription />} />
             <Route exact path="/search/:query" component={Content} />
           </div>
-          {<Subscription />}
+          {/*<Subscription />*/}
           <Footer />
         </div>
       </BrowserRouter>

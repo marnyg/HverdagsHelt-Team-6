@@ -13,12 +13,15 @@ class CaseSubscriptionService {
               .then((logged_in: Boolean) => {
                   if(logged_in === true){
                       let token = localStorage.getItem('token');
-                      axios.get('/api/cases/subscriptions/' + user_id, {}, {
+                      axios.get('/api/cases/subscriptions/' + user_id, {
                           headers: {
                               Authorization: 'Bearer ' + token
                           }
                       })
-                          .then((subscriptions: CaseSubscription[]) => resolve(subscriptions))
+                          .then((subscriptions: CaseSubscription[]) => {
+                            console.log(subscriptions);
+                            resolve(subscriptions);
+                          })
                           .catch((error: Error) => reject(error));
                   } else {
                       reject('User is not logged in');
