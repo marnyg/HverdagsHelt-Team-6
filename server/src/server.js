@@ -230,6 +230,10 @@ app.put('/api/users/:user_id/password', async (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Users.changePassword);
 });
 
+app.get('/api/users/:user_id/region_subscriptions', (req: Request, res: Response) => {
+  return Users.getRegionSubscriptionsForUser(req,res);
+});
+
 app.get('/api/counties', (req: Request, res: Response) => {
   County.getAllCounties(req, res);
 });
