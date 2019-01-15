@@ -9,8 +9,6 @@ export class GoogleMapsContainer extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    console.log(this.props);
-
     if (prevProps.centerPos !== this.props.centerPos) {
       this.gmap.setCenter(this.props.centerPos);
       this.marker.setPosition(this.props.centerPos)
@@ -32,7 +30,7 @@ export class GoogleMapsContainer extends Component {
         {/* <SearchBox
           controlPosition={google.maps.ControlPosition.TOP_LEFT}
         /> */}
-        <Marker ref="marker" position={this.props.userPos} />
+        <Marker ref="marker" position={this.props.markerPos} />
       </Map>
     );
   }
