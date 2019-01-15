@@ -10,6 +10,7 @@ import Location from '../classes/Location.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faListUl, faTh } from '@fortawesome/free-solid-svg-icons/index';
 import Notify from './Notify.js';
+import CaseSubscriptionService from "../services/CaseSubscriptionService";
 
 class Content extends Component {
   cases = null;
@@ -53,22 +54,13 @@ class Content extends Component {
             )}
           </div>
         </div>
-        <div>
-          {this.grid ? (
-            <div className="content">
-              {this.cases.map(e => (
-                <CaseItem case={e} key={e.case_id} grid={this.grid} />
-              ))}
-            </div>
-          ) : (
-            this.cases.map(e => <CaseItem case={e} key={e.case_id} grid={this.grid} />)
-          )}
-        </div>
       </div>
     );
   }
 
   mounted() {
+    //console.log('Using token:', localStorage.getItem('token'));
+
     if (this.props.match && this.props.match.params) {
       // Redirected from search
       // Must render only search results

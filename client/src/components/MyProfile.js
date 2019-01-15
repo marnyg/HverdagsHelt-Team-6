@@ -2,35 +2,47 @@
 //
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import MyCases from './CaseList.js';
-import NewCase from './NewCase';
+import User from '../classes/User';
+import UserService from '../services/UserService';
 
 class MyProfile extends Component<{}, { isEditing: boolean }> {
   state = { isEditing: false };
+  us = new UserService();
 
-  user = { name: 'Ola Norman', epost: '123@asd.abc', tlf: '12312312', rolle: 'Mordi' };
+  // user: User;
+  user = new User();
   render() {
-    return <div>{this.state.isEditing ? this.getDisplayInfoVersion() : this.getEditFormVersion()}</div>;
+    if (this.user == null) {
+      return <div>404</div>;
+    }
+    return <div>{this.state.isEditing ? this.getEditFormVersion() : this.getDisplayInfoVersion()}</div>;
   }
 
-  changToEditVersion(arg: boolean) {
+  mounted() {
+    // this.us.getUser(1).then(res => this.user=new User(..........................));
+    this.user = new User(1, 1, 1, 'ola', 'norman', '123', 'a@b.c', '1');
+  }
+
+  changToEditVersion(event, arg: boolean) {
+    event.preventDefault();
     this.setState({ isEditing: arg });
-    console.log(this.state);
-    console.log(this.state.isEditing);
   }
   handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     switch (event.target.id) {
-      case 'name':
-        this.user.name = event.target.value;
-        console.log('changed name to ' + event.target.value);
+      case 'firstname':
+        this.user.firstname = event.target.value;
+        break;
+      case 'lastname':
+        this.user.lastname = event.target.value;
         break;
       case 'email':
-        this.user.epost = event.target.value;
-        console.log('changed email to ' + event.target.value);
+        this.user.email = event.target.value;
         break;
       case 'tlf':
         this.user.tlf = event.target.value;
-        console.log('changed email to ' + event.target.value);
+        break;
+      case 'password1':
+        this.user.password = event.target.value;
         break;
     }
     console.log(this.user);
@@ -39,12 +51,21 @@ class MyProfile extends Component<{}, { isEditing: boolean }> {
     return (
       <form id="form-inline">
         <legend>Profil</legend>
-        <label>Naaaaavn: </label>
+        <label>Fornavn: </label>
         <input
           type="text"
-          id="name"
+          id="firstname"
           required
-          defaultValue={this.user.name}
+          defaultValue={this.user.firstname}
+          onChange={this.handleChange}
+          className="form-control"
+        />
+        <label>Etteravn: </label>
+        <input
+          type="text"
+          id="lastname"
+          required
+          defaultValue={this.user.lastname}
           onChange={this.handleChange}
           className="form-control"
         />
@@ -53,38 +74,71 @@ class MyProfile extends Component<{}, { isEditing: boolean }> {
           type="email"
           required
           id="email"
-          defaultValue={this.user.epost}
+          defaultValue={this.user.email}
           onChange={this.handleChange}
           className="form-control"
         />
         <label>Tlf</label>
-        <input type="tel" id="tlf" defaultValue={this.user.tlf} onChange={this.handleChange} className="form-control" />
-        <label>Rolle (???????????)</label>
-        <input type="text" defaultValue={this.user.rolle} onChange={this.handleChange} className="form-control" />
-        <button className="btn btn-primary" onClick={() => this.changToEditVersion(true)}>
-          Send Endringer
-        </button>
+        <input
+          type="tel"
+          required
+          id="tlf"
+          defaultValue={this.user.tlf}
+          onChange={this.handleChange}
+          className="form-control"
+        />
+        <label>Nytt Passord</label>
+        <input type="password" required id="password1" onChange={this.handleChange} className="form-control" />
+        <label>Gjenta Passord</label>
+        <input type="password" required id="password2" onChange={this.handleChange} className="form-control" />
+        <input type="submit" valie="asd" className="btn btn-primary" onClick={this.validateForm}>
+          {/* Send Endringer */}
+        </input>
 
-        <button className="btn btn-danger" onClick={() => this.changToEditVersion(true)}>
+        <button className="btn btn-danger" onClick={e => this.changToEditVersion(e, false)}>
           Avbryt
         </button>
       </form>
     );
+  }
+  validateForm(event: Event) {
+    event.preventDefault();
+    let form = event.target.parentNode;
+    let children = Array.prototype.slice.call(form.children, 0);
+
+    if (this.arePasswordsEqual(children) && form.checkValidity()) {
+      console.log('form is valid, this is where you send the data to te server');
+      console.log('you also get the newest profile data from the server');
+
+      this.setState({ isEditing: false }); //shuld be false
+      console.log(this.state);
+    } else {
+      if (this.arePasswordsEqual(children)) {
+        let passwordInputs = children.filter(e => e.id.includes('password'));
+        passwordInputs.map(e => e.setCustomValidity('Passwords must match'));
+      }
+      form.reportValidity();
+    }
+  }
+
+  arePasswordsEqual(children: Array<HTMLInputElement>) {
+    let passwordInputs = children.filter(e => e.id.includes('password'));
+    return passwordInputs[1].value === passwordInputs[0].value;
   }
 
   getDisplayInfoVersion() {
     return (
       <form id="form-inline">
         <legend>Profil</legend>
-        <label>Navn: </label>
-        <p>{this.user.name}</p>
+        <label>Fornavn: </label>
+        <p>{this.user.firstname}</p>
+        <label>Etternavn: </label>
+        <p>{this.user.lastname}</p>
         <label>Epost :</label>
-        <p>{this.user.epost}</p>
+        <p>{this.user.email}</p>
         <label>Tlf</label>
         <p>{this.user.tlf}</p>
-        <label>Rolle (???????????)</label>
-        <p>{this.user.rolle}</p>
-        <button className="btn btn-primary" onClick={() => this.changToEditVersion(false)}>
+        <button className="btn btn-primary" onClick={e => this.changToEditVersion(e, true)}>
           Rediger Profil
         </button>
       </form>
