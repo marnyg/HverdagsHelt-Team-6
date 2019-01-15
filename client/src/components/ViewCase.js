@@ -75,7 +75,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               {this.statuses.map(e => (
                 <option key={e.status_id} value={e.status_id}>
                   {' '}
-                  {e.status_name}{' '}
+                  {e.name}{' '}
                 </option>
               ))}
             </select>
@@ -131,7 +131,6 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       .then(e => {
         this.case = e;
         console.log('This.case:');
-        console.log(this.case);
       })
       .catch((err: Error) => {
         console.log('Could not load case with id ' + this.props.match.params.case_id);
@@ -146,7 +145,6 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       .getAllStatusComments(this.props.match.params.case_id)
       .then(e => {
         this.statusMessage = e;
-        console.log(this.statusMessage);
         if (this.statusMessage.length === 0) {
           let p = document.querySelector('#noComments');
           if(p)p.hidden = false

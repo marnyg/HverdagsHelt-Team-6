@@ -104,7 +104,7 @@ class CaseList extends Component<{ match: { params: { user_id: number, region_id
     let token = localStorage.getItem('token');
     if(this.props.match.params.user_id){
       // Set up table for cases on per user basis
-      id = this.props.match.params.user_id;
+      //id = this.props.match.params.user_id;
       cas
         .getAllCasesGivenUser(id)
         .then(cases => {
@@ -133,7 +133,7 @@ class CaseList extends Component<{ match: { params: { user_id: number, region_id
       // Set up table for cases on per municipality/region basis
       id = this.props.match.params.region_id;
       cas
-        .getAllCasesGivenRegion(id)
+        .getAllCasesGivenRegionId(id)
         .then(cases => {
           this.cases = cases;
           console.log('Length of this.cases = ' + this.cases.length);
