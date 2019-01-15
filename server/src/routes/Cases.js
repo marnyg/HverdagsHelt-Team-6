@@ -13,7 +13,7 @@ module.exports = {
     sequelize
       .query(
         'Select c.case_id, c.title, c.description, c.lat, c.lon, r.name as region_name, s.name as status_name, cg.name as category_name, ' +
-          "CONCAT(u.firstname, ' ', u.lastname) as createdBy, c.createdAt, c.updatedAt " +
+          "CONCAT(u.firstname, ' ', u.lastname) as createdBy, u.tlf, u.email, c.createdAt, c.updatedAt " +
           'FROM Cases c JOIN Regions r ON c.region_id = r.region_id ' +
           'JOIN Users u ON c.user_id = u.user_id ' +
           'JOIN Statuses s ON c.status_id = s.status_id ' +
@@ -23,8 +23,7 @@ module.exports = {
       .then(async cases => {
         const out = cases.map(async c => {
           let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
-          let images = await pictures.map(img => img.path);
-          c.img = images;
+          c.img = pictures.map(img => img.path);
           return c;
         });
         return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
@@ -130,48 +129,50 @@ module.exports = {
   getAllCasesInRegionByName: async function(req: Request, res: Response) {
     if (!req.params || typeof req.params.county_name != 'string' || typeof req.params.region_name != 'string')
       return res.sendStatus(400);
-    let region = await Regions.getOneRegionByNameAndCounty(req, res);
-    let regionId = region ? region : res.sendStatus(404);
-    let cases = await Case.findAll({
-      where: { region_id: Number(regionId.region_id) },
-      order: [['updatedAt', 'DESC']]
-    });
-    cases = cases.map(c => c.toJSON());
-    const out = cases.map(async c => {
-      let stat_name = await Status.findOne({ where: { status_id: c.status_id }, attributes: ['name'] });
-      let cat_name = await Category.findOne({ where: { category_id: c.category_id }, attributes: ['name'] });
-      let pics = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
-      delete c.status_id;
-      delete c.category_id;
-      c.region_name = req.params.region_name;
-      c.status_name = stat_name.name;
-      c.category_name = cat_name.name;
-      c.img = pics.map(img => img.path);
-      return c;
-    });
-    return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+
+    return sequelize
+      .query(
+        'Select c.case_id, c.title, c.description, c.lat, c.lon, r.name as region_name, co.name as county_name, s.name as status_name, cg.name as category_name, ' +
+        "CONCAT(u.firstname, ' ', u.lastname) as createdBy, u.tlf, u.email, c.createdAt, c.updatedAt " +
+        'FROM Cases c JOIN Regions r ON c.region_id = r.region_id ' +
+        'JOIN Counties co ON r.county_id = co.county_id ' +
+        'JOIN Users u ON c.user_id = u.user_id ' +
+        'JOIN Statuses s ON c.status_id = s.status_id ' +
+        'JOIN Categories cg ON c.category_id = cg.category_id ' +
+        'WHERE r.name = ? AND co.name = ?;',
+        { replacements: [req.params.region_name, req.params.county_name] },
+        { type: sequelize.QueryTypes.SELECT }
+      ).then(async cases => {
+        const out = cases[0].map(async c => {
+          let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+          c.img = pictures.map(img => img.path);
+          return c;
+        });
+        return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+      });
   },
   getAllCasesInRegionById: async function(req: Request, res: Response) {
     if (!req.params || typeof Number(req.params.region_id) != 'number')
       return res.sendStatus(400);
-    let cases = await Case.findAll({
-      where: { region_id: Number(req.params.region_id) },
-      order: [['updatedAt', 'DESC']]
-    });
-    cases = cases.map(c => c.toJSON());
-    const out = cases.map(async c => {
-      let stat_name = await Status.findOne({ where: { status_id: c.status_id }, attributes: ['name'] });
-      let cat_name = await Category.findOne({ where: { category_id: c.category_id }, attributes: ['name'] });
-      let pics = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
-      delete c.status_id;
-      delete c.category_id;
-      c.region_name = req.params.region_name;
-      c.status_name = stat_name.name;
-      c.category_name = cat_name.name;
-      c.img = pics.map(img => img.path);
-      return c;
-    });
-    return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+    sequelize
+      .query(
+        'Select c.case_id, c.title, c.description, c.lat, c.lon, r.name as region_name, s.name as status_name, cg.name as category_name, ' +
+        "CONCAT(u.firstname, ' ', u.lastname) as createdBy, u.tlf, u.email, c.createdAt, c.updatedAt " +
+        'FROM Cases c JOIN Regions r ON c.region_id = r.region_id ' +
+        'JOIN Users u ON c.user_id = u.user_id ' +
+        'JOIN Statuses s ON c.status_id = s.status_id ' +
+        'JOIN Categories cg ON c.category_id = cg.category_id ' +
+        'WHERE c.region_id = ?;',
+        { replacements: [Number(req.params.region_id)] },
+        { type: sequelize.QueryTypes.SELECT }
+      ).then(async cases => {
+        const out = cases[0].map(async c => {
+          let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+          c.img = pictures.map(img => img.path);
+          return c;
+        });
+        return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+      });
   },
   getAllCasesForUser: async function(req: Request, res: Response) {
     if (
@@ -188,25 +189,25 @@ module.exports = {
 
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
 
-    let cases = await Case.findAll({
-      where: { user_id: req.params.user_id },
-      order: [['updatedAt', 'DESC']]
-    }).then(cases => (cases ? cases : res.sendStatus(404)));
-    cases = cases.map(c => c.toJSON());
-    const out = cases.map(async c => {
-      let reg_name = await Region.findOne({ where: { region_id: c.region_id }, attributes: ['name'] });
-      let stat_name = await Status.findOne({ where: { status_id: c.status_id }, attributes: ['name'] });
-      let cat_name = await Category.findOne({ where: { category_id: c.category_id }, attributes: ['name'] });
-      let pics = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
-      delete c.status_id;
-      delete c.category_id;
-      c.region_name = reg_name.name;
-      c.status_name = stat_name.name;
-      c.category_name = cat_name.name;
-      c.img = pics.map(img => img.path);
-      return c;
+    sequelize
+      .query(
+        'Select c.case_id, c.title, c.description, c.lat, c.lon, r.name as region_name, s.name as status_name, cg.name as category_name, ' +
+        "CONCAT(u.firstname, ' ', u.lastname) as createdBy, u.tlf, u.email, c.createdAt, c.updatedAt " +
+        'FROM Cases c JOIN Regions r ON c.region_id = r.region_id ' +
+        'JOIN Users u ON c.user_id = u.user_id ' +
+        'JOIN Statuses s ON c.status_id = s.status_id ' +
+        'JOIN Categories cg ON c.category_id = cg.category_id ' +
+        'WHERE c.user_id = ?;',
+        { replacements: [Number(req.params.user_id)] },
+        { type: sequelize.QueryTypes.SELECT }
+      ).then(async cases => {
+      const out = cases[0].map(async c => {
+        let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+        c.img = pictures.map(img => img.path);
+        return c;
+      });
+      return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
     });
-    return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
   }
 };
 
