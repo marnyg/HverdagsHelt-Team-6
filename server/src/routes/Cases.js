@@ -105,11 +105,35 @@ module.exports = {
         return res.send(data);
       });
   },
-  getAllCasesInRegion: async function(req: Request, res: Response) {
+  getAllCasesInRegionByName: async function(req: Request, res: Response) {
+    if (!req.params || typeof req.params.county_name != 'string' || typeof req.params.region_name != 'string')
+      return res.sendStatus(400);
     let region = await Regions.getOneRegionByNameAndCounty(req, res);
     let regionId = region ? region : res.sendStatus(404);
     let cases = await Case.findAll({
       where: { region_id: Number(regionId.region_id) },
+      order: [['updatedAt', 'DESC']]
+    });
+    cases = cases.map(c => c.toJSON());
+    const out = cases.map(async c => {
+      let stat_name = await Status.findOne({ where: { status_id: c.status_id }, attributes: ['name'] });
+      let cat_name = await Category.findOne({ where: { category_id: c.category_id }, attributes: ['name'] });
+      let pics = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+      delete c.status_id;
+      delete c.category_id;
+      c.region_name = req.params.region_name;
+      c.status_name = stat_name.name;
+      c.category_name = cat_name.name;
+      c.img = pics.map(img => img.path);
+      return c;
+    });
+    return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+  },
+  getAllCasesInRegionById: async function(req: Request, res: Response) {
+    if (!req.params || typeof Number(req.params.region_id) != 'number')
+      return res.sendStatus(400);
+    let cases = await Case.findAll({
+      where: { region_id: Number(req.params.region_id) },
       order: [['updatedAt', 'DESC']]
     });
     cases = cases.map(c => c.toJSON());
