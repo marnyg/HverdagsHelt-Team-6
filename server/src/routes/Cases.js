@@ -3,7 +3,9 @@
 import { Case, sequelize } from '../models.js';
 import { reqAccessLevel, verifyToken } from '../auth';
 import { Category, Picture, Status, Region } from '../models';
-import Regions from './Regions';
+
+type Request = express$Request;
+type Response = express$Response;
 
 module.exports = {
   createNewCase: function(req: Request, res: Response) {
@@ -84,11 +86,12 @@ module.exports = {
     */
     sequelize
       .query(
-        'Select c.case_id, c.title, c.description, c.lat, c.lon, r.name as region_name, s.name as status_name, ' +
+        'Select c.case_id, ca.name AS category_name, c.title, c.description, c.lat, c.lon, r.name as region_name, s.name as status_name, ' +
           "CONCAT(u.firstname, ' ', u.lastname) as createdBy, c.createdAt, c.updatedAt " +
           'FROM Cases c JOIN Regions r ON c.region_id = r.region_id ' +
           'JOIN Users u ON c.user_id = u.user_id ' +
           'JOIN Statuses s ON c.status_id = s.status_id ' +
+          'JOIN Categories ca ON c.category_id = ca.category_id ' +
           'WHERE c.case_id = ?;',
         { replacements: [req.params.case_id] },
         { type: sequelize.QueryTypes.SELECT }
