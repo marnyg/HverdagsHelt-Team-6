@@ -181,7 +181,8 @@ module.exports = {
       )
       .then(subs => {
         subscr.regions = subs;
-        res.send(subscr);
-      });
+        return res.send(subscr);
+      })
+      .catch(err => res.status(500).send(err));
   }
 };
