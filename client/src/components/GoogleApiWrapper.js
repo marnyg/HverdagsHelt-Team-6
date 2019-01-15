@@ -6,13 +6,14 @@ export class GoogleMapsContainer extends Component {
   onClick(t, map, coord) {
     const latLng = { lat: coord.latLng.lat(), lon: coord.latLng.lng() };
     this.props.updatePos(latLng);
-    this.render();
-    console.log(this.marker)
   }
 
   componentDidUpdate(prevProps) {
+    console.log(this.props);
+
     if (prevProps.params.centerPos !== this.props.params.centerPos) {
-      this.Gmap.setCenter(this.props.centerPos);
+      this.gmap.setCenter(this.props.centerPos);
+      this.marker.setPosition(this.props.centerPos)
     }
   }
 
@@ -38,7 +39,7 @@ export class GoogleMapsContainer extends Component {
   mounted() {
 
     this.gmap = this.refs.Gmap.map
-    this.marker = this.refs.marker
+    this.marker = this.refs.marker.marker
   }
 }
 export default GoogleApiWrapper({
