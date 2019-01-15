@@ -26,7 +26,7 @@ class Navbar extends Component {
     return (
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <NavLink to="/" className="navbar-brand">
-          HverdagsHelt
+          HverdagsHelt<span className="badge badge-primary mobile-notification">{this.notification_count > 0 ? this.notification_count:null}</span>
         </NavLink>
         <button
           className="navbar-toggler"
@@ -56,7 +56,7 @@ class Navbar extends Component {
             <li className="nav-item">
               {this.logged_in ? (
                 <NavLink to="/notifications" className="nav-link">
-                  Varsler <span className="badge badge-primary">{this.notification_count > 0 ? this.notification_count:null}</span>
+                  Varsler <span className="badge badge-primary fullbar-notification">{this.notification_count > 0 ? this.notification_count:null}</span>
                 </NavLink>
               ) : null}
             </li>
@@ -81,7 +81,7 @@ class Navbar extends Component {
 
   mounted() {
     // Check if user is logged in
-    console.log('Navbar mounted');
+    //console.log('Navbar mounted');
     let loginService = new LoginService();
     loginService.isLoggedIn()
         .then((logged_in: Boolean) => {
@@ -89,7 +89,9 @@ class Navbar extends Component {
           if(logged_in === true){
               // get notifications
               let subscriptionService = new CaseSubscriptionService();
-              subscriptionService.getAllCaseSubscriptions()
+              //let user = localStorage.getItem('user');
+              let user = {user_id: 1};
+              subscriptionService.getAllCaseSubscriptions(user.user_id)
                   .then((cs: CaseSubscription[]) => {
                       for (let i = 0; i < cs.length; i++) {
                         if(cs[i].is_up_to_date === true){
