@@ -12,6 +12,7 @@ module.exports = {
   },
 
   createUser: function(req: Request, res: Response) {
+    console.log(typeof req.body.tlf);
     if (
       !req.body ||
       typeof req.body.firstname !== 'string' ||

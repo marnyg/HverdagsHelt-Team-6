@@ -5,7 +5,7 @@ class LoginService {
   isLoggedIn(): Promise<Boolean> {
       return new Promise((resolve, reject) => {
           let token = localStorage.getItem('token');
-          console.log('LoginService found this token:', token);
+          //console.log('LoginService found this token:', token);
           if(token){
               axios.post('/api/verify', {}, {
                   headers: {
@@ -13,7 +13,7 @@ class LoginService {
                   }
               })
                   .then((response) => {
-                      console.log('LoginService received this on verify:', response);
+                      //console.log('LoginService received this on verify:', response);
                       if(response === "OK"){
                           resolve(true);
                       } else {
