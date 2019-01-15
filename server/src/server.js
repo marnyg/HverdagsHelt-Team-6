@@ -18,10 +18,10 @@ import Role from './routes/Roles.js';
 import Status from './routes/Statuses.js';
 import Case_subscription from './routes/Case_subscriptions.js';
 import Status_comment from './routes/Status_comments.js';
-import { Case, Picture } from './models.js';
+import { Case } from './models.js';
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
-import {verifyToken} from "./auth";
+import { verifyToken } from './auth';
 
 let os = require('os');
 let hostname = os.hostname();
@@ -39,22 +39,21 @@ app.use(bearerToken()); // For easy access to token sent in 'Authorization' head
 
 const storage = multer.diskStorage({
   destination: public_path + '/' + 'uploads',
-  filename: function (req, file, callback) {
+  filename: function(req, file, callback) {
     crypto.pseudoRandomBytes(16, (err, raw) => {
       console.log('crypto firing!!!');
       if (err) return callback(err);
       console.log(file.originalname);
       callback(null, raw.toString('hex') + path.extname(file.originalname));
-
-    })
+    });
   }
 });
 
-let upload = multer({storage: storage});
+let upload = multer({ storage: storage });
 
 app.post('/api/uploads', upload.single('avatar'), (req, res) => {
   if (!req.file) {
-    console.log("No file received");
+    console.log('No file received');
     return res.send({
       success: false
     });
@@ -151,7 +150,7 @@ app.get('/api/cases/subscriptions/:user_id', (req: Request, res: Response) => {
 });
 
 app.get('/api/cases/subscriptions/:user_id/cases', (req: Request, res: Response) => {
-    reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptionCases);
+  reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptionCases);
 });
 
 app.post('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
@@ -167,11 +166,11 @@ app.delete('/api/cases/:case_id/subscribe/:user_id', (req: Request, res: Respons
 });
 
 app.get('/api/cases/region_cases/:county_name/:region_name', async (req: Request, res: Response) => {
-  return Cases.getAllCasesInRegionByName(req,res);
+  return Cases.getAllCasesInRegionByName(req, res);
 });
 
 app.get('/api/cases/region_cases/:region_id', async (req: Request, res: Response) => {
-  return Cases.getAllCasesInRegionById(req,res);
+  return Cases.getAllCasesInRegionById(req, res);
 });
 
 app.get('/api/statuses', (req: Request, res: Response) => {
