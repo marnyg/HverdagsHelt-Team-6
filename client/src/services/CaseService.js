@@ -119,7 +119,9 @@ class CaseService {
 
   //Get all cases given location
   getCasesByLoc(county_name: string, region_name: string): Promise<Case[]> {
-    return axios.get('/api/cases/region_cases/' + county_name + '/' + region_name);
+    return axios.get('/api/cases/region_cases/' + county_name + '/' + region_name, {}, {
+        headers: {"Content-Type":"application/json"}
+    });
   }
 }
 export default CaseService;

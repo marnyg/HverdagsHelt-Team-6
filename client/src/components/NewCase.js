@@ -27,6 +27,7 @@ class NewCase extends Component {
   lastResortAddressLabel = null;
   lastResortPos = { lat: 59.9138688, lon: 10.752245399999993 }; // Last resort position OSLO
   pos = this.lastResortPos;
+  markerPos = this.lastResortPos;
   fileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
   constructor() {
@@ -192,7 +193,11 @@ class NewCase extends Component {
               </div>
             </div>
             <div className="col-md-6 embed-responsive">
-              <GoogleApiWrapper centerPos={{ lat: this.pos.latitude, lng: this.pos.longitude }} updatePos={this.updatePos} userPos={{ lat: this.pos.latitude, lng: this.pos.longitude }} />
+              <GoogleApiWrapper
+                centerPos={{ lat: this.pos.lat, lng: this.pos.lon }}
+                updatePos={this.updatePos}
+                markerPos={{ lat: this.markerPos.lat, lng: this.markerPos.lon }}
+              />
             </div>
           </div>
         </div>
@@ -226,15 +231,17 @@ class NewCase extends Component {
     this.lastResortAddress = document.getElementById('last-resort-address');
     this.lastResortAddressLabel = document.getElementById('last-resort-address-label');
     let locationService = new LocationService();
-    locationService.getLocation()
-        .then((location: Location) => {
-          this.updatePos(location);
-        })
-        .catch((error: Error) => {
-          console.log(error);
-          this.pos = this.lastResortPos;
-        });
-    
+    locationService
+      .getLocation()
+      .then((location: Location) => {
+        this.pos = location;
+        this.markerPos = location;
+      })
+      .catch((error: Error) => {
+        console.log(error);
+        this.pos = this.lastResortPos;
+      });
+
     // Fetching logic
     console.log('Fetchng categories.');
     let cat = new CategoryService();
@@ -575,7 +582,7 @@ class NewCase extends Component {
   send(obj: Case) {
     console.log('Sending form data to server.');
     console.log('Case is ' + JSON.stringify(obj));
-    /*let cas = new CaseService();
+    let cas = new CaseService();
     cas
       .createCase(obj)
       .then(e => {
@@ -591,12 +598,13 @@ class NewCase extends Component {
             err.message
         );
         console.warn('Error while transmitting form data to server with error message: ' + err.message);
-      });*/
+      });
   }
 
   updatePos(newPos) {
-    this.pos = newPos;
-    console.log('got pos from map: ', this.pos);
+    this.markerPos = { lat: newPos.lat, lon: newPos.lon };
+    console.log(newPos);
+    console.log('got pos from map:', this.markerPos);
   }
 }
 

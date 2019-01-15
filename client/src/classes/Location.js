@@ -1,13 +1,13 @@
 class Location{
-    latitude: number;
-    longitude: number;
+    lat: number;
+    lon: number;
     city: string;
     region: string;
     country: string;
 
     constructor(lat, lng, city, region, country){
-        this.latitude = lat;
-        this.longitude = lng;
+        this.lat = lat;
+        this.lon = lng;
         this.city = city;
         this.region = region;
         this.country = country;
