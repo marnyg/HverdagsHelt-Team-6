@@ -320,7 +320,6 @@ class NewCase extends Component {
 
   radio1() {
     // Automatic location discovery
-    // let gmap = document.querySelector('GoogleApiWrapper');
     if (this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
       this.list1.hidden = true;
       this.list2.hidden = true;
@@ -335,7 +334,6 @@ class NewCase extends Component {
 
   radio2() {
     // Map marker location discovery
-    let gmap = document.querySelector('GoogleApiWrapper');
     if (this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
       this.list1.hidden = true;
       this.list2.hidden = true;
@@ -347,9 +345,8 @@ class NewCase extends Component {
 
   radio3() {
     // Last resort list location selection
-    // let gmap = document.querySelector('GoogleApiWrapper');
     if (
-      // gmap &&
+      //gmap &&
       this.list1 &&
       this.list2 &&
       this.lastResortAddress &&

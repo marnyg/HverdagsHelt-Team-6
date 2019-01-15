@@ -53,7 +53,6 @@ class CaseService {
             axios
               .delete(
                 '/api/cases' + case_id,
-                {},
                 {
                   headers: {
                     Authorization: 'Bearer ' + token
@@ -118,7 +117,6 @@ class CaseService {
             axios
               .get(
                 '/api/cases/user_cases/' + user_id,
-                {},
                 {
                   headers: {
                     Authorization: 'Bearer ' + token
@@ -147,7 +145,6 @@ class CaseService {
             axios
               .get(
                 '/api/cases/region_cases/' + region_id,
-                {},
                 {
                   headers: {
                     Authorization: 'Bearer ' + token
