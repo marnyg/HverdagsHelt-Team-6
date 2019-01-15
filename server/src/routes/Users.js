@@ -158,8 +158,6 @@ module.exports = {
     } else {
       return res.sendStatus(403);
     }
-<<<<<<< HEAD
-=======
   },
   getRegionSubscriptionsForUser: function(req: Request, res: Response) {
     if (
@@ -193,6 +191,5 @@ module.exports = {
         return res.send(subscr);
       })
       .catch(err => res.status(500).send(err));
->>>>>>> master
   }
 };
