@@ -2,6 +2,7 @@
 
 import { User } from '../models.js';
 import { createToken, hashPassword, loginOk, verifyToken } from '../auth';
+import { Region_subscriptions, sequelize } from '../models';
 
 type Request = express$Request;
 type Response = express$Response;
@@ -157,5 +158,30 @@ module.exports = {
     } else {
       return res.sendStatus(403);
     }
+  },
+  getRegionSubscriptionsForUser: function(req: Request, res: Response) {
+    if (
+      !req.token ||
+      !req.params.user_id ||
+      typeof Number(req.params.user_id) !== 'number' ||
+      typeof req.token !== 'string'
+    ) {
+      return res.sendStatus(400);
+    }
+    const subscr = { user_id: Number(req.params.user_id) };
+    sequelize
+      .query(
+        'Select sub.region_id, r.name as region_name, sub.notify ' +
+          'FROM Region_subscriptions sub JOIN Regions r ON sub.region_id = r.region_id ' +
+          'WHERE sub.user_id = ?;',
+        {
+          replacements: [Number(req.params.user_id)],
+          type: sequelize.QueryTypes.SELECT
+        }
+      )
+      .then(subs => {
+        subscr.regions = subs;
+        res.send(subscr);
+      });
   }
 };
