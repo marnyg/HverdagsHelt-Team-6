@@ -140,7 +140,7 @@ class UserService {
                   console.log('UserService reveived this user on login:', data.user);
                   //console.log('UserService login received this token:', data.token);
                   localStorage.setItem('token', data.token);
-                  localStorage.setItem('user', data.user);
+                  localStorage.setItem('user', JSON.stringify(data.user));
                   resolve('Logged in');
               })
               .catch((error: Error) => reject(error));
