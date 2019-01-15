@@ -118,6 +118,16 @@
       bottom: 0px;
     }
 }
+@media only screen and (min-width: 990px) {
+    .mobile-notification {
+        display: none;
+    }
+}
+@media only screen and (max-width: 990px){
+    .fullbar-notification {
+        display: none;
+    }
+}
 
 @media only screen and (min-width: 700px) {
     .toggle {
@@ -153,7 +163,7 @@
     }
 }
 
-@media only screen and (min-width: 800px) {
+@media only screen and (min-width: 990px) {
     .content-wrapper {
         padding-top: 25px;
         margin-left: 7%;
