@@ -115,7 +115,7 @@ class RegionService {
      });
   }
 
-  
+
 }
 
 export default RegionService;
