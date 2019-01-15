@@ -22,6 +22,9 @@ import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
 import {verifyToken} from "./auth";
 
+let os = require('os');
+let hostname = os.hostname();
+
 type Request = express$Request;
 type Response = express$Response;
 
@@ -63,6 +66,8 @@ app.post('/api/uploads', upload.single('avatar'), (req, res) => {
     });
   }
 });
+
+app.get('/', (req: Request, res: Response) => res.sendFile(public_path + '/index.html'));
 
 app.post('/api/cases', upload.array('images', 3), Cases.createNewCase);
 
@@ -315,6 +320,10 @@ app.put('/api/categories/:category_id', (req: Request, res: Response) => {
 
 app.delete('/api/categories/:category_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, Category.delCategory);
+});
+
+app.get('/*', (req, res) => {
+  res.redirect('/');
 });
 
 // Hot reload application when not in production environment
