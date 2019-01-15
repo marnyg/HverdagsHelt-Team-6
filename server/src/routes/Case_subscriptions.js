@@ -1,6 +1,6 @@
 // @flow
 
-import { Case_subscriptions } from '../models';
+import { Case_subscriptions, sequelize } from '../models';
 import { verifyToken } from '../auth';
 
 type Request = express$Request;
@@ -27,6 +27,29 @@ module.exports = {
         user_id: req.params.user_id
       }
     }).then(cases => res.send(cases));
+  },
+  getAllCase_subscriptionCases: function(req: Request, res: Response) {
+    if (
+      !req.token ||
+      !req.params.user_id ||
+      typeof Number(req.params.user_id) !== 'number' ||
+      typeof req.token !== 'string'
+    )
+      return res.sendStatus(400);
+
+    let decoded_token = verifyToken(req.token);
+    let user_id_token = decoded_token.user_id;
+    let user_id_param = Number(req.params.user_id);
+
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+
+    return sequelize
+      .query(
+        'SELECT DISTINCT case_id, title, description, lat, lon, createdAt, updatedAt, region_id, user_id, category_id, status_id  FROM Case_subscriptions NATURAL JOIN Cases WHERE user_id = ?',
+        { replacements: [req.params.user_id] },
+        { type: sequelize.QueryTypes.SELECT }
+      )
+      .then(cases => res.send(cases[0]));
   },
   addCase_subscriptions: function(req: Request, res: Response) {
     if (
