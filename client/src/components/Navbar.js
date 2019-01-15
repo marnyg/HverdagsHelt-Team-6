@@ -13,7 +13,11 @@ import CaseSubscription from "../classes/CaseSubscription";
 
 class Navbar extends Component {
   logged_in = false;
+<<<<<<< HEAD
   notification_count = 1;
+=======
+  notification_count = 0;
+>>>>>>> master
   notifications = [];
   constructor() {
     super();
@@ -26,7 +30,7 @@ class Navbar extends Component {
     return (
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <NavLink to="/" className="navbar-brand">
-          HverdagsHelt
+          HverdagsHelt<span className="badge badge-primary mobile-notification">{this.notification_count > 0 ? this.notification_count:null}</span>
         </NavLink>
         <button
           className="navbar-toggler"
@@ -56,7 +60,11 @@ class Navbar extends Component {
             <li className="nav-item">
               {this.logged_in ? (
                 <NavLink to="/notifications" className="nav-link">
+<<<<<<< HEAD
                   Varsler <span className="badge badge-primary">{this.notification_count > 0 ? this.notification_count:null}</span>
+=======
+                  Varsler <span className="badge badge-primary fullbar-notification">{this.notification_count > 0 ? this.notification_count:null}</span>
+>>>>>>> master
                 </NavLink>
               ) : null}
             </li>
@@ -81,7 +89,11 @@ class Navbar extends Component {
 
   mounted() {
     // Check if user is logged in
+<<<<<<< HEAD
     console.log('Navbar mounted');
+=======
+    //console.log('Navbar mounted');
+>>>>>>> master
     let loginService = new LoginService();
     loginService.isLoggedIn()
         .then((logged_in: Boolean) => {
@@ -89,10 +101,18 @@ class Navbar extends Component {
           if(logged_in === true){
               // get notifications
               let subscriptionService = new CaseSubscriptionService();
+<<<<<<< HEAD
               subscriptionService.getAllCaseSubscriptions()
                   .then((cs: CaseSubscription[]) => {
                       for (let i = 0; i < cs.length; i++) {
                         if(cs[i].is_up_to_date === true){
+=======
+              let user = JSON.parse(localStorage.getItem('user'));
+              subscriptionService.getAllCaseSubscriptions(user.user_id)
+                  .then((cs: CaseSubscription[]) => {
+                      for (let i = 0; i < cs.length; i++) {
+                        if(cs[i].is_up_to_date === false){
+>>>>>>> master
                             this.notification_count++;
                         }
                       }

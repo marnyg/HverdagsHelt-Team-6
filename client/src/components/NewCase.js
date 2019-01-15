@@ -1,12 +1,14 @@
+//@flow
+
 import ReactDOM from 'react-dom';
 import * as React from 'react';
 import { Component } from 'react-simplified';
 import { NavLink, withRouter } from 'react-router-dom';
-import { CountyService } from '../services/CountyService';
-import { RegionService } from '../services/RegionService';
+import CountyService from '../services/CountyService';
+import CaseService from '../services/CaseService';
+import RegionService from '../services/RegionService';
 import CategoryService from '../services/CategoryService';
-import { CaseService } from '../services/CaseService';
-import Notify from './Notify';
+import Notify from './Notify.js';
 import LocationService from '../services/LocationService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons/index';
@@ -25,7 +27,9 @@ class NewCase extends Component {
   lastResortAddressLabel = null;
   lastResortPos = { lat: 59.9138688, lon: 10.752245399999993 }; // Last resort position OSLO
   pos = this.lastResortPos;
+  markerPos = this.lastResortPos;
   fileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+  isMapClickable = false
 
   constructor() {
     super();
@@ -45,8 +49,8 @@ class NewCase extends Component {
               >
                 <div className={'form-group'}>
                   <label htmlFor="category">Kategori</label>
-                  <select className={'form-control'} id={'category'} required>
-                    <option selected disabled>
+                  <select defaultValue={'.null'} className={'form-control'} id={'category'} required>
+                    <option value={'.null'} disabled>
                       Kategori
                     </option>
                     {this.categories.map(e => (
@@ -65,6 +69,7 @@ class NewCase extends Component {
                     type="text"
                     pattern="^.{2,255}$"
                     autoComplete="off"
+                    placeholder={'Gi saken din en beskrivende tittel'}
                     required
                   />
                 </div>
@@ -122,12 +127,13 @@ class NewCase extends Component {
                 </div>
                 <div className={'form-group ml-3 my-3'}>
                   <select
+                    defaultValue={'.null'}
                     className={'form-control mb-3'}
                     id={'last-resort-county'}
                     onChange={this.countyListener}
                     hidden
                   >
-                    <option selected disabled>
+                    <option value={'.null'} disabled>
                       Velg fylke
                     </option>
                     {this.counties.map(e => (
@@ -138,12 +144,13 @@ class NewCase extends Component {
                     ))}
                   </select>
                   <select
+                    defaultValue={'.null'}
                     className={'form-control mb-3'}
                     id={'last-resort-municipality'}
                     onChange={this.municipalityListener}
                     hidden
                   >
-                    <option selected disabled>
+                    <option value={'.null'} disabled>
                       Velg kommune
                     </option>
                     {this.municipalities.map(e => (
@@ -187,19 +194,23 @@ class NewCase extends Component {
               </div>
             </div>
             <div className="col-md-6 embed-responsive">
-              <GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.pos.lat, lng: this.pos.lon }} />
+              <GoogleApiWrapper
+                centerPos={{ lat: this.pos.lat, lng: this.pos.lon }}
+                updatePos={this.updatePos}
+                markerPos={{ lat: this.markerPos.lat, lng: this.markerPos.lon }}
+                isClickable={this.isMapClickable}
+              />
             </div>
           </div>
         </div>
         <div className="container my-5">
           <div className="row">
             {this.images.map(e => (
-              <div className="col-md-3">
+              <div key={e.src} className="col-md-3">
                 <div className="card">
                   <img src={e.src} alt={e.alt} className="card-img-top" />
                   <div className="card-img-overlay">
                     <button
-                      key={e.src}
                       className={'btn btn-danger img-overlay float-right align-text-bottom'}
                       onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
                     >
@@ -216,40 +227,53 @@ class NewCase extends Component {
   }
 
   mounted() {
-    // this.list1 = document.getElementById('last-resort-county');
-    // this.list2 = document.getElementById('last-resort-municipality');
-    // this.lastResortAddress = document.getElementById('last-resort-address');
-    // this.lastResortAddressLabel = document.getElementById('last-resort-address-label');
+    this.list1 = document.getElementById('last-resort-county');
+    this.list2 = document.getElementById('last-resort-municipality');
+    this.lastResortAddress = document.getElementById('last-resort-address');
+    this.lastResortAddressLabel = document.getElementById('last-resort-address-label');
+    let locationService = new LocationService();
+    locationService
+      .getLocation()
+      .then((location: Location) => {
+        this.pos = location;
+        this.markerPos = location;
+      })
+      .catch((error: Error) => {
+        console.log(error);
+        this.pos = this.lastResortPos;
+      });
 
     // Fetching logic
-    // console.log('Fetchng categories.');
-    // categoryService
-    //   .getAllCategories()
-    //   .then(e => (this.categories = e))
-    //   .then(e => console.log('Received ' + e.length + ' categories from server.'))
-    //   .catch((err: Error) => {
-    //     console.warn('FEIL!' + err.toString());
-    //     Notify.danger(
-    //       'Det oppstod en feil under lasting av kategorier. ' +
-    //         'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-    //         '\n\nFeilmelding: ' +
-    //         err.toString()
-    //     );
-    //   });
-    // console.log('Fetchng counties.');
-    // countyService
-    //   .getAllCounties()
-    //   .then(e => (this.counties = e))
-    //   .then(e => console.log('Received ' + e.length + ' counties from server.'))
-    //   .catch((err: Error) => {
-    //     console.warn('FEIL!' + err.toString());
-    //     Notify.danger(
-    //       'Det oppstod en feil under lasting av fylker. ' +
-    //         'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-    //         '\n\nFeilmelding: ' +
-    //         err.toString()
-    //     );
-    //   });
+    console.log('Fetchng categories.');
+    let cat = new CategoryService();
+    let cout = new CountyService();
+    cat
+      .getAllCategories()
+      .then(e => (this.categories = e))
+      .then(e => console.log('Received ' + e.length + ' categories from server.'))
+      .catch((err: Error) => {
+        console.warn('FEIL!' + err.toString());
+        Notify.danger(
+          'Det oppstod en feil under lasting av kategorier. ' +
+          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+          '\n\nFeilmelding: ' +
+          err.toString()
+        );
+      });
+    console.log('Fetchng counties.');
+    cout
+      .getAllCounties()
+      .then(e => (this.counties = e))
+      .then(e => console.log('Received ' + e.length + ' counties from server.'))
+      .catch((err: Error) => {
+        console.warn('FEIL!' + err.toString());
+        Notify.danger(
+          'Det oppstod en feil under lasting av fylker. ' +
+          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+          '\n\nFeilmelding: ' +
+          err.toString()
+        );
+      });
     console.log('Mounted!');
   }
 
@@ -270,42 +294,66 @@ class NewCase extends Component {
     }
   }
 
-  radioSelector(): Promise<number> {
-    let posSelector = this.form.querySelectorAll('input[name="pos"]');
-    let select = Array.from(posSelector).find(e => e.checked === true);
-    switch (select.value) {
-      case 'auto':
-        // Automatic location discovery
-        return 0;
-      case 'mapmarker':
-        // Map marker
-        return 1;
-      case 'last-resort-selection':
-        // Last resort list
-        return 2;
+  radioSelector() {
+    if (this.form) {
+      let posSelector: NodeList<HTMLElement> = this.form.querySelectorAll('input[name="pos"]');
+      let select = [...posSelector].find((e: HTMLElement) => e instanceof HTMLInputElement && e.checked === true);
+      let radioValue = null;
+      if (select instanceof HTMLInputElement) {
+        radioValue = select.value;
+        switch (radioValue) {
+          case 'auto':
+            // Automatic location discovery
+            return 0;
+          case 'mapmarker':
+            // Map marker
+            return 1;
+          case 'last-resort-selection':
+            // Last resort list
+            return 2;
+        }
+      } else {
+        return -1;
+      }
     }
   }
 
   radio1() {
     // Automatic location discovery
-    this.list1.hidden = true;
-    this.list2.hidden = true;
-    this.lastResortAddress.hidden = true;
-    this.lastResortAddressLabel.hidden = true;
-    // let gpos = LocationService.getLocartion();
+    if (this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
+      this.list1.hidden = true;
+      this.list2.hidden = true;
+      this.lastResortAddress.hidden = true;
+      this.lastResortAddressLabel.hidden = true;
+      this.isMapClickable = false;
+    }
+    let locator = new LocationService();
+    this.pos = locator.getLocation();
+    this.isMapClickable = false;
   }
 
   radio2() {
     // Map marker location discovery
-    this.list1.hidden = true;
-    this.list2.hidden = true;
-    this.lastResortAddress.hidden = true;
-    this.lastResortAddressLabel.hidden = true;
+    if (this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
+      this.list1.hidden = true;
+      this.list2.hidden = true;
+      this.lastResortAddress.hidden = true;
+      this.lastResortAddressLabel.hidden = true;
+      this.isMapClickable = true;
+    }
   }
 
   radio3() {
     // Last resort list location selection
-    if (this.list1 && this.list2 && this.lastResortAddress) {
+    if (
+      //gmap &&
+      this.list1 &&
+      this.list2 &&
+      this.lastResortAddress &&
+      this.lastResortAddressLabel &&
+      this.list1 instanceof HTMLSelectElement &&
+      this.list2 instanceof HTMLSelectElement
+    ) {
       if (this.list1.selectedIndex === 0) {
         this.list1.hidden = false;
       } else if (this.list2.selectedIndex === 0) {
@@ -317,6 +365,7 @@ class NewCase extends Component {
         this.lastResortAddress.hidden = false;
         this.lastResortAddressLabel.hidden = false;
       }
+      this.isMapClickable = false;
     } else {
       console.log('list1 eller list2 er null!');
     }
@@ -324,60 +373,73 @@ class NewCase extends Component {
 
   countyListener(event: SyntheticInputEvent<HTMLInputElement>) {
     console.log('Selecting county from drop-down list.');
-    let county = event.target;
-    console.log(
-      'Slected ' +
+    if (this.list2 && this.list2 instanceof HTMLSelectElement) {
+      let county = event.target;
+      console.log(
+        'Slected ' +
         county.options[county.selectedIndex].text +
         ' with id = ' +
         county.value +
         ' as county from drop-down list.'
-    );
-    this.list2.hidden = false;
-    this.fetchMunicipalities(county.value);
-    this.resetMunicipalityList();
-    console.log(this.list2.options[this.list2.selectedIndex].value);
+      );
+      this.list2.hidden = false;
+      this.fetchMunicipalities(county.value);
+      this.resetMunicipalityList();
+      console.log(this.list2.options[this.list2.selectedIndex].value);
+    }
   }
 
   municipalityListener(event: SyntheticInputEvent<HTMLInputElement>) {
     console.log('Selecting municipality from drop-down list.');
-    let muni = event.target;
-    let obj = this.municipalities.find(e => e.region_id === parseInt(muni.value));
-    console.log(
-      'Slected ' +
-        muni.options[muni.selectedIndex].text +
-        ' with id = ' +
-        muni.value +
-        ' as municipality from drop-down list.'
-    );
-    this.lastResortAddress.hidden = false;
-    this.lastResortAddressLabel.hidden = false;
-    this.pos = { lat: obj.lat, lon: obj.lon };
+    if (this.lastResortAddress && this.lastResortAddressLabel) {
+      let muni = event.target;
+      let obj = this.municipalities.find(e => e.region_id === parseInt(muni.value));
+      if (muni instanceof HTMLSelectElement) {
+        console.log(
+          'Slected ' +
+          muni.options[muni.selectedIndex].text +
+          ' with id = ' +
+          muni.value +
+          ' as municipality from drop-down list.'
+        );
+      }
+      this.lastResortAddress.hidden = false;
+      this.lastResortAddressLabel.hidden = false;
+      if (obj) {
+        this.pos = { lat: obj.lat, lon: obj.lon };
+      }
+    }
   }
 
   fetchMunicipalities(county_id: number) {
-    console.log(
-      'Fetching municipalities for county: ' +
+    if (this.list1 && this.list1 instanceof HTMLSelectElement) {
+      console.log(
+        'Fetching municipalities for county: ' +
         this.list1.options[this.list1.selectedIndex].text +
         ' (county_id = ' +
         county_id +
         ').'
-    );
-    // Fetching logic here
-    // regionService
-    //   .getAllRegionGivenCounty(county_id)
-    //   .then(e => (this.municipalities = e))
-    //   .then(e => console.log('Received ' + e.length + ' municipalities from server.'))
-    //   .catch((err: Error) => {
-    //     console.warn(err.toString());
-    //     Notify.danger(
-    //       'Det oppstod en feil under lasting av kommuner fra fylke ' +
-    //         this.list1.options[this.list1.selectedIndex].text +
-    //         '. ' +
-    //         'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-    //         '\n\nFeilmelding: ' +
-    //         err.toString()
-    //     );
-    //   });
+      );
+      // Fetching logic here
+      let reg = new RegionService();
+      reg
+        .getAllRegionGivenCounty(county_id)
+        .then(e => (this.municipalities = e))
+        .then(e => console.log('Received ' + e.length + ' municipalities from server.'))
+        .catch((err: Error) => {
+          console.warn(err.toString());
+          if (this.list1 instanceof HTMLSelectElement) {
+            Notify.danger(
+              'Det oppstod en feil under lasting av kommuner fra fylke ' +
+              this.list1.options[this.list1.selectedIndex].text +
+              '. ' +
+              'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+              '\n\nFeilmelding: ' +
+              err.toString()
+            );
+          }
+        });
+    }
   }
 
   resetMunicipalityList() {
@@ -418,52 +480,67 @@ class NewCase extends Component {
   }
 
   validate(index: number) {
-    switch (index) {
-      case 0:
-        // Validate automatic position
-        return true;
-      case 1:
-        // Validate map marker position
-        return true;
-      case 2:
-        // Validate last resort list selection
-        if (this.list1.selectedIndex !== 0 && this.list2.selectedIndex !== 0) {
+    if (
+      this.list1 &&
+      this.list1 instanceof HTMLSelectElement &&
+      this.list2 &&
+      this.list2 instanceof HTMLSelectElement
+    ) {
+      switch (index) {
+        case 0:
+          // Validate automatic position
           return true;
-        } else {
-          Notify.danger('Vennligst velg et fylke og en kommune hvor saken finner sted og prøv igjen.');
-          console.warn('County or municipality has not been set.');
-          return false;
-        }
+        case 1:
+          // Validate map marker position
+          return true;
+        case 2:
+          // Validate last resort list selection
+          if (this.list1.selectedIndex !== 0 && this.list2.selectedIndex !== 0) {
+            return true;
+          } else {
+            Notify.danger('Vennligst velg et fylke og en kommune hvor saken finner sted og prøv igjen.');
+            console.warn('County or municipality has not been set.');
+            return false;
+          }
+      }
     }
   }
 
   submit() {
-    console.log('Validating form input.');
-    if (this.form.checkValidity() && this.pos) {
-      // Basic Built-in HTML5 form validation succeeded. Proceeding to validate using JavaScript.
-      let index = this.radioSelector();
-      let region_id = null;
-      if (this.validate(index)) {
-        switch (index) {
-          case 0:
-            // Automatic location discovery
-            console.log(
-              'Using automatic location discovery using IP-address and GPS if available to determine position.'
-            );
-            break;
-          case 1:
-            // Map marker
-            console.log('Using a map marker to determine position.');
-            if (this.pos != null) {
-            } else {
-              Notify.warning('Vennligst trykk på en kommune på kartet hvor saken finner sted og prøv igjen.');
-            }
-            break;
-          case 2:
-            // Last resort list
-            console.log('Using list selection to determine position.');
-            console.log(
-              'Selected options are county = ' +
+    if (this.form != null) {
+      console.log('Validating form input.');
+      if (this.form.checkValidity() && this.pos) {
+        // Basic Built-in HTML5 form validation succeeded. Proceeding to validate using JavaScript.
+        let index = this.radioSelector();
+        let region_id = null;
+        if (
+          this.validate(index) &&
+          this.list1 &&
+          this.list2 &&
+          this.list1 instanceof HTMLSelectElement &&
+          this.list2 instanceof HTMLSelectElement &&
+          this.lastResortAddress instanceof HTMLInputElement
+        ) {
+          switch (index) {
+            case 0:
+              // Automatic location discovery
+              console.log(
+                'Using automatic location discovery using IP-address and GPS if available to determine position.'
+              );
+              break;
+            case 1:
+              // Map marker
+              console.log('Using a map marker to determine position.');
+              if (this.pos != null) {
+              } else {
+                Notify.warning('Vennligst trykk på en kommune på kartet hvor saken finner sted og prøv igjen.');
+              }
+              break;
+            case 2:
+              // Last resort list
+              console.log('Using list selection to determine position.');
+              console.log(
+                'Selected options are county = ' +
                 this.counties[this.list1.selectedIndex - 1].name +
                 ' with id = ' +
                 this.counties[this.list1.selectedIndex - 1].county_id +
@@ -474,62 +551,66 @@ class NewCase extends Component {
                 '. Custom message is: "' +
                 this.lastResortAddress.value +
                 '".'
-            );
-            this.pos = {
-              lat: this.municipalities[this.list2.selectedIndex - 1].lat,
-              lon: this.municipalities[this.list2.selectedIndex - 1].lon
-            };
-            region_id = this.municipalities[this.list2.selectedIndex - 1].region_id;
-            break;
+              );
+              this.pos = {
+                lat: this.municipalities[this.list2.selectedIndex - 1].lat,
+                lon: this.municipalities[this.list2.selectedIndex - 1].lon
+              };
+              region_id = this.municipalities[this.list2.selectedIndex - 1].region_id;
+              break;
+          }
+          let user_id = JSON.parse(localStorage.getItem('user')).user_id;
+          let newcase = new Case(
+            null,
+            region_id,
+            user_id,
+            this.categories[this.form.querySelector('#category').selectedIndex - 1].category_id,
+            null,
+            this.form.querySelector('#title').value,
+            this.form.querySelector('#description').value,
+            null,
+            null,
+            this.pos.lat,
+            this.pos.lon
+          );
+          this.send(newcase);
+        } else {
+          console.log('Secondary validation failed.');
         }
-        let user_id = null;
-        let newcase = new Case(
-          null,
-          region_id,
-          user_id,
-          this.categories[this.form.querySelector('#category').selectedIndex - 1].category_id,
-          null,
-          this.form.querySelector('#title').value,
-          this.form.querySelector('#description').value,
-          null,
-          null,
-          this.pos.lat,
-          this.pos.lon
-        );
-        this.send(newcase);
       } else {
-        console.log('Secondary validation failed.');
+        // Basic built-in HTML5 form validation failed. Cannot send form data.
+        console.log('Failed basic validation.');
+        Notify.warning('Vennligst fyll inn de pålagte feltene i skjemaet og prøv igjen.');
       }
-    } else {
-      // Basic built-in HTML5 form validation failed. Cannot send form data.
-      console.log('Failed basic validation.');
-      Notify.warning('Vennligst fyll inn de pålagte feltene i skjemaet og prøv igjen.');
     }
   }
 
   send(obj: Case) {
     console.log('Sending form data to server.');
     console.log('Case is ' + JSON.stringify(obj));
-    // caseService
-    //   .createCase(obj)
-    //   .then(e => {
-    //     Notify.success('Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id);
-    //     console.log('Form data transmission success! Case ID: ' + e.case_id);
-    //     this.props.history.push('/');
-    //   })
-    //   .catch((err: Error) => {
-    //     Notify.danger(
-    //       'Det oppstod en feil ved sending av saken til oss. Sørg for at alle felter er fyllt ut korrekt. ' +
-    //         'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
-    //         err.message
-    //     );
-    //     console.warn('Error while transmitting form data to server with error message: ' + err.message);
-    //   });
+    let cas = new CaseService();
+    cas
+      .createCase(obj, this.images)
+      .then(e => {
+        Notify.success('Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id);
+        console.log('Form data transmission success! Case ID: ' + e.case_id);
+        this.props.history.push('/'); // Placeholder
+        //this.props.history.push('/case/' + e.case_id);
+      })
+      .catch((err: Error) => {
+        Notify.danger(
+          'Det oppstod en feil ved sending av saken til oss. Sørg for at alle felter er fyllt ut korrekt. ' +
+          'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
+          err.message
+        );
+        console.warn('Error while transmitting form data to server with error message: ' + err.message);
+      });
   }
 
   updatePos(newPos) {
-    this.pos = newPos;
-    console.log('got pos from map:', this.pos);
+    this.markerPos = { lat: newPos.lat, lon: newPos.lon };
+    console.log(newPos);
+    console.log('got pos from map:', this.markerPos);
   }
 }
 

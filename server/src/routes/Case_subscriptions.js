@@ -1,6 +1,6 @@
 // @flow
 
-import { Case_subscriptions } from '../models';
+import { Case_subscriptions, sequelize } from '../models';
 import { verifyToken } from '../auth';
 
 type Request = express$Request;
@@ -27,6 +27,42 @@ module.exports = {
         user_id: req.params.user_id
       }
     }).then(cases => res.send(cases));
+  },
+  getAllCase_subscriptionCases: function(req: Request, res: Response) {
+    if (
+      !req.token ||
+      !req.params.user_id ||
+      typeof Number(req.params.user_id) !== 'number' ||
+      typeof req.token !== 'string'
+    )
+      return res.sendStatus(400);
+
+    let decoded_token = verifyToken(req.token);
+    let user_id_token = decoded_token.user_id;
+    let user_id_param = Number(req.params.user_id);
+
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+
+    return sequelize
+      .query(
+        'Select distinct c.case_id, c.title, c.description, c.lat, c.lon, c.user_id, ' +
+          "CONCAT(u.firstname, ' ', u.lastname) as createdBy, u.tlf, u.email, " +
+          'co.county_id, co.name AS county_name, ' +
+          'c.region_id, r.name as region_name, ' +
+          'c.status_id, s.name as status_name, ' +
+          'c.category_id, cg.name as category_name, ' +
+          'c.createdAt, c.updatedAt ' +
+          'FROM Case_subscriptions csubs NATURAL JOIN Cases c ' +
+          'JOIN Regions r ON c.region_id = r.region_id ' +
+          'Join Counties co ON r.county_id = co.county_id ' +
+          'JOIN Users u ON c.user_id = u.user_id ' +
+          'JOIN Statuses s ON c.status_id = s.status_id ' +
+          'JOIN Categories cg ON c.category_id = cg.category_id ' +
+          'WHERE csubs.user_id = ?',
+        { replacements: [req.params.user_id] },
+        { type: sequelize.QueryTypes.SELECT }
+      )
+      .then(cases => res.send(cases[0]));
   },
   addCase_subscriptions: function(req: Request, res: Response) {
     if (
@@ -80,16 +116,17 @@ module.exports = {
     ).then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)));
   },
   delCase_subscriptions: function(req: Request, res: Response) {
-    if (!req.token || !req.body.user_id || typeof req.token !== 'string') return res.sendStatus(400);
+    if (!req.token || typeof Number(req.params.user_id) !== 'number' || typeof req.token !== 'string')
+      return res.sendStatus(400);
 
     let decoded_token = verifyToken(req.token);
     let user_id_token = decoded_token.user_id;
-    let user_id_param = req.body.user_id;
+    let user_id_param = Number(req.params.user_id);
 
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
 
     return Case_subscriptions.destroy({
-      where: { case_id: Number(req.params.case_id), user_id: Number(req.body.user_id) }
+      where: { case_id: Number(req.params.case_id), user_id: Number(req.params.user_id) }
     }).then(cases => (cases ? res.send() : res.status(500).send()));
   }
 };

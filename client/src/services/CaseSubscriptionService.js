@@ -32,7 +32,7 @@ class CaseSubscriptionService {
   }
 
   //Delete subscription, given case
-  deleteCaseSubscription(case_id: number): Promise<any> {
+  deleteCaseSubscription(case_id: number, user_id: number): Promise<any> {
       return new Promise((resolve, reject) => {
           let loginService = new LoginService();
           loginService.isLoggedIn()
@@ -40,7 +40,10 @@ class CaseSubscriptionService {
                   if(logged_in === true){
                       let token = localStorage.getItem('token');
                       ///api/cases/:case_id/subscribe
-                      axios.delete('/api/cases/' + case_id + '/subscribe', {}, {
+                      console.log('/api/cases/' + case_id + '/subscribe');
+                      console.log('user_id:', user_id);
+                      console.log('token:', token);
+                      axios.delete('/api/cases/' + case_id + '/subscribe/' + user_id, {
                           headers: {
                               Authorization: 'Bearer ' + token
                           }
@@ -64,12 +67,16 @@ class CaseSubscriptionService {
                   if(logged_in === true){
                       let token = localStorage.getItem('token');
                       //'/api/cases/:case_id/subscribe'
+                      console.log('/api/cases/' + subscription.case_id + '/subscribe');
                       axios.post('/api/cases/' + subscription.case_id + '/subscribe', subscription, {
                           headers: {
                               Authorization: 'Bearer ' + token
                           }
                       })
-                          .then(response => resolve(response))
+                          .then(response => {
+                              console.log('Response got:', response);
+                              resolve(response);
+                          })
                           .catch((error: Error) => reject(error));
                   } else {
                       reject('User is not logged in');

@@ -13,7 +13,11 @@ class LoginService {
                   }
               })
                   .then((response) => {
+<<<<<<< HEAD
                       console.log('LoginService received this on verify:', response);
+=======
+                      //console.log('LoginService received this on verify:', response);
+>>>>>>> master
                       if(response === "OK"){
                           resolve(true);
                       } else {

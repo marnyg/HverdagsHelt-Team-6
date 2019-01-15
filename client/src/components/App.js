@@ -11,16 +11,17 @@ import '../styles/simple-sidebar.css';
 import Notify from './Notify.js';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell } from '@fortawesome/free-solid-svg-icons';
-library.add(faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell);
+import { faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell } from '@fortawesome/free-solid-svg-icons';
+library.add(faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell);
 
 import Navbar from './Navbar.js';
 import Content from './Content.js';
 import Footer from './Footer.js';
 import MyPage from './MyPage.js';
+import ViewCase from './ViewCase.js';
+import CaseList from './CaseList.js';
 import NewCase from './NewCase.js';
-import MyCases from './MyCases.js';
-import Subscription from './Subscriptions.js';
+import MyCases from './CaseList.js';
 import axios from 'axios';
 
 axios.interceptors.response.use(response => response.data);
@@ -38,7 +39,6 @@ class App extends Component {
             <Route exact path="/new-case" render={() => <Subscription />} />
             <Route exact path="/search/:query" component={Content} />
           </div>
-          {/*<Subscription />*/}
           <Footer />
         </div>
       </BrowserRouter>

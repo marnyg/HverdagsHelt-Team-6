@@ -17,10 +17,18 @@ import County from './routes/Counties.js';
 import Role from './routes/Roles.js';
 import Status from './routes/Statuses.js';
 import Case_subscription from './routes/Case_subscriptions.js';
+<<<<<<< HEAD
 import { Case, Status_comment, Picture } from './models.js';
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
 import {verifyToken} from "./auth";
+=======
+import Status_comment from './routes/Status_comments.js';
+import { Case } from './models.js';
+import type { Model } from 'sequelize';
+import Sequelize from 'sequelize';
+import { verifyToken } from './auth';
+>>>>>>> master
 
 let os = require('os');
 let hostname = os.hostname();
@@ -38,12 +46,17 @@ app.use(bearerToken()); // For easy access to token sent in 'Authorization' head
 
 const storage = multer.diskStorage({
   destination: public_path + '/' + 'uploads',
+<<<<<<< HEAD
   filename: function (req, file, callback) {
+=======
+  filename: function(req, file, callback) {
+>>>>>>> master
     crypto.pseudoRandomBytes(16, (err, raw) => {
       console.log('crypto firing!!!');
       if (err) return callback(err);
       console.log(file.originalname);
       callback(null, raw.toString('hex') + path.extname(file.originalname));
+<<<<<<< HEAD
 
     })
   }
@@ -76,6 +89,37 @@ app.get('/api/cases', (req: Request, res: Response) => {
 });
 
 app.post('/api/verify', (req, res) => {
+=======
+    });
+  }
+});
+
+let upload = multer({ storage: storage });
+
+app.post('/api/uploads', upload.single('avatar'), (req, res) => {
+  if (!req.file) {
+    console.log('No file received');
+    return res.send({
+      success: false
+    });
+  } else {
+    console.log('file received');
+    console.log(req.files);
+    console.log(req.body.alt);
+    return res.send({
+      success: true
+    });
+  }
+});
+
+app.get('/', (req: Request, res: Response) => res.sendFile(public_path + '/index.html'));
+
+app.post('/api/cases', upload.array('images', 3), Cases.createNewCase);
+
+app.get('/api/cases', (req: Request, res: Response) => Cases.getAllCases(req, res));
+
+app.post('/api/verify', (req: Request, res: Response) => {
+>>>>>>> master
   reqAccessLevel(req, res, 4, (req, res) => {
     console.log('------Token Verified!-------');
     return res.sendStatus(200);
@@ -93,40 +137,28 @@ app.post('/api/logout', (req: Request, res: Response) => {
 app.get('/api/cases/:case_id', (req: Request, res: Response) => Cases.getOneCase(req, res));
 
 app.get('/api/cases/user_cases/:user_id', (req: Request, res: Response) => {
-  return Case.findAll({
-    where: {
-      user_id: req.params.user_id
-    },
-    order: [['createdAt', 'DESC']] //Order by updatedAt????
-  }).then(cases => res.send(cases));
+  reqAccessLevel(req, res, 4, Cases.getAllCasesForUser);
 });
 
 app.get('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
-  return Status_comment.findAll({
-    where: {
-      case_id: req.params.case_id
-    },
-    order: [['updatedAt', 'DESC']] //Order by updatedAt????
-  }).then(comments => res.send(comments));
+  Status_comment.getAllStatus_comment(req, res);
 });
 
 app.post('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
-  if (
-    !req.body ||
-    typeof req.body.user_id !== 'number' ||
-    typeof req.body.comment !== 'string' ||
-    typeof req.body.status_id !== 'number'
-  )
-    return res.sendStatus(400);
-
-  return Status_comment.create({
-    comment: req.body.comment,
-    case_id: Number(req.params.case_id),
-    status_id: req.body.status_id,
-    user_id: req.body.user_id
-  }).then(comment => (comment ? res.send(comment) : res.sendStatus(404)));
+  reqAccessLevel(req, res, 2, Status_comment.addStatus_comment);
 });
 
+app.put('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Status_comment.updateStatus_comment);
+});
+
+<<<<<<< HEAD
+=======
+app.delete('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Status_comment.delStatus_comment);
+});
+
+>>>>>>> master
 app.put('/api/cases/:case_id', (req: Request, res: Response) => {
   if (
     !req.body ||
@@ -166,19 +198,26 @@ app.get('/api/cases/subscriptions/:user_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptions);
 });
 
+app.get('/api/cases/subscriptions/:user_id/cases', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptionCases);
+});
+
 app.post('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
+  console.log(req.body);
   reqAccessLevel(req, res, 4, Case_subscription.addCase_subscriptions);
 });
 
 app.put('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
+  console.log(req.body);
   reqAccessLevel(req, res, 4, Case_subscription.updateCase_subscriptions);
 });
 
-app.delete('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
+app.delete('/api/cases/:case_id/subscribe/:user_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Case_subscription.delCase_subscriptions);
 });
 
 app.get('/api/cases/region_cases/:county_name/:region_name', async (req: Request, res: Response) => {
+<<<<<<< HEAD
   let region = await Region.getOneRegionByNameAndCounty(req, res);
   let regionId = region ? region : res.sendStatus(404);
   let cases = await Case.findAll({ where: { region_id: Number(regionId.region_id) }, order: [['updatedAt', 'DESC']] });
@@ -188,6 +227,13 @@ app.get('/api/cases/region_cases/:county_name/:region_name', async (req: Request
     return c;
   });
   return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+=======
+  return Cases.getAllCasesInRegionByName(req, res);
+});
+
+app.get('/api/cases/region_cases/:region_id', async (req: Request, res: Response) => {
+  return Cases.getAllCasesInRegionById(req, res);
+>>>>>>> master
 });
 
 app.get('/api/statuses', (req: Request, res: Response) => {
@@ -227,6 +273,7 @@ app.get('/api/users', (req: Request, res: Response) => {
 });
 
 app.post('/api/users', (req: Request, res: Response) => {
+  console.log(req.body);
   Users.createUser(req, res);
 });
 
@@ -244,6 +291,13 @@ app.delete('/api/users/:user_id', (req: Request, res: Response) => {
 
 app.put('/api/users/:user_id/password', async (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Users.changePassword);
+<<<<<<< HEAD
+=======
+});
+
+app.get('/api/users/:user_id/region_subscriptions', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Users.getRegionSubscriptionsForUser);
+>>>>>>> master
 });
 
 app.get('/api/counties', (req: Request, res: Response) => {
@@ -291,6 +345,7 @@ app.get('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
 });
 
 app.post('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
+  console.log(req.body);
   reqAccessLevel(req, res, 4, Region_subscriptions.addRegion_subscriptions);
 });
 

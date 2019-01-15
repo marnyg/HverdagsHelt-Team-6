@@ -19,8 +19,13 @@ class MyProfile extends Component<{}, { isEditing: boolean }> {
   }
 
   mounted() {
+<<<<<<< HEAD
     // this.us.getUser(1).then(res => this.user=new User(..........................));
     this.user = new User(1, 1, 1, 'ola', 'norman', '123', 'a@b.c', '1');
+=======
+    let a = localStorage.getItem("user")
+    this.user = JSON.parse(a)
+>>>>>>> master
   }
 
   changToEditVersion(event, arg: boolean) {
@@ -107,11 +112,20 @@ class MyProfile extends Component<{}, { isEditing: boolean }> {
     let children = Array.prototype.slice.call(form.children, 0);
 
     if (this.arePasswordsEqual(children) && form.checkValidity()) {
+<<<<<<< HEAD
       console.log('form is valid, this is where you send the data to te server');
       console.log('you also get the newest profile data from the server');
 
       this.setState({ isEditing: false }); //shuld be false
       console.log(this.state);
+=======
+
+      this.us.updateUser(this.user.user_id, this.user)
+        .then(() => {
+          localStorage.setItem("user", JSON.stringify(this.user))
+        }).catch(() => console.log("ERROR"))
+      this.setState({ isEditing: false }); //shuld be false
+>>>>>>> master
     } else {
       if (this.arePasswordsEqual(children)) {
         let passwordInputs = children.filter(e => e.id.includes('password'));
@@ -119,6 +133,11 @@ class MyProfile extends Component<{}, { isEditing: boolean }> {
       }
       form.reportValidity();
     }
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> master
   }
 
   arePasswordsEqual(children: Array<HTMLInputElement>) {

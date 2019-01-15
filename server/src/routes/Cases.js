@@ -4,7 +4,44 @@ import { Case, sequelize } from '../models.js';
 import { reqAccessLevel, verifyToken } from '../auth';
 import { Picture } from '../models';
 
+<<<<<<< HEAD
 module.exports = {
+=======
+type Request = express$Request;
+type Response = express$Response;
+
+let rawQueryCases =
+  'Select c.case_id, c.title, c.description, c.lat, c.lon, c.user_id, ' +
+  "CONCAT(u.firstname, ' ', u.lastname) as createdBy, u.tlf, u.email, " +
+  'co.county_id, co.name AS county_name, ' +
+  'c.region_id, r.name as region_name, ' +
+  'c.status_id, s.name as status_name, ' +
+  'c.category_id, cg.name as category_name, ' +
+  'c.createdAt, c.updatedAt ' +
+  'FROM Cases c JOIN Regions r ON c.region_id = r.region_id ' +
+  'Join Counties co ON r.county_id = co.county_id ' +
+  'JOIN Users u ON c.user_id = u.user_id ' +
+  'JOIN Statuses s ON c.status_id = s.status_id ' +
+  'JOIN Categories cg ON c.category_id = cg.category_id';
+
+module.exports = {
+  getAllCases: async function(req: Request, res: Response) {
+    sequelize
+      .query(rawQueryCases, { type: sequelize.QueryTypes.SELECT })
+      .then(async cases => {
+        const out = cases.map(async c => {
+          let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+          c.img = pictures.map(img => img.path);
+          return c;
+        });
+        return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+      })
+      .catch(err => {
+        return res.status(500).send(err);
+      });
+  },
+
+>>>>>>> master
   createNewCase: function(req: Request, res: Response) {
     reqAccessLevel(req, res, 4, () => true);
     if (!req.files) {
@@ -66,7 +103,11 @@ module.exports = {
               });
         })
         .catch(error => {
+<<<<<<< HEAD
           return res.status(400).send(error);
+=======
+          return res.status(500).send(error);
+>>>>>>> master
         });
     }
   },
@@ -82,6 +123,7 @@ module.exports = {
     })
     */
     sequelize
+<<<<<<< HEAD
       .query(
         'Select c.case_id, c.title, c.description, c.lat, c.lon, r.name as region_name, s.name as status_name, ' +
           "CONCAT(u.firstname, ' ', u.lastname) as createdBy, c.createdAt, c.updatedAt " +
@@ -99,5 +141,91 @@ module.exports = {
         data['images'] = images;
         return res.send(data);
       })
+=======
+      .query(rawQueryCases + ' WHERE c.case_id = ?;', {
+        replacements: [req.params.case_id],
+        type: sequelize.QueryTypes.SELECT
+      })
+      .then(async result => {
+        let pictures = await Picture.findAll({ where: { case_id: req.params.case_id } });
+        result[0].img = pictures.map(img => img.path);
+        return result ? res.send(result) : res.sendStatus(404);
+      })
+      .catch(err => {
+        return res.status(500).send(err);
+      });
+  },
+  getAllCasesInRegionByName: async function(req: Request, res: Response) {
+    if (!req.params || typeof req.params.county_name != 'string' || typeof req.params.region_name != 'string')
+      return res.sendStatus(400);
+
+    return sequelize
+      .query(rawQueryCases + ' WHERE r.name = ? AND co.name = ?;', {
+        replacements: [req.params.region_name, req.params.county_name],
+        type: sequelize.QueryTypes.SELECT
+      })
+      .then(async cases => {
+        const out = cases.map(async c => {
+          let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+          c.img = pictures.map(img => img.path);
+          return c;
+        });
+        return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+      })
+      .catch(err => {
+        return res.status(500).send(err);
+      });
+  },
+  getAllCasesInRegionById: async function(req: Request, res: Response) {
+    if (!req.params || typeof Number(req.params.region_id) != 'number') return res.sendStatus(400);
+    sequelize
+      .query(rawQueryCases + ' WHERE c.region_id = ?;', {
+        replacements: [Number(req.params.region_id)],
+        type: sequelize.QueryTypes.SELECT
+      })
+      .then(async cases => {
+        const out = cases.map(async c => {
+          let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+          c.img = pictures.map(img => img.path);
+          return c;
+        });
+        return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+      })
+      .catch(err => {
+        return res.status(500).send(err);
+      });
+  },
+  getAllCasesForUser: async function(req: Request, res: Response) {
+    if (
+      !req.token ||
+      !req.params.user_id ||
+      typeof Number(req.params.user_id) !== 'number' ||
+      typeof req.token !== 'string'
+    )
+      return res.sendStatus(400);
+
+    let decoded_token = verifyToken(req.token);
+    let user_id_token = decoded_token.user_id;
+    let user_id_param = Number(req.params.user_id);
+
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+
+    sequelize
+      .query(rawQueryCases + ' WHERE c.user_id = ?;', {
+        replacements: [Number(req.params.user_id)],
+        type: sequelize.QueryTypes.SELECT
+      })
+      .then(async cases => {
+        const out = cases.map(async c => {
+          let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+          c.img = pictures.map(img => img.path);
+          return c;
+        });
+        return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+      })
+      .catch(err => {
+        return res.status(500).send(err);
+      });
+>>>>>>> master
   }
 };
