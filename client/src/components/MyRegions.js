@@ -33,7 +33,7 @@ class MyProfile extends Component<{}, { isEditing: boolean }> {
             <ul>
                 {listItems.map(e => {
                     return <li id={e.region_id}>{e.name}
-                        <input type="checkbox" id="notify"></input>
+                        <p>Notify me<input type="checkbox" id="notify"></input></p>
                         <button onClick={this.handleDelete}>remove</button>
                     </li>
                 })}
