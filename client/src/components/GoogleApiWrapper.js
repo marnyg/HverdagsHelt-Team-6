@@ -26,7 +26,8 @@ export class GoogleMapsContainer extends Component {
         zoom={14}
         initialCenter={this.props.centerPos}
         disableDefaultUI={true}
-        draggable={false}
+        // draggable={false}
+        panControl={false}
       >
         {/* <SearchBox
           controlPosition={google.maps.ControlPosition.TOP_LEFT}
