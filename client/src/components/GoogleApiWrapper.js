@@ -6,6 +6,7 @@ export class GoogleMapsContainer extends Component {
   onClick(t, map, coord) {
     const latLng = { lat: coord.latLng.lat(), lon: coord.latLng.lng() };
     this.props.updatePos(latLng);
+
   }
 
   componentDidUpdate(prevProps) {
@@ -13,7 +14,11 @@ export class GoogleMapsContainer extends Component {
       this.gmap.setCenter(this.props.centerPos);
       this.marker.setPosition(this.props.centerPos)
     }
+    this.gmap.draggable = this.props.isClickable
+    this.gmap.onClick = this.props.isClickable ? (t, map, coord) => this.onClick(t, map, coord) : null;
   }
+
+
 
   render() {
     return (
@@ -22,11 +27,11 @@ export class GoogleMapsContainer extends Component {
         item
         xs={12}
         google={this.props.google}
-        onClick={this.onClick}
+        onClick={this.props.isClickable ? (t, map, coord) => this.onClick(t, map, coord) : null}
         zoom={14}
         initialCenter={this.props.centerPos}
         disableDefaultUI={true}
-        draggable={false}
+        draggable={this.props.isClickable}
       >
         {/* <SearchBox
           controlPosition={google.maps.ControlPosition.TOP_LEFT}
