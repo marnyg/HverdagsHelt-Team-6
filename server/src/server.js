@@ -18,7 +18,7 @@ import Role from './routes/Roles.js';
 import Status from './routes/Statuses.js';
 import Case_subscription from './routes/Case_subscriptions.js';
 import Status_comment from './routes/Status_comments.js';
-import { Case, Picture, Statuses, Categories } from './models.js';
+import { Case, Picture } from './models.js';
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
 import {verifyToken} from "./auth";
@@ -72,12 +72,10 @@ app.get('/', (req: Request, res: Response) => res.sendFile(public_path + '/index
 
 app.post('/api/cases', upload.array('images', 3), Cases.createNewCase);
 
-app.get('/api/cases', (req: Request, res: Response) => {
-  return Case.getAllCases(req,res);
-});
+app.get('/api/cases', (req: Request, res: Response) => Cases.getAllCases(req, res));
 
 app.post('/api/verify', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, (req, res) => {
+  reqAccessLevel(req, res, 4, (req, res) => {
     console.log('------Token Verified!-------');
     return res.sendStatus(200);
   });
@@ -94,12 +92,7 @@ app.post('/api/logout', (req: Request, res: Response) => {
 app.get('/api/cases/:case_id', (req: Request, res: Response) => Cases.getOneCase(req, res));
 
 app.get('/api/cases/user_cases/:user_id', (req: Request, res: Response) => {
-  return Case.findAll({
-    where: {
-      user_id: req.params.user_id
-    },
-    order: [['createdAt', 'DESC']] //Order by updatedAt????
-  }).then(cases => res.send(cases));
+  reqAccessLevel(req, res, 4, Cases.getAllCasesForUser);
 });
 
 app.get('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
@@ -174,15 +167,11 @@ app.delete('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
 });
 
 app.get('/api/cases/region_cases/:county_name/:region_name', async (req: Request, res: Response) => {
-  let region = await Region.getOneRegionByNameAndCounty(req, res);
-  let regionId = region ? region : res.sendStatus(404);
-  let cases = await Case.findAll({ where: { region_id: Number(regionId.region_id) }, order: [['updatedAt', 'DESC']] });
-  cases = cases.map(c => c.toJSON());
-  const out = cases.map(async c => {
-    c.img = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
-    return c;
-  });
-  return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+  return Cases.getAllCasesInRegionByName(req,res);
+});
+
+app.get('/api/cases/region_cases/:region_id', async (req: Request, res: Response) => {
+  return Cases.getAllCasesInRegionById(req,res);
 });
 
 app.get('/api/statuses', (req: Request, res: Response) => {
@@ -222,6 +211,7 @@ app.get('/api/users', (req: Request, res: Response) => {
 });
 
 app.post('/api/users', (req: Request, res: Response) => {
+  console.log(req.body);
   Users.createUser(req, res);
 });
 
