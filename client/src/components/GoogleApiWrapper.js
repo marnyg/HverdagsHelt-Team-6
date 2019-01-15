@@ -11,7 +11,7 @@ export class GoogleMapsContainer extends Component {
   componentDidUpdate(prevProps) {
     console.log(this.props);
 
-    if (prevProps.params.centerPos !== this.props.params.centerPos) {
+    if (prevProps.centerPos !== this.props.centerPos) {
       this.gmap.setCenter(this.props.centerPos);
       this.marker.setPosition(this.props.centerPos)
     }
