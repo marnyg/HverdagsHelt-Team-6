@@ -3,11 +3,34 @@
 import { Case, sequelize } from '../models.js';
 import { reqAccessLevel, verifyToken } from '../auth';
 import { Category, Picture, Status, Region } from '../models';
+import Regions from './Regions';
 
 type Request = express$Request;
 type Response = express$Response;
 
 module.exports = {
+  getAllCases: async function(req: Request, res: Response) {
+    sequelize
+      .query(
+        'Select c.case_id, c.title, c.description, c.lat, c.lon, r.name as region_name, s.name as status_name, cg.name as category_name, ' +
+          "CONCAT(u.firstname, ' ', u.lastname) as createdBy, c.createdAt, c.updatedAt " +
+          'FROM Cases c JOIN Regions r ON c.region_id = r.region_id ' +
+          'JOIN Users u ON c.user_id = u.user_id ' +
+          'JOIN Statuses s ON c.status_id = s.status_id ' +
+          'JOIN Categories cg ON c.category_id = cg.category_id',
+        { type: sequelize.QueryTypes.SELECT }
+      )
+      .then(async cases => {
+        const out = cases.map(async c => {
+          let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+          let images = await pictures.map(img => img.path);
+          c.img = images;
+          return c;
+        });
+        return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+      });
+  },
+
   createNewCase: function(req: Request, res: Response) {
     reqAccessLevel(req, res, 4, () => true);
     if (!req.files) {
@@ -105,7 +128,7 @@ module.exports = {
       });
   },
   getAllCasesInRegion: async function(req: Request, res: Response) {
-    let region = await Region.getOneRegionByNameAndCounty(req, res);
+    let region = await Regions.getOneRegionByNameAndCounty(req, res);
     let regionId = region ? region : res.sendStatus(404);
     let cases = await Case.findAll({
       where: { region_id: Number(regionId.region_id) },
@@ -115,12 +138,13 @@ module.exports = {
     const out = cases.map(async c => {
       let stat_name = await Status.findOne({ where: { status_id: c.status_id }, attributes: ['name'] });
       let cat_name = await Category.findOne({ where: { category_id: c.category_id }, attributes: ['name'] });
+      let pics = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
       delete c.status_id;
       delete c.category_id;
       c.region_name = req.params.region_name;
       c.status_name = stat_name.name;
       c.category_name = cat_name.name;
-      c.img = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+      c.img = pics.map(img => img.path);
       return c;
     });
     return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
@@ -149,14 +173,16 @@ module.exports = {
       let reg_name = await Region.findOne({ where: { region_id: c.region_id }, attributes: ['name'] });
       let stat_name = await Status.findOne({ where: { status_id: c.status_id }, attributes: ['name'] });
       let cat_name = await Category.findOne({ where: { category_id: c.category_id }, attributes: ['name'] });
+      let pics = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
       delete c.status_id;
       delete c.category_id;
       c.region_name = reg_name.name;
       c.status_name = stat_name.name;
       c.category_name = cat_name.name;
-      c.img = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+      c.img = pics.map(img => img.path);
       return c;
     });
     return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
   }
 };
+
