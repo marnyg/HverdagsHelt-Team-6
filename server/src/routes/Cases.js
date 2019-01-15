@@ -2,7 +2,8 @@
 
 import { Case, sequelize } from '../models.js';
 import { reqAccessLevel, verifyToken } from '../auth';
-import { Picture } from '../models';
+import { Category, Picture, Status, Region } from '../models';
+import Regions from './Regions';
 
 module.exports = {
   createNewCase: function(req: Request, res: Response) {
@@ -92,12 +93,67 @@ module.exports = {
         { replacements: [req.params.case_id] },
         { type: sequelize.QueryTypes.SELECT }
       )
-      .then( async (result) => {
+      .then(async result => {
         let pictures = Picture.findAll({ where: { case_id: req.params.case_id } });
         let images = await pictures.map(img => img.path);
         let data = result[0][0];
         data['images'] = images;
         return res.send(data);
-      })
+      });
+  },
+  getAllCasesInRegion: async function(req: Request, res: Response) {
+    let region = await Region.getOneRegionByNameAndCounty(req, res);
+    let regionId = region ? region : res.sendStatus(404);
+    let cases = await Case.findAll({
+      where: { region_id: Number(regionId.region_id) },
+      order: [['updatedAt', 'DESC']]
+    });
+    cases = cases.map(c => c.toJSON());
+    const out = cases.map(async c => {
+      let stat_name = await Status.findOne({ where: { status_id: c.status_id }, attributes: ['name'] });
+      let cat_name = await Category.findOne({ where: { category_id: c.category_id }, attributes: ['name'] });
+      delete c.status_id;
+      delete c.category_id;
+      c.region_name = req.params.region_name;
+      c.status_name = stat_name.name;
+      c.category_name = cat_name.name;
+      c.img = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+      return c;
+    });
+    return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+  },
+  getAllCasesForUser: async function(req: Request, res: Response) {
+    if (
+      !req.token ||
+      !req.params.user_id ||
+      typeof Number(req.params.user_id) !== 'number' ||
+      typeof req.token !== 'string'
+    )
+      return res.sendStatus(400);
+
+    let decoded_token = verifyToken(req.token);
+    let user_id_token = decoded_token.user_id;
+    let user_id_param = Number(req.params.user_id);
+
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+
+    let cases = await Case.findAll({
+      where: { user_id: req.params.user_id },
+      order: [['updatedAt', 'DESC']]
+    }).then(cases => (cases ? cases : res.sendStatus(404)));
+    cases = cases.map(c => c.toJSON());
+    const out = cases.map(async c => {
+      let reg_name = await Region.findOne({ where: { region_id: c.region_id }, attributes: ['name'] });
+      let stat_name = await Status.findOne({ where: { status_id: c.status_id }, attributes: ['name'] });
+      let cat_name = await Category.findOne({ where: { category_id: c.category_id }, attributes: ['name'] });
+      delete c.status_id;
+      delete c.category_id;
+      c.region_name = reg_name.name;
+      c.status_name = stat_name.name;
+      c.category_name = cat_name.name;
+      c.img = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+      return c;
+    });
+    return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
   }
 };
