@@ -1,20 +1,43 @@
 // @flow
 
-import { Case, Status_comment, User } from '../models';
+import { Case, Status_comment, User, sequelize } from '../models';
 import { verifyToken } from '../auth';
 
 type Request = express$Request;
 type Response = express$Response;
 
 module.exports = {
-  getAllStatus_comment: function(req: Request, res: Response) {
-    return Status_comment.findAll({
-      where: {
-        case_id: req.params.case_id
-      },
-      order: [['updatedAt', 'DESC']] //Order by updatedAt????
-    }).then(comments => res.send(comments));
+  getAllStatus_comment: async function(req: Request, res: Response) {
+    sequelize
+      .query(
+        'Select sc.status_comment_id, sc.comment, sc.createdAt, sc.updatedAt, sc.case_id, sc.status_id, sc.user_id, ' +
+          "CONCAT(u.firstname, ' ', u.lastname) as createdBy, " +
+          's.name AS status_name ' +
+          'FROM Status_comments sc ' +
+          'JOIN Users u ON sc.user_id = u.user_id ' +
+          'JOIN Statuses s ON sc.status_id = s.status_id ' +
+          'WHERE case_id = ?;',
+        {
+          replacements: [Number(req.params.case_id)],
+          type: sequelize.QueryTypes.SELECT
+        }
+      )
+      .then(async result =>  {
+        return res.send(result);
+      })
+      .catch(err => {
+        return res.status(500).send(err);
+      });
   },
+  // Back up code:
+  // getAllStatus_comment: function(req: Request, res: Response) {
+  //   return Status_comment.findAll({
+  //     where: {
+  //       case_id: req.params.case_id
+  //     },
+  //     order: [['updatedAt', 'DESC']] //Order by updatedAt????
+  //   }).then(comments => res.send(comments));
+  // },
   // Kun ansatt i riktig kommune kan legge inn kommentarer til den kommunen
   addStatus_comment: function(req: Request, res: Response) {
     if (
