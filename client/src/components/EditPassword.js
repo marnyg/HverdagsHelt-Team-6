@@ -59,24 +59,31 @@ class EditPassword extends Component {
                         <input type="password" required id="password2" onChange={this.handleChange} className="form-control" />
                     </div>
                 </div>
-            </div>
-        );
-    }
+                <div className={'d-flex'}>
+                    <div className={'col-lg btn btn-primary'} onClick={this.validateForm}>
+                        Lagre
+                </div>
+                    <div className={'col-md btn btn-danger'} onClick={e => this.props.callback(e, <DisplayProfile callback={this.props.callback} />)}>
+                        Avbryt
+                </div>
+                </div>
+                );
+            }
     validateForm(event: Event) {
-        event.preventDefault();
-        let form = event.target.parentNode;
-        let children = Array.prototype.slice.call(form.children, 0);
-
+                    event.preventDefault();
+                let form = event.target.parentNode;
+                let children = Array.prototype.slice.call(form.children, 0);
+        
         if (this.arePasswordsEqual(children) && form.checkValidity()) {
 
-            this.us.updatePassword(this.user.user_id, this.oldPass, this.user.password)
-                .catch((error: Error) => console.error(error))
-        } else {
+                    this.us.updatePassword(this.user.user_id, this.oldPass, this.user.password)
+                        .catch((error: Error) => console.error(error))
+                } else {
             if (this.arePasswordsEqual(children)) {
-                let passwordInputs = children.filter(e => e.id.includes('password'));
+                    let passwordInputs = children.filter(e => e.id.includes('password'));
                 passwordInputs.map(e => e.setCustomValidity('Passwords must match'));
             } else {
-                let passwordInputs = children.filter(e => e.id.includes('password'));
+                    let passwordInputs = children.filter(e => e.id.includes('password'));
                 passwordInputs.map(e => e.setCustomValidity(''));
             }
             form.reportValidity();
@@ -86,17 +93,17 @@ class EditPassword extends Component {
     }
 
     arePasswordsEqual(children: Array<HTMLInputElement>) {
-        console.log(children);
+                    console.log(children);
 
-        let passwordInputs = children.filter(e => e.id.includes('password'));
-        console.log(passwordInputs);
-        console.log(passwordInputs[0].value);
-        console.log(passwordInputs[1].value);
-
-        return (passwordInputs[1].value === passwordInputs[0].value);
-    }
-
-
-}
-
-export default EditPassword;
+                    let passwordInputs = children.filter(e => e.id.includes('password'));
+                    console.log(passwordInputs);
+                    console.log(passwordInputs[0].value);
+                    console.log(passwordInputs[1].value);
+            
+                    return (passwordInputs[1].value === passwordInputs[0].value);
+                }
+            
+            
+            }
+            
+            export default EditPassword;
