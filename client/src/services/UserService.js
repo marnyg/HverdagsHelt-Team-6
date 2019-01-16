@@ -133,7 +133,6 @@ class UserService {
   }
 
   updatePassword(user_id: number, old_password: string, new_password: string): Promise<void> {
-    // Trenger token i header her
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
       loginService

@@ -23,12 +23,12 @@ class Subscriptions extends Component {
     return(
       <div>
         {this.temp.map(e => {
-          return <div>
+          return <div className='card-body'>
             <h1>{e[0].region_name}</h1>
           {e.map(j => (
             <div className='border'>
               <p><b>{j.title}</b></p>
-              <p>Opprettet: {j.created_at}, Oppdatert: {j.updated_at}</p>
+              <p>Opprettet: {this.dateFormat(j.createdAt)}, oppdatert: {this.dateFormat(j.updatedAt)}</p>
               <p><i>{j.description}</i></p>
             </div>
           ))
@@ -59,10 +59,14 @@ class Subscriptions extends Component {
     return unique;
   }
 
-  toRegionName(region_id: number){
-    let regionService = new RegionService();
-    return regionService.getRegion(region_id);
+  dateFormat(date: string) {
+    if (date) {
+      let a = date.split('.')[0].replace('T', ' ');
+      return a.substr(0, a.length - 3);
+    } else {
+      return 'Fant ikke dato.';
+    }
   }
 }
 
-export default withRouter(Subscriptions);
+export default Subscriptions;
