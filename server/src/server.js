@@ -115,12 +115,12 @@ app.put('/api/cases/:case_id', (req: Request, res: Response) => {
     !req.body ||
     typeof req.body.title !== 'string' ||
     typeof req.body.description !== 'string' ||
-    typeof req.body.lat !== 'number' ||
-    typeof req.body.lon !== 'number' ||
-    typeof req.body.region_id !== 'number' ||
-    typeof req.body.user_id !== 'number' ||
-    typeof req.body.category_id !== 'number' ||
-    typeof req.body.status_id !== 'number'
+    typeof req.body.lat != 'number' ||
+    typeof req.body.lon != 'number' ||
+    typeof req.body.region_id != 'number' ||
+    typeof req.body.user_id != 'number' ||
+    typeof req.body.category_id != 'number' ||
+    typeof req.body.status_id != 'number'
   )
     return res.sendStatus(400);
 
