@@ -107,7 +107,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             {this.statusMessage.map(e => (
               <li className={'list-group-item'} key={e.status_comment_id}>
                 <div>
-                  <h4>{e.user_name}</h4>
+                  <h4>{e.createdBy}</h4>
                   <p>{this.dateFormat(e.createdAt)}</p>
                   <p>{e.comment}</p>
                   <p style={this.getStatusColour(e.status_id)}>{e.status_name}</p>
@@ -121,16 +121,19 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   }
 
   mounted() {
-    this.props.match.params.case_id = 1; // Placeholder!!!
+    //this.props.match.params.case_id = 1; // Placeholder!!!
     let cas = new CaseService();
     let cascom = new StatusCommentService();
     let stat = new StatusService();
-    let token = localStorage.getItem('token');
     cas
       .getCase(this.props.match.params.case_id)
-      .then(e => {
-        this.case = e;
-        console.log('This.case:');
+      .then((c: Case)=> {
+        if(c.length > 0){
+            this.case = c[0];
+            console.log('This.case:', c);
+        } else {
+            this.case = null;
+        }
       })
       .catch((err: Error) => {
         console.log('Could not load case with id ' + this.props.match.params.case_id);

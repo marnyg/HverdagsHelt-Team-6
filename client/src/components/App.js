@@ -33,16 +33,16 @@ class App extends Component {
   render() {
     return (
       <BrowserRouter>
-        <div>
+        <div className={'main-wrapper'}>
           <Navbar />
           <Route exact path="/my-page" render={() => <MyPage />} />
           <div className="content-wrapper">
             <Notify />
             <Route exact path="/" render={() => <Content />} />
             <Route exact path="/case/:case_id" render={() => <ViewCase/>} />
-            <Route exact path="/notifications" render={() => <Subscriptions/>} />
+            <Route exact path="/subscriptions" render={() => <Subscriptions/>} />
+              <Route exact path="/notifications" render={() => <h1>Coming soon!</h1>} />
             <Route exact path="/new-case" render={() => <NewCase />} />
-            <Route exact path="/notifications" render={() => <Subscription />} />
             <Route exact path="/search/:query" component={Content} />
           </div>
           <Footer />
