@@ -65,11 +65,8 @@ class CaseList extends Component<{ props: { user_id: number, region_id: number }
     console.log("user_id: " + this.props.user_id + ", region_id: " + this.props.region_id);
     if (this.props.user_id) {
       // Set up table for cases on per user basis
-      id = this.props.user_id;
-      // id = JSON.parse(localStorage.getItem('user')).user_id;
-      // console.log("ID = " + id);
       cas
-        .getAllCasesGivenUser(id)
+        .getAllCasesGivenUser(this.props.user_id)
         .then(cases => {
           this.cases = cases;
           console.log('Length of this.cases = ' + this.cases.length);
@@ -90,9 +87,8 @@ class CaseList extends Component<{ props: { user_id: number, region_id: number }
         });
     } else if (this.props.region_id) {
       // Set up table for cases on per municipality/region basis
-      id = this.props.region_id;
       cas
-        .getAllCasesGivenRegionId(id)
+        .getAllCasesGivenRegionId(this.props.region_id)
         .then(cases => {
           this.cases = cases;
           console.log('Length of this.cases = ' + this.cases.length);
@@ -129,11 +125,13 @@ class CaseList extends Component<{ props: { user_id: number, region_id: number }
   }
 
   onClickTableRow(event: SyntheticInputEvent<HTMLInputElement>) {
-    if (event.target && event.target instanceof HTMLTableRowElement) {
+    console.log("Trykket på tabell.");
+    if (event.target && event.target.parentElement instanceof HTMLTableRowElement) {
       let case_id = this.cases[event.target.parentElement.rowIndex - 1].case_id;
       console.log(case_id);
-      //this.props.history.push('/case/' + case_id);
-      //this.props.history.push('/'); // Placeholder
+     this.props.history.push('/case/' + case_id);
+    }else{
+      Notify.danger("Kunne ikke videresende deg til sak.");
     }
   }
 

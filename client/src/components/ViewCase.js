@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import * as React from 'react';
 import { Component } from 'react-simplified';
 import { NavLink, withRouter } from 'react-router-dom';
+import CategoryService from '../services/CategoryService';
 import CaseService from '../services/CaseService';
 import StatusService from '../services/StatusService';
 import StatusCommentService from '../services/StatusCommentService';
@@ -71,7 +72,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             </table>
             <p>{this.case.description}</p>
             <h2>Sett saksstatus</h2>
-            <select defaultValue={this.getInitialStatus()} className={'form-control'} id={'category'} required>
+            <select defaultValue={this.getInitialStatus()} onChange={this.statusListener} className={'form-control'} id={'category'} required>
               {this.statuses.map(e => (
                 <option key={e.status_id} value={e.status_id}>
                   {' '}
@@ -121,12 +122,12 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   }
 
   mounted() {
-    //this.props.match.params.case_id = 1; // Placeholder!!!
     let cas = new CaseService();
     let cascom = new StatusCommentService();
     let stat = new StatusService();
+    let cat = new CategoryService();
     cas
-      .getCase(this.props.match.params.case_id)
+      .getCase(this.props.case_id)
       .then((c: Case)=> {
         if(c.length > 0){
             this.case = c[0];
@@ -136,28 +137,29 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
         }
       })
       .catch((err: Error) => {
-        console.log('Could not load case with id ' + this.props.match.params.case_id);
+        console.log('Could not load case with id ' + this.props.case_id);
         Notify.danger(
           'Klarte ikke å hente sak med id ' +
-            this.props.match.params.case_id +
+            this.props.case_id +
             '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
             err.message
         );
       });
     cascom
-      .getAllStatusComments(this.props.match.params.case_id)
+      .getAllStatusComments(this.props.case_id)
       .then(e => {
         this.statusMessage = e;
+        console.log("Statuskommentarer lengde = " + this.statusMessage.length);
         if (this.statusMessage.length === 0) {
           let p = document.querySelector('#noComments');
-          if(p)p.hidden = false
+          if(p)p.hidden = false;
         }
       })
       .catch((err: Error) => {
-        console.log('Could not load case comments for case with id ' + this.props.match.params.case_id);
+        console.log('Could not load case comments for case with id ' + this.props.case_id);
         Notify.danger(
           'Klarte ikke å hente kommentarer til sak med id ' +
-            this.props.match.params.case_id +
+            this.props.case_id +
             '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
             err.message
         );
@@ -211,6 +213,15 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   updatePos(newPos) {
     this.pos = newPos;
     console.log('got pos from map: ', this.pos);
+  }
+  
+  statusListener(event: SyntheticInputEvent<HTMLInputElement>){
+    if(event.target && event.target instanceof HTMLSelectElement && this.case){
+      this.case.status_id = event.target.options[event.target.selectedIndex].value;
+      console.log("this.case.status_id: " + this.case.status_id);
+    }else{
+      console.log("HEII!");
+    }
   }
 
   sendMessage() {
