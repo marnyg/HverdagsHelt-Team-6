@@ -8,10 +8,10 @@ class StatusService {
   getAllStatuses(): Promise<Status[]> {
     return axios.get('/api/statuses');
   }
+
   createStatus(s: Status): Promise<any> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
-
       loginService
         .isLoggedIn()
         .then((logged_in: Boolean) => {
@@ -32,6 +32,7 @@ class StatusService {
         .catch((error: Error) => reject(error));
     });
   }
+
   updateStatus(status_id: number, s: Status): Promise<any> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
@@ -55,10 +56,10 @@ class StatusService {
         .catch((error: Error) => reject(error));
     });
   }
+
   deleteStatus(status_id: number): Promise<any> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
-
       loginService
         .isLoggedIn()
         .then((logged_in: Boolean) => {
