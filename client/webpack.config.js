@@ -6,6 +6,9 @@ module.exports = {
     path: path.resolve(__dirname, 'public'),
     filename: 'bundle.js'
   },
+  node: {
+    fs: 'empty'
+  },
   module: {
     rules: [
       {
@@ -14,8 +17,12 @@ module.exports = {
         use: ['babel-loader']
       },
       {
-          test:/\.css$/,
-          use:['style-loader','css-loader']
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.(svg|png|jpg|jpeg|gif)$/,
+        use: ['file-loader']
       }
     ]
   }

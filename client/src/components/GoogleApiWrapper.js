@@ -11,7 +11,7 @@ export class GoogleMapsContainer extends Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.centerPos !== this.props.centerPos) {
-      this.gmap.setCenter(this.props.centerPos);
+      this.gmap.panTo(this.props.markerPos);
       this.marker.setPosition(this.props.centerPos)
     }
     this.gmap.draggable = this.props.isClickable
@@ -29,8 +29,10 @@ export class GoogleMapsContainer extends Component {
         google={this.props.google}
         onClick={this.props.isClickable ? (t, map, coord) => this.onClick(t, map, coord) : null}
         zoom={14}
-        initialCenter={this.props.centerPos}
-        disableDefaultUI={true}
+        initialCenter={this.props.markerPos}
+        // disableDefaultUI={true}
+        streetViewControl={false}
+
         draggable={this.props.isClickable}
       >
         {/* <SearchBox

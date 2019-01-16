@@ -4,13 +4,16 @@ import * as React from 'react';
 import { Component } from 'react-simplified';
 import User from '../classes/User';
 import UserService from '../services/UserService';
+import EditPassword from './EditPassword';
+import EditProfile from './EditProfile';
+import DisplayProfile from './DisplayProfile'
 
 class MyProfile extends Component<{}, { isEditing: boolean }> {
-  state = { isEditing: false };
+  isEditing = false
   us = new UserService();
+  user = JSON.parse(localStorage.getItem("user"))
+  currentComponent = <DisplayProfile callback={this.setComponent} />;
 
-  // user: User;
-  user = new User();
   render() {
     if (this.user == null) {
       return <div>404</div>;
@@ -152,28 +155,11 @@ class MyProfile extends Component<{}, { isEditing: boolean }> {
     let form = event.target.parentNode;
     let children = Array.prototype.slice.call(form.children, 0);
 
-    if (this.arePasswordsEqual(children) && form.checkValidity()) {
+  setComponent(e, comp) {
+    console.log(e, comp);
 
-      this.us.updateUser(this.user.user_id, this.user)
-        .then(() => {
-          localStorage.setItem("user", JSON.stringify(this.user))
-        }).catch(() => console.log("ERROR"))
-      this.setState({ isEditing: false }); //shuld be false
-    } else {
-      if (this.arePasswordsEqual(children)) {
-        let passwordInputs = children.filter(e => e.id.includes('password'));
-        passwordInputs.map(e => e.setCustomValidity('Passwords must match'));
-      }
-      form.reportValidity();
-    }
-
-
-  }
-
-  arePasswordsEqual(children: Array<HTMLInputElement>) {
-    let passwordInputs = children.filter(e => e.id.includes('password'));
-    return passwordInputs[1].value === passwordInputs[0].value;
-  }
+    e.preventDefault()
+    this.currentComponent = comp
 
   getDisplayInfoVersion() {
     return (

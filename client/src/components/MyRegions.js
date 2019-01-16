@@ -1,4 +1,3 @@
-
 // @flow
 //
 import * as React from 'react';
@@ -134,16 +133,89 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
         let id = Number.parseInt(e.target.id)
         console.log("finltering on region with id " + id);
 
-        this.regionService.getAllRegionGivenCounty(id)
-            .then(res => this.region = res.map(e => new Region(e.region_id, e.county_id, e.name, e.lat, e.lon)))
+  render() {
+    return (
+      <div>
+        {this.getYourRegionListEllement('Dine Kommuner', this.followedRegions)}
+        {this.getCountyListEllement('Fylker', this.county)}
+        {this.getRegionListEllement('Kommuner', this.region)}
+      </div>
+    );
+  }
+  getYourRegionListEllement(headline: string, listItems: Array<RegionSubscription>) {
+    return (
+      <div>
+        {headline}
+        <ul>
+          {listItems.map(e => {
+            return (
+              <li className="border " id={e.region_id}>
+                {e.region_name}
+                <div>
+                  Notify me {console.log(e)}
+                  <input type="checkbox" defaultChecked={e.region_id} id="notify" />
+                </div>
+                <button onClick={this.handleDelete}>remove</button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    );
+  }
+  getCountyListEllement(headline: string, listItems: Array<County>) {
+    return (
+      <div>
+        {headline}
+        <ul>
+          {listItems.map(e => {
+            return (
+              <li id={e.county_id} onClick={this.filterKomuner}>
+                {e.name}{' '}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    );
+  }
+  getRegionListEllement(headline: string, listItems: Array<{ name: string, id: number }>) {
+    return (
+      <div>
+        {headline}
+        <ul>
+          {listItems.map(e => {
+            return (
+              <li id={e.region_id}>
+                {' '}
+                {e.name} <button onClick={this.handleAdd}>add</button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    );
+  }
+  filterKomuner(e) {
+    let all = Array.prototype.slice.call(e.target.parentNode.children, 0);
+    all.map(e => e.removeAttribute('class', 'bg-dark'));
+    e.target.setAttribute('class', 'bg-dark');
+    let id = Number.parseInt(e.target.id);
+    console.log('finltering on region with id ' + id);
 
-    }
+    this.regionService
+      .getAllRegionGivenCounty(id)
+      .then(res => (this.region = res.map(e => new Region(e.region_id, e.county_id, e.name, e.lat, e.lon))));
+  }
 
-    handleDelete(e) {
-        console.log(e);
-        console.log("delete " + e.target.parentNode.id);
-        console.log("delete " + e.target.parentNode.id);
-    }
+  handleDelete(e) {
+    console.log('delete ' + e.target.parentNode.id);
+    this.regSubService.deleteRegionSubscription(e.target.parentNode.id, this.user.user_id).then(() => {
+      this.userServise
+        .getRegionSubscriptionsGivenUserId(this.user.user_id)
+        .then(res => (this.followedRegions = res.regions));
+    });
+  }
 
     handleAdd(e) {
         let regionSub = new RegionSubscription(this.userid, e.target.parentNode.id, true);

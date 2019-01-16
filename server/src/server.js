@@ -115,12 +115,12 @@ app.put('/api/cases/:case_id', (req: Request, res: Response) => {
     !req.body ||
     typeof req.body.title !== 'string' ||
     typeof req.body.description !== 'string' ||
-    typeof req.body.lat !== 'number' ||
-    typeof req.body.lon !== 'number' ||
-    typeof req.body.region_id !== 'number' ||
-    typeof req.body.user_id !== 'number' ||
-    typeof req.body.category_id !== 'number' ||
-    typeof req.body.status_id !== 'number'
+    typeof req.body.lat != 'number' ||
+    typeof req.body.lon != 'number' ||
+    typeof req.body.region_id != 'number' ||
+    typeof req.body.user_id != 'number' ||
+    typeof req.body.category_id != 'number' ||
+    typeof req.body.status_id != 'number'
   )
     return res.sendStatus(400);
 
@@ -150,14 +150,17 @@ app.get('/api/cases/subscriptions/:user_id', (req: Request, res: Response) => {
 });
 
 app.get('/api/cases/subscriptions/:user_id/cases', (req: Request, res: Response) => {
+  console.log(req.body);
   reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptionCases);
 });
 
 app.post('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
+  console.log(req.body);
   reqAccessLevel(req, res, 4, Case_subscription.addCase_subscriptions);
 });
 
 app.put('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
+  console.log(req.body);
   reqAccessLevel(req, res, 4, Case_subscription.updateCase_subscriptions);
 });
 
@@ -279,6 +282,7 @@ app.get('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
 });
 
 app.post('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
+  console.log(req.body);
   reqAccessLevel(req, res, 4, Region_subscriptions.addRegion_subscriptions);
 });
 

@@ -61,7 +61,7 @@ class CaseList extends Component<{ props: { user_id: number, region_id: number }
     let id;
     let cas = new CaseService();
     let token = localStorage.getItem('token');
-    
+
     console.log("user_id: " + this.props.user_id + ", region_id: " + this.props.region_id);
     if (this.props.user_id) {
       // Set up table for cases on per user basis
