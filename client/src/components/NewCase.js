@@ -14,7 +14,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons/index';
 import GoogleApiWrapper from './GoogleApiWrapper';
 import Case from '../classes/Case';
-import fs from 'fs';
 
 class NewCase extends Component {
   form = null;
@@ -329,8 +328,14 @@ class NewCase extends Component {
       this.isMapClickable = false;
     }
     let locator = new LocationService();
-    this.pos = locator.getLocation();
+    let loc = locator.getLocation();
+    console.log("LOC");
+    console.log(JSON.stringify(loc));
+    this.pos = {lat: loc.lat, lon: loc.lon};
+    //this.pos = {};
     this.isMapClickable = false;
+    console.log("THIS.POS");
+    console.log(this.pos);
   }
 
   radio2() {
