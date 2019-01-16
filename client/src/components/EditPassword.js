@@ -10,7 +10,9 @@ import DisplayProfile from './DisplayProfile'
 class EditPassword extends Component {
     us = new UserService();
     user = JSON.parse(localStorage.getItem("user"))
-    oldUser = JSON.parse(localStorage.getItem("user"))
+    // oldUser = JSON.parse(localStorage.getItem("user"))
+    oldPass: string
+    oldPass = ""
 
     render() {
         if (this.user == null) {
@@ -24,6 +26,9 @@ class EditPassword extends Component {
             case 'password1':
                 this.user.password = event.target.value;
                 break;
+            case 'oldPassword':
+                this.oldPass = event.target.value;
+                break;
         }
         console.log(this.user);
     }
@@ -31,6 +36,8 @@ class EditPassword extends Component {
         return (
             <form id="form-inline">
 
+                <label>Gammelt Passord</label>
+                <input type="password" required id="oldPassword" onChange={this.handleChange} className="form-control" />
                 <label>Nytt Passord</label>
                 <input type="password" required id="password1" onChange={this.handleChange} className="form-control" />
                 <label>Gjenta Passord</label>
@@ -51,7 +58,7 @@ class EditPassword extends Component {
 
         if (this.arePasswordsEqual(children) && form.checkValidity()) {
 
-            this.us.updatePassword(this.user.user_id, this.oldUser.password, this.user.password)
+            this.us.updatePassword(this.user.user_id, this.oldPass, this.user.password)
                 .catch((error: Error) => console.error(error))
         } else {
             if (this.arePasswordsEqual(children)) {

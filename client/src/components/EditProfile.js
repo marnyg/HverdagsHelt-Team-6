@@ -12,12 +12,11 @@ class EditProfile extends Component<{}, { isEditing: boolean }> {
     us = new UserService();
     user = JSON.parse(localStorage.getItem("user"))
 
-    // user: User;
-    user = new User();
     render() {
         if (this.user == null) {
             return <div>404</div>;
         }
+        { console.log(this.user) }
         return <div>{this.getForm()}</div>;
     }
 
@@ -35,6 +34,9 @@ class EditProfile extends Component<{}, { isEditing: boolean }> {
                 break;
             case 'tlf':
                 this.user.tlf = event.target.value;
+                break;
+            case 'password':
+                this.user.password = event.target.value;
                 break;
 
         }
@@ -80,6 +82,8 @@ class EditProfile extends Component<{}, { isEditing: boolean }> {
                     onChange={this.handleChange}
                     className="form-control"
                 />
+                <label>Bekreft Passord</label>
+                <input type="password" required id="password" onChange={this.handleChange} className="form-control" />
                 <button type="submit" valie="asd" className="btn btn-primary" onClick={this.validateForm}>
                     Send
                 </button>
@@ -98,6 +102,7 @@ class EditProfile extends Component<{}, { isEditing: boolean }> {
             this.us.updateUser(this.user.user_id, this.user)
                 .then(() => {
                     localStorage.setItem("user", JSON.stringify(this.user))
+                    this.props.callback(null, <DisplayProfile callback={this.callback}></DisplayProfile>)
                 }).catch(Error => console.log(Error))
         } else {
             form.reportValidity();

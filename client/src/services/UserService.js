@@ -142,8 +142,8 @@ class UserService {
           if (logged_in === true) {
             let token = localStorage.getItem('token');
             axios
-              .post(
-                '/api/users/' + user_id,
+              .put(
+                '/api/users/' + user_id + '/password',
                 {
                   body: {
                     old_password: old_password,
