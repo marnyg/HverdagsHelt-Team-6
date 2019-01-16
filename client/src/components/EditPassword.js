@@ -71,7 +71,6 @@ class EditPassword extends Component {
                     <div className={'col-lg btn btn-primary'} onClick={this.validateForm}>
                         Lagre
           </div>
-                    {/* asd */}
                 </div>
                 <div
                     className={'col-md btn btn-danger'}
