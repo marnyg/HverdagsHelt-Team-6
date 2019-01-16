@@ -6,12 +6,12 @@ import User from '../classes/User';
 import UserService from '../services/UserService';
 import EditPassword from './EditPassword';
 import EditProfile from './EditProfile';
-import DisplayProfile from './DisplayProfile'
+import DisplayProfile from './DisplayProfile';
 
 class MyProfile extends Component {
   isEditing = false;
   us = new UserService();
-  user = JSON.parse(localStorage.getItem("user"))
+  user = JSON.parse(localStorage.getItem('user'));
   currentComponent = <DisplayProfile callback={this.setComponent} />;
 
   render() {
@@ -23,11 +23,9 @@ class MyProfile extends Component {
 
   setComponent(e, comp) {
     console.log(e, comp);
-    e.preventDefault()
+    // e.preventDefault()
 
-
-    this.currentComponent = comp
-
+    this.currentComponent = comp;
   }
 }
 
