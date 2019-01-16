@@ -479,11 +479,16 @@ class NewCase extends Component {
       this.list1 &&
       this.list1 instanceof HTMLSelectElement &&
       this.list2 &&
-      this.list2 instanceof HTMLSelectElement
+      this.list2 instanceof HTMLSelectElement &&
+      this.pos
     ) {
       switch (index) {
         case 0:
           // Validate automatic position
+          let service = new LocationService();
+          let loc = service.geocodeLatLng(this.pos.lat, this.pos.lon);
+          console.log('VALIDATE loc: ');
+          console.log(loc);
           return true;
         case 1:
           // Validate map marker position
@@ -502,12 +507,13 @@ class NewCase extends Component {
   }
 
   submit() {
-    if (this.form != null) {
+    if (this.form) {
       console.log('Validating form input.');
       if (this.form.checkValidity() && this.pos) {
         // Basic Built-in HTML5 form validation succeeded. Proceeding to validate using JavaScript.
         let index = this.radioSelector();
         let region_id = null;
+        let description = this.form.querySelector('#description').value;
         if (
           this.validate(index) &&
           this.list1 &&
@@ -552,22 +558,19 @@ class NewCase extends Component {
                 lon: this.municipalities[this.list2.selectedIndex - 1].lon
               };
               region_id = this.municipalities[this.list2.selectedIndex - 1].region_id;
+              description += ('\n\nAdresse gitt av bruker som følge av manuelt valg av kommune ved hjelp av. liste: ' + this.lastResortAddress.value);
               break;
           }
           let user_id = null;
-          let newcase = new Case(
-            null,
-            region_id,
-            user_id,
-            this.categories[this.form.querySelector('#category').selectedIndex - 1].category_id,
-            null,
-            this.form.querySelector('#title').value,
-            this.form.querySelector('#description').value,
-            null,
-            null,
-            this.pos.lat,
-            this.pos.lon
-          );
+          let newcase = {
+            category_id: this.categories[this.form.querySelector('#category').selectedIndex - 1].category_id,
+            title: this.form.querySelector('#title').value,
+            description: description,
+            region_id: region_id,
+            lat: this.pos.lat,
+            lon: this.pos.lon,
+            images: this.images
+          };
           this.send(newcase);
         } else {
           console.log('Secondary validation failed.');
