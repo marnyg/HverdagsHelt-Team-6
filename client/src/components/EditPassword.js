@@ -81,6 +81,7 @@ class EditPassword extends Component {
         </div>
             </form>
         );
+
     }
     validateForm(event: Event) {
         event.preventDefault();
