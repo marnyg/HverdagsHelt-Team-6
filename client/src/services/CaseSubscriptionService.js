@@ -2,6 +2,7 @@
 import axios from 'axios';
 import CaseSubscription from '../classes/CaseSubscription.js';
 import LoginService from './LoginService.js';
+import Case from '../classes/Case.js';
 
 class CaseSubscriptionService {
   //Get all subscriotions, given user
@@ -109,6 +110,34 @@ class CaseSubscriptionService {
               .catch((error: Error) => reject(error));
       });
   }
+  getAllSubscribedCasesGivenUser(user_id: number): Promise<Case[]> {
+    //return axios.get('/api/cases/subscription/' + user_id);
+      return new Promise((resolve, reject) => {
+          let loginService = new LoginService();
+          loginService.isLoggedIn()
+              .then((logged_in: Boolean) => {
+                  if(logged_in === true){
+                      let token = localStorage.getItem('token');
+                      axios.get('/api/cases/subscriptions/' + user_id + '/cases', {
+                          headers: {
+                              Authorization: 'Bearer ' + token
+                          }
+                      })
+                          .then((subscriptions: Case[]) => {
+                            console.log(subscriptions);
+                            resolve(subscriptions);
+                          })
+                          .catch((error: Error) => reject(error));
+                  } else {
+                      reject('User is not logged in');
+                  }
+              })
+              .catch((error: Error) => reject(error));
+      });
+  }
+
+
+
 }
 
 export default CaseSubscriptionService;

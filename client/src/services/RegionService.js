@@ -44,7 +44,7 @@ class RegionService {
 
   //Get region, given id
   getRegion(region_id: number): Promise<Region> {
-    return axios.get('api/regions/' + region_id);
+    return axios.get('/api/regions/' + region_id);
   }
 
   //Update region, gived id

@@ -7,46 +7,12 @@ import CaseSubscriptionService from '../services/CaseSubscriptionService.js';
 import CaseSubscription from '../classes/CaseSubscription.js';
 import Users from '../classes/User.js';
 import RegionService from '../services/RegionService.js';
+import Case from '../classes/Case.js';
+import Region from '../classes/Region.js';
 
 class Subscriptions extends Component {
   temp=[];
-  subscriptions = [
-    {
-      title: 'Trondheim smiler i sola',
-      description: 'Dårlig måking',
-      created_at: '10.07.2018',
-      updated_at: '11.07.2018',
-      region_id: 3
-    },
-    {
-      title: 'Bilen min er nedsnødd i Trondheim',
-      description: 'Må måkes',
-      created_at: '10.07.2018',
-      updated_at: '11.07.2018',
-      region_id: 4
-    },
-    {
-      title: 'Frogner er flott på vintern!',
-      description: 'Høvlig ok måking',
-      created_at: '10.07.2018',
-      updated_at: '11.07.2018',
-      region_id: 2
-    },
-    {
-      title: 'Hurra det er flott på vintern!',
-      description: 'Høvlig ok måking',
-      created_at: '10.07.2018',
-      updated_at: '11.07.2018',
-      region_id: 1
-    },
-    {
-      title: 'Hurra det er flott på vintern!',
-      description: 'Høvlig ok måking',
-      created_at: '10.07.2018',
-      updated_at: '11.07.2018',
-      region_id: 1
-    }
-  ];
+  subscriptions = [];
 
   render() {
     if (!this.subscriptions) {
@@ -55,33 +21,34 @@ class Subscriptions extends Component {
 
     return(
       <div>
-        {this.temp.map((e, i) => (
-          <div>
-            <h1>{this.temp[i][0].region_id}</h1>
-            <p>Opprettet: {this.temp[i][0].created_at}, Oppdatert: {this.temp[i][0].updated_at}</p>
-            <p><b>{this.temp[i][0].title}</b></p>
-            <p><i>{this.temp[i][0].description}</i></p>
-          </div>
-        ))}
+        {this.temp.map(e => {
+          return <div>
+            <h1>{e[0].region_id}</h1>
+          {e.map(j => (
+            <div>
+              <p><b>{j.title}</b></p>
+              <p>Opprettet: {j.created_at}, Oppdatert: {j.updated_at}</p>
+              <p><i>{j.description}</i></p>
+            </div>
+          ))
+        }</div>})}
       </div>
     )
   }
-
 
   mounted() {
     this.indexerRegion().map(index => {
       this.temp.push(this.subscriptions.filter(sub => sub.region_id === index));
     });
-    console.log('hei');
-    //console.log(this.temp);
+    console.log('hei', this.temp);
 
     let caseSubscriptionService = new CaseSubscriptionService();
     caseSubscriptionService
-    .getAllCaseSubscriptions(1)
-    /*.then((subscriptions: CaseSubscription[]) => {
+    .getAllSubscribedCasesGivenUser(1)
+    .then((subscriptions: Case[]) => {
       this.subscriptions = subscriptions;
       console.log(subscriptions);
-    })*/
+    })
     .catch((error: Error) => console.error(error));
   }
 
@@ -95,17 +62,6 @@ class Subscriptions extends Component {
     let regionService = new RegionService();
     return regionService.getRegion(region_id);
   }
-
-  subCases(){
-    let region_ids = this.indexerRegion();
-    console.log('heer');
-    console.log(region_ids);
-    let res = this.subscriptions.filter(cases => region_ids === cases.region_id);
-    console.log('hei');
-    console.log(res);
-    return res;
-  }
-
 }
 
 /*
@@ -139,7 +95,21 @@ class Subscriptions extends Component {
 indexListe.map(index=> {
   relevantcasse=subscriptions.filter(sub=> sub.region_id===index)
 } )
+
+
+{this.temp.map((e, row) => (
+  e.map((j, col) => (
+    <div>
+      <h1>{this.temp[row][col].region_id}</h1>
+      <p>Opprettet: {this.temp[row][col].created_at}, Oppdatert: {this.temp[row][col].updated_at}</p>
+      <p><b>{this.temp[row][col].title}</b></p>
+      <p><i>{this.temp[row][col].description}</i></p>
+    </div>
+  ))
+))}
 */
+
+
 
 /*<div>
   <h1>{this.subscriptions[i].region_id}</h1>
