@@ -48,6 +48,7 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
             </div>
         );
     }
+
     getYourRegionListEllement(headline: string, listItems: Array<RegionSubscription>) {
         return listItems.map((e, index) => {
             return(
@@ -126,87 +127,14 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
             </div >
         );
     }
+
     filterKomuner(e) {
         //let all = Array.prototype.slice.call(e.target.parentNode.children, 0);
         //all.map(e => e.removeAttribute("class", "bg-dark"));
         //e.target.setAttribute("class", "bg-dark")
         let id = Number.parseInt(e.target.id)
         console.log("finltering on region with id " + id);
-
-  render() {
-    return (
-      <div>
-        {this.getYourRegionListEllement('Dine Kommuner', this.followedRegions)}
-        {this.getCountyListEllement('Fylker', this.county)}
-        {this.getRegionListEllement('Kommuner', this.region)}
-      </div>
-    );
-  }
-  getYourRegionListEllement(headline: string, listItems: Array<RegionSubscription>) {
-    return (
-      <div>
-        {headline}
-        <ul>
-          {listItems.map(e => {
-            return (
-              <li className="border " id={e.region_id}>
-                {e.region_name}
-                <div>
-                  Notify me {console.log(e)}
-                  <input type="checkbox" defaultChecked={e.region_id} id="notify" />
-                </div>
-                <button onClick={this.handleDelete}>remove</button>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    );
-  }
-  getCountyListEllement(headline: string, listItems: Array<County>) {
-    return (
-      <div>
-        {headline}
-        <ul>
-          {listItems.map(e => {
-            return (
-              <li id={e.county_id} onClick={this.filterKomuner}>
-                {e.name}{' '}
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    );
-  }
-  getRegionListEllement(headline: string, listItems: Array<{ name: string, id: number }>) {
-    return (
-      <div>
-        {headline}
-        <ul>
-          {listItems.map(e => {
-            return (
-              <li id={e.region_id}>
-                {' '}
-                {e.name} <button onClick={this.handleAdd}>add</button>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    );
-  }
-  filterKomuner(e) {
-    let all = Array.prototype.slice.call(e.target.parentNode.children, 0);
-    all.map(e => e.removeAttribute('class', 'bg-dark'));
-    e.target.setAttribute('class', 'bg-dark');
-    let id = Number.parseInt(e.target.id);
-    console.log('finltering on region with id ' + id);
-
-    this.regionService
-      .getAllRegionGivenCounty(id)
-      .then(res => (this.region = res.map(e => new Region(e.region_id, e.county_id, e.name, e.lat, e.lon))));
-  }
+    }
 
   handleDelete(e) {
     console.log('delete ' + e.target.parentNode.id);

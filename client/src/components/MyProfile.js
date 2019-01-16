@@ -8,10 +8,10 @@ import EditPassword from './EditPassword';
 import EditProfile from './EditProfile';
 import DisplayProfile from './DisplayProfile'
 
-class MyProfile extends Component<{}, { isEditing: boolean }> {
-  isEditing = false
+class MyProfile extends Component{
+  isEditing = false;
   us = new UserService();
-  user = JSON.parse(localStorage.getItem("user"))
+  user = JSON.parse(localStorage.getItem("user"));
   currentComponent = <DisplayProfile callback={this.setComponent} />;
 
   render() {
@@ -20,19 +20,18 @@ class MyProfile extends Component<{}, { isEditing: boolean }> {
     }
     return(
         <div className={'ml-3 mt-3'}>
-            {this.state.isEditing ? this.getEditFormVersion() : this.getDisplayInfoVersion()}
+            {this.isEditing ? this.getEditFormVersion() : this.getDisplayInfoVersion()}
         </div>
     );
   }
 
   mounted() {
-    let a = localStorage.getItem("user");
-    this.user = JSON.parse(a);
+      this.user = JSON.parse(localStorage.getItem("user"));
   }
 
   changToEditVersion(event, arg: boolean) {
     event.preventDefault();
-    this.setState({ isEditing: arg });
+    this.isEditing = arg;
   }
 
   handleChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -139,7 +138,7 @@ class MyProfile extends Component<{}, { isEditing: boolean }> {
                     </div>
                 </div>
             </div>
-            <div className={'d-flex p-0'}>
+            <div className={'d-flex'}>
                 <div className={'col-lg btn btn-primary'} onClick={this.validateForm}>
                     Lagre
                 </div>
@@ -151,15 +150,17 @@ class MyProfile extends Component<{}, { isEditing: boolean }> {
     );
   }
   validateForm(event: Event) {
-    event.preventDefault();
-    let form = event.target.parentNode;
-    let children = Array.prototype.slice.call(form.children, 0);
+      event.preventDefault();
+      let form = event.target.parentNode;
+      let children = Array.prototype.slice.call(form.children, 0);
+  }
 
-  setComponent(e, comp) {
-    console.log(e, comp);
+  setComponent(e, comp){
+      console.log(e, comp);
 
-    e.preventDefault()
-    this.currentComponent = comp
+      e.preventDefault()
+      this.currentComponent = comp;
+  }
 
   getDisplayInfoVersion() {
     return (

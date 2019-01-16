@@ -11,12 +11,12 @@ import { NavLink } from 'react-router-dom';
 class MyPage extends Component {
   menuItems = [
     { name: 'Min Profil', component: <MyProfile />, selected: true},
-    { name: 'Mine Komuner', component: <MyRegions />, selected: false },
+    { name: 'Mine Komuner', component: <MyRegions />, selected: false},
     { name: 'Mine Saker', component: <MyCases user_id={JSON.parse(localStorage.getItem('user')).user_id} />, selected: false }
   ];
 
   element = this.menuItems[0];
-  comp = <MyProfile />;
+  comp = <MyProfile/>;
   render() {
     return (
       <div>
