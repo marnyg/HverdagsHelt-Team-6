@@ -5,3 +5,4 @@ client/public/bundle.js
 server/src/private.key
 server/src/public.key
 client/public/uploads
+.DS_Store
