@@ -25,7 +25,7 @@ export let County: Class<Model<{ county_id?: number, name: string }>> = sequeliz
   'County',
   {
     county_id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-    name: { type: Sequelize.STRING, allowNull: false }
+    name: { type: Sequelize.STRING, allowNull: false, unique: true }
   },
   {
     timestamps: false
