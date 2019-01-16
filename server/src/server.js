@@ -115,12 +115,12 @@ app.put('/api/cases/:case_id', (req: Request, res: Response) => {
     !req.body ||
     typeof req.body.title !== 'string' ||
     typeof req.body.description !== 'string' ||
-    typeof req.body.lat !== 'number' ||
-    typeof req.body.lon !== 'number' ||
-    typeof req.body.region_id !== 'number' ||
-    typeof req.body.user_id !== 'number' ||
-    typeof req.body.category_id !== 'number' ||
-    typeof req.body.status_id !== 'number'
+    typeof req.body.lat != 'number' ||
+    typeof req.body.lon != 'number' ||
+    typeof req.body.region_id != 'number' ||
+    typeof req.body.user_id != 'number' ||
+    typeof req.body.category_id != 'number' ||
+    typeof req.body.status_id != 'number'
   )
     return res.sendStatus(400);
 
@@ -140,8 +140,8 @@ app.put('/api/cases/:case_id', (req: Request, res: Response) => {
 });
 
 app.delete('/api/cases/:case_id', (req: Request, res: Response) => {
-  return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(cases =>
-    cases ? res.send() : res.status(500).send()
+  return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(
+    cases => (cases ? res.send() : res.status(500).send())
   );
 });
 
@@ -150,6 +150,7 @@ app.get('/api/cases/subscriptions/:user_id', (req: Request, res: Response) => {
 });
 
 app.get('/api/cases/subscriptions/:user_id/cases', (req: Request, res: Response) => {
+  console.log(req.body);
   reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptionCases);
 });
 

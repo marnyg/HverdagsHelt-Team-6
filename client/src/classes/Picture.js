@@ -1,14 +1,16 @@
 class Picture {
   picture_id: number;
   case_id: number;
-  path: string;
+  src: string;
   alt: string;
+  value: any;
 
-  constructor(picture_id, case_id, path, alt){
+  constructor(picture_id, case_id, src, alt, value){
     this.picture_id = picture_id;
     this.case_id = case_id;
-    this.path = path;
+    this.src = path;
     this.alt = alt;
+    this.value = value;
   }
 }
 export default Picture;

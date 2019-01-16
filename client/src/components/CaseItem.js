@@ -81,7 +81,6 @@ class CaseItem extends Component {
   }
 
   mounted() {
-      console.log('CaseItem:', this.props.case);
       if(this.props.case.subscribed){
           this.button_type = "success";
       }

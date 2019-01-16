@@ -52,7 +52,7 @@ module.exports = {
           'c.status_id, s.name as status_name, ' +
           'c.category_id, cg.name as category_name, ' +
           'c.createdAt, c.updatedAt ' +
-          'FROM Case_subscriptions csubs NATURAL JOIN Cases c ' +
+          'FROM Case_subscriptions csubs JOIN Cases c ON csubs.case_id = c.case_id ' +
           'JOIN Regions r ON c.region_id = r.region_id ' +
           'Join Counties co ON r.county_id = co.county_id ' +
           'JOIN Users u ON c.user_id = u.user_id ' +
