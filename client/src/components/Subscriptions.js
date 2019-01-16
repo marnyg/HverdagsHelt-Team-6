@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
 import CaseSubscriptionService from '../services/CaseSubscriptionService.js';
 import CaseSubscription from '../classes/CaseSubscription.js';
-import Users from '../classes/User.js';
+import User from '../classes/User.js';
 import RegionService from '../services/RegionService.js';
 import Case from '../classes/Case.js';
 import Region from '../classes/Region.js';
@@ -13,6 +13,7 @@ import Region from '../classes/Region.js';
 class Subscriptions extends Component {
   temp=[];
   subscriptions = [];
+  user = JSON.parse(localStorage.getItem("users"));
 
   render() {
     if (!this.subscriptions) {
@@ -23,9 +24,9 @@ class Subscriptions extends Component {
       <div>
         {this.temp.map(e => {
           return <div>
-            <h1>{e[0].region_id}</h1>
+            <h1>{e[0].region_name}</h1>
           {e.map(j => (
-            <div>
+            <div className='border'>
               <p><b>{j.title}</b></p>
               <p>Opprettet: {j.created_at}, Oppdatert: {j.updated_at}</p>
               <p><i>{j.description}</i></p>
@@ -37,17 +38,20 @@ class Subscriptions extends Component {
   }
 
   mounted() {
-    this.indexerRegion().map(index => {
-      this.temp.push(this.subscriptions.filter(sub => sub.region_id === index));
-    });
-    console.log('hei', this.temp);
+
+    console.log('hei ', this.temp);
 
     let caseSubscriptionService = new CaseSubscriptionService();
     caseSubscriptionService
     .getAllSubscribedCasesGivenUser(1)
     .then((subscriptions: Case[]) => {
       this.subscriptions = subscriptions;
-      console.log(subscriptions);
+      console.log('tabell: ', subscriptions)
+    })
+    .then(() => {
+      this.indexerRegion().map(index => {
+        this.temp.push(this.subscriptions.filter(sub => sub.region_id === index));
+      })
     })
     .catch((error: Error) => console.error(error));
   }
@@ -148,6 +152,24 @@ indexListe.map(index=> {
   <h1>{this.subscriptions[index].title}</h1>
   <p>Opprettet: {this.subscriptions[index].created_at}, Oppdatert: {this.subscriptions[index].updated_at}</p>
   <p><i>{this.subscriptions[index].description}</i></p>
+
+
+
+  FUNKER MED PREDATA:
+
+  <div>
+    {this.temp.map(e => {
+      return <div>
+        <h1>{e[0].region_id}</h1>
+      {e.map(j => (
+        <div>
+          <p><b>{j.title}</b></p>
+          <p>Opprettet: {j.created_at}, Oppdatert: {j.updated_at}</p>
+          <p><i>{j.description}</i></p>
+        </div>
+      ))
+    }</div>})}
+  </div>
 */
 
 export default withRouter(Subscriptions);

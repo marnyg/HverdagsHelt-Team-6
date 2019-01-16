@@ -150,6 +150,7 @@ app.get('/api/cases/subscriptions/:user_id', (req: Request, res: Response) => {
 });
 
 app.get('/api/cases/subscriptions/:user_id/cases', (req: Request, res: Response) => {
+  console.log(req.body);
   reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptionCases);
 });
 
