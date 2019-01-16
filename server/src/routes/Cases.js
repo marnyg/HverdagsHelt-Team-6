@@ -19,7 +19,8 @@ let rawQueryCases =
   'Join Counties co ON r.county_id = co.county_id ' +
   'JOIN Users u ON c.user_id = u.user_id ' +
   'JOIN Statuses s ON c.status_id = s.status_id ' +
-  'JOIN Categories cg ON c.category_id = cg.category_id';
+  'JOIN Categories cg ON c.category_id = cg.category_id ' +
+  'ORDER BY c.updatedAt DESC';
 
 module.exports = {
   getAllCases: async function(req: Request, res: Response) {
@@ -40,8 +41,8 @@ module.exports = {
 
   createNewCase: function(req: Request, res: Response) {
     reqAccessLevel(req, res, 4, () => true);
-    console.log("11111111111111111111111111 DENNE SKAL VI SE");
-    if(req.body){
+    console.log('11111111111111111111111111 DENNE SKAL VI SE');
+    if (req.body) {
       console.log(req.body);
       console.log(req.body.images);
     }
