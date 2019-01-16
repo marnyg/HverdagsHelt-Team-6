@@ -24,9 +24,9 @@ class MyProfile extends Component<{}, { isEditing: boolean }> {
   render() {
     return (
       <div>
-        {this.getYourRegionListEllement('Dine Komuner', this.followedRegions)}
+        {this.getYourRegionListEllement('Dine Kommuner', this.followedRegions)}
         {this.getCountyListEllement('Fylker', this.county)}
-        {this.getRegionListEllement('Komuner', this.region)}
+        {this.getRegionListEllement('Kommuner', this.region)}
       </div>
     );
   }

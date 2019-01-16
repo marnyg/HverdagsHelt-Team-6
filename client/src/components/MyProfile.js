@@ -60,7 +60,7 @@ class MyProfile extends Component<{}, { isEditing: boolean }> {
           onChange={this.handleChange}
           className="form-control"
         />
-        <label>Etteravn: </label>
+        <label>Etternavn: </label>
         <input
           type="text"
           id="lastname"
