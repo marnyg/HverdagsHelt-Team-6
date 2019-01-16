@@ -10,6 +10,7 @@ import UserService from '../services/UserService.js';
 import LoginService from "../services/LoginService";
 import CaseSubscriptionService from "../services/CaseSubscriptionService";
 import CaseSubscription from "../classes/CaseSubscription";
+import hverdagsheltLogo from '../../public/hverdagsheltLogo2Trans.png';
 
 class Navbar extends Component {
   logged_in = false;
@@ -25,9 +26,10 @@ class Navbar extends Component {
   render() {
     return (
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
-        <NavLink to="/" className="navbar-brand">
+        <a href="#" className="navbar-left"><img src={hverdagsheltLogo} height={29.7} width={185}/></a>
+        {/*<NavLink to="/" className="navbar-brand">
           HverdagsHelt<span className="badge badge-primary mobile-notification">{this.notification_count > 0 ? this.notification_count:null}</span>
-        </NavLink>
+        </NavLink>*/}
         <button
           className="navbar-toggler"
           type="button"
