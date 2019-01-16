@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faListUl, faTh } from '@fortawesome/free-solid-svg-icons/index';
 import Notify from './Notify.js';
 import CaseSubscriptionService from "../services/CaseSubscriptionService";
+import CaseSubscription from "../classes/CaseSubscription";
 
 class Content extends Component {
   cases = null;
@@ -74,15 +75,27 @@ class Content extends Component {
     } else {
       // Loaded by normal navigation
       let locationService = new LocationService();
+      let caseService = new CaseService();
+      let subService = new CaseSubscriptionService();
       locationService
         .getLocation()
         .then((location: Location) => {
-            console.log("Location", location);
-            let caseService = new CaseService();
             caseService.getCasesByLoc(location.city, location.region)
                 .then((cases: Case[]) => {
-                    console.log("Retreived cases:", cases);
-                    this.cases = cases;
+                    let user = JSON.parse(localStorage.getItem('user'));
+                    subService.getAllCaseSubscriptions(user.user_id)
+                        .then((subscriptions: CaseSubscription) => {
+                            for(let i = 0; i < cases.length; i++){
+                              for(let j = 0; j < subscriptions.length; j++){
+                                if(subscriptions[j].case_id === cases[i].case_id){
+                                  //c.subscribed = true;
+                                    cases[i].subscribed = true;
+                                }
+                              }
+                            }
+                            this.cases = cases;
+                        })
+                        .catch((error: Error) => console.error(error));
                 })
                 .catch((error: Error) => console.error(error));
         })

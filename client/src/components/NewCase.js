@@ -29,6 +29,7 @@ class NewCase extends Component {
   pos = this.lastResortPos;
   markerPos = this.lastResortPos;
   fileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+  isMapClickable = false
 
   constructor() {
     super();
@@ -197,7 +198,7 @@ class NewCase extends Component {
                 centerPos={{ lat: this.pos.lat, lng: this.pos.lon }}
                 updatePos={this.updatePos}
                 markerPos={{ lat: this.markerPos.lat, lng: this.markerPos.lon }}
-                isClickable={'false'}
+                isClickable={this.isMapClickable}
               />
             </div>
           </div>
@@ -324,9 +325,11 @@ class NewCase extends Component {
       this.list2.hidden = true;
       this.lastResortAddress.hidden = true;
       this.lastResortAddressLabel.hidden = true;
+      this.isMapClickable = false;
     }
     let locator = new LocationService();
     this.pos = locator.getLocation();
+    this.isMapClickable = false;
   }
 
   radio2() {
@@ -336,6 +339,7 @@ class NewCase extends Component {
       this.list2.hidden = true;
       this.lastResortAddress.hidden = true;
       this.lastResortAddressLabel.hidden = true;
+      this.isMapClickable = true;
     }
   }
 
@@ -361,6 +365,7 @@ class NewCase extends Component {
         this.lastResortAddress.hidden = false;
         this.lastResortAddressLabel.hidden = false;
       }
+      this.isMapClickable = false;
     } else {
       console.log('list1 eller list2 er null!');
     }
