@@ -945,3 +945,4 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(
   }
 );
 
+
