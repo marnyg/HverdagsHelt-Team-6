@@ -14,6 +14,7 @@ class EditPassword extends Component {
     oldPass: string;
     oldPass = '';
 
+
     render() {
         if (this.user == null) {
             return <div>404</div>;
