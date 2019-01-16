@@ -294,7 +294,7 @@ class NewCase extends Component {
     }
   }
 
-  radioSelector() {
+  radioSelector(): number {
     if (this.form) {
       let posSelector: NodeList<HTMLElement> = this.form.querySelectorAll('input[name="pos"]');
       let select = [...posSelector].find((e: HTMLElement) => e instanceof HTMLInputElement && e.checked === true);
@@ -328,14 +328,19 @@ class NewCase extends Component {
       this.isMapClickable = false;
     }
     let locator = new LocationService();
-    let loc = locator.getLocation();
-    console.log("LOC");
-    console.log(JSON.stringify(loc));
-    this.pos = {lat: loc.lat, lon: loc.lon};
-    //this.pos = {};
+    locator
+      .getLocation()
+      .then(e => {
+        if (this.pos) {
+          this.pos = e;
+        }
+      })
+      .catch((err: Error) => {
+        Notify.danger('Det oppstod en feil ved henting av automatisk posisjon. \n\nFeilmelding: ' + err.message);
+      });
     this.isMapClickable = false;
-    console.log("THIS.POS");
-    console.log(this.pos);
+    console.log('THIS.POS');
+    console.log(JSON.stringify(this.pos));
   }
 
   radio2() {
@@ -485,6 +490,29 @@ class NewCase extends Component {
     console.log('Deleting image file with src = ' + src);
   }
 
+  getRegionId(name: string){
+    let service = new RegionService();
+    service
+      .getAllRegions()
+      .then(e => {
+        let region = e.find(j => j.region_name === name);
+        if(region){
+          return region.region_id;
+        }else{
+          Notify.danger("Ingen kommuner passer ditt valg.");
+          return null;
+        }
+      })
+      .catch((err: Error) => {
+        console.log('Could not get regions.');
+        Notify.danger(
+          'Kunne ikke hente kommunedata fra server for å sammenlikne med din valgte kommune. \n\nFeilmelding: ' +
+            err.message
+        );
+        return null;
+      });
+  }
+
   validate(index: number) {
     if (
       this.list1 &&
@@ -496,17 +524,33 @@ class NewCase extends Component {
       switch (index) {
         case 0:
           // Validate automatic position
-          let service = new LocationService();
-          let loc = service.geocodeLatLng(this.pos.lat, this.pos.lon);
-          console.log('VALIDATE loc: ');
-          console.log(loc);
-          return true;
+
+          if (this.pos && this.pos.country === 'Norway') {
+            return true;
+          } else {
+            Notify.warning(
+              'Din posisjon (lat: ' +
+                this.pos.lat +
+                ', lon: ' +
+                this.pos.lon +
+                ') finner sted i ' +
+                this.pos.country +
+                ' og kan derfor ikke brukes som posisjon. Posisjon blir satt til Oslo. Vennligst benytt en annen metode for å velge posisjon.'
+            );
+            console.warn('Position is not in Norway. Oslo has been selected as position.');
+            this.pos = this.lastResortPos;
+            console.log('Automatic position is not valid.');
+            return false;
+          }
         case 1:
           // Validate map marker position
+
           return true;
         case 2:
           // Validate last resort list selection
+
           if (this.list1.selectedIndex !== 0 && this.list2.selectedIndex !== 0) {
+            console.log('Last-resort-list validation is valid.');
             return true;
           } else {
             Notify.danger('Vennligst velg et fylke og en kommune hvor saken finner sted og prøv igjen.');
@@ -539,6 +583,9 @@ class NewCase extends Component {
               console.log(
                 'Using automatic location discovery using IP-address and GPS if available to determine position.'
               );
+              console.log("this.pos.city: " + this.pos.city);
+              region_id = this.getRegionId(this.pos.city);
+              console.log("Region-ID: " + region_id);
               break;
             case 1:
               // Map marker
