@@ -39,7 +39,13 @@ module.exports = {
       salt: salt,
       role_id: 4,
       region_id: req.body.region_id
-    }).then(users => (users ? res.send({ user_id: users.user_id }) : res.sendStatus(404)));
+    })
+      .then(users => (users ? res.send({ user_id: users.user_id }) : res.sendStatus(404)))
+      .catch(err => {
+        err.description = 'Det finnes allerede en bruker med den oppgitte e-posten, bruk en unik e-post';
+        res.status(409).json(err);
+        console.log(err.parent.sqlMessage);
+      });
   },
 
   getOneUser: function(req: Request, res: Response) {
@@ -93,7 +99,13 @@ module.exports = {
         region_id: req.body.region_id
       },
       { where: { user_id: req.params.user_id } }
-    ).then(users => (users ? res.send(users) : res.sendStatus(404)));
+    )
+      .then(users => (users ? res.send(users) : res.sendStatus(404)))
+      .catch(err => {
+        err.description = 'Det finnes allerede en bruker med den oppgitte eposten, bruk en unik epost';
+        res.status(409).json(err);
+        console.log(err.parent.sqlMessage);
+      });
   },
 
   deleteOneUser: function(req: Request, res: Response) {
@@ -111,8 +123,8 @@ module.exports = {
 
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
 
-    return User.destroy({ where: { user_id: Number(req.params.user_id) } }).then(
-      user => (user ? res.send() : res.status(400).send())
+    return User.destroy({ where: { user_id: Number(req.params.user_id) } }).then(user =>
+      user ? res.send() : res.status(400).send()
     );
   },
   changePassword: async function(req: Request, res: Response) {

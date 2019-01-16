@@ -8,13 +8,13 @@ type Response = express$Response;
 
 module.exports = {
   getAllRegionsInCounty: function(req: Request, res: Response) {
-    return Region.findAll({ where: { county_id: Number(req.params.county_id) } }).then(
-      regions => (regions ? res.send(regions) : res.sendStatus(404))
+    return Region.findAll({ where: { county_id: Number(req.params.county_id) } }).then(regions =>
+      regions ? res.send(regions) : res.sendStatus(404)
     );
   },
   getRegionName: function(req: Request, res: Response) {
-    return Region.findOne({ where: { region_id: res.body.region_id }, attributes: ['name'] }).then(
-      name => (name ? res.send(name) : res.sendStatus(404))
+    return Region.findOne({ where: { region_id: res.body.region_id }, attributes: ['name'] }).then(name =>
+      name ? res.send(name) : res.sendStatus(404)
     );
   },
   getOneRegionByNameAndCounty: async function(req: Request, res: Response) {
@@ -45,8 +45,8 @@ module.exports = {
     }).then(regions => (regions ? res.send(regions) : res.sendStatus(404)));
   },
   getRegion: function(req: Request, res: Response) {
-    return Region.findOne({ where: { region_id: Number(req.params.region_id) } }).then(
-      region => (region ? res.send(region) : res.sendStatus(404))
+    return Region.findOne({ where: { region_id: Number(req.params.region_id) } }).then(region =>
+      region ? res.send(region) : res.sendStatus(404)
     );
   },
   updateRegion: function(req: Request, res: Response) {
@@ -72,8 +72,13 @@ module.exports = {
     ).then(regions => (regions ? res.send(regions) : res.sendStatus(404)));
   },
   delRegion: function(req: Request, res: Response) {
-    return Region.destroy({ where: { region_id: Number(req.params.region_id) } }).then(
-      regions => (regions ? res.send() : res.status(500).send())
-    );
+    return Region.destroy({ where: { region_id: Number(req.params.region_id) } })
+      .then(regions => (regions ? res.send() : res.status(500).send()))
+      .catch(err => {
+        err.description =
+          'Kommunen kan ikke slettes, fordi det er brukere og/eller saker knyttet til den. Slett disse først.';
+        res.status(409).json(err);
+        console.log(err.parent.sqlMessage);
+      });
   }
 };
