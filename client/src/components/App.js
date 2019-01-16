@@ -9,11 +9,10 @@ import '../styles/registermodal.css';
 import '../styles/grid-list-toggle.css';
 import '../styles/simple-sidebar.css';
 import Notify from './Notify.js';
-import Subscriptions from './Subscriptions.js';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus,faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell } from '@fortawesome/free-solid-svg-icons';
-library.add(faPlus,faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell);
+import { faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell } from '@fortawesome/free-solid-svg-icons';
+library.add(faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell);
 
 import Navbar from './Navbar.js';
 import Content from './Content.js';
@@ -39,9 +38,9 @@ class App extends Component {
           <div className="content-wrapper">
             <Notify />
             <Route exact path="/" render={() => <Content />} />
-            <Route exact path="/case/:case_id" render={() => <ViewCase/>} />
-            <Route exact path="/subscriptions" render={() => <Subscriptions/>} />
-              <Route exact path="/notifications" render={() => <h1>Coming soon!</h1>} />
+            <Route exact path="/case/:case_id" render={() => <ViewCase />} />
+            <Route exact path="/subscriptions" render={() => <Subscriptions />} />
+            <Route exact path="/notifications" render={() => <h1>Coming soon!</h1>} />
             <Route exact path="/new-case" render={() => <NewCase />} />
             <Route exact path="/search/:query" component={Content} />
           </div>

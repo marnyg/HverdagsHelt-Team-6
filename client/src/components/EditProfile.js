@@ -44,61 +44,100 @@ class EditProfile extends Component<{}, { isEditing: boolean }> {
     }
     getForm() {
         return (
-            <form id="form-inline">
-                <legend>Profil</legend>
-                <label>Fornavn: </label>
-                <input
-                    type="text"
-                    id="firstname"
-                    required
-                    defaultValue={this.user.firstname}
-                    onChange={this.handleChange}
-                    className="form-control"
-                />
-                <label>Etteravn: </label>
-                <input
-                    type="text"
-                    id="lastname"
-                    required
-                    defaultValue={this.user.lastname}
-                    onChange={this.handleChange}
-                    className="form-control"
-                />
-                <label>Epost :</label>
-                <input
-                    type="email"
-                    required
-                    id="email"
-                    defaultValue={this.user.email}
-                    onChange={this.handleChange}
-                    className="form-control"
-                />
-                <label>Tlf</label>
-                <input
-                    type="tel"
-                    required
-                    id="tlf"
-                    defaultValue={this.user.tlf}
-                    onChange={this.handleChange}
-                    className="form-control"
-                />
-                <label>Bekreft Passord</label>
-                <input type="password" required id="password" onChange={this.handleChange} className="form-control" />
-                <button type="submit" valie="asd" className="btn btn-primary" onClick={this.validateForm}>
-                    Send
-                </button>
-
-                <button className="btn btn-danger" onClick={e => this.props.callback(e, <DisplayProfile callback={this.props.callback} />)}>
-                    Avbryt
-        </button>
-            </form >
+            <div className={'card w-100'}>
+                <div className={'list-group list-group-flush mw-100'}>
+                    <div className={'container w-100'}>
+                        <div className={'row list-group-item d-flex'}>
+                            <div className={'col-sm'}>
+                                Fornavn:
+                        </div>
+                            <div className={'col-lg'}>
+                                <input
+                                    type="text"
+                                    id="firstname"
+                                    required
+                                    defaultValue={this.user.firstname}
+                                    onChange={this.handleChange}
+                                    className="form-control"
+                                />
+                            </div>
+                        </div>
+                        <div className={'row list-group-item d-flex'}>
+                            <div className={'col-sm'}>
+                                Etternavn:
+                        </div>
+                            <div className={'col-lg'}>
+                                <input
+                                    type="text"
+                                    id="lastname"
+                                    required
+                                    defaultValue={this.user.lastname}
+                                    onChange={this.handleChange}
+                                    className="form-control"
+                                />
+                            </div>
+                        </div>
+                        <div className={'row list-group-item'}>
+                            <div className={'col-lg-auto'}>
+                                Email:
+                            <input
+                                    type="email"
+                                    required
+                                    id="email"
+                                    defaultValue={this.user.email}
+                                    onChange={this.handleChange}
+                                    className="form-control mt-2"
+                                />
+                            </div>
+                        </div>
+                        <div className={'row list-group-item d-flex'}>
+                            <div className={'col-sm'}>
+                                Tlf:
+                        </div>
+                            <div className={'col-lg'}>
+                                <input
+                                    type="tel"
+                                    required
+                                    id="tlf"
+                                    defaultValue={this.user.tlf}
+                                    onChange={this.handleChange}
+                                    className="form-control"
+                                />
+                            </div>
+                        </div>
+                        <div className={'row list-group-item d-flex'}>
+                            <div className={'col-sm'}>
+                                Passord:
+                        </div>
+                            <div className={'col-lg'}>
+                                <input
+                                    type="password"
+                                    required
+                                    id="tlf"
+                                    onChange={this.handleChange}
+                                    className="form-control"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className={'d-flex'}>
+                    <div className={'col-lg btn btn-primary'} onClick={this.validateForm}>
+                        Lagre
+                </div>
+                    <div className={'col-md btn btn-danger'} onClick={e => this.props.callback(e, <DisplayProfile callback={this.props.callback} />)}>
+                        Avbryt
+                </div>
+                </div>
+            </div >
         );
     }
     validateForm(event: Event) {
         event.preventDefault();
         let form = event.target.parentNode;
 
-        if (form.checkValidity()) {
+        // if (form.checkValidity() || true) {
+        if (true) {
             this.us.updateUser(this.user.user_id, this.user)
                 .then(() => {
                     localStorage.setItem("user", JSON.stringify(this.user))
