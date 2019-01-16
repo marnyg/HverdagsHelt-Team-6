@@ -132,8 +132,12 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
         //let all = Array.prototype.slice.call(e.target.parentNode.children, 0);
         //all.map(e => e.removeAttribute("class", "bg-dark"));
         //e.target.setAttribute("class", "bg-dark")
-        let id = Number.parseInt(e.target.id)
+        let id = Number.parseInt(e.target.id);
         console.log("finltering on region with id " + id);
+        this.regionService.getAllRegionGivenCounty(id)
+            .then((regions: Region[]) => this.region = regions)
+            .catch((error: Error) => console.error(error));
+
     }
 
   handleDelete(e) {
