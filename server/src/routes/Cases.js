@@ -19,13 +19,14 @@ let rawQueryCases =
   'Join Counties co ON r.county_id = co.county_id ' +
   'JOIN Users u ON c.user_id = u.user_id ' +
   'JOIN Statuses s ON c.status_id = s.status_id ' +
-  'JOIN Categories cg ON c.category_id = cg.category_id ' +
-  'ORDER BY c.updatedAt DESC';
+  'JOIN Categories cg ON c.category_id = cg.category_id ';
+
+let casesOrder =  'ORDER BY c.updatedAt DESC';
 
 module.exports = {
   getAllCases: async function(req: Request, res: Response) {
     sequelize
-      .query(rawQueryCases, { type: sequelize.QueryTypes.SELECT })
+      .query(rawQueryCases + casesOrder, { type: sequelize.QueryTypes.SELECT })
       .then(async cases => {
         const out = cases.map(async c => {
           let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
@@ -137,7 +138,7 @@ module.exports = {
       return res.sendStatus(400);
 
     return sequelize
-      .query(rawQueryCases + ' WHERE r.name = ? AND co.name = ?;', {
+      .query(rawQueryCases + ' WHERE r.name = ? AND co.name = ? ' + casesOrder, {
         replacements: [req.params.region_name, req.params.county_name],
         type: sequelize.QueryTypes.SELECT
       })
@@ -156,7 +157,7 @@ module.exports = {
   getAllCasesInRegionById: async function(req: Request, res: Response) {
     if (!req.params || typeof Number(req.params.region_id) != 'number') return res.sendStatus(400);
     sequelize
-      .query(rawQueryCases + ' WHERE c.region_id = ?;', {
+      .query(rawQueryCases + ' WHERE c.region_id = ? ' + casesOrder, {
         replacements: [Number(req.params.region_id)],
         type: sequelize.QueryTypes.SELECT
       })
@@ -188,7 +189,7 @@ module.exports = {
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
 
     sequelize
-      .query(rawQueryCases + ' WHERE c.user_id = ?;', {
+      .query(rawQueryCases + ' WHERE c.user_id = ? ' + casesOrder, {
         replacements: [Number(req.params.user_id)],
         type: sequelize.QueryTypes.SELECT
       })
