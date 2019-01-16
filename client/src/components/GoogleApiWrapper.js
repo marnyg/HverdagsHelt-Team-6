@@ -20,7 +20,7 @@ export class GoogleMapsContainer extends Component {
       this.gmap.draggable = false
       this.gmap.setOptions({ styles: [{ stylers: [{ saturation: -100 }] }] })
     } else {
-
+      this.gmap.draggable = true
       this.gmap.onClick = (t, map, coord) => this.onClick(t, map, coord)
       this.gmap.setOptions({ styles: [{ stylers: [{ saturation: 0 }] }] })
     }

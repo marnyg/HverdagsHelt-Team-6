@@ -34,7 +34,7 @@ class EditPassword extends Component {
     }
     getEditFormVersion() {
         return (
-            <div className={'row list-group-item'}>
+            <form ref="form" className={'row list-group-item'}>
                 <div className={'row'}>
                     <div className={'col-sm'}>
                         Gammelt Passord:
@@ -48,7 +48,7 @@ class EditPassword extends Component {
                         Passord:
                             </div>
                     <div className={'col-lg'}>
-                        <input type="password" required id="password1" onChange={this.handleChange} className="form-control" />
+                        <input ref="passInput1" type="password" required id="password1" onChange={this.handleChange} className="form-control" />
                     </div>
                 </div>
                 <div className={'row'}>
@@ -56,54 +56,67 @@ class EditPassword extends Component {
                         Gjenta passord:
                             </div>
                     <div className={'col-lg'}>
-                        <input type="password" required id="password2" onChange={this.handleChange} className="form-control" />
+                        <input ref="passInput2" type="password" required id="password2" onChange={this.handleChange} className="form-control" />
                     </div>
                 </div>
                 <div className={'d-flex'}>
                     <div className={'col-lg btn btn-primary'} onClick={this.validateForm}>
                         Lagre
+                    </div>
                 </div>
-                    <div className={'col-md btn btn-danger'} onClick={e => this.props.callback(e, <DisplayProfile callback={this.props.callback} />)}>
-                        Avbryt
+                <div className={'col-md btn btn-danger'} onClick={e => this.props.callback(e, <DisplayProfile callback={this.props.callback} />)}>
+                    Avbryt
                 </div>
-                </div>
-                );
-            }
+            </form>
+        );
+    }
     validateForm(event: Event) {
-                    event.preventDefault();
-                let form = event.target.parentNode;
-                let children = Array.prototype.slice.call(form.children, 0);
-        
-        if (this.arePasswordsEqual(children) && form.checkValidity()) {
+        event.preventDefault();
+        let form = this.refs.form;
+        let passInput1 = this.refs.passInput1
+        let passInput2 = this.refs.passInput2
 
-                    this.us.updatePassword(this.user.user_id, this.oldPass, this.user.password)
-                        .catch((error: Error) => console.error(error))
-                } else {
-            if (this.arePasswordsEqual(children)) {
-                    let passwordInputs = children.filter(e => e.id.includes('password'));
-                passwordInputs.map(e => e.setCustomValidity('Passwords must match'));
-            } else {
-                    let passwordInputs = children.filter(e => e.id.includes('password'));
-                passwordInputs.map(e => e.setCustomValidity(''));
-            }
-            form.reportValidity();
+        if (passInput1.value === passInput2.value) {
+            console.log("pass OK");
+
+        } else {
+
+            console.log("pass NO OK");
         }
+        // let children = Array.prototype.slice.call(form.children, 0);
+
+        // if (this.arePasswordsEqual(children) && form.checkValidity()) {
+
+        //     this.us.updatePassword(this.user.user_id, this.oldPass, this.user.password)
+        //         .catch((error: Error) => console.error(error))
+        // } else {
+        //     if (this.arePasswordsEqual(children)) {
+        //         let passwordInputs = children.filter(e => e.id.includes('password'));
+        //         passwordInputs.map(e => e.setCustomValidity('Passwords must match'));
+        //     } else {
+        //         let passwordInputs = children.filter(e => e.id.includes('password'));
+        //         passwordInputs.map(e => e.setCustomValidity(''));
+        //     }
+        //     form.reportValidity();
+        // }
+        console.log(passInput1, passInput2);
+
 
 
     }
 
-    arePasswordsEqual(children: Array<HTMLInputElement>) {
-                    console.log(children);
+    // arePasswordsEqual(children: Array<HTMLInputElement>) {
+    //     console.log(children);
 
-                    let passwordInputs = children.filter(e => e.id.includes('password'));
-                    console.log(passwordInputs);
-                    console.log(passwordInputs[0].value);
-                    console.log(passwordInputs[1].value);
-            
-                    return (passwordInputs[1].value === passwordInputs[0].value);
-                }
-            
-            
-            }
-            
-            export default EditPassword;
+    //     let passwordInputs = children.filter(e => e.id.includes('password'));
+    //     console.log(passwordInputs);
+    //     console.log(passwordInputs[0].value);
+    //     console.log(passwordInputs[1].value);
+
+    //     return (passwordInputs[1].value === passwordInputs[0].value);
+    // }
+
+
+}
+
+export default EditPassword;
