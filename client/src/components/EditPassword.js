@@ -70,7 +70,8 @@ class EditPassword extends Component {
                 <div className={'d-flex'}>
                     <div className={'col-lg btn btn-primary'} onClick={this.validateForm}>
                         Lagre
-          </div>
+                        {/* asd */}
+                    </div>
                 </div>
                 <div
                     className={'col-md btn btn-danger'}
