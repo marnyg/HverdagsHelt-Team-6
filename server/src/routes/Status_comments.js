@@ -22,7 +22,7 @@ module.exports = {
           type: sequelize.QueryTypes.SELECT
         }
       )
-      .then(async result =>  {
+      .then(async result => {
         return res.send(result);
       })
       .catch(err => {
