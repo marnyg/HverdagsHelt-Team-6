@@ -13,7 +13,7 @@ import Region from '../classes/Region.js';
 class Subscriptions extends Component {
   temp=[];
   subscriptions = [];
-  user = JSON.parse(localStorage.getItem("users"));
+  //user = JSON.parse(localStorage.getItem("users"));
 
   render() {
     if (!this.subscriptions) {
