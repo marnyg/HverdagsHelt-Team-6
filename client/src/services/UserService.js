@@ -145,10 +145,8 @@ class UserService {
               .put(
                 '/api/users/' + user_id + '/password',
                 {
-                  body: {
-                    old_password: old_password,
-                    new_password: new_password
-                  }
+                  old_password: old_password,
+                  new_password: new_password
                 },
                 {
                   headers: {
