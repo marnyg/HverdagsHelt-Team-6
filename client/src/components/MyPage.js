@@ -11,7 +11,7 @@ import { NavLink } from 'react-router-dom';
 class MyPage extends Component {
   menuItems = [
     { name: 'Min Profil', component: <MyProfile /> },
-    { name: 'Mine Komuner', component: <MyRegions /> },
+    { name: 'Mine Kommuner', component: <MyRegions /> },
     { name: 'Min Profil', component: <MyProfile /> },
     { name: 'Min Profil', component: <MyProfile /> },
     { name: 'Mine Saker', component: <MyCases /> }
