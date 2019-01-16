@@ -45,7 +45,7 @@ class EditPassword extends Component {
                 <button type="submit" className="btn btn-primary" onClick={this.validateForm}>
                     Send
                 </button>
-                <button className="btn btn-danger" onClick={e => this.props.returnHome(e)}>
+                <button className="btn btn-danger" onClick={e => this.props.callback(e, <DisplayProfile callback={this.props.callback} />)}>
                     Avbryt
                 </button>
             </form>
