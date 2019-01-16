@@ -25,7 +25,7 @@ class CaseList extends Component<{ props: { user_id: number, region_id: number }
     }
 
     return (
-      <div>
+      <div className={'card my-3 mx-3'}>
         <table className="table table-hover table-striped">
           <thead>
             <tr>
