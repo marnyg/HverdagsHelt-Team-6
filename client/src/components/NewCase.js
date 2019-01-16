@@ -14,6 +14,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons/index';
 import GoogleApiWrapper from './GoogleApiWrapper';
 import Case from '../classes/Case';
+import fs from 'fs';
 
 class NewCase extends Component {
   form = null;
@@ -29,7 +30,7 @@ class NewCase extends Component {
   pos = this.lastResortPos;
   markerPos = this.lastResortPos;
   fileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-  isMapClickable = false
+  isMapClickable = false;
 
   constructor() {
     super();
@@ -448,7 +449,6 @@ class NewCase extends Component {
 
   fileInputListener(event: SyntheticInputEvent<HTMLInputElement>) {
     let files = Array.from(event.target.files);
-
     console.log(files);
 
     if (files.length === 0) {
@@ -462,8 +462,9 @@ class NewCase extends Component {
         // File type is accepted.
         files.map(e => {
           this.images.push({
-            alt: 'Bildenavn:' + e.name + ', størrelse ' + e.size + ' bytes.',
-            src: window.URL.createObjectURL(e)
+            value: e,
+            alt: 'Bildenavn: ' + e.name,
+            src: URL.createObjectURL(e)
           });
         });
       } else {
@@ -563,7 +564,9 @@ class NewCase extends Component {
                 lon: this.municipalities[this.list2.selectedIndex - 1].lon
               };
               region_id = this.municipalities[this.list2.selectedIndex - 1].region_id;
-              description += ('\n\nAdresse gitt av bruker som følge av manuelt valg av kommune ved hjelp av. liste: ' + this.lastResortAddress.value);
+              description +=
+                '\n\nAdresse gitt av bruker som følge av manuelt valg av kommune ved hjelp av. liste: ' +
+                this.lastResortAddress.value;
               break;
           }
           let user_id = null;
@@ -573,8 +576,7 @@ class NewCase extends Component {
             description: description,
             region_id: region_id,
             lat: this.pos.lat,
-            lon: this.pos.lon,
-            images: this.images
+            lon: this.pos.lon
           };
           this.send(newcase);
         } else {
@@ -593,7 +595,7 @@ class NewCase extends Component {
     console.log('Case is ' + JSON.stringify(obj));
     let cas = new CaseService();
     cas
-      .createCase(obj)
+      .createCase(obj, this.images)
       .then(e => {
         Notify.success('Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id);
         console.log('Form data transmission success! Case ID: ' + e.case_id);
