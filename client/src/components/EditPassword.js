@@ -73,7 +73,6 @@ class EditPassword extends Component {
                     event.preventDefault();
                 let form = event.target.parentNode;
                 let children = Array.prototype.slice.call(form.children, 0);
-
         if (this.arePasswordsEqual(children) && form.checkValidity()) {
 
                     this.us.updatePassword(this.user.user_id, this.oldPass, this.user.password)
@@ -81,13 +80,13 @@ class EditPassword extends Component {
                 } else {
             if (this.arePasswordsEqual(children)) {
                     let passwordInputs = children.filter(e => e.id.includes('password'));
-            passwordInputs.map(e => e.setCustomValidity('Passwords must match'));
+        passwordInputs.map(e => e.setCustomValidity('Passwords must match'));
             } else {
                     let passwordInputs = children.filter(e => e.id.includes('password'));
-            passwordInputs.map(e => e.setCustomValidity(''));
-        }
-        form.reportValidity();
+        passwordInputs.map(e => e.setCustomValidity(''));
     }
+    form.reportValidity();
+}
 
 
 }
