@@ -9,7 +9,6 @@ import EditProfile from './EditProfile';
 
 class DisplayProfile extends Component {
     user = JSON.parse(localStorage.getItem("user"))
-
     render() {
         return (
             <div className={'card'}>
@@ -48,17 +47,17 @@ class DisplayProfile extends Component {
                             </div>
                         </div>
                     </div>
-                    <button className="btn btn-primary" onClick={e => {
-                        this.props.callback(e, <EditProfile callback={this.props.callback} />)
-                    }}>
-                        Rediger Profil
+                    <div className={'d-flex'}>
+                        <button className={'col-lg btn btn-primary'} onClick={e => {
+                            console.log(this.props);
+                            this.props.callback(e, <EditProfile callback={this.props.callback} />)
+                        }}>
+                            Rediger Profil
                     </button>
-                    <button className="btn btn-primary" onClick={e => {
-                        this.props.callback(e, <EditPassword callback={this.props.callback} />)
-                    }
-                    }>
-                        Rediger Passord
+                        <button className={'col-md btn btn-danger'} onClick={e => { this.props.callback(e, <EditPassword callback={this.props.callback} />) }}>
+                            Rediger Passord
                     </button >
+                    </div>
                 </div>
             </div>
         );

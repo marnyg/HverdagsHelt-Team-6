@@ -45,7 +45,7 @@ class EditProfile extends Component<{}, { isEditing: boolean }> {
     getForm() {
         return (
             <div className={'card w-100'}>
-                <div className={'list-group list-group-flush mw-100'}>
+                <form ref="form" className={'list-group list-group-flush mw-100'}>
                     <div className={'container w-100'}>
                         <div className={'row list-group-item d-flex'}>
                             <div className={'col-sm'}>
@@ -120,24 +120,33 @@ class EditProfile extends Component<{}, { isEditing: boolean }> {
                             </div>
                         </div>
                     </div>
+                    <div className={'d-flex'}>
+                        <div className={'col-lg btn btn-primary'} onClick={this.validateForm}>
+                            Lagre
                 </div>
-                <div className={'d-flex'}>
-                    <div className={'col-lg btn btn-primary'} onClick={this.validateForm}>
-                        Lagre
-                </div>
-                    <div className={'col-md btn btn-danger'} onClick={e => this.props.callback(e, <DisplayProfile callback={this.props.callback} />)}>
-                        Avbryt
-                </div>
-                </div>
+                        <div className={'col-md btn btn-danger'} onClick={e => this.props.callback(e, <DisplayProfile callback={this.props.callback} />)}>
+                            Avbryt
+                    </div>
+                    </div>
+                </form>
+
             </div >
         );
     }
     validateForm(event: Event) {
         event.preventDefault();
-        let form = event.target.parentNode;
+        // let form = event.target.parentNode;
+        let form = this.refs.form
+        // console.log(form);
+        // console.log(form);
+        // console.log(form);
+        // console.log(form.checkValidity());
 
-        // if (form.checkValidity() || true) {
-        if (true) {
+        // form.reportValidity()
+
+
+        if (form.checkValidity() || true) {
+            // if (true) {
             this.us.updateUser(this.user.user_id, this.user)
                 .then(() => {
                     localStorage.setItem("user", JSON.stringify(this.user))
