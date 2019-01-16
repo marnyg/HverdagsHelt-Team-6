@@ -2,6 +2,7 @@
 import axios from 'axios';
 import RegionSubscription from '../classes/RegionSubscription.js';
 import LoginService from './LoginService.js';
+import User from '../classes/User.js';
 
 class RegionSubscriptionService {
   getAllRegionSubscribers(region_id: number): Promise<RegionSubscription[]> {
@@ -100,6 +101,31 @@ class RegionSubscriptionService {
         .catch((error: Error) => reject(error));
     });
   }
+
+  getSubscribedRegionsForUser(user_id: number): Promise<User[]> {
+    return new Promise((resolve, reject) => {
+      let loginService = new LoginService();
+      loginService
+        .isLoggedIn()
+        .then((logged_in: Boolean) => {
+          if (logged_in === true) {
+            let token = localStorage.getItem('token');
+            axios
+              .get('/api/users/' + user_id + '/region_subscriptions', {
+                headers: {
+                  Authorization: 'Bearer ' + token
+                }
+              })
+              .then(response => resolve(response))
+              .catch((error: Error) => reject(error));
+          } else {
+            reject('User is not registered and/or not logged in.');
+          }
+        })
+        .catch((error: Error) => reject(error));
+    });
+  }
+
 }
 
 export default RegionSubscriptionService;
