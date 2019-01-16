@@ -69,4 +69,4 @@ class Subscriptions extends Component {
   }
 }
 
-export default withRouter(Subscriptions);
+export default Subscriptions;

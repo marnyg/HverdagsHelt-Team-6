@@ -10,40 +10,54 @@ import { NavLink } from 'react-router-dom';
 
 class MyPage extends Component {
   menuItems = [
-    { name: 'Min Profil', component: <MyProfile /> },
-    { name: 'Mine Kommuner', component: <MyRegions /> },
-    { name: 'Min Profil', component: <MyProfile /> },
-    { name: 'Min Profil', component: <MyProfile /> },
-    { name: 'Mine Saker', component: <MyCases /> }
+    { name: 'Min Profil', component: <MyProfile />, selected: true},
+    { name: 'Mine Komuner', component: <MyRegions />, selected: false},
+    { name: 'Mine Saker', component: <MyCases user_id={JSON.parse(localStorage.getItem('user')).user_id} />, selected: false }
   ];
 
-  comp = <MyProfile />;
+  element = this.menuItems[0];
+  comp = <MyProfile/>;
   render() {
     return (
-      <div className="wrapper">
-        <nav id="sidebar" className="bg-danger ">
-          <div className="sidebar-header">
-            <h2>Sidebar</h2>
-          </div>
+      <div>
+        <div className={'wrapper'}>
+          <nav id="sidebar" className="nav flex-column bg-light">
+            <div className="sidebar-header">
+              <h2>Meny</h2>
+            </div>
 
-          <ul className="list-unstyled components">
-            {this.menuItems.map(e => {
-              return (
-                <li>
-                  <button
-                    className={'btn btn-secondary'}
-                    onClick={() => {
-                      this.comp = e.component;
-                    }}
-                  >
-                    {e.name}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-        {this.comp}
+            <ul className="nav flex-column components">
+              {this.menuItems.map(e => {
+                if(e.selected === true){
+                  return(
+                      <li className={'nav-item nav-link active'}
+                          onClick={() => {
+                              this.element.selected = false;
+                              this.comp = e.component;
+                              this.element = e;
+                              this.element.selected = true;
+                          }}>
+                          {e.name}
+                      </li>
+                  );
+                } else {
+                  return(
+                      <li className={'nav-item nav-link disabled'}
+                          onClick={() => {
+                              this.element.selected = false;
+                              this.comp = e.component;
+                              this.element = e;
+                              this.element.selected = true;
+                          }}>
+                          {e.name}
+                      </li>
+                  );
+                }
+              })}
+            </ul>
+          </nav>
+          {this.element.component}
+        </div>
       </div>
     );
   }

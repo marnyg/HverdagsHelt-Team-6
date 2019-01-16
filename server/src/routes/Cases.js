@@ -40,6 +40,11 @@ module.exports = {
 
   createNewCase: function(req: Request, res: Response) {
     reqAccessLevel(req, res, 4, () => true);
+    console.log("11111111111111111111111111 DENNE SKAL VI SE");
+    if(req.body){
+      console.log(req.body);
+      console.log(req.body.images);
+    }
     if (!req.files) {
       console.log('No file received');
       return res.send({
@@ -57,12 +62,10 @@ module.exports = {
         !req.token ||
         typeof req.body.title !== 'string' ||
         typeof req.body.description !== 'string' ||
-        typeof Number(req.body.lat) !== 'number' ||
-        typeof Number(req.body.lon) !== 'number' ||
-        typeof Number(req.body.region_id) !== 'number' ||
-        typeof Number(req.body.user_id) !== 'number' ||
-        typeof Number(req.body.category_id) !== 'number' ||
-        typeof Number(req.body.status_id) !== 'number'
+        typeof Number(req.body.lat) != 'number' ||
+        typeof Number(req.body.lon) != 'number' ||
+        typeof Number(req.body.region_id) != 'number' ||
+        typeof Number(req.body.category_id) != 'number'
       ) {
         console.log(req.body);
         return res.sendStatus(400);
