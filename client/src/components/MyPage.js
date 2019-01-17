@@ -11,8 +11,8 @@ import DisplayProfile from './DisplayProfile.js';
 
 class MyPage extends Component {
   menuItems = [
-    { name: 'Min Profil', component: <MyProfile />, selected: true },
-    { name: 'Mine Komuner', component: <MyRegions />, selected: false },
+    { name: 'Min Profil', component: <MyProfile />, selected: true},
+    { name: 'Mine Kommuner', component: <MyRegions />, selected: false},
     { name: 'Mine Saker', component: <MyCases user_id={JSON.parse(localStorage.getItem('user')).user_id} />, selected: false }
   ];
 
