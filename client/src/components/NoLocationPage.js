@@ -12,7 +12,6 @@ class NoLocationPage extends Component {
     region_id = null;
 
     render() {
-        console.log('Rendering');
         return(
             <div className={'no-page'}>
                 <h1>Vi finner ingen saker til deg...</h1>
@@ -28,8 +27,8 @@ class NoLocationPage extends Component {
                     <p>
                         Dersom dette ikke stemmer, kan du velge riktig fylke og kommune i menyen under.<br/>
                     </p>
-                    <div className={'form-group'}>
-                        <select id={'county-selector'} onChange={this.countySelected}>
+                    <form className={'form-group w-50'}>
+                        <select className={'form-control mb-3'} id={'county-selector'} onChange={this.countySelected}>
                             <option value={'.null'} disabled>Velg fylke</option>
                             {this.counties.map(e => (
                                 <option key={e.county_id} value={e.county_id}>
@@ -38,7 +37,7 @@ class NoLocationPage extends Component {
                                 </option>
                             ))}
                         </select>
-                        <select id={'region-selector'} onChange={this.regionSelected} hidden>
+                        <select className={'form-control mb-3'} id={'region-selector'} onChange={this.regionSelected} hidden>
                             <option value={'.null'} disabled>Velg kommune</option>
                             {this.regions.map(e => (
                                 <option key={e.region_id} value={e.region_id}>
@@ -47,19 +46,17 @@ class NoLocationPage extends Component {
                                 </option>
                             ))}
                         </select>
-                        <button className={'btn btn-primary'} onClick={this.submit}>Send</button>
-                    </div>
+                        <button className={'form-control btn btn-primary mb-3'} onClick={this.submit}>Send</button>
+                    </form>
                 </div>
             </div>
         );
     }
 
     mounted(){
-        console.log('NoLocPage:', this.props.location);
         let locationService = new LocationService();
         locationService.getLocation()
             .then((location: Location) => {
-                console.log('SetState');
                 this.location = location;
             })
             .catch((error: Error) => console.error(error));

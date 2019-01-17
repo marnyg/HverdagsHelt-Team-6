@@ -28,13 +28,13 @@ class Navbar extends Component {
     let user = JSON.parse(localStorage.getItem('user'));
     if(user === null){
         registerlink = (
-            <div className="nav-link" data-toggle="modal" data-target="#register-modal">
+            <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#register-modal">
                 Registrer sak
             </div>
         );
     } else if(this.logged_in === false){
         registerlink = (
-            <div className="nav-link" data-toggle="modal" data-target="#login-modal">
+            <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#login-modal">
                 Registrer sak
             </div>
         );
@@ -149,7 +149,7 @@ class Navbar extends Component {
             </NavLink>
           </li>
           <li className="nav-item">
-            <div className="nav-link" onClick={this.logout}>
+            <div className="nav-link" style={{cursor: 'pointer'}} onClick={this.logout}>
               Logg ut
             </div>
             <LoginModal onLogin={() => this.onLogin()} />
@@ -160,13 +160,13 @@ class Navbar extends Component {
       return (
         <ul className="navbar-nav">
           <li className="nav-item">
-            <div className="nav-link" data-toggle="modal" data-target="#register-modal">
+            <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#register-modal">
               Ny bruker
             </div>
             <RegisterModal onLogin={() => this.onLogin()}/>
           </li>
           <li className="nav-item">
-            <div className="nav-link" data-toggle="modal" data-target="#login-modal">
+            <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#login-modal">
               Logg inn
             </div>
             <LoginModal onLogin={() => this.onLogin()} />
