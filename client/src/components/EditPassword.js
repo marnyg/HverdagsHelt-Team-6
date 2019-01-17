@@ -5,14 +5,15 @@ import { Component } from 'react-simplified';
 import User from '../classes/User';
 import UserService from '../services/UserService';
 import EditProfile from './EditProfile';
-import DisplayProfile from './DisplayProfile'
+import DisplayProfile from './DisplayProfile';
 
 class EditPassword extends Component {
     us = new UserService();
-    user = JSON.parse(localStorage.getItem("user"))
+    user = JSON.parse(localStorage.getItem('user'));
     // oldUser = JSON.parse(localStorage.getItem("user"))
-    oldPass: string
-    oldPass = ""
+    oldPass: string;
+    oldPass = '';
+
 
     render() {
         if (this.user == null) {
@@ -30,62 +31,77 @@ class EditPassword extends Component {
                 this.oldPass = event.target.value;
                 break;
         }
-        console.log(this.user);
-    }
-    getEditFormVersion() {
-        return (
-            <form id="form-inline">
+        getEditFormVersion() {
+            return (
+                <form ref="form" className={'row list-group-item'}>
+                    <div className={'row'}>
+                        <div className={'col-sm'}>Gammelt Passord:</div>
+                        <div className={'col-lg'}>
+                            <input type="password" required id="oldPassword" onChange={this.handleChange} className="form-control" />
+                        </div>
+                    </div>
+                    <div className={'row'}>
+                        <div className={'col-sm'}>Passord:</div>
+                        <div className={'col-lg'}>
+                            <input
+                                ref="passInput1"
+                                type="password"
+                                required
+                                id="password1"
+                                onChange={this.handleChange}
+                                className="form-control"
+                            />
+                        </div>
+                    </div>
+                    <div className={'row'}>
+                        <div className={'col-sm'}>Gjenta passord:</div>
+                        <div className={'col-lg'}>
+                            <input
+                                ref="passInput2"
+                                type="password"
+                                required
+                                id="password2"
+                                onChange={this.handleChange}
+                                className="form-control"
+                            />
+                        </div>
+                    </div>
+                    <div className={'d-flex'}>
+                        <div className={'col-lg btn btn-primary'} onClick={this.validateForm}>
+                            Lagre
+                        {/* asd */}
+                        </div>
+                    </div>
+                    <div
+                        className={'col-md btn btn-danger'}
+                        onClick={e => this.props.callback(e, <DisplayProfile callback={this.props.callback} />)}
+                    >
+                        Avbryt
+        </div>
+                </form>
+            );
 
-                <label>Gammelt Passord</label>
-                <input type="password" required id="oldPassword" onChange={this.handleChange} className="form-control" />
-                <label>Nytt Passord</label>
-                <input type="password" required id="password1" onChange={this.handleChange} className="form-control" />
-                <label>Gjenta Passord</label>
-                <input type="password" required id="password2" onChange={this.handleChange} className="form-control" />
-                <button type="submit" className="btn btn-primary" onClick={this.validateForm}>
-                    Send
-                </button>
-                <button className="btn btn-danger" onClick={e => this.props.callback(e, <DisplayProfile callback={this.props.callback} />)}>
-                    Avbryt
-                </button>
-            </form>
-        );
-    }
-    validateForm(event: Event) {
-        event.preventDefault();
-        let form = event.target.parentNode;
-        let children = Array.prototype.slice.call(form.children, 0);
-
-        if (this.arePasswordsEqual(children) && form.checkValidity()) {
-
-            this.us.updatePassword(this.user.user_id, this.oldPass, this.user.password)
-                .catch((error: Error) => console.error(error))
-        } else {
-            if (this.arePasswordsEqual(children)) {
-                let passwordInputs = children.filter(e => e.id.includes('password'));
-                passwordInputs.map(e => e.setCustomValidity('Passwords must match'));
-            } else {
-                let passwordInputs = children.filter(e => e.id.includes('password'));
-                passwordInputs.map(e => e.setCustomValidity(''));
-            }
-            form.reportValidity();
         }
+        validateForm(event: Event) {
+            event.preventDefault();
 
+            let passInput1 = this.refs.passInput1;
+            let passInput2 = this.refs.passInput2;
 
+            if (passInput1.value === passInput2.value && this.refs.form.checkValidity()) {
+                console.log('pass OK');
+                passInput2.setCustomValidity('');
+                this.us
+                    .updatePassword(this.user.user_id, this.oldPass, this.user.password)
+                    .then(() => this.props.callback(null, <DisplayProfile callback={this.props.callback} />))
+                    .catch((error: Error) => console.error(error));
+            } else {
+                passInput2.setCustomValidity('Passwords must match');
+                this.refs.form.reportValidity();
+                passInput2.setCustomValidity('');
+                console.log('pass NO OK');
+            }
+        }
     }
 
-    arePasswordsEqual(children: Array<HTMLInputElement>) {
-        console.log(children);
-
-        let passwordInputs = children.filter(e => e.id.includes('password'));
-        console.log(passwordInputs);
-        console.log(passwordInputs[0].value);
-        console.log(passwordInputs[1].value);
-
-        return (passwordInputs[1].value === passwordInputs[0].value);
-    }
-
-
-}
-
-export default EditPassword;
+    export default EditPassword;
