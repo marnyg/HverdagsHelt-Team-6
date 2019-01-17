@@ -617,7 +617,7 @@ class NewCase extends Component {
               };
               region_id = this.municipalities[this.list2.selectedIndex - 1].region_id;
               description +=
-                '\n\nAdresse gitt av bruker som følge av manuelt valg av kommune ved hjelp av. liste: ' +
+                '\n\nAdresse gitt av bruker som følge av manuelt valg av kommune ved hjelp av liste: ' +
                 this.lastResortAddress.value;
               break;
           }

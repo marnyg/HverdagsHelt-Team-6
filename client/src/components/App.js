@@ -10,8 +10,8 @@ import '../styles/grid-list-toggle.css';
 import '../styles/simple-sidebar.css';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus,faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell } from '@fortawesome/free-solid-svg-icons';
-library.add(faPlus,faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell);
+import { faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell } from '@fortawesome/free-solid-svg-icons';
+library.add(faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell);
 
 import Navbar from './Navbar.js';
 import Content from './Content.js';
