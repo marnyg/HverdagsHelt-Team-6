@@ -228,7 +228,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     let stat = new StatusService();
     let cat = new CategoryService();
     cas
-      .getCase(this.props.case_id)
+      .getCase(this.props.match.params.case_id)
       .then((c: Case) => {
         if (c.length > 0) {
           this.case = c[0];
@@ -239,16 +239,16 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
         }
       })
       .catch((err: Error) => {
-        console.log('Could not load case with id ' + this.props.case_id);
+        console.log('Could not load case with id ' + this.props.match.params.case_id);
         Notify.danger(
           'Klarte ikke å hente sak med id ' +
-            this.props.case_id +
+            this.props.match.params.case_id +
             '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
             err.message
         );
       });
     cascom
-      .getAllStatusComments(this.props.case_id)
+      .getAllStatusComments(this.props.match.params.case_id)
       .then(e => {
         this.statusMessage = e;
         console.log('Statuskommentarer lengde = ' + this.statusMessage.length);
@@ -261,10 +261,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
         }
       })
       .catch((err: Error) => {
-        console.log('Could not load case comments for case with id ' + this.props.case_id);
+        console.log('Could not load case comments for case with id ' + this.props.match.params.case_id);
         Notify.danger(
           'Klarte ikke å hente kommentarer til sak med id ' +
-            this.props.case_id +
+            this.props.match.params.case_id +
             '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
             err.message
         );
