@@ -191,7 +191,7 @@ Case_subscriptions.belongsTo(Case, { foreignKey: { name: 'case_id', allowNull: f
 
 // Drop tables and create test data when not in production environment
 let production = process.env.NODE_ENV === 'production';
-production = false; // Gjør at databasen er statisk
+production = true; // Gjør at databasen er statisk
 // The sync promise can be used to wait for the database to be ready (for instance in your tests)
 export let sync = sequelize.sync({ force: production ? false : true }).then(
   () => {
@@ -199,26 +199,11 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(
       return (
         // ****************************** Counties ******************************
         County.create({
-          name: 'Østfold'
+          name: 'Akershus'
         })
           .then(() =>
             County.create({
-              name: 'Akershus'
-            })
-          )
-          .then(() =>
-            County.create({
-              name: 'Oslo'
-            })
-          )
-          .then(() =>
-            County.create({
-              name: 'Hedmark'
-            })
-          )
-          .then(() =>
-            County.create({
-              name: 'Oppland'
+              name: 'Aust-Agder'
             })
           )
           .then(() =>
@@ -228,27 +213,12 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(
           )
           .then(() =>
             County.create({
-              name: 'Vestfold'
+              name: 'Finnmark'
             })
           )
           .then(() =>
             County.create({
-              name: 'Telemark'
-            })
-          )
-          .then(() =>
-            County.create({
-              name: 'Aust-Agder'
-            })
-          )
-          .then(() =>
-            County.create({
-              name: 'Vest-Agder'
-            })
-          )
-          .then(() =>
-            County.create({
-              name: 'Rogaland'
+              name: 'Hedmark'
             })
           )
           .then(() =>
@@ -258,17 +228,7 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(
           )
           .then(() =>
             County.create({
-              name: 'Sogn og Fjordane'
-            })
-          )
-          .then(() =>
-            County.create({
               name: 'Møre og Romsdal'
-            })
-          )
-          .then(() =>
-            County.create({
-              name: 'Trøndelag'
             })
           )
           .then(() =>
@@ -278,40 +238,55 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(
           )
           .then(() =>
             County.create({
+              name: 'Oppland'
+            })
+          )
+          .then(() =>
+            County.create({
+              name: 'Oslo'
+            })
+          )
+          .then(() =>
+            County.create({
+              name: 'Rogaland'
+            })
+          )
+          .then(() =>
+            County.create({
+              name: 'Sogn og Fjordane'
+            })
+          )
+          .then(() =>
+            County.create({
+              name: 'Telemark'
+            })
+          )
+          .then(() =>
+            County.create({
               name: 'Troms'
             })
           )
           .then(() =>
             County.create({
-              name: 'Finnmark'
+              name: 'Trøndelag'
+            })
+          )
+          .then(() =>
+            County.create({
+              name: 'Vest-Agder'
+            })
+          )
+          .then(() =>
+            County.create({
+              name: 'Vestfold'
+            })
+          )
+          .then(() =>
+            County.create({
+              name: 'Østfold'
             })
           )
           // ****************************** Regions ******************************
-          // Østfold
-          .then(() =>
-            Region.create({
-              name: 'Aremark',
-              lat: 59.2441615,
-              lon: 11.682433299999957,
-              county_id: 1
-            })
-          )
-          .then(() =>
-            Region.create({
-              name: 'Askim',
-              lat: 59.5834589,
-              lon: 11.162900499999978,
-              county_id: 1
-            })
-          )
-          .then(() =>
-            Region.create({
-              name: 'Eidsberg',
-              lat: 59.5119336,
-              lon: 11.332992999999988,
-              county_id: 1
-            })
-          )
           // Akershus
           .then(() =>
             Region.create({
@@ -335,140 +310,6 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(
               lat: 59.8945502,
               lon: 10.546342699999968,
               county_id: 2
-            })
-          )
-          // Oslo
-          .then(() =>
-            Region.create({
-              name: 'Oslo',
-              lat: 59.9138688,
-              lon: 10.752245399999993,
-              county_id: 3
-            })
-          )
-          // Hedmark
-          .then(() =>
-            Region.create({
-              name: 'Alvdal',
-              lat: 62.11020989999999,
-              lon: 10.63983189999999,
-              county_id: 4
-            })
-          )
-          .then(() =>
-            Region.create({
-              name: 'Eidskog',
-              lat: 59.9855907,
-              lon: 12.052325099999962,
-              county_id: 4
-            })
-          )
-          .then(() =>
-            Region.create({
-              name: 'Elverum',
-              lat: 60.8865732,
-              lon: 11.567248199999995,
-              county_id: 4
-            })
-          )
-          // Oppland
-          .then(() =>
-            Region.create({
-              name: 'Dovre',
-              lat: 62.0748588,
-              lon: 9.53601750000007,
-              county_id: 5
-            })
-          )
-          .then(() =>
-            Region.create({
-              name: 'Etnedal',
-              lat: 60.961946,
-              lon: 9.599301800000035,
-              county_id: 5
-            })
-          )
-          .then(() =>
-            Region.create({
-              name: 'Gausdal',
-              lat: 61.29669779999999,
-              lon: 9.85144850000006,
-              county_id: 5
-            })
-          )
-          // Buskerud
-          .then(() =>
-            Region.create({
-              name: 'Drammen',
-              lat: 59.70335500000001,
-              lon: 10.148064500000032,
-              county_id: 6
-            })
-          )
-          .then(() =>
-            Region.create({
-              name: 'Flesberg',
-              lat: 59.8174274,
-              lon: 9.56432719999998,
-              county_id: 6
-            })
-          )
-          .then(() =>
-            Region.create({
-              name: 'Flå',
-              lat: 60.3837212,
-              lon: 9.485904900000037,
-              county_id: 6
-            })
-          )
-          // Vestfold
-          .then(() =>
-            Region.create({
-              name: 'Færder',
-              lat: 59.02679850000001,
-              lon: 10.524605000000065,
-              county_id: 7
-            })
-          )
-          .then(() =>
-            Region.create({
-              name: 'Holmestrand',
-              lat: 59.5115168,
-              lon: 10.217080099999976,
-              county_id: 7
-            })
-          )
-          .then(() =>
-            Region.create({
-              name: 'Horten',
-              lat: 59.417084,
-              lon: 10.483212900000012,
-              county_id: 7
-            })
-          )
-          // Telemark
-          .then(() =>
-            Region.create({
-              name: 'Bamble',
-              lat: 59.00306370000001,
-              lon: 9.741110700000036,
-              county_id: 8
-            })
-          )
-          .then(() =>
-            Region.create({
-              name: 'Bø i Telemark',
-              lat: 59.413934,
-              lon: 9.06189900000004,
-              county_id: 8
-            })
-          )
-          .then(() =>
-            Region.create({
-              name: 'Drangedal',
-              lat: 59.1135318,
-              lon: 9.010694400000034,
-              county_id: 8
             })
           )
           // Aust-Agder
@@ -496,54 +337,79 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(
               county_id: 9
             })
           )
-          // Vest-Agder
+          // Buskerud
           .then(() =>
             Region.create({
-              name: 'Audnedal',
-              lat: 58.28574979999999,
-              lon: 7.35594059999994,
-              county_id: 10
+              name: 'Drammen',
+              lat: 59.70335500000001,
+              lon: 10.148064500000032,
+              county_id: 6
             })
           )
           .then(() =>
             Region.create({
-              name: 'Farsund',
-              lat: 58.0630377,
-              lon: 6.620277100000067,
-              county_id: 10
+              name: 'Flesberg',
+              lat: 59.8174274,
+              lon: 9.56432719999998,
+              county_id: 6
             })
           )
           .then(() =>
             Region.create({
-              name: 'Flekkefjord',
-              lat: 58.25043989999999,
-              lon: 6.5352949000000535,
-              county_id: 10
+              name: 'Flå',
+              lat: 60.3837212,
+              lon: 9.485904900000037,
+              county_id: 6
             })
           )
-          // Rogaland
+          // Finnmark
           .then(() =>
             Region.create({
-              name: 'Bjerkreim',
-              lat: 58.6383562,
-              lon: 6.08925899999997,
-              county_id: 11
-            })
-          )
-          .then(() =>
-            Region.create({
-              name: 'Bokn',
-              lat: 59.22403259999999,
-              lon: 5.452889499999969,
-              county_id: 11
+              name: 'Alta',
+              lat: 69.96873760000001,
+              lon: 23.27154960000007,
+              county_id: 18
             })
           )
           .then(() =>
             Region.create({
-              name: 'Eigersund',
-              lat: 58.3730054,
-              lon: 5.899172000000021,
-              county_id: 11
+              name: 'Berlevåg',
+              lat: 70.7198284,
+              lon: 29.030086200000028,
+              county_id: 18
+            })
+          )
+          .then(() =>
+            Region.create({
+              name: 'Båtsfjord',
+              lat: 70.6304931,
+              lon: 29.711803199999963,
+              county_id: 18
+            })
+          )
+          // Hedmark
+          .then(() =>
+            Region.create({
+              name: 'Alvdal',
+              lat: 62.11020989999999,
+              lon: 10.63983189999999,
+              county_id: 4
+            })
+          )
+          .then(() =>
+            Region.create({
+              name: 'Eidskog',
+              lat: 59.9855907,
+              lon: 12.052325099999962,
+              county_id: 4
+            })
+          )
+          .then(() =>
+            Region.create({
+              name: 'Elverum',
+              lat: 60.8865732,
+              lon: 11.567248199999995,
+              county_id: 4
             })
           )
           // Hordaland
@@ -571,6 +437,115 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(
               county_id: 12
             })
           )
+          // Møre og Romsdal
+          .then(() =>
+            Region.create({
+              name: 'Aukra',
+              lat: 62.84611659999999,
+              lon: 6.942303600000059,
+              county_id: 14
+            })
+          )
+          .then(() =>
+            Region.create({
+              name: 'Aure',
+              lat: 63.26999540000001,
+              lon: 8.536928999999986,
+              county_id: 14
+            })
+          )
+          .then(() =>
+            Region.create({
+              name: 'Averøy',
+              lat: 63.05326669999999,
+              lon: 7.4759509000000435,
+              county_id: 14
+            })
+          )
+          // Nordland
+          .then(() =>
+            Region.create({
+              name: 'Alstahaug',
+              lat: 65.8740772,
+              lon: 12.460837399999946,
+              county_id: 16
+            })
+          )
+          .then(() =>
+            Region.create({
+              name: 'Andøy',
+              lat: 69.253191,
+              lon: 15.593840499999942,
+              county_id: 16
+            })
+          )
+          .then(() =>
+            Region.create({
+              name: 'Ballangen',
+              lat: 68.3429232,
+              lon: 16.831425099999933,
+              county_id: 16
+            })
+          )
+          // Oppland
+          .then(() =>
+            Region.create({
+              name: 'Dovre',
+              lat: 62.0748588,
+              lon: 9.53601750000007,
+              county_id: 5
+            })
+          )
+          .then(() =>
+            Region.create({
+              name: 'Etnedal',
+              lat: 60.961946,
+              lon: 9.599301800000035,
+              county_id: 5
+            })
+          )
+          .then(() =>
+            Region.create({
+              name: 'Gausdal',
+              lat: 61.29669779999999,
+              lon: 9.85144850000006,
+              county_id: 5
+            })
+          )
+          // Oslo
+          .then(() =>
+            Region.create({
+              name: 'Oslo',
+              lat: 59.9138688,
+              lon: 10.752245399999993,
+              county_id: 3
+            })
+          )
+          // Rogaland
+          .then(() =>
+            Region.create({
+              name: 'Bjerkreim',
+              lat: 58.6383562,
+              lon: 6.08925899999997,
+              county_id: 11
+            })
+          )
+          .then(() =>
+            Region.create({
+              name: 'Bokn',
+              lat: 59.22403259999999,
+              lon: 5.452889499999969,
+              county_id: 11
+            })
+          )
+          .then(() =>
+            Region.create({
+              name: 'Eigersund',
+              lat: 58.3730054,
+              lon: 5.899172000000021,
+              county_id: 11
+            })
+          )
           // Sogn og Fjordane
           .then(() =>
             Region.create({
@@ -596,29 +571,54 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(
               county_id: 13
             })
           )
-          // Møre og Romsdal
+          // Telemark
           .then(() =>
             Region.create({
-              name: 'Aukra',
-              lat: 62.84611659999999,
-              lon: 6.942303600000059,
-              county_id: 14
+              name: 'Bamble',
+              lat: 59.00306370000001,
+              lon: 9.741110700000036,
+              county_id: 8
             })
           )
           .then(() =>
             Region.create({
-              name: 'Aure',
-              lat: 63.26999540000001,
-              lon: 8.536928999999986,
-              county_id: 14
+              name: 'Bø i Telemark',
+              lat: 59.413934,
+              lon: 9.06189900000004,
+              county_id: 8
             })
           )
           .then(() =>
             Region.create({
-              name: 'Averøy',
-              lat: 63.05326669999999,
-              lon: 7.4759509000000435,
-              county_id: 14
+              name: 'Drangedal',
+              lat: 59.1135318,
+              lon: 9.010694400000034,
+              county_id: 8
+            })
+          )
+          // Troms
+          .then(() =>
+            Region.create({
+              name: 'Balsfjord',
+              lat: 69.2389558,
+              lon: 19.22602710000001,
+              county_id: 17
+            })
+          )
+          .then(() =>
+            Region.create({
+              name: 'Bardu',
+              lat: 68.76474809999999,
+              lon: 18.43886180000004,
+              county_id: 17
+            })
+          )
+          .then(() =>
+            Region.create({
+              name: 'Berg',
+              lat: 69.5440586,
+              lon: 17.159426199999984,
+              county_id: 17
             })
           )
           // Trøndelag
@@ -654,79 +654,79 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(
               county_id: 15
             })
           )
-          // Nordland
+          // Vest-Agder
           .then(() =>
             Region.create({
-              name: 'Alstahaug',
-              lat: 65.8740772,
-              lon: 12.460837399999946,
-              county_id: 16
+              name: 'Audnedal',
+              lat: 58.28574979999999,
+              lon: 7.35594059999994,
+              county_id: 10
             })
           )
           .then(() =>
             Region.create({
-              name: 'Andøy',
-              lat: 69.253191,
-              lon: 15.593840499999942,
-              county_id: 16
+              name: 'Farsund',
+              lat: 58.0630377,
+              lon: 6.620277100000067,
+              county_id: 10
             })
           )
           .then(() =>
             Region.create({
-              name: 'Ballangen',
-              lat: 68.3429232,
-              lon: 16.831425099999933,
-              county_id: 16
+              name: 'Flekkefjord',
+              lat: 58.25043989999999,
+              lon: 6.5352949000000535,
+              county_id: 10
             })
           )
-          // Troms
+          // Vestfold
           .then(() =>
             Region.create({
-              name: 'Balsfjord',
-              lat: 69.2389558,
-              lon: 19.22602710000001,
-              county_id: 17
-            })
-          )
-          .then(() =>
-            Region.create({
-              name: 'Bardu',
-              lat: 68.76474809999999,
-              lon: 18.43886180000004,
-              county_id: 17
+              name: 'Færder',
+              lat: 59.02679850000001,
+              lon: 10.524605000000065,
+              county_id: 7
             })
           )
           .then(() =>
             Region.create({
-              name: 'Berg',
-              lat: 69.5440586,
-              lon: 17.159426199999984,
-              county_id: 17
-            })
-          )
-          // Finnmark
-          .then(() =>
-            Region.create({
-              name: 'Alta',
-              lat: 69.96873760000001,
-              lon: 23.27154960000007,
-              county_id: 18
+              name: 'Holmestrand',
+              lat: 59.5115168,
+              lon: 10.217080099999976,
+              county_id: 7
             })
           )
           .then(() =>
             Region.create({
-              name: 'Berlevåg',
-              lat: 70.7198284,
-              lon: 29.030086200000028,
-              county_id: 18
+              name: 'Horten',
+              lat: 59.417084,
+              lon: 10.483212900000012,
+              county_id: 7
+            })
+          )
+          // Østfold
+          .then(() =>
+            Region.create({
+              name: 'Aremark',
+              lat: 59.2441615,
+              lon: 11.682433299999957,
+              county_id: 1
             })
           )
           .then(() =>
             Region.create({
-              name: 'Båtsfjord',
-              lat: 70.6304931,
-              lon: 29.711803199999963,
-              county_id: 18
+              name: 'Askim',
+              lat: 59.5834589,
+              lon: 11.162900499999978,
+              county_id: 1
+            })
+          )
+          .then(() =>
+            Region.create({
+              name: 'Eidsberg',
+              lat: 59.5119336,
+              lon: 11.332992999999988,
+              county_id: 1
             })
           )
           // ****************************** Roles ******************************
@@ -944,4 +944,6 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(
     console.log('Database connection failed');
   }
 );
+
+
 
