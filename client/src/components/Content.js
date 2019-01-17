@@ -19,6 +19,9 @@ class Content extends Component {
   grid = true;
   location = null;
 
+  caseResponse = false;
+  locationResponse = false;
+
   constructor() {
     super();
     Notify.flush();
@@ -26,56 +29,57 @@ class Content extends Component {
 
   render() {
     console.log('Content rendering');
-    if (this.cases === null || this.cases === undefined){
-        if(this.location !== null || this.location !== undefined){ // No response from the locationservice has been given, wait before showing
-            console.log('No Location');
+    if (this.location !== null){
+        if(this.cases !== null && this.cases.length > 0){ // No response from the locationservice has been given, wait before showing
             return (
-                <NoLocationPage location={this.location} onSubmit={(region_id) => this.onRegionSelected(region_id)}/>
+                <div>
+                    <div>
+                        <div className="d-none d-sm-block">
+                            <div className="btn-toolbar my-3 mx-2" role="toolbar">
+                                <div className="btn-group mr-2" role="group">
+                                    <button
+                                        type="button"
+                                        className={this.grid ? 'btn btn-secondary' : 'btn btn-secondary'}
+                                        onClick={() => (this.grid = true)}
+                                    >
+                                        <FontAwesomeIcon icon={faTh} /> Grid
+                                    </button>
+                                    <button type="button" className="btn btn-secondary" onClick={() => (this.grid = false)}>
+                                        <FontAwesomeIcon icon={faListUl} /> List
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div className={'ml-3 mb-3'}>
+                            <h4>Saker i {this.location.city} {this.location.region}</h4>
+                        </div>
+                        <div>
+                            {this.grid ? (
+                                <div className="content">
+                                    {this.cases.map(e => (
+                                        <CaseItem case={e} key={e.case_id} grid={this.grid} />
+                                    ))}
+                                </div>
+                            ) : (
+                                this.cases.map(e => <CaseItem case={e} key={e.case_id} grid={this.grid} />)
+                            )}
+                        </div>
+                    </div>
+                </div>
             );
         } else {
             return(
-                <h1>Waiting for location</h1>
+                <NoLocationPage location={this.location} onSubmit={(region_id) => this.onRegionSelected(region_id)}/>
             );
         }
     } else {
-        return (
-            <div>
-                <div>
-                    <div className="d-none d-sm-block">
-                        <div className="btn-toolbar my-3 mx-2" role="toolbar">
-                            <div className="btn-group mr-2" role="group">
-                                <button
-                                    type="button"
-                                    className={this.grid ? 'btn btn-secondary' : 'btn btn-secondary'}
-                                    onClick={() => (this.grid = true)}
-                                >
-                                    <FontAwesomeIcon icon={faTh} /> Grid
-                                </button>
-                                <button type="button" className="btn btn-secondary" onClick={() => (this.grid = false)}>
-                                    <FontAwesomeIcon icon={faListUl} /> List
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        {this.grid ? (
-                            <div className="content">
-                                {this.cases.map(e => (
-                                    <CaseItem case={e} key={e.case_id} grid={this.grid} />
-                                ))}
-                            </div>
-                        ) : (
-                            this.cases.map(e => <CaseItem case={e} key={e.case_id} grid={this.grid} />)
-                        )}
-                    </div>
-                </div>
-            </div>
+        return(
+            <NoLocationPage location={this.location} onSubmit={(region_id) => this.onRegionSelected(region_id)}/>
         );
     }
   }
 
   mounted() {
-    console.log('Content mounted');
     if (this.props.match && this.props.match.params) {
       // Redirected from search
       // Must render only search results
@@ -94,7 +98,7 @@ class Content extends Component {
       locationService
         .getLocation()
         .then((location: Location) => {
-            console.log('Found location!', location);
+            console.log('Locationresponse!');
             this.location = location;
             caseService.getCasesByLoc(location.city, location.region)
                 .then((cases: Case[]) => {
@@ -111,15 +115,18 @@ class Content extends Component {
                                     }
                                 }
                                 //document.getElementsByClassName("loading")[0].style.display = "none";
+                                console.log('Caseresponse!');
                                 this.cases = cases;
                             })
                             .catch((error: Error) => {
                                 //document.getElementsByClassName("loading")[0].style.display = "none";
+                                console.log('Caseresponse!');
                                 this.cases = cases;
                                 console.error(error);
                             });
                     } else {
                         //document.getElementsByClassName("loading")[0].style.display = "none";
+                        console.log('Caseresponse!');
                         this.cases = cases;
                     }
                 })
@@ -130,12 +137,11 @@ class Content extends Component {
   }
 
   onRegionSelected(region_id) {
-      console.log('Region selected', region_id);
+      console.log('NoLocPageCallback, region_id:', region_id);
       let caseService = new CaseService();
-      caseService.getAllCasesGivenRegionId(region_id)
+      caseService.getCaseGivenRegionId(region_id)
           .then((cases: Case[]) => {
-              console.log('Cases: ', cases);
-              this.location = new Location();
+              console.log('NoLocationCallback cases:', cases);
               this.cases = cases;
           })
           .catch((error: Error) => console.error(error));

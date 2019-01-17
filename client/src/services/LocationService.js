@@ -9,6 +9,7 @@ class LocationService{
                     .then(latlng => {
                         this.geocodeLatLng(latlng.lat, latlng.lng)
                             .then(locationdata => {
+                                console.log(locationdata);
                                 //console.log('Got location by browser navigator');
                                 //console.log('Line 14: nodata', locationdata.results[0]);
                                 if(locationdata.results){

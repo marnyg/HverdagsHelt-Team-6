@@ -24,6 +24,27 @@ class Navbar extends Component {
   }
 
   render() {
+    let registerlink = null;
+    let user = JSON.parse(localStorage.getItem('user'));
+    if(user === null){
+        registerlink = (
+            <div className="nav-link" data-toggle="modal" data-target="#register-modal">
+                Registrer sak
+            </div>
+        );
+    } else if(this.logged_in === false){
+        registerlink = (
+            <div className="nav-link" data-toggle="modal" data-target="#login-modal">
+                Registrer sak
+            </div>
+        );
+    } else {
+        registerlink = (
+            <NavLink to="/new-case" className="nav-link">
+                Registrer sak
+            </NavLink>
+        );
+    }
     return (
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <NavLink to={'/'} className="navbar-left"><img src={hverdagsheltLogo} height={29.7} width={185}/></NavLink>
@@ -50,11 +71,7 @@ class Navbar extends Component {
               </NavLink>
             </li>
 
-            <li className="nav-item">
-              <NavLink to="/new-case" className="nav-link">
-                Registrer sak
-              </NavLink>
-            </li>
+            <li className="nav-item">{registerlink}</li>
             <li className="nav-item">
               {this.logged_in ? (
                 <NavLink to="/subscriptions" className="nav-link">
