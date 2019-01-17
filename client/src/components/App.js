@@ -38,7 +38,6 @@ class App extends Component {
           <Route exact path="/my-page" render={() => <MyPage />} />
           <div className="content-wrapper">
             <Notify />
-            <ViewCase case_id={70} />
             <Route exact path="/" render={() => <Content />} />
             <Route exact path="/case/:case_id" render={() => <ViewCase/>} />
             <Route exact path="/subscriptions" render={() => <Subscriptions/>} />

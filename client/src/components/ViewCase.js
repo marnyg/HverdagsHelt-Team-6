@@ -11,6 +11,8 @@ import StatusCommentService from '../services/StatusCommentService';
 import Notify from './Notify';
 import GoogleApiWrapper from './GoogleApiWrapper';
 import Case from '../classes/Case';
+import { faTrashAlt } from '@fortawesome/free-solid-svg-icons/index';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 // Constants used for colouring status fields in table
 
@@ -23,10 +25,8 @@ const red = { color: 'red' };
 
 class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   case = null;
-
   statuses = [];
   categories = [];
-  images = [];
   lastResortPos = { lat: 59.9138688, lon: 10.752245399999993 }; // Last resort position OSLO
   pos = this.lastResortPos;
   statusMessage = [];
@@ -37,10 +37,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     if (!this.case) {
       return null;
     }
-    
+
     // TODO Del opp grantAcess() til tre deler. 1. Kan ikke editere noen ting. 2. Kan sette kategori og status. 3. Kan også sende melding.
-    
-    if(this.grantAccess()){
+
+    if (this.grantAccess()) {
       return (
         <div className={'modal-body row'}>
           <div className={'col-md-6'}>
@@ -52,26 +52,26 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               <h1>{this.case.title}</h1>
               <table className={'table'}>
                 <tbody>
-                <tr>
-                  <td>Status</td>
-                  <td style={this.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
-                </tr>
-                <tr>
-                  <td>Kategori</td>
-                  <td>{this.case.category_name}</td>
-                </tr>
-                <tr>
-                  <td>Sak sendt av</td>
-                  <td>{this.case.createdBy}</td>
-                </tr>
-                <tr>
-                  <td>Sak opprettet</td>
-                  <td>{this.dateFormat(this.case.createdAt)}</td>
-                </tr>
-                <tr>
-                  <td>Sist oppdatert</td>
-                  <td>{this.dateFormat(this.case.updatedAt)}</td>
-                </tr>
+                  <tr>
+                    <td>Status</td>
+                    <td style={this.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
+                  </tr>
+                  <tr>
+                    <td>Kategori</td>
+                    <td>{this.case.category_name}</td>
+                  </tr>
+                  <tr>
+                    <td>Sak sendt av</td>
+                    <td>{this.case.createdBy}</td>
+                  </tr>
+                  <tr>
+                    <td>Sak opprettet</td>
+                    <td>{this.dateFormat(this.case.createdAt)}</td>
+                  </tr>
+                  <tr>
+                    <td>Sist oppdatert</td>
+                    <td>{this.dateFormat(this.case.updatedAt)}</td>
+                  </tr>
                 </tbody>
               </table>
               <p>{this.case.description}</p>
@@ -116,6 +116,25 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   required
                 />
               </div>
+              <div className="container my-5">
+                <div className="row">
+                  {this.case.img.map(e => (
+                    <div key={e} className="col-md-3">
+                      <div className="card">
+                        <img src={e} alt={e} className="card-img-top" />
+                        <div className="card-img-overlay">
+                          <button
+                            className={'btn btn-danger img-overlay float-right align-text-bottom'}
+                            onClick={(event, src) => this.fileInputDeleteImage(event, e)}
+                          >
+                            <FontAwesomeIcon icon={faTrashAlt} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </form>
             <button className={'btn btn-primary mr-2'} onClick={this.submit}>
               Oppdater
@@ -144,7 +163,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           </div>
         </div>
       );
-    }else{
+    } else {
       return (
         <div className={'modal-body row'}>
           <div className={'col-md-6'}>
@@ -152,26 +171,26 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               <h1>{this.case.title}</h1>
               <table className={'table'}>
                 <tbody>
-                <tr>
-                  <td>Status</td>
-                  <td style={this.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
-                </tr>
-                <tr>
-                  <td>Kategori</td>
-                  <td>{this.case.category_name}</td>
-                </tr>
-                <tr>
-                  <td>Sak sendt av</td>
-                  <td>{this.case.createdBy}</td>
-                </tr>
-                <tr>
-                  <td>Sak opprettet</td>
-                  <td>{this.dateFormat(this.case.createdAt)}</td>
-                </tr>
-                <tr>
-                  <td>Sist oppdatert</td>
-                  <td>{this.dateFormat(this.case.updatedAt)}</td>
-                </tr>
+                  <tr>
+                    <td>Status</td>
+                    <td style={this.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
+                  </tr>
+                  <tr>
+                    <td>Kategori</td>
+                    <td>{this.case.category_name}</td>
+                  </tr>
+                  <tr>
+                    <td>Sak sendt av</td>
+                    <td>{this.case.createdBy}</td>
+                  </tr>
+                  <tr>
+                    <td>Sak opprettet</td>
+                    <td>{this.dateFormat(this.case.createdAt)}</td>
+                  </tr>
+                  <tr>
+                    <td>Sist oppdatert</td>
+                    <td>{this.dateFormat(this.case.updatedAt)}</td>
+                  </tr>
                 </tbody>
               </table>
               <p>{this.case.description}</p>
@@ -201,8 +220,6 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
         </div>
       );
     }
-    
-    
   }
 
   mounted() {
@@ -215,6 +232,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       .then((c: Case) => {
         if (c.length > 0) {
           this.case = c[0];
+          this.case.deleted_img = [];
           console.log('This.case:', c);
         } else {
           this.case = null;
@@ -235,8 +253,11 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
         this.statusMessage = e;
         console.log('Statuskommentarer lengde = ' + this.statusMessage.length);
         if (this.statusMessage.length === 0) {
-          let p = document.querySelector('#noComments');
-          if (p) p.hidden = false;
+          let p = document.getElementById('noComments');
+          console.log(p);
+          if (p && p instanceof HTMLElement) {
+            p.hidden = false;
+          }
         }
       })
       .catch((err: Error) => {
@@ -273,21 +294,21 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
         );
       });
   }
-  
-  grantAccess(){
-    if(this.case){
+
+  grantAccess() {
+    if (this.case) {
       let user = JSON.parse(localStorage.getItem('user'));
       console.log(user);
-      if(user.access_level > 2 || this.case.user_id !== user.user_id){
+      if (user.access_level > 2 || this.case.user_id !== user.user_id) {
         // User is authorized to edit case
         return true;
-      }else{
+      } else {
         // User is not authorized to edit case
         return true;
       }
     }
   }
-  
+
   getInitialCategory() {
     if (this.case) {
       let cat = this.categories.find(e => parseInt(e.category_id) === this.case.category_id);
@@ -298,7 +319,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       }
     }
   }
-  
+
   getInitialStatus() {
     if (this.case) {
       let status = this.statuses.find(e => parseInt(e.status_id) === this.case.status_id);
@@ -349,23 +370,45 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
-  sendMessage() {
-    console.log('Clicked send message!');
-    if (this.messageForm) {
-      let textarea = this.messageForm.querySelector('textarea');
-      if (this.messageForm && this.messageForm.checkValidity() && textarea instanceof HTMLTextAreaElement) {
-        let comment = {
-          case_id: this.case.case_id,
-          status: this.case.status_id,
-          comment: textarea.value
-        };
-        console.log(comment);
+  fileInputListener(event: SyntheticInputEvent<HTMLInputElement>) {
+    let files = Array.from(event.target.files);
+    console.log(files);
+
+    if (files.length === 0) {
+      // No files were selected. No changes committed.
+      console.log('No files were selected.');
+    } else {
+      // Files selected. Processing changes.
+      console.log('Files were selected.');
+      // Redundant file type check.
+      if (files.filter(e => this.fileTypes.includes(e.type))) {
+        // File type is accepted.
+        files.map(e => {
+          this.case.img.push({
+            value: e,
+            alt: 'Bildenavn: ' + e.name,
+            src: URL.createObjectURL(e)
+          });
+        });
+      } else {
+        // File type not accepted.
+        console.warn('File type not accepted.');
+        Notify.warning('Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png.');
       }
     }
   }
 
+  fileInputDeleteImage(event: SyntheticInputEvent<HTMLInputElement>, src) {
+    this.case.deleted_img.push(this.case.img.find(e => e === src));
+    this.case.img = this.case.img.filter(e => e !== src);
+    console.log('Deleting image file with src = ' + src);
+    console.log('this.case.deleted_img: ' + JSON.stringify(this.case.deleted_img));
+    console.log('this.case.img: ' + JSON.stringify(this.case.img));
+  }
+
   submit() {
-    console.log('Clicked submit!');
+    console.log('Clicked submit! this.case:');
+    console.log(this.case);
   }
 }
 
