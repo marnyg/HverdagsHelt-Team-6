@@ -39,7 +39,7 @@ class App extends Component {
             <Notify />
             <Route exact path="/" render={() => <Content />} />
             <Route exact path="/case/:case_id" render={() => <ViewCase />} />
-            <Route exact path="/subscriptions" render={() => <Subscriptions />} />
+            <Route exact path="/subscriptions" render={() => <Subscription />} />
             <Route exact path="/notifications" render={() => <h1>Coming soon!</h1>} />
             <Route exact path="/new-case" render={() => <NewCase />} />
             <Route exact path="/search/:query" component={Content} />
