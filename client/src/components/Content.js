@@ -1,6 +1,7 @@
 //@flow
 import * as React from 'react';
 import { Component } from 'react-simplified';
+import { NavLink } from 'react-router-dom';
 
 import CaseItem from './CaseItem.js';
 //import CaseService from '../services/CaseServices.js'; REMOVE COMMENT WHEN SERVICES DONE
@@ -19,20 +20,17 @@ class Content extends Component {
   grid = true;
   location = null;
 
-  caseResponse = false;
-  locationResponse = false;
-
   constructor() {
     super();
     Notify.flush();
   }
 
   render() {
-    console.log('Content rendering');
     if (this.location !== null){
         if(this.cases !== null && this.cases.length > 0){ // No response from the locationservice has been given, wait before showing
             return (
                 <div>
+                    <NavLink to={'/new-case'} className={'btn btn-primary btn-lg w-100 mb-3 megabutton'}>Registrer sak</NavLink>
                     <div>
                         <div className="d-none d-sm-block">
                             <div className="btn-toolbar my-3 mx-2" role="toolbar">
@@ -57,11 +55,11 @@ class Content extends Component {
                             {this.grid ? (
                                 <div className="content">
                                     {this.cases.map(e => (
-                                        <CaseItem case={e} key={e.case_id} grid={this.grid} />
+                                        <CaseItem case={e} key={e.case_id} grid={this.grid} user={this.user}/>
                                     ))}
                                 </div>
                             ) : (
-                                this.cases.map(e => <CaseItem case={e} key={e.case_id} grid={this.grid} />)
+                                this.cases.map(e => <CaseItem case={e} key={e.case_id} grid={this.grid} user={this.user}/>)
                             )}
                         </div>
                     </div>
@@ -98,12 +96,11 @@ class Content extends Component {
       locationService
         .getLocation()
         .then((location: Location) => {
-            console.log('Locationresponse!');
             this.location = location;
             caseService.getCasesByLoc(location.city, location.region)
                 .then((cases: Case[]) => {
-                    console.log('Found cases:', cases, ' Region: ', location.city, location.region);
                     let user = JSON.parse(localStorage.getItem('user'));
+                    this.user = user;
                     if(user){
                         subService.getAllCaseSubscriptions(user.user_id)
                             .then((subscriptions: CaseSubscription) => {
@@ -115,18 +112,15 @@ class Content extends Component {
                                     }
                                 }
                                 //document.getElementsByClassName("loading")[0].style.display = "none";
-                                console.log('Caseresponse!');
                                 this.cases = cases;
                             })
                             .catch((error: Error) => {
                                 //document.getElementsByClassName("loading")[0].style.display = "none";
-                                console.log('Caseresponse!');
                                 this.cases = cases;
                                 console.error(error);
                             });
                     } else {
                         //document.getElementsByClassName("loading")[0].style.display = "none";
-                        console.log('Caseresponse!');
                         this.cases = cases;
                     }
                 })
