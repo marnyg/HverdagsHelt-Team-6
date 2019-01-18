@@ -199,6 +199,7 @@ class NewCase extends Component {
                 updatePos={this.updatePos}
                 markerPos={{ lat: this.markerPos.lat, lng: this.markerPos.lon }}
                 isClickable={this.isMapClickable}
+                chosenMuni={this.list2 ? this.municipalities[this.list2.selectedIndex - 1] : null}
               />
             </div>
           </div>
@@ -255,9 +256,9 @@ class NewCase extends Component {
         console.warn('FEIL!' + err.toString());
         Notify.danger(
           'Det oppstod en feil under lasting av kategorier. ' +
-            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-            '\n\nFeilmelding: ' +
-            err.toString()
+          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+          '\n\nFeilmelding: ' +
+          err.toString()
         );
       });
     console.log('Fetchng counties.');
@@ -269,9 +270,9 @@ class NewCase extends Component {
         console.warn('FEIL!' + err.toString());
         Notify.danger(
           'Det oppstod en feil under lasting av fylker. ' +
-            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-            '\n\nFeilmelding: ' +
-            err.toString()
+          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+          '\n\nFeilmelding: ' +
+          err.toString()
         );
       });
     console.log('Mounted!');
@@ -333,6 +334,7 @@ class NewCase extends Component {
       .then(e => {
         if (this.pos) {
           this.pos = e;
+          this.markerPos = e;
         }
       })
       .catch((err: Error) => {
@@ -388,10 +390,10 @@ class NewCase extends Component {
       let county = event.target;
       console.log(
         'Slected ' +
-          county.options[county.selectedIndex].text +
-          ' with id = ' +
-          county.value +
-          ' as county from drop-down list.'
+        county.options[county.selectedIndex].text +
+        ' with id = ' +
+        county.value +
+        ' as county from drop-down list.'
       );
       this.list2.hidden = false;
       this.fetchMunicipalities(county.value);
@@ -407,11 +409,12 @@ class NewCase extends Component {
       let obj = this.municipalities.find(e => e.region_id === parseInt(muni.value));
       if (muni instanceof HTMLSelectElement) {
         console.log(
+          muni,
           'Slected ' +
-            muni.options[muni.selectedIndex].text +
-            ' with id = ' +
-            muni.value +
-            ' as municipality from drop-down list.'
+          muni.options[muni.selectedIndex].text +
+          ' with id = ' +
+          muni.value +
+          ' as municipality from drop-down list.'
         );
       }
       this.lastResortAddress.hidden = false;
@@ -426,10 +429,10 @@ class NewCase extends Component {
     if (this.list1 && this.list1 instanceof HTMLSelectElement) {
       console.log(
         'Fetching municipalities for county: ' +
-          this.list1.options[this.list1.selectedIndex].text +
-          ' (county_id = ' +
-          county_id +
-          ').'
+        this.list1.options[this.list1.selectedIndex].text +
+        ' (county_id = ' +
+        county_id +
+        ').'
       );
       // Fetching logic here
       let reg = new RegionService();
@@ -442,11 +445,11 @@ class NewCase extends Component {
           if (this.list1 instanceof HTMLSelectElement) {
             Notify.danger(
               'Det oppstod en feil under lasting av kommuner fra fylke ' +
-                this.list1.options[this.list1.selectedIndex].text +
-                '. ' +
-                'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-                '\n\nFeilmelding: ' +
-                err.toString()
+              this.list1.options[this.list1.selectedIndex].text +
+              '. ' +
+              'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+              '\n\nFeilmelding: ' +
+              err.toString()
             );
           }
         });
@@ -490,15 +493,15 @@ class NewCase extends Component {
     console.log('Deleting image file with src = ' + src);
   }
 
-  getRegionId(name: string){
+  getRegionId(name: string) {
     let service = new RegionService();
     service
       .getAllRegions()
       .then(e => {
         let region = e.find(j => j.region_name === name);
-        if(region){
+        if (region) {
           return region.region_id;
-        }else{
+        } else {
           Notify.danger("Ingen kommuner passer ditt valg.");
           return null;
         }
@@ -507,7 +510,7 @@ class NewCase extends Component {
         console.log('Could not get regions.');
         Notify.danger(
           'Kunne ikke hente kommunedata fra server for å sammenlikne med din valgte kommune. \n\nFeilmelding: ' +
-            err.message
+          err.message
         );
         return null;
       });
@@ -530,12 +533,12 @@ class NewCase extends Component {
           } else {
             Notify.warning(
               'Din posisjon (lat: ' +
-                this.pos.lat +
-                ', lon: ' +
-                this.pos.lon +
-                ') finner sted i ' +
-                this.pos.country +
-                ' og kan derfor ikke brukes som posisjon. Posisjon blir satt til Oslo. Vennligst benytt en annen metode for å velge posisjon.'
+              this.pos.lat +
+              ', lon: ' +
+              this.pos.lon +
+              ') finner sted i ' +
+              this.pos.country +
+              ' og kan derfor ikke brukes som posisjon. Posisjon blir satt til Oslo. Vennligst benytt en annen metode for å velge posisjon.'
             );
             console.warn('Position is not in Norway. Oslo has been selected as position.');
             this.pos = this.lastResortPos;
@@ -600,16 +603,16 @@ class NewCase extends Component {
               console.log('Using list selection to determine position.');
               console.log(
                 'Selected options are county = ' +
-                  this.counties[this.list1.selectedIndex - 1].name +
-                  ' with id = ' +
-                  this.counties[this.list1.selectedIndex - 1].county_id +
-                  ' and municipality = ' +
-                  this.municipalities[this.list2.selectedIndex - 1].name +
-                  ' with id = ' +
-                  this.municipalities[this.list2.selectedIndex - 1].region_id +
-                  '. Custom message is: "' +
-                  this.lastResortAddress.value +
-                  '".'
+                this.counties[this.list1.selectedIndex - 1].name +
+                ' with id = ' +
+                this.counties[this.list1.selectedIndex - 1].county_id +
+                ' and municipality = ' +
+                this.municipalities[this.list2.selectedIndex - 1].name +
+                ' with id = ' +
+                this.municipalities[this.list2.selectedIndex - 1].region_id +
+                '. Custom message is: "' +
+                this.lastResortAddress.value +
+                '".'
               );
               this.pos = {
                 lat: this.municipalities[this.list2.selectedIndex - 1].lat,
@@ -657,8 +660,8 @@ class NewCase extends Component {
       .catch((err: Error) => {
         Notify.danger(
           'Det oppstod en feil ved sending av saken til oss. Sørg for at alle felter er fyllt ut korrekt. ' +
-            'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
-            err.message
+          'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
+          err.message
         );
         console.warn('Error while transmitting form data to server with error message: ' + err.message);
       });
@@ -666,6 +669,7 @@ class NewCase extends Component {
 
   updatePos(newPos) {
     this.markerPos = { lat: newPos.lat, lon: newPos.lon };
+    this.pos = { lat: newPos.lat, lon: newPos.lon };
     console.log(newPos);
     console.log('got pos from map:', this.markerPos);
   }
