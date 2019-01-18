@@ -359,8 +359,16 @@ class NewCase extends Component {
           .getAllRegions()
           .then(e => {
             let region = e.find(e => e.name === this.pos.city);
-            this.case.region_id = region.region_id;
-            console.log('This.case.region_id: ' + this.case.region_id + '\nCity/region_name: ' + this.pos.city);
+            if(region){
+              // Region detected by Google Location was found in database
+              this.case.region_id = region.region_id;
+              console.log('This.case.region_id: ' + this.case.region_id + '\nCity/region_name: ' + this.pos.city);
+            }else{
+              // Region detected by Google Location was not found in databse
+              // Proceeding to set this.pos = users home region's GPS position from localStorage object
+              this.case.region_id = JSON.stringify(localStorage.getItem('user')).region_id;
+              console.log("this.case.region_id set to: " + this.case.region_id);
+            }
           })
           .catch((err: Error) => {
             console.log('Could not load regions from server. Error: ' + err.message);
@@ -580,8 +588,23 @@ class NewCase extends Component {
           }
         case 1:
           // Validate map marker position
-
-          return true;
+          if(this.pos && this.case.region_id){
+            return true;
+          } else {
+            Notify.warning(
+              'Din posisjon (lat: ' +
+              this.pos.lat +
+              ', lon: ' +
+              this.pos.lon +
+              ') finner sted i ' +
+              this.pos.country +
+              ' og kan derfor ikke brukes som posisjon. Posisjon blir satt til Oslo. Vennligst benytt en annen metode for å velge posisjon.'
+            );
+            console.warn('Position is not in Norway. Oslo has been selected as position.');
+            this.pos = this.lastResortPos;
+            console.log('Automatic position is not valid.');
+            return false;
+          }
         case 2:
           // Validate last resort list selection
 
@@ -598,7 +621,7 @@ class NewCase extends Component {
   }
 
   submit() {
-    if (this.form) {
+    if (this.form && this.case) {
       console.log('Validating form input.');
       if (this.form.checkValidity() && this.pos) {
         // Basic Built-in HTML5 form validation succeeded. Proceeding to validate using JavaScript.
@@ -620,13 +643,14 @@ class NewCase extends Component {
                 'Using automatic location discovery using IP-address and GPS if available to determine position.'
               );
               console.log('this.pos.city: ' + this.pos.city);
-              region_id = this.getRegionId(this.pos.city);
+              region_id = this.case.region_id;
               console.log('Region-ID: ' + region_id);
               break;
             case 1:
               // Map marker
               console.log('Using a map marker to determine position.');
-              if (this.pos != null) {
+              if (this.case) {
+                region_id = this.case.region_id;
               } else {
                 Notify.warning('Vennligst trykk på en kommune på kartet hvor saken finner sted og prøv igjen.');
               }
@@ -647,10 +671,12 @@ class NewCase extends Component {
                   this.lastResortAddress.value +
                   '".'
               );
-              this.pos = {
-                lat: this.municipalities[this.list2.selectedIndex - 1].lat,
-                lon: this.municipalities[this.list2.selectedIndex - 1].lon
-              };
+              if(this.list2 instanceof HTMLSelectElement){
+                this.pos = {
+                  lat: this.municipalities[this.list2.selectedIndex - 1].lat,
+                  lon: this.municipalities[this.list2.selectedIndex - 1].lon
+                };
+              }
               region_id = this.municipalities[this.list2.selectedIndex - 1].region_id;
               description +=
                 '\n\nAdresse gitt av bruker som følge av manuelt valg av kommune ved hjelp av liste: ' +
@@ -685,10 +711,14 @@ class NewCase extends Component {
     cas
       .createCase(obj, this.images)
       .then(e => {
-        Notify.success('Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id);
-        console.log('Form data transmission success! Case ID: ' + e.case_id);
-        this.props.history.push('/'); // Placeholder
-        //this.props.history.push('/case/' + e.case_id);
+        if(e){
+          Notify.success('Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id);
+          console.log('Form data transmission success! Case ID: ' + e.case_id);
+          this.props.history.push('/case/' + e.case_id);
+        }else{
+          Notify.danger("Det skjedde en feil ved prosessering av din nye sak. Du kan prøve å finne saken din på \'Min side\' > '\Mine Saker\'.");
+          console.log('Received case is undefined. Something went very wrong!');
+        }
       })
       .catch((err: Error) => {
         Notify.danger(
@@ -719,8 +749,16 @@ class NewCase extends Component {
           .getAllRegions()
           .then(e => {
             let region = e.find(e => e.name === this.pos.city);
-            this.case.region_id = region.region_id;
-            console.log('This.case.region_id: ' + this.case.region_id + '\nCity/region_name: ' + this.pos.city);
+            if(region){
+              // Region detected by Google Location was found in database
+              this.case.region_id = region.region_id;
+              console.log('This.case.region_id: ' + this.case.region_id + '\nCity/region_name: ' + this.pos.city);
+            }else{
+              // Region detected by Google Location was not found in databse
+              // Proceeding to set this.pos = users home region's GPS position from localStorage object
+              this.case.region_id = JSON.stringify(localStorage.getItem('user')).region_id;
+              console.log("this.case.region_id set to: " + this.case.region_id);
+            }
           })
           .catch((err: Error) => {
             console.log('Could not load regions from server. Error: ' + err.message);

@@ -5,10 +5,11 @@ class Case {
   user_id: number;
   category_id: number;
   status_id: number;
+  createdBy: string
   title: string;
   description: string;
-  createdAt: any;
-  updatedAt: any;
+  createdAt: string;
+  updatedAt: string;
   lat: number;
   lon: number;
   picture: Picture[];
