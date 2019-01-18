@@ -24,15 +24,11 @@ import MyCases from './CaseList.js';
 import Subscription from './Subscriptions.js';
 import axios from 'axios';
 import MyRegions from "./MyRegions";
-<<<<<<< HEAD
-import Notifications from './Notifications.js';
-=======
 import Notify from './Notify.js';
 import Subscriptions from './Subscriptions.js';
 import InfoPage from './InfoPage.js';
 import About from './About.js';
 import NoLocationPage from "./NoLocationPage";
->>>>>>> master
 
 axios.interceptors.response.use(response => response.data);
 
@@ -45,19 +41,6 @@ class App extends Component {
 
     return (
       <BrowserRouter>
-<<<<<<< HEAD
-        <div className={'main-wrapper'}>
-          <Navbar />
-          <Route exact path="/my-page" render={() => <MyPage />} />
-          <div className="content-wrapper">
-            <Notify />
-            <Route exact path="/" render={() => <Content />} />
-            <Route exact path="/case/:case_id" render={() => <ViewCase/>} />
-            <Route exact path="/subscriptions" render={() => <Subscriptions/>} />
-              <Route exact path="/notifications" render={() => <Notifications/>} />
-            <Route exact path="/new-case" render={() => <NewCase />} />
-            <Route exact path="/search/:query" component={Content} />
-=======
           <div className={'main-wrapper'}>
               <Navbar />
               <Route exact path="/my-page" render={() => <MyPage />} />
@@ -73,7 +56,6 @@ class App extends Component {
                   <Route exact path="/about" render={() => <About/>} />
               </div>
               <Footer />
->>>>>>> master
           </div>
       </BrowserRouter>
     );
