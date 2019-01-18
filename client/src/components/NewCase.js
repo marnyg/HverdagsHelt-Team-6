@@ -690,7 +690,8 @@ class NewCase extends Component {
             description: description,
             region_id: region_id,
             lat: this.pos.lat,
-            lon: this.pos.lon
+            lon: this.pos.lon,
+            pictures: this.images
           };
           this.send(newcase);
         } else {

@@ -3,7 +3,7 @@
 import ReactDOM from 'react-dom';
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import { NavLink, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import CategoryService from '../services/CategoryService';
 import CaseService from '../services/CaseService';
 import StatusService from '../services/StatusService';
@@ -13,6 +13,7 @@ import GoogleApiWrapper from './GoogleApiWrapper';
 import Case from '../classes/Case';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons/index';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Picture from '../classes/Picture';
 
 // Constants used for colouring status fields in table
 
@@ -22,9 +23,11 @@ const statusOpen = 1;
 const green = { color: 'green' };
 const orange = { color: 'orange' };
 const red = { color: 'red' };
+const MAX_NUMBER_IMG = 3;
 
 class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
-  case = null;
+  case: Case = null;
+  deletedImages: string[] = [];
   statuses = [];
   categories = [];
   lastResortPos = { lat: 59.9138688, lon: 10.752245399999993 }; // Last resort position OSLO
@@ -32,6 +35,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   statusMessage = [];
   statusForm = null;
   messageForm = null;
+  fileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
   render() {
     if (!this.case) {
@@ -116,16 +120,28 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   required
                 />
               </div>
+              {this.case.img.length < MAX_NUMBER_IMG ? (
+                <div className={'form-group'}>
+                  <label htmlFor={'image-input'}>Legg ved bilder</label>
+                  <input
+                    className={'form-control-file'}
+                    id={'image-inpu'}
+                    type={'file'}
+                    accept={'.png, .jpg, .jpeg'}
+                    onChange={this.fileInputListener}
+                  />
+                </div>
+              ) : null}
               <div className="container my-5">
                 <div className="row">
                   {this.case.img.map(e => (
-                    <div key={e} className="col-md-3">
+                    <div key={e.src} className="col-md-3">
                       <div className="card">
-                        <img src={e} alt={e} className="card-img-top" />
+                        <img src={e.src} alt={e.src} className="card-img-top" />
                         <div className="card-img-overlay">
                           <button
                             className={'btn btn-danger img-overlay float-right align-text-bottom'}
-                            onClick={(event, src) => this.fileInputDeleteImage(event, e)}
+                            onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
                           >
                             <FontAwesomeIcon icon={faTrashAlt} />
                           </button>
@@ -231,12 +247,78 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       .getCase(this.props.match.params.case_id)
       .then((c: Case) => {
         if (c.length > 0) {
-          this.case = c[0];
-          this.case.deleted_img = [];
-          console.log('This.case:', c);
+          let a = c[0];
+          this.case = new Case(
+            a.case_id,
+            a.region_id,
+            a.user_id,
+            a.category_id,
+            a.status_id,
+            a.createdBy,
+            a.title,
+            a.description,
+            a.status_name,
+            a.region_name,
+            a.county_name,
+            a.category_name,
+            a.createdAt,
+            a.updatedAt,
+            a.lat,
+            a.lon
+          );
+          a.img.map(e => this.case.img.push({ src: e }));
         } else {
           this.case = null;
         }
+      })
+      .then(() => {
+        cascom
+          .getAllStatusComments(this.props.match.params.case_id)
+          .then(e => {
+            this.statusMessage = e;
+            console.log('Statuskommentarer lengde = ' + this.statusMessage.length);
+            if (this.statusMessage.length === 0) {
+              let p = document.getElementById('noComments');
+              console.log(p);
+              if (p && p instanceof HTMLElement) {
+                p.hidden = false;
+              }
+            }
+          })
+          .catch((err: Error) => {
+            console.log('Could not load case comments for case with id ' + this.props.match.params.case_id);
+            Notify.danger(
+              'Klarte ikke å hente kommentarer til sak med id ' +
+                this.props.match.params.case_id +
+                '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+                err.message
+            );
+          });
+        stat
+          .getAllStatuses()
+          .then(e => {
+            this.statuses = e;
+          })
+          .catch((err: Error) => {
+            console.log('Could not load statuses.');
+            Notify.danger(
+              'Klarte ikke å hente statuser. ' +
+                'Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+                err.message
+            );
+          });
+        cat
+          .getAllCategories()
+          .then(e => {
+            this.categories = e;
+          })
+          .catch((err: Error) => {
+            console.log('Could not load categories.');
+            Notify.danger(
+              'Klarte ikke å hente statuser. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+                err.message
+            );
+          });
       })
       .catch((err: Error) => {
         console.log('Could not load case with id ' + this.props.match.params.case_id);
@@ -247,65 +329,20 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             err.message
         );
       });
-    cascom
-      .getAllStatusComments(this.props.match.params.case_id)
-      .then(e => {
-        this.statusMessage = e;
-        console.log('Statuskommentarer lengde = ' + this.statusMessage.length);
-        if (this.statusMessage.length === 0) {
-          let p = document.getElementById('noComments');
-          console.log(p);
-          if (p && p instanceof HTMLElement) {
-            p.hidden = false;
-          }
-        }
-      })
-      .catch((err: Error) => {
-        console.log('Could not load case comments for case with id ' + this.props.match.params.case_id);
-        Notify.danger(
-          'Klarte ikke å hente kommentarer til sak med id ' +
-            this.props.match.params.case_id +
-            '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
-            err.message
-        );
-      });
-    stat
-      .getAllStatuses()
-      .then(e => {
-        this.statuses = e;
-      })
-      .catch((err: Error) => {
-        console.log('Could not load statuses.');
-        Notify.danger(
-          'Klarte ikke å hente statuser. ' +
-            'Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
-            err.message
-        );
-      });
-    cat
-      .getAllCategories()
-      .then(e => {
-        this.categories = e;
-      })
-      .catch((err: Error) => {
-        console.log('Could not load categories.');
-        Notify.danger(
-          'Klarte ikke å hente statuser. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' + err.message
-        );
-      });
   }
 
   grantAccess() {
-    if (this.case) {
-      let user = JSON.parse(localStorage.getItem('user'));
+    let userObj = localStorage.getItem('user');
+    if (this.case && userObj) {
+      let user = JSON.parse(userObj);
       console.log(user);
       if (user.access_level > 2) {
         // User is a municipality employee. May edit any parametre of case
         return true;
-      } else if(this.case.user_id !== user.user_id) {
+      } else if (this.case.user_id !== user.user_id) {
         // User is owner of case, may not send messages
         return true;
-      } else{
+      } else {
         // User is not authorized to edit case
         return 3;
       }
@@ -354,7 +391,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
-  updatePos(newPos) {
+  updatePos(newPos: Object) {
     this.pos = newPos;
     console.log('got pos from map: ', this.pos);
   }
@@ -384,15 +421,30 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       // Files selected. Processing changes.
       console.log('Files were selected.');
       // Redundant file type check.
-      if (files.filter(e => this.fileTypes.includes(e.type))) {
+      if ((files = files.filter(e => this.fileTypes.includes(e.type)))) {
         // File type is accepted.
-        files.map(e => {
-          this.case.img.push({
-            value: e,
-            alt: 'Bildenavn: ' + e.name,
-            src: URL.createObjectURL(e)
+        if (files.length + this.case.img.length <= MAX_NUMBER_IMG) {
+          files.map(e => {
+            this.case.img.push({
+              value: e,
+              alt: 'Bildenavn: ' + e.name,
+              src: URL.createObjectURL(e)
+            });
           });
-        });
+        } else {
+          console.log(
+            'Max number of pictures (' +
+              MAX_NUMBER_IMG +
+              ') reached. \nCurrent embedded images: ' +
+              this.case.img.length +
+              '\nTried to add: ' +
+              files.length +
+              ' new files.'
+          );
+          Notify.warning(
+            'Du kan maksimalt feste ' + MAX_NUMBER_IMG + ' til en sak. Noen bilder må slettes før du kan legge til nye.'
+          );
+        }
       } else {
         // File type not accepted.
         console.warn('File type not accepted.');
@@ -401,11 +453,11 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
-  fileInputDeleteImage(event: SyntheticInputEvent<HTMLInputElement>, src) {
-    this.case.deleted_img.push(this.case.img.find(e => e === src));
-    this.case.img = this.case.img.filter(e => e !== src);
+  fileInputDeleteImage(event: SyntheticInputEvent<HTMLInputElement>, src: string) {
+    this.deletedImages.push(this.case.img.find(e => e.src === src));
+    this.case.img = this.case.img.filter(e => e.src !== src);
     console.log('Deleting image file with src = ' + src);
-    console.log('this.case.deleted_img: ' + JSON.stringify(this.case.deleted_img));
+    console.log('this.deletedImages: ' + JSON.stringify(this.deletedImages));
     console.log('this.case.img: ' + JSON.stringify(this.case.img));
   }
 
