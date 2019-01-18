@@ -666,6 +666,7 @@ class NewCase extends Component {
 
   updatePos(newPos) {
     this.markerPos = { lat: newPos.lat, lon: newPos.lon };
+    this.pos = { lat: newPos.lat, lon: newPos.lon };
     console.log(newPos);
     console.log('got pos from map:', this.markerPos);
   }
