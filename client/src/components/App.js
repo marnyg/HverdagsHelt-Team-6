@@ -27,6 +27,7 @@ import Subscriptions from './Subscriptions.js';
 import InfoPage from './InfoPage.js';
 import About from './About.js';
 import NoLocationPage from "./NoLocationPage";
+import Notifications from './Notifications.js';
 library.add(faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell);
 axios.interceptors.response.use(response => response.data);
 
