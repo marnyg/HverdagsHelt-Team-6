@@ -1,6 +1,6 @@
 // @flow
 
-import { Case_subscriptions, sequelize } from '../models';
+import { Case_subscriptions, Picture, sequelize } from '../models';
 import { verifyToken } from '../auth';
 
 type Request = express$Request;
@@ -28,7 +28,7 @@ module.exports = {
       }
     }).then(cases => res.send(cases));
   },
-  getAllCase_subscriptionCases: function(req: Request, res: Response) {
+  getAllCase_subscriptionCases: async function(req: Request, res: Response) {
     if (
       !req.token ||
       !req.params.user_id ||
@@ -43,9 +43,9 @@ module.exports = {
 
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
 
-    return sequelize
+    sequelize
       .query(
-        'Select distinct c.case_id, c.title, c.description, c.lat, c.lon, c.user_id, ' +
+        'Select c.case_id, c.title, c.description, c.lat, c.lon, c.user_id, ' +
           "CONCAT(u.firstname, ' ', u.lastname) as createdBy, u.tlf, u.email, " +
           'co.county_id, co.name AS county_name, ' +
           'c.region_id, r.name as region_name, ' +
@@ -59,10 +59,19 @@ module.exports = {
           'JOIN Statuses s ON c.status_id = s.status_id ' +
           'JOIN Categories cg ON c.category_id = cg.category_id ' +
           'WHERE csubs.user_id = ?',
-        { replacements: [req.params.user_id] },
-        { type: sequelize.QueryTypes.SELECT }
+        { replacements: [req.params.user_id], type: sequelize.QueryTypes.SELECT }
       )
-      .then(cases => res.send(cases[0]));
+      .then(async cases => {
+        const out = cases.map(async c => {
+          let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+          c.img = pictures.map(img => img.path);
+          return c;
+        });
+        return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+      })
+      .catch(err => {
+        return res.status(500).send(err);
+      });
   },
   addCase_subscriptions: function(req: Request, res: Response) {
     if (
@@ -134,5 +143,50 @@ module.exports = {
     return Case_subscriptions.destroy({
       where: { case_id: Number(req.params.case_id), user_id: Number(req.params.user_id) }
     }).then(cases => (cases ? res.send() : res.status(500).send()));
+  },
+  getAllCase_subscriptionCasesIs_up_to_date: async function(req: Request, res: Response) {
+    if (
+        !req.token ||
+        !req.params.user_id ||
+        typeof Number(req.params.user_id) !== 'number' ||
+        typeof req.token !== 'string'
+    )
+      return res.sendStatus(400);
+
+    let decoded_token = verifyToken(req.token);
+    let user_id_token = decoded_token.user_id;
+    let user_id_param = Number(req.params.user_id);
+
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+
+    sequelize
+        .query(
+            'Select c.case_id, c.title, c.description, c.lat, c.lon, c.user_id, ' +
+            "CONCAT(u.firstname, ' ', u.lastname) as createdBy, u.tlf, u.email, " +
+            'co.county_id, co.name AS county_name, ' +
+            'c.region_id, r.name as region_name, ' +
+            'c.status_id, s.name as status_name, ' +
+            'c.category_id, cg.name as category_name, ' +
+            'c.createdAt, c.updatedAt ' +
+            'FROM Case_subscriptions csubs JOIN Cases c ON csubs.case_id = c.case_id ' +
+            'JOIN Regions r ON c.region_id = r.region_id ' +
+            'Join Counties co ON r.county_id = co.county_id ' +
+            'JOIN Users u ON c.user_id = u.user_id ' +
+            'JOIN Statuses s ON c.status_id = s.status_id ' +
+            'JOIN Categories cg ON c.category_id = cg.category_id ' +
+            'WHERE csubs.user_id = ? AND csubs.is_up_to_date = false',
+            { replacements: [req.params.user_id], type: sequelize.QueryTypes.SELECT }
+        )
+        .then(async cases => {
+          const out = cases.map(async c => {
+            let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+            c.img = pictures.map(img => img.path);
+            return c;
+          });
+          return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+        })
+        .catch(err => {
+          return res.status(500).send(err);
+        });
   }
 };

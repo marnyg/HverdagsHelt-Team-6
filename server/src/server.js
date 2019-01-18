@@ -154,6 +154,11 @@ app.get('/api/cases/subscriptions/:user_id/cases', (req: Request, res: Response)
   reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptionCases);
 });
 
+app.get('/api/cases/subscriptions/:user_id/cases/is_up_to_date', (req: Request, res: Response) => {
+  console.log(req.body);
+  reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptionCasesIs_up_to_date);
+});
+
 app.post('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
   console.log(req.body);
   reqAccessLevel(req, res, 4, Case_subscription.addCase_subscriptions);
