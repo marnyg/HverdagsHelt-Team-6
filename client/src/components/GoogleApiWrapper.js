@@ -22,11 +22,15 @@ export class GoogleMapsContainer extends Component {
       this.gmap.onClick = (t, map, coord) => this.onClick(t, map, coord)
       this.gmap.setOptions({ styles: [{ stylers: [{ saturation: 0 }] }] })
     }
+    if (this.props.chosenMuni !== undefined && this.props.chosenMuni !== prevProps.chosenMuni) {
+
+      let pos = { lat: this.props.chosenMuni.lat, lon: this.props.chosenMuni.lon }
+      this.props.updatePos(pos)
+    }
   }
 
   getSearchPlaces(res) {
     let lok = res[0].geometry.location
-    console.log(lok);
     let respos = { lat: lok.lat(), lon: lok.lng() }
     this.props.updatePos(respos)
   }

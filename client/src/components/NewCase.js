@@ -199,6 +199,7 @@ class NewCase extends Component {
                 updatePos={this.updatePos}
                 markerPos={{ lat: this.markerPos.lat, lng: this.markerPos.lon }}
                 isClickable={this.isMapClickable}
+                chosenMuni={this.list2 ? this.municipalities[this.list2.selectedIndex - 1] : null}
               />
             </div>
           </div>
@@ -408,6 +409,7 @@ class NewCase extends Component {
       let obj = this.municipalities.find(e => e.region_id === parseInt(muni.value));
       if (muni instanceof HTMLSelectElement) {
         console.log(
+          muni,
           'Slected ' +
           muni.options[muni.selectedIndex].text +
           ' with id = ' +
