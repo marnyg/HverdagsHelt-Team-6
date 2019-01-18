@@ -4,12 +4,14 @@ import * as React from 'react';
 import { Component } from 'react-simplified';
 import User from '../classes/User';
 import { Bar, Doughnut, Pie, Line } from 'react-chartjs-2';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 class Statistics extends Component {
   data = {};
   render() {
     return (
-      <div className="container">
+      <div ref="statPage" className="container" style={{ maxWidth: '210mm' }}>
         <div className="row">
           <div className={'col-md'}>
             <Bar data={this.data} />
@@ -60,7 +62,16 @@ class Statistics extends Component {
     console.log(this.data.datasets[0].data);
   }
 
-  generatePdf() {}
+  generatePdf() {
+    let input = this.refs.statPage;
+    html2canvas(input).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF();
+      pdf.addImage(imgData, 'PNG', 0, 0);
+      // pdf.output('dataurlnewwindow');
+      pdf.save('download.pdf');
+    });
+  }
 
   getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;

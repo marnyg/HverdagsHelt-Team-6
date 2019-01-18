@@ -8,6 +8,7 @@ import NewCase from './NewCase';
 import MyRegions from './MyRegions';
 import { NavLink } from 'react-router-dom';
 import DisplayProfile from './DisplayProfile.js';
+import Statistics from './Statistics.js';
 
 class MyPage extends Component {
   menuItems = [
