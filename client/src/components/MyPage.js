@@ -20,48 +20,47 @@ class MyPage extends Component {
   comp = <MyProfile />;
   render() {
     return (
-      <div>
-        <div className={'wrapper'}>
-          <nav id="sidebar" className="nav flex-column bg-light">
-            <div className="sidebar-header">
-              <h2>Meny</h2>
+        <div>
+            <div>
+                <ul className={'nav nav-tabs bg-light pl-3'}>
+                        {this.menuItems.map(e => {
+                            if (e.selected === true) {
+                                return (
+                                    <li className={'nav-item'}
+                                        style={{cursor: 'pointer'}}
+                                        onClick={() => {
+                                            this.element.selected = false;
+                                            this.comp = e.component;
+                                            this.element = e;
+                                            this.element.selected = true;
+                                        }}>
+                                        <a className={'nav-link active'}>{e.name}</a>
+                                    </li>
+                                );
+                            } else {
+                                return (
+                                    <li className={'nav-item'}
+                                        style={{cursor: 'pointer'}}
+                                        onClick={() => {
+                                            this.element.selected = false;
+                                            this.comp = e.component;
+                                            this.element = e;
+                                            this.element.selected = true;
+                                        }}>
+                                        <a className={'nav-link disabled'}>{e.name}</a>
+                                    </li>
+                                );
+                            }
+                        })}
+                    </ul>
             </div>
-
-            <ul className="nav flex-column components">
-              {this.menuItems.map(e => {
-                if (e.selected === true) {
-                  return (
-                    <li className={'nav-item nav-link active'} style={{cursor: 'pointer'}}
-                      onClick={() => {
-                        this.element.selected = false;
-                        this.comp = e.component;
-                        this.element = e;
-                        this.element.selected = true;
-                      }}>
-                      {e.name}
-                    </li>
-                  );
-                } else {
-                  return (
-                    <li className={'nav-item nav-link disabled'}
-                      onClick={() => {
-                        this.element.selected = false;
-                        this.comp = e.component;
-                        this.element = e;
-                        this.element.selected = true;
-                      }}>
-                      {e.name}
-                    </li>
-                  );
-                }
-              })}
-            </ul>
-          </nav>
-          {this.element.component}
+            <div>
+                <div className={'w-100 py-5 px-2'}>
+                    {this.element.component}
+                </div>
+            </div>
         </div>
-      </div>
     );
   }
 }
-
 export default MyPage;

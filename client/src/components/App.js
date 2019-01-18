@@ -40,21 +40,23 @@ class App extends Component {
 
     return (
       <BrowserRouter>
-          <div className={'main-wrapper'}>
-              <Navbar />
-              <Route exact path="/my-page" render={() => <MyPage />} />
-              <div className="content-wrapper">
-                  <Notify />
-                  {visited ? <Route exact path="/" render={() => <ContentWrapper />} /> : <Route exact path="/" render={() => <InfoPage/>}/>}
-                  <Route exact path="/case/:case_id" render={() => <ViewCase/>} />
-                  <Route exact path="/subscriptions" render={() => <Subscriptions/>} />
-                  <Route exact path="/notifications" render={() => <Notifications/>} />
-                  <Route exact path="/new-case" render={() => <NewCase />} />
-                  <Route exact path="/search/:query" component={ContentWrapper} />
-                  <Route exact path="/welcome" render={() => <InfoPage/>} />
-                  <Route exact path="/about" render={() => <About/>} />
+          <div className={'h-100'}>
+              <div>
+                  <Navbar />
+                  <Route exact path="/my-page" render={() => <MyPage />} />
+                  <div className="content-wrapper">
+                      <Notify />
+                      {visited ? <Route exact path="/" render={() => <ContentWrapper />} /> : <Route exact path="/" render={() => <InfoPage/>}/>}
+                      <Route exact path="/case/:case_id" render={() => <ViewCase/>} />
+                      <Route exact path="/subscriptions" render={() => <Subscriptions/>} />
+                      <Route exact path="/notifications" render={() => <Notifications/>} />
+                      <Route exact path="/new-case" render={() => <NewCase />} />
+                      <Route exact path="/search/:query" component={ContentWrapper} />
+                      <Route exact path="/welcome" render={() => <InfoPage/>} />
+                      <Route exact path="/about" render={() => <About/>} />
+                  </div>
               </div>
-              <Footer />
+              <Footer/>
           </div>
       </BrowserRouter>
     );

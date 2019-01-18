@@ -30,7 +30,7 @@ class NoLocationPage extends Component {
                         Dersom dette ikke stemmer, kan du velge riktig fylke og kommune i menyen under.<br/>
                     </p>
                     <RegionSelect
-                        className={"w-50"}
+                        className={"region-select"}
                         onSubmit={(region_id) => this.props.onSubmit(region_id)}
                         elementsMargin={'mb-3'}
                     />
