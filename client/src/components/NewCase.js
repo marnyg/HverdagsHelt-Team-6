@@ -16,6 +16,7 @@ import GoogleApiWrapper from './GoogleApiWrapper';
 import Case from '../classes/Case';
 
 class NewCase extends Component {
+  case: Case = new Case();
   form = null;
   counties = [];
   municipalities = [];
@@ -238,6 +239,22 @@ class NewCase extends Component {
         this.pos = location;
         this.markerPos = location;
       })
+      .then(() => {
+        let reg = new RegionService();
+        reg
+          .getAllRegions()
+          .then(e => {
+            let region = e.find(e => e.name === this.pos.city);
+            this.case.region_id = region.region_id;
+            console.log('This.case.region_id: ' + this.case.region_id + '\nCity/region_name: ' + this.pos.city);
+          })
+          .catch((err: Error) => {
+            console.log('Could not load regions from server. Error: ' + err.message);
+            throw new Error(
+              'Klarte ikke å sammenlikne automatisk posisjon med en kommune. \n\nFeilmelding: ' + err.message
+            );
+          });
+      })
       .catch((error: Error) => {
         console.log(error);
         this.pos = this.lastResortPos;
@@ -333,7 +350,24 @@ class NewCase extends Component {
       .then(e => {
         if (this.pos) {
           this.pos = e;
+          this.markerPos = location;
         }
+      })
+      .then(() => {
+        let reg = new RegionService();
+        reg
+          .getAllRegions()
+          .then(e => {
+            let region = e.find(e => e.name === this.pos.city);
+            this.case.region_id = region.region_id;
+            console.log('This.case.region_id: ' + this.case.region_id + '\nCity/region_name: ' + this.pos.city);
+          })
+          .catch((err: Error) => {
+            console.log('Could not load regions from server. Error: ' + err.message);
+            throw new Error(
+              'Klarte ikke å sammenlikne automatisk posisjon med en kommune. \n\nFeilmelding: ' + err.message
+            );
+          });
       })
       .catch((err: Error) => {
         Notify.danger('Det oppstod en feil ved henting av automatisk posisjon. \n\nFeilmelding: ' + err.message);
@@ -351,6 +385,7 @@ class NewCase extends Component {
       this.lastResortAddress.hidden = true;
       this.lastResortAddressLabel.hidden = true;
       this.isMapClickable = true;
+      console.log(JSON.stringify(this.pos));
     }
   }
 
@@ -365,6 +400,7 @@ class NewCase extends Component {
       this.list1 instanceof HTMLSelectElement &&
       this.list2 instanceof HTMLSelectElement
     ) {
+      console.log(JSON.stringify(this.pos));
       if (this.list1.selectedIndex === 0) {
         this.list1.hidden = false;
       } else if (this.list2.selectedIndex === 0) {
@@ -490,16 +526,16 @@ class NewCase extends Component {
     console.log('Deleting image file with src = ' + src);
   }
 
-  getRegionId(name: string){
+  getRegionId(name: string) {
     let service = new RegionService();
     service
       .getAllRegions()
       .then(e => {
         let region = e.find(j => j.region_name === name);
-        if(region){
+        if (region) {
           return region.region_id;
-        }else{
-          Notify.danger("Ingen kommuner passer ditt valg.");
+        } else {
+          Notify.danger('Ingen kommuner passer ditt valg.');
           return null;
         }
       })
@@ -583,9 +619,9 @@ class NewCase extends Component {
               console.log(
                 'Using automatic location discovery using IP-address and GPS if available to determine position.'
               );
-              console.log("this.pos.city: " + this.pos.city);
+              console.log('this.pos.city: ' + this.pos.city);
               region_id = this.getRegionId(this.pos.city);
-              console.log("Region-ID: " + region_id);
+              console.log('Region-ID: ' + region_id);
               break;
             case 1:
               // Map marker
@@ -666,8 +702,36 @@ class NewCase extends Component {
 
   updatePos(newPos) {
     this.markerPos = { lat: newPos.lat, lon: newPos.lon };
-    console.log(newPos);
-    console.log('got pos from map:', this.markerPos);
+    this.pos = this.markerPos;
+    console.log('got pos from map:', this.pos);
+    let locator = new LocationService();
+    locator
+      .geocodeLatLng(this.pos.lat, this.pos.lon)
+      .then(e => {
+        if (this.pos) {
+          this.pos = e;
+          this.markerPos = location;
+        }
+      })
+      .then(() => {
+        let reg = new RegionService();
+        reg
+          .getAllRegions()
+          .then(e => {
+            let region = e.find(e => e.name === this.pos.city);
+            this.case.region_id = region.region_id;
+            console.log('This.case.region_id: ' + this.case.region_id + '\nCity/region_name: ' + this.pos.city);
+          })
+          .catch((err: Error) => {
+            console.log('Could not load regions from server. Error: ' + err.message);
+            throw new Error(
+              'Klarte ikke å sammenlikne automatisk posisjon med en kommune. \n\nFeilmelding: ' + err.message
+            );
+          });
+      })
+      .catch((err: Error) => {
+        Notify.danger('Det oppstod en feil ved sammenlikning av valgt posisjon og kommuner i databasen vår. \n\nFeilmelding: ' + err.message);
+      });
   }
 }
 

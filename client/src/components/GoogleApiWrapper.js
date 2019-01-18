@@ -13,7 +13,7 @@ export class GoogleMapsContainer extends Component {
   componentDidUpdate(prevProps) {
     if (prevProps.centerPos !== this.props.centerPos) {
       this.gmap.panTo(this.props.markerPos);
-      this.marker.setPosition(this.props.centerPos)
+      this.marker.setPosition(this.props.markerPos)
     }
     if (!this.props.isClickable) {
       this.gmap.onClick = null;

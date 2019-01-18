@@ -299,12 +299,15 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     if (this.case) {
       let user = JSON.parse(localStorage.getItem('user'));
       console.log(user);
-      if (user.access_level > 2 || this.case.user_id !== user.user_id) {
-        // User is authorized to edit case
+      if (user.access_level > 2) {
+        // User is a municipality employee. May edit any parametre of case
         return true;
-      } else {
+      } else if(this.case.user_id !== user.user_id) {
+        // User is owner of case, may not send messages
+        return true;
+      } else{
         // User is not authorized to edit case
-        return true;
+        return 3;
       }
     }
   }
