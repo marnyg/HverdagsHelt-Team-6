@@ -143,7 +143,7 @@ class CaseSubscriptionService {
             let token = localStorage.getItem('token');
             axios
               .get(
-                '/api/cases/subscriptions/' + user_id + '/cases',
+                '/api/cases/subscriptions/' + user_id + '/cases/is_up_to_date',
                 {
                   headers: {
                     Authorization: 'Bearer ' + token

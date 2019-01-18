@@ -100,7 +100,7 @@ class RegionService {
              .then((logged_in: Boolean) => {
                  if(logged_in === true){
                      let token = localStorage.getItem('token');
-                     axios.put('/api/regions/' + region_id, r, {
+                     axios.put('/api/regions/' + user_id, {
                          headers: {
                              Authorization: 'Bearer ' + token
                          }

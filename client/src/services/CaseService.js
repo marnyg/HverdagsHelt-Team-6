@@ -25,7 +25,7 @@ class CaseService {
           if (logged_in === true) {
             let token = localStorage.getItem('token');
             axios
-              .get('/api/cases/' + case_id, c, {
+              .put('/api/cases/' + case_id, c, {
                 headers: {
                   Authorization: 'Bearer ' + token
                 }
