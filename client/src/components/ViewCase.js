@@ -13,6 +13,7 @@ import GoogleApiWrapper from './GoogleApiWrapper';
 import Case from '../classes/Case';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons/index';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import CaseSubscriptionService from '../services/CaseSubscriptionService.js';
 
 // Constants used for colouring status fields in table
 
@@ -227,6 +228,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     let cascom = new StatusCommentService();
     let stat = new StatusService();
     let cat = new CategoryService();
+    let cassub = new CaseSubscriptionService();
     cas
       .getCase(this.props.match.params.case_id)
       .then((c: Case) => {

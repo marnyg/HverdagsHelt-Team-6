@@ -31,7 +31,7 @@ class MyPage extends Component {
               {this.menuItems.map(e => {
                 if (e.selected === true) {
                   return (
-                    <li className={'nav-item nav-link active'}
+                    <li className={'nav-item nav-link active'} style={{cursor: 'pointer'}}
                       onClick={() => {
                         this.element.selected = false;
                         this.comp = e.component;
