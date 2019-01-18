@@ -86,7 +86,13 @@ module.exports = {
       case_id: Number(req.params.case_id),
       notify_by_email: req.body.notify_by_email,
       is_up_to_date: req.body.is_up_to_date
-    }).then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)));
+    })
+      .then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)))
+      .catch(err => {
+        err.description = 'Det finnes allerede et abonnement for denne brukeren, på den oppgitte saken';
+        res.status(409).json(err);
+        console.log(err.parent.sqlMessage);
+      });
   },
   updateCase_subscriptions: function(req: Request, res: Response) {
     if (
