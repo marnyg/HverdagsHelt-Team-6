@@ -10,6 +10,7 @@ import RegionService from '../services/RegionService.js';
 import Case from '../classes/Case.js';
 import Region from '../classes/Region.js';
 import ViewCase from './ViewCase.js';
+import { Redirect } from 'react-router-dom'
 
 class Notifications extends Component {
   temp=[];
@@ -17,6 +18,7 @@ class Notifications extends Component {
     {
       user_id: 1,
       region_id: 1,
+      case_id: 1,
       region_name: 'Lillestrøm',
       title: 'Her var det glatt gitt',
       createdAt: '10.07.1994',
@@ -26,6 +28,7 @@ class Notifications extends Component {
     {
       user_id: 1,
       region_id: 2,
+      case_id: 2,
       region_name: 'Trondheim',
       title: 'Hola påræ!',
       createdAt: '10.07.1994',
@@ -35,6 +38,7 @@ class Notifications extends Component {
     {
       user_id: 1,
       region_id: 1,
+      case_id: 3,
       region_name: 'Lillestrøm',
       title: 'Jaggumei jaggu',
       createdAt: '10.07.1994',
@@ -44,6 +48,7 @@ class Notifications extends Component {
     {
       user_id: 1,
       region_id: 3,
+      case_id: 4,
       region_name: 'Frogner',
       title: 'Hurra hurra, bursdag bursdag',
       createdAt: '10.07.1994',
@@ -53,6 +58,7 @@ class Notifications extends Component {
     {
       user_id: 1,
       region_id: 3,
+      case_id: 5,
       region_name: 'Lillestrøm',
       title: 'Berit er ute å cruiser på rolleblades igjen, hjølp!',
       createdAt: '10.07.1994',
@@ -112,12 +118,14 @@ class Notifications extends Component {
   }
 
   onClickCaseBlock(event: SyntheticInputEvent<HTMLInputElement>) {
-    if (event.target && event.target instanceof HTMLTableRowElement) {
+    /*if (event.target && event.target instanceof HTMLTableRowElement) {
       let case_id = this.notifications[event.target.parentElement].region_id;
       console.log(case_id);
       //this.props.history.push('/case/' + case_id);
       //this.props.history.push('/'); // Placeholder
-    }
+    }*/
+    history.push()
+    console.log('hei');
   }
 
   dateFormat(date: string) {
