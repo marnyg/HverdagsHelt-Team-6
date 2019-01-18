@@ -9,6 +9,7 @@ import User from '../classes/User.js';
 import RegionService from '../services/RegionService.js';
 import Case from '../classes/Case.js';
 import Region from '../classes/Region.js';
+import RegionSubscriptionService from '../services/RegionSubscriptionService.js';
 
 class Subscriptions extends Component {
   temp=[];
@@ -38,8 +39,9 @@ class Subscriptions extends Component {
   }
 
   mounted() {
-    let caseSubscriptionService = new CaseSubscriptionService();
-    caseSubscriptionService
+    let css = new CaseSubscriptionService();
+    let rss = new RegionSubscriptionService();
+    css
     .getAllSubscribedCasesGivenUser(this.user.user_id)
     .then((subscriptions: Case[]) => {
       this.subscriptions = subscriptions;
@@ -51,6 +53,8 @@ class Subscriptions extends Component {
       })
     })
     .catch((error: Error) => console.error(error));
+
+    
   }
 
   indexerRegion() {
