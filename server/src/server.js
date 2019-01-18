@@ -291,6 +291,10 @@ app.delete('/api/categories/:category_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, Category.delCategory);
 });
 
+app.get('/api/search/:searchtext', (req: Request, res: Response) => {
+  Cases.search(req, res);
+});
+
 app.get('/*', (req, res) => {
   res.redirect('/');
 });
