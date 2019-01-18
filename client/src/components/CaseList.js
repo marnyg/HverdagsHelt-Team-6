@@ -25,34 +25,38 @@ class CaseList extends Component<{ props: { user_id: number, region_id: number }
     }
 
     return (
-      <div className={'card my-3 mx-3'}>
-        <table className="table table-hover table-striped">
-          <thead>
-            <tr>
-              <th scope="col">Tittel</th>
-              <th scope="col">Status</th>
-              <th scope="col">Kommune</th>
-              <th scope="col">Eier</th>
-              <th scope="col">Dato opprettet</th>
-              <th scope="col">Siste oppdatering</th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.cases.map(c => (
-              <tr key={c.case_id} style={{ cursor: 'pointer' }} onClick={this.onClickTableRow}>
-                <td>{c.title.trim()}</td>
-                <td style={this.getStatusColour(c.status_id)}>{c.status_name}</td>
-                <td>{c.region_name}</td>
-                <td>{c.createdBy}</td>
-                <td>{this.dateFormat(c.createdAt)}</td>
-                <td>{this.dateFormat(c.updatedAt)}</td>
+        <div>
+        <div className={'card mx-3'}>
+          <table className="table table-hover table-striped">
+            <thead>
+              <tr>
+                <th scope="col">Tittel</th>
+                <th scope="col">Status</th>
+                <th scope="col" className={'desktop-table-column'}>Kommune</th>
+                <th scope="col" className={'desktop-table-column'}>Dato opprettet</th>
+                <th scope="col" className={'desktop-table-column'}>Siste oppdatering</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        <p id={'noEntries'} style={{ color: '#666' }} hidden>
-          Ingen innlegg å vise.
-        </p>
+            </thead>
+            <tbody>
+              {this.cases.map(c => (
+                <tr key={c.case_id} style={{ cursor: 'pointer' }} onClick={this.onClickTableRow}>
+                  <td>
+                      {
+                        c.title.trim().length > 25 ? c.title.trim().substring(0, 25) : c.title.trim()
+                      }
+                  </td>
+                  <td style={this.getStatusColour(c.status_id)}>{c.status_name}</td>
+                  <td className={'desktop-table-column'}>{c.region_name}</td>
+                  <td className={'desktop-table-column'}>{this.dateFormat(c.createdAt)}</td>
+                  <td className={'desktop-table-column'}>{this.dateFormat(c.updatedAt)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p id={'noEntries'} style={{ color: '#666' }} hidden>
+            Ingen innlegg å vise.
+          </p>
+        </div>
       </div>
     );
   }

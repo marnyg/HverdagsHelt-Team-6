@@ -24,32 +24,45 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
   subscribed = true;
 
   render() {
-    return (
-      <div className={'ml-2 pl-2'}>
-        <div className={'card'}>
-          <div className={'card-header'}> Dine kommuner</div>
-          <table className={'table'}>
-            <th itemScope={'col'}>#</th>
-            <th itemScope={'col'}>Kommune</th>
-            <th itemScope={'col'}>Få epost varsler</th>
-            <th itemScope={'col'}>Slett fra varsler</th>
-            <tbody>{this.getYourRegionListEllement('Dine Komuner', this.followedRegions)}</tbody>
-          </table>
-        </div>
-        <div className={'card my-3'}>
-          <div className={'card-header'}>Velg fylke:</div>
-          {this.getCountyListEllement('Fylker', this.county)}
-        </div>
-
-        <div className={'card my-3'}>
-          <div className={'card-header'}>Velg kommune:</div>
-          {this.getRegionListEllement('Komuner', this.region)}
-        </div>
-      </div>
+      let overflowstyle = {
+          'overflow': 'scroll',
+          '-webkit-overflow-scrolling': 'touch'
+      };
+      return (
+          <div className={'container'}>
+              <div className={'row'}>
+                  <div className={'col col-md'}>
+                      <div className={'card'}>
+                          <div className={'card-header'}> Dine kommuner</div>
+                          <table className={'table'}>
+                              <th itemScope={'col'}>#</th>
+                              <th itemScope={'col'}>Kommune</th>
+                              <th itemScope={'col'}>Få epost varsler</th>
+                              <th itemScope={'col'}>Slett fra varsler</th>
+                              <tbody>{this.getYourRegionListEllement(this.followedRegions)}</tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+              <div className={'row'}>
+                  <div className={'col-md'}>
+                      <div className={'card my-3'} style={{maxHeight: '500px'}}>
+                          <div className={'card-header'}>Velg fylke:</div>
+                          {this.getCountyListEllement(this.county)}
+                      </div>
+                  </div>
+                  <div className={'col-md'}>
+                      <div className={'card my-3'}>
+                          <div className={'card-header'}>Velg kommune:</div>
+                          <div style={{overflow: 'scroll'}}>{this.getRegionListEllement()}</div>
+                      </div>
+                  </div>
+              </div>
+          </div>
     );
   }
 
-  getYourRegionListEllement(headline: string, listItems: Array<RegionSubscription>) {
+  getYourRegionListEllement(listItems: RegionSubscription[]) {
     return listItems.map((e, index) => {
       return (
         <tr id={e.region_id} key={e.region_id}>
@@ -77,7 +90,7 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
             )}
           </td>
           <td className={'text-center'}>
-            <button onClick={this.handleDelete} className={'btn btn-danger'}>
+            <button onClick={(event) => this.handleDelete(event, e)} className={'btn btn-danger'}>
               <FontAwesomeIcon
                 id={'subscribe'}
                 icon={faTrashAlt}
@@ -90,31 +103,28 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
       );
     });
   }
-
-  getCountyListEllement(headline: string, listItems: Array<County>) {
+  getCountyListEllement(listItems: Array<County>) {
     return (
-      <div>
-        <ul className={'list-group list-group-flush'}>
+        <ul className={'list-group list-group-flush'} style={{overflow: 'scroll'}}>
           {listItems.map(e => {
             return (
-              <li className={'list-group-item '} id={e.county_id} onClick={this.filterKomuner}>
+              <li key={e.county_id} className={'list-group-item'} id={e.county_id} onClick={this.filterRegions}>
                 {e.name}
               </li>
             );
           })}
         </ul>
-      </div>
     );
   }
-  getRegionListEllement(headline: string, listItems: Array<{ name: string, id: number }>) {
+  getRegionListEllement() {
     return (
       <div>
         <ul className={'list-group list-group-flush'}>
-          {listItems.map(e => {
+          {this.region.map(e => {
             return (
               <li key={e.region_id} className={'list-group-item'} id={e.region_id}>
                 {e.name}
-                <button className={'btn btn-primary float-right'} onClick={this.handleAdd} id={e.region_id}>
+                <button className={'btn btn-primary float-right'} onClick={(event) => this.handleAdd(event, e)} id={e.region_id}>
                   <FontAwesomeIcon icon={faPlus} />
                 </button>
               </li>
@@ -125,29 +135,33 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
     );
   }
 
-  filterKomuner(e) {
+  filterRegions(e) {
+      console.log('filtering regions');
     let id = Number.parseInt(e.target.id);
     console.log('finltering on region with id ' + id);
     this.regionService
       .getAllRegionGivenCounty(id)
-      .then((regions: Region[]) => (this.region = regions))
+      .then((regions: Region[]) => {
+          this.region = regions;
+      })
       .catch((error: Error) => console.error(error));
   }
 
-  handleDelete(e) {
-    console.log('delete ' + e.target.parentNode.parentNode.id);
-    console.log(e.target.parentNode.parentNode);
-    console.log(e.target.parentNode.parentNode.parentNode);
-    this.regSubService.deleteRegionSubscription(e.target.parentNode.parentNode.id, this.user.user_id).then(() => {
-      this.userServise
-        .getRegionSubscriptionsGivenUserId(this.user.user_id)
-        .then(res => (this.followedRegions = res.regions));
-    });
+  handleDelete(event, e) {
+    console.log('delete ', e);
+    this.regSubService.deleteRegionSubscription(e.region_id, this.user.user_id)
+        .then(() => {
+            this.userServise.getRegionSubscriptionsGivenUserId(this.user.user_id)
+                .then(res => (this.followedRegions = res.regions))
+                .catch((error: Error) => console.error(error));
+        })
+        .catch((error: Error) => console.error(error));
   }
 
-  handleAdd(e) {
-    let regionSub = new RegionSubscription(this.user.user_id, e.target.parentNode.id, true);
-    console.log('add sub for user ' + this.user.user_id + ' to region ' + e.target.parentNode.id);
+  handleAdd(event, e) {
+    this.region.splice( this.region.indexOf(e), 1 );
+    let regionSub = new RegionSubscription(this.user.user_id, e.region_id, true);
+    console.log('add sub for user ' + this.user.user_id + ' to region ' + e.region_id);
     this.regSubService.createRegionSubscription(regionSub, regionSub.region_id).then(() => {
       this.userServise
         .getRegionSubscriptionsGivenUserId(this.user.user_id)
@@ -166,7 +180,9 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
       .catch((error: Error) => console.error(error));
     this.userServise
       .getRegionSubscriptionsGivenUserId(this.user.user_id)
-      .then(res => (this.followedRegions = res.regions))
+      .then(res => {
+          this.followedRegions = res.regions;
+      })
       .then(console.log(this.followedRegions));
   }
 

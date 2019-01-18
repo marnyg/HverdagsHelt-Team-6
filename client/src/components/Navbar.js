@@ -15,7 +15,7 @@ import hverdagsheltLogo from '../../public/hverdagsheltLogo2Trans.png';
 
 class Navbar extends Component {
   logged_in = false;
-  notification_count = 1;
+  notification_count = 0;
   notifications = [];
   constructor() {
     super();

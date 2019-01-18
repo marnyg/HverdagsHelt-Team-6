@@ -35,7 +35,7 @@ class EditPassword extends Component {
         getEditFormVersion()
         {
             return (
-                <form ref="form" className={'row list-group-item'}>
+                <form ref="form" className={'row list-group-item mx-5'}>
                     <div className={'row'}>
                         <div className={'col-sm'}>Gammelt Passord:</div>
                         <div className={'col-lg'}>
