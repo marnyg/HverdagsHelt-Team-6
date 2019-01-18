@@ -11,10 +11,8 @@ import '../styles/simple-sidebar.css';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell } from '@fortawesome/free-solid-svg-icons';
-library.add(faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell);
-
 import Navbar from './Navbar.js';
-import Content from './Content.js';
+import ContentWrapper from './ContentWrapper.js';
 import Footer from './Footer.js';
 import MyPage from './MyPage.js';
 import ViewCase from './ViewCase.js';
@@ -29,9 +27,7 @@ import Subscriptions from './Subscriptions.js';
 import InfoPage from './InfoPage.js';
 import About from './About.js';
 import NoLocationPage from "./NoLocationPage";
-import Notifications from './Notifications.js';
-
-
+library.add(faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell);
 axios.interceptors.response.use(response => response.data);
 
 class App extends Component {
@@ -48,12 +44,12 @@ class App extends Component {
               <Route exact path="/my-page" render={() => <MyPage />} />
               <div className="content-wrapper">
                   <Notify />
-                  {visited ? <Route exact path="/" render={() => <Content />} /> : <Route exact path="/" render={() => <InfoPage/>}/>}
+                  {visited ? <Route exact path="/" render={() => <ContentWrapper />} /> : <Route exact path="/" render={() => <InfoPage/>}/>}
                   <Route exact path="/case/:case_id" render={() => <ViewCase/>} />
                   <Route exact path="/subscriptions" render={() => <Subscriptions/>} />
                   <Route exact path="/notifications" render={() => <Notifications/>} />
                   <Route exact path="/new-case" render={() => <NewCase />} />
-                  <Route exact path="/search/:query" component={Content} />
+                  <Route exact path="/search/:query" component={ContentWrapper} />
                   <Route exact path="/welcome" render={() => <InfoPage/>} />
                   <Route exact path="/about" render={() => <About/>} />
               </div>
