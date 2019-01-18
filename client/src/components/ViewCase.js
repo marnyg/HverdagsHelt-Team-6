@@ -233,6 +233,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
         if (c.length > 0) {
           this.case = c[0];
           this.case.deleted_img = [];
+          this.case.is_up_to_date = true;   //For å oppdatere en case når du har trykket inn på den?
           console.log('This.case:', c);
         } else {
           this.case = null;

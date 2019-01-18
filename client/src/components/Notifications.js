@@ -10,122 +10,70 @@ import RegionService from '../services/RegionService.js';
 import Case from '../classes/Case.js';
 import Region from '../classes/Region.js';
 import ViewCase from './ViewCase.js';
-import { Redirect } from 'react-router-dom'
+import { Redirect } from 'react-router-dom';
+import Notify from './Notify.js';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import CaseItem from './CaseItem.js';
+import { faListUl, faTh } from '@fortawesome/free-solid-svg-icons/index';
 
 class Notifications extends Component {
-  temp=[];
-  notifications = [
-    {
-      user_id: 1,
-      region_id: 1,
-      case_id: 1,
-      region_name: 'Lillestrøm',
-      title: 'Her var det glatt gitt',
-      createdAt: '10.07.1994',
-      updatedAt: '10.07.2019',
-      description: 'Må måkes plezz'
-    },
-    {
-      user_id: 1,
-      region_id: 2,
-      case_id: 2,
-      region_name: 'Trondheim',
-      title: 'Hola påræ!',
-      createdAt: '10.07.1994',
-      updatedAt: '10.07.2019',
-      description: 'Må måkes plezz'
-    },
-    {
-      user_id: 1,
-      region_id: 1,
-      case_id: 3,
-      region_name: 'Lillestrøm',
-      title: 'Jaggumei jaggu',
-      createdAt: '10.07.1994',
-      updatedAt: '10.07.2019',
-      description: 'Må måkes plezz'
-    },
-    {
-      user_id: 1,
-      region_id: 3,
-      case_id: 4,
-      region_name: 'Frogner',
-      title: 'Hurra hurra, bursdag bursdag',
-      createdAt: '10.07.1994',
-      updatedAt: '10.07.2019',
-      description: 'Bare krims og krams'
-    },
-    {
-      user_id: 1,
-      region_id: 3,
-      case_id: 5,
-      region_name: 'Lillestrøm',
-      title: 'Berit er ute å cruiser på rolleblades igjen, hjølp!',
-      createdAt: '10.07.1994',
-      updatedAt: '10.07.2019',
-      description: 'Bistand kreves'
-    }
-  ];
-
+  grid = true;
+  cases = null;
   user = JSON.parse(localStorage.getItem('user'));
 
   render() {
-    if (!this.notifications) {
+    if (!this.cases) {
       return null;
     }
 
     return(
-      <div>
-        {this.temp.map(e => {
-          return <div className='card-body'>
-            <h1>{e[0].region_name}</h1>
-          {e.map(j => (
-            <div className='border' style={{ cursor: 'pointer' }} onClick={this.onClickCaseBlock}>
-              <p><b>{j.title}</b></p>
-              <p>Opprettet: {this.dateFormat(j.createdAt)}, oppdatert: {this.dateFormat(j.updatedAt)}</p>
-              <p><i>{j.description}</i></p>
+        <div>
+            <NavLink to={'/new-case'} className={'btn btn-primary btn-lg w-100 mb-3 megabutton'}>Registrer sak</NavLink>
+            <div>
+                <div className="d-none d-sm-block">
+                    <div className="btn-toolbar my-3 mx-2" role="toolbar">
+                        <div className="btn-group mr-2" role="group">
+                            <button
+                                type="button"
+                                className={this.grid ? 'btn btn-secondary' : 'btn btn-secondary'}
+                                onClick={() => (this.grid = true)}
+                            >
+                                <FontAwesomeIcon icon={faTh} /> Grid
+                            </button>
+                            <button type="button" className="btn btn-secondary" onClick={() => (this.grid = false)}>
+                                <FontAwesomeIcon icon={faListUl} /> List
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    {this.grid ? (
+                        <div className="content">
+                            {this.cases.map(e => (
+                                <CaseItem case={e} key={e.case_id} grid={this.grid} user={this.user}/>
+                            ))}
+                        </div>
+                    ) : (
+                        this.cases.map(e => <CaseItem case={e} key={e.case_id} grid={this.grid} user={this.user}/>)
+                    )}
+                </div>
             </div>
-          ))
-        }</div>})}
-      </div>
-    )
+        </div>
+    );
   }
 
   mounted() {
-    this.indexerRegion().map(index => {
-      this.temp.push(this.notifications.filter(sub => sub.region_id === index));
-    });
-    console.log(this.temp);
-    /*let caseSubscriptionService = new CaseSubscriptionService();
+    let caseSubscriptionService = new CaseSubscriptionService();
     caseSubscriptionService
-    .getAllSubscribedCasesGivenUser(this.user.user_id)
-    .then((subscriptions: Case[]) => {
-      this.notifications = subscriptions;
-      console.log('tabell: ', subscriptions)
+    .getAllOutdatedCaseSubscriptions(this.user.user_id)
+    .then((cases: Case[]) => {
+      for (var i = 0; i < cases.length; i++) {
+        cases[i].subscribed = true;
+      }
+      this.cases = cases;
+      console.log('tabell: ', cases)
     })
-    .then(() => {
-      this.indexerRegion().map(index => {
-        this.temp.push(this.notifications.filter(sub => sub.region_id === index));
-      })
-    })
-    .catch((error: Error) => console.error(error));*/
-  }
-
-  indexerRegion() {
-    let unique = [...new Set(this.notifications.map(item => item.region_id))];
-    console.log(unique);
-    return unique;
-  }
-
-  onClickCaseBlock(event: SyntheticInputEvent<HTMLInputElement>) {
-    /*if (event.target && event.target instanceof HTMLTableRowElement) {
-      let case_id = this.notifications[event.target.parentElement].region_id;
-      console.log(case_id);
-      //this.props.history.push('/case/' + case_id);
-      //this.props.history.push('/'); // Placeholder
-    }*/
-    history.push()
-    console.log('hei');
+    .catch((error: Error) => console.error(error));
   }
 
   dateFormat(date: string) {

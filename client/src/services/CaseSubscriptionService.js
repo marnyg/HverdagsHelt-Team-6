@@ -132,6 +132,33 @@ class CaseSubscriptionService {
         .catch((error: Error) => reject(error));
     });
   }
+
+  getAllOutdatedCaseSubscriptions(user_id: number): Promise<Case[]> {
+    return new Promise((resolve, reject) => {
+      let loginService = new LoginService();
+      loginService
+        .isLoggedIn()
+        .then((logged_in: Boolean) => {
+          if (logged_in === true) {
+            let token = localStorage.getItem('token');
+            axios
+              .get(
+                '/api/cases/subscriptions/' + user_id + '/cases',
+                {
+                  headers: {
+                    Authorization: 'Bearer ' + token
+                  }
+                }
+              )
+              .then((cases: Case[]) => resolve(cases))
+              .catch((error: Error) => reject(error));
+          } else {
+            reject('User is not logged in');
+          }
+        })
+        .catch((error: Error) => reject(error));
+    });
+  }
 }
 
 
