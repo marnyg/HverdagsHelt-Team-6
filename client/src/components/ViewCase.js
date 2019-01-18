@@ -11,230 +11,372 @@ import StatusCommentService from '../services/StatusCommentService';
 import Notify from './Notify';
 import GoogleApiWrapper from './GoogleApiWrapper';
 import Case from '../classes/Case';
+import StatusComment from '../classes/StatusComment';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons/index';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Picture from '../classes/Picture';
 
-// Constants used for colouring status fields in table
-
-const statusClosed = 3;
-const statusProcesing = 2;
-const statusOpen = 1;
-const green = { color: 'green' };
-const orange = { color: 'orange' };
-const red = { color: 'red' };
-const MAX_NUMBER_IMG = 3;
+const statusStyles = [{ color: 'red' }, { color: 'orange' }, { color: 'green' }]; // Constant used for colouring status fields in table.
+const MAX_NUMBER_IMG = 3; // Maximum number of images allwed in a single case.
+const NOT_OWNER_NOT_EMPLOYEE = 3;
+const OWNER_NOT_EMPLOYEE = 2;
+const EMPLOYEE = 1;
+const EMPLOYEE_ACCESS_LEVEL = 2;
 
 class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   case: Case = null;
+  statusComment: StatusComment = null;
   deletedImages: string[] = [];
   statuses = [];
   categories = [];
-  lastResortPos = { lat: 59.9138688, lon: 10.752245399999993 }; // Last resort position OSLO
-  pos = this.lastResortPos;
-  statusMessage = [];
-  statusForm = null;
-  messageForm = null;
+  statusMessages = [];
+  form = null;
   fileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
   render() {
-    if (!this.case) {
+    if (!this.case || !this.statusComment) {
       return null;
     }
 
-    // TODO Del opp grantAcess() til tre deler. 1. Kan ikke editere noen ting. 2. Kan sette kategori og status. 3. Kan også sende melding.
-
-    if (this.grantAccess()) {
-      return (
-        <div className={'modal-body row'}>
-          <div className={'col-md-6'}>
-            <form
-              ref={e => {
-                this.messageForm = e;
-              }}
-            >
-              <h1>{this.case.title}</h1>
-              <table className={'table'}>
-                <tbody>
-                  <tr>
-                    <td>Status</td>
-                    <td style={this.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
-                  </tr>
-                  <tr>
-                    <td>Kategori</td>
-                    <td>{this.case.category_name}</td>
-                  </tr>
-                  <tr>
-                    <td>Sak sendt av</td>
-                    <td>{this.case.createdBy}</td>
-                  </tr>
-                  <tr>
-                    <td>Sak opprettet</td>
-                    <td>{this.dateFormat(this.case.createdAt)}</td>
-                  </tr>
-                  <tr>
-                    <td>Sist oppdatert</td>
-                    <td>{this.dateFormat(this.case.updatedAt)}</td>
-                  </tr>
-                </tbody>
-              </table>
-              <p>{this.case.description}</p>
-              <h2>Sett kategori</h2>
-              <select
-                defaultValue={this.getInitialCategory()}
-                onChange={this.categoryListener}
-                className={'form-control'}
-                id={'category'}
-                required
+    switch (this.grantAccess()) {
+      case EMPLOYEE:
+        // Kommuneansatt. Full tilgang.
+        console.log('USER IS EMPLOYEE OR HIGHER');
+        return (
+          <div className={'modal-body row'}>
+            <div className={'col-md-6'}>
+              <form
+                ref={e => {
+                  this.form = e;
+                }}
               >
-                {this.categories.map(e => (
-                  <option key={e.category_id} value={e.category_id}>
-                    {' '}
-                    {e.name}{' '}
-                  </option>
-                ))}
-              </select>
-              <h2>Sett saksstatus</h2>
-              <select
-                defaultValue={this.getInitialStatus()}
-                onChange={this.statusListener}
-                className={'form-control'}
-                id={'category'}
-                required
-              >
-                {this.statuses.map(e => (
-                  <option key={e.status_id} value={e.status_id}>
-                    {' '}
-                    {e.name}{' '}
-                  </option>
-                ))}
-              </select>
-              <div className={'form-group'}>
-                <label htmlFor="description">Melding</label>
-                <textarea
+                <h1>{this.case.title}</h1>
+                <table className={'table'}>
+                  <tbody>
+                    <tr>
+                      <td>Status</td>
+                      <td style={this.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
+                    </tr>
+                    <tr>
+                      <td>Kategori</td>
+                      <td>{this.case.category_name}</td>
+                    </tr>
+                    <tr>
+                      <td>Sak sendt av</td>
+                      <td>{this.case.createdBy}</td>
+                    </tr>
+                    <tr>
+                      <td>Sak opprettet</td>
+                      <td>{this.dateFormat(this.case.createdAt)}</td>
+                    </tr>
+                    <tr>
+                      <td>Sist oppdatert</td>
+                      <td>{this.dateFormat(this.case.updatedAt)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p>{this.case.description}</p>
+                <h2>Rediger sak</h2>
+                <h3>Sett kategori</h3>
+                <select
+                  defaultValue={this.getInitialCategory()}
+                  onChange={this.categoryListener}
                   className={'form-control'}
-                  id={'description'}
-                  maxLength={255}
-                  minLength={2}
-                  placeholder="Melding"
+                  id={'category'}
                   required
-                />
-              </div>
-              {this.case.img.length < MAX_NUMBER_IMG ? (
+                >
+                  {this.categories.map(e => (
+                    <option key={e.category_id} value={e.category_id}>
+                      {' '}
+                      {e.name}{' '}
+                    </option>
+                  ))}
+                </select>
+                <h3>Sett saksstatus</h3>
+                <select
+                  defaultValue={this.getInitialStatus()}
+                  onChange={this.statusListener}
+                  className={'form-control'}
+                  id={'category'}
+                  required
+                >
+                  {this.statuses.map(e => (
+                    <option key={e.status_id} value={e.status_id}>
+                      {' '}
+                      {e.name}{' '}
+                    </option>
+                  ))}
+                </select>
                 <div className={'form-group'}>
-                  <label htmlFor={'image-input'}>Legg ved bilder</label>
-                  <input
-                    className={'form-control-file'}
-                    id={'image-inpu'}
-                    type={'file'}
-                    accept={'.png, .jpg, .jpeg'}
-                    onChange={this.fileInputListener}
+                  <label htmlFor="description">Melding</label>
+                  <textarea
+                    className={'message'}
+                    id={'message'}
+                    maxLength={255}
+                    minLength={2}
+                    placeholder="Melding"
+                    value={this.statusComment.comment}
+                    onChange={this.textareaListener}
+                    required
                   />
                 </div>
-              ) : null}
-              <div className="container my-5">
-                <div className="row">
-                  {this.case.img.map(e => (
-                    <div key={e.src} className="col-md-3">
-                      <div className="card">
-                        <img src={e.src} alt={e.src} className="card-img-top" />
-                        <div className="card-img-overlay">
-                          <button
-                            className={'btn btn-danger img-overlay float-right align-text-bottom'}
-                            onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
-                          >
-                            <FontAwesomeIcon icon={faTrashAlt} />
-                          </button>
+                {this.case.img.length < MAX_NUMBER_IMG ? (
+                  <div className={'form-group'}>
+                    <label htmlFor={'image-input'}>Legg ved bilder</label>
+                    <input
+                      className={'form-control-file'}
+                      id={'image-inpu'}
+                      type={'file'}
+                      accept={'.png, .jpg, .jpeg'}
+                      onChange={this.fileInputListener}
+                    />
+                  </div>
+                ) : null}
+                <div className="container my-5">
+                  <div className="row">
+                    {this.case.img.map(e => (
+                      <div key={e.src} className="col-md-3">
+                        <div className="card">
+                          <img src={e.src} alt={e.src} className="card-img-top" />
+                          <div className="card-img-overlay">
+                            <button
+                              className={'btn btn-danger img-overlay float-right align-text-bottom'}
+                              onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
+                            >
+                              <FontAwesomeIcon icon={faTrashAlt} />
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
+              </form>
+              <button className={'btn btn-primary mr-2'} onClick={this.submit}>
+                Oppdater
+              </button>
+              <div className={'col-md-6 embed-responsive'}>
+                <GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.case.lat, lng: this.case.lon }} />
               </div>
-            </form>
-            <button className={'btn btn-primary mr-2'} onClick={this.submit}>
-              Oppdater
-            </button>
-            <div className={'col-md-6 embed-responsive'}>
-              <GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.pos.lat, lng: this.pos.lon }} />
+            </div>
+            <div className={'col-md-6'}>
+              <h2>Statusmeldinger</h2>
+              <p id={'noComments'} style={{ color: '#666' }} hidden>
+                Ingen har kommentert enda.
+              </p>
+              <ul className={'list-group'}>
+                {this.statusMessages.map(e => (
+                  <li className={'list-group-item'} key={e.status_comment_id}>
+                    <div>
+                      <h4>{e.createdBy}</h4>
+                      <p>{this.dateFormat(e.createdAt)}</p>
+                      <p>{e.comment}</p>
+                      <p style={this.getStatusColour(e.status_id)}>{e.status_name}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
-          <div className={'col-md-6'}>
-            <h2>Statusmeldinger</h2>
-            <p id={'noComments'} style={{ color: '#666' }} hidden>
-              Ingen har kommentert enda.
-            </p>
-            <ul className={'list-group'}>
-              {this.statusMessage.map(e => (
-                <li className={'list-group-item'} key={e.status_comment_id}>
-                  <div>
-                    <h4>{e.createdBy}</h4>
-                    <p>{this.dateFormat(e.createdAt)}</p>
-                    <p>{e.comment}</p>
-                    <p style={this.getStatusColour(e.status_id)}>{e.status_name}</p>
+        );
+      case OWNER_NOT_EMPLOYEE:
+        // Eier, men ikke ansatt. Kan ikke sende kommentar, men kan editere saken som om den var ny før status blir satt til under behandling.
+        console.log('USER IS OWNER OF CASE');
+        return (
+          <div className={'modal-body row'}>
+            <div className={'col-md-6'}>
+              <form
+                ref={e => {
+                  this.form = e;
+                }}
+              >
+                <h1>{this.case.title}</h1>
+                <table className={'table'}>
+                  <tbody>
+                    <tr>
+                      <td>Status</td>
+                      <td style={this.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
+                    </tr>
+                    <tr>
+                      <td>Kategori</td>
+                      <td>{this.case.category_name}</td>
+                    </tr>
+                    <tr>
+                      <td>Sak sendt av</td>
+                      <td>{this.case.createdBy}</td>
+                    </tr>
+                    <tr>
+                      <td>Sak opprettet</td>
+                      <td>{this.dateFormat(this.case.createdAt)}</td>
+                    </tr>
+                    <tr>
+                      <td>Sist oppdatert</td>
+                      <td>{this.dateFormat(this.case.updatedAt)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p>{this.case.description}</p>
+                <h2>Rediger sak</h2>
+                <h3>Sett kategori</h3>
+                <select
+                  defaultValue={this.getInitialCategory()}
+                  onChange={this.categoryListener}
+                  className={'form-control'}
+                  id={'category'}
+                  required
+                >
+                  {this.categories.map(e => (
+                    <option key={e.category_id} value={e.category_id}>
+                      {' '}
+                      {e.name}{' '}
+                    </option>
+                  ))}
+                </select>
+                <div className={'form-group'}>
+                  <label htmlFor="description">Beskrivelse</label>
+                  <textarea
+                    className={'form-control'}
+                    id={'description'}
+                    maxLength={255}
+                    minLength={2}
+                    placeholder="Gi din sak en beskrivende tittel, så blir det enklere for oss å hjelpe deg."
+                    value={this.case.description}
+                    onChange={this.textareaListener}
+                    required
+                  />
+                </div>
+                {this.case.img.length < MAX_NUMBER_IMG ? (
+                  <div className={'form-group'}>
+                    <label htmlFor={'image-input'}>Legg ved bilder</label>
+                    <input
+                      className={'form-control-file'}
+                      id={'image-input'}
+                      type={'file'}
+                      accept={'.png, .jpg, .jpeg'}
+                      onChange={this.fileInputListener}
+                    />
                   </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      );
-    } else {
-      return (
-        <div className={'modal-body row'}>
-          <div className={'col-md-6'}>
-            <div>
-              <h1>{this.case.title}</h1>
-              <table className={'table'}>
-                <tbody>
-                  <tr>
-                    <td>Status</td>
-                    <td style={this.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
-                  </tr>
-                  <tr>
-                    <td>Kategori</td>
-                    <td>{this.case.category_name}</td>
-                  </tr>
-                  <tr>
-                    <td>Sak sendt av</td>
-                    <td>{this.case.createdBy}</td>
-                  </tr>
-                  <tr>
-                    <td>Sak opprettet</td>
-                    <td>{this.dateFormat(this.case.createdAt)}</td>
-                  </tr>
-                  <tr>
-                    <td>Sist oppdatert</td>
-                    <td>{this.dateFormat(this.case.updatedAt)}</td>
-                  </tr>
-                </tbody>
-              </table>
-              <p>{this.case.description}</p>
-            </div>
-            <div className={'col-md-6 embed-responsive'}>
-              <GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.pos.lat, lng: this.pos.lon }} />
-            </div>
-          </div>
-          <div className={'col-md-6'}>
-            <h2>Statusmeldinger</h2>
-            <p id={'noComments'} style={{ color: '#666' }} hidden>
-              Ingen har kommentert enda.
-            </p>
-            <ul className={'list-group'}>
-              {this.statusMessage.map(e => (
-                <li className={'list-group-item'} key={e.status_comment_id}>
-                  <div>
-                    <h4>{e.createdBy}</h4>
-                    <p>{this.dateFormat(e.createdAt)}</p>
-                    <p>{e.comment}</p>
-                    <p style={this.getStatusColour(e.status_id)}>{e.status_name}</p>
+                ) : null}
+                <div className="container my-5">
+                  <div className="row">
+                    {this.case.img.map(e => (
+                      <div key={e.src} className="col-md-3">
+                        <div className="card">
+                          <img src={e.src} alt={e.src} className="card-img-top" />
+                          <div className="card-img-overlay">
+                            <button
+                              className={'btn btn-danger img-overlay float-right align-text-bottom'}
+                              onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
+                            >
+                              <FontAwesomeIcon icon={faTrashAlt} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </li>
-              ))}
-            </ul>
+                </div>
+              </form>
+              <button className={'btn btn-primary mr-2'} onClick={this.submit}>
+                Oppdater
+              </button>
+              <div className={'col-md-6 embed-responsive'}>
+                <GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.case.lat, lng: this.case.lon }} />
+              </div>
+            </div>
+            <div className={'col-md-6'}>
+              <h2>Statusmeldinger</h2>
+              <p id={'noComments'} style={{ color: '#666' }} hidden>
+                Ingen har kommentert enda.
+              </p>
+              <ul className={'list-group'}>
+                {this.statusMessages.map(e => (
+                  <li className={'list-group-item'} key={e.status_comment_id}>
+                    <div>
+                      <h4>{e.createdBy}</h4>
+                      <p>{this.dateFormat(e.createdAt)}</p>
+                      <p>{e.comment}</p>
+                      <p style={this.getStatusColour(e.status_id)}>{e.status_name}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-        </div>
-      );
+        );
+      case NOT_OWNER_NOT_EMPLOYEE:
+        // Kan ikke gjøre noe.
+        console.log('UNAUTHORIZED USER. MAY ONLy VIEW CASE.');
+        return (
+          <div className={'modal-body row'}>
+            <div className={'col-md-6'}>
+              <form
+                ref={e => {
+                  this.form = e;
+                }}
+              >
+                <h1>{this.case.title}</h1>
+                <table className={'table'}>
+                  <tbody>
+                    <tr>
+                      <td>Status</td>
+                      <td style={this.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
+                    </tr>
+                    <tr>
+                      <td>Kategori</td>
+                      <td>{this.case.category_name}</td>
+                    </tr>
+                    <tr>
+                      <td>Sak sendt av</td>
+                      <td>{this.case.createdBy}</td>
+                    </tr>
+                    <tr>
+                      <td>Sak opprettet</td>
+                      <td>{this.dateFormat(this.case.createdAt)}</td>
+                    </tr>
+                    <tr>
+                      <td>Sist oppdatert</td>
+                      <td>{this.dateFormat(this.case.updatedAt)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p>{this.case.description}</p>
+                <div className="container my-5">
+                  <div className="row">
+                    {this.case.img.map(e => (
+                      <div key={e.src} className="col-md-3">
+                        <div className="card">
+                          <img src={e.src} alt={e.src} className="card-img-top" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </form>
+              <div className={'col-md-6 embed-responsive'}>
+                <GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.case.lat, lng: this.case.lon }} />
+              </div>
+            </div>
+            <div className={'col-md-6'}>
+              <h2>Statusmeldinger</h2>
+              <p id={'noComments'} style={{ color: '#666' }} hidden>
+                Ingen har kommentert enda.
+              </p>
+              <ul className={'list-group'}>
+                {this.statusMessages.map(e => (
+                  <li className={'list-group-item'} key={e.status_comment_id}>
+                    <div>
+                      <h4>{e.createdBy}</h4>
+                      <p>{this.dateFormat(e.createdAt)}</p>
+                      <p>{e.comment}</p>
+                      <p style={this.getStatusColour(e.status_id)}>{e.status_name}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        );
     }
   }
 
@@ -267,19 +409,32 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             a.lon
           );
           a.img.map(e => this.case.img.push({ src: e }));
+          let userObj = localStorage.getItem('user');
+          let statusCommentPoster: number;
+          if (userObj) {
+            statusCommentPoster = JSON.parse(userObj).user_id;
+          } else {
+            alert('HEI!');
+          }
+          this.statusComment = {
+            case_id: this.case.case_id,
+            status_id: this.case.status_id,
+            user_id: statusCommentPoster,
+            comment: ''
+          };
         } else {
-          this.case = null;
+          console.log('Case object was not returned encapsulated in an array. Using this.case = Case[0].');
+          Notify.danger('Saken ble hentet i et ukjent format.');
         }
       })
       .then(() => {
         cascom
           .getAllStatusComments(this.props.match.params.case_id)
           .then(e => {
-            this.statusMessage = e;
-            console.log('Statuskommentarer lengde = ' + this.statusMessage.length);
-            if (this.statusMessage.length === 0) {
+            this.statusMessages = e;
+            console.log('Statuskommentarer lengde = ' + this.statusMessages.length);
+            if (this.statusMessages.length === 0) {
               let p = document.getElementById('noComments');
-              console.log(p);
               if (p && p instanceof HTMLElement) {
                 p.hidden = false;
               }
@@ -334,17 +489,18 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   grantAccess() {
     let userObj = localStorage.getItem('user');
     if (this.case && userObj) {
-      let user = JSON.parse(userObj);
-      console.log(user);
-      if (user.access_level > 2) {
-        // User is a municipality employee. May edit any parametre of case
-        return true;
-      } else if (this.case.user_id !== user.user_id) {
-        // User is owner of case, may not send messages
-        return true;
+      let user: Object = JSON.parse(userObj);
+      console.log('User ' + user.firstname + ' ' + user.lastname + ' has privilege ' + user.access_level);
+      console.log('user.user_id: ' + user.user_id + ', this.case.user_id: ' + this.case.user_id);
+      if (user.access_level <= EMPLOYEE_ACCESS_LEVEL && user.region_id === this.case.region_id) {
+        // User is a municipality employee or higher. May edit case.
+        return EMPLOYEE;
+      } else if (this.case.user_id === user.user_id) {
+        // User is owner of case, may not send messages, but can edit until process or closed status.
+        return OWNER_NOT_EMPLOYEE;
       } else {
-        // User is not authorized to edit case
-        return 3;
+        // User is not authorized to edit case.
+        return NOT_OWNER_NOT_EMPLOYEE;
       }
     }
   }
@@ -372,14 +528,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   }
 
   getStatusColour(status_id: number) {
-    switch (status_id) {
-      case statusClosed:
-        return green;
-      case statusProcesing:
-        return orange;
-      case statusOpen:
-        return red;
-    }
+    return statusStyles[status_id + 1];
   }
 
   dateFormat(date: string) {
@@ -392,8 +541,19 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   }
 
   updatePos(newPos: Object) {
-    this.pos = newPos;
-    console.log('got pos from map: ', this.pos);
+    this.case.lat = newPos.lat;
+    this.case.lon = newPos.lon;
+    console.log('got pos from map: ', { lat: this.case.lat, lon: this.case.lon });
+  }
+
+  textareaListener(event: SyntheticInputEvent<HTMLInputElement>) {
+    if (event.target) {
+      if (event.target.id === 'description') {
+        this.case.description = event.target.value;
+      } else {
+        this.statusComment.comment = event.target.value;
+      }
+    }
   }
 
   categoryListener(event: SyntheticInputEvent<HTMLSelectElement>) {
@@ -462,8 +622,8 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   }
 
   submit() {
-    console.log('Clicked submit! this.case:');
-    console.log(this.case);
+    console.log('Clicked submit! this.case:', this.case);
+    console.log('this.statusComment: ', this.statusComment);
   }
 }
 

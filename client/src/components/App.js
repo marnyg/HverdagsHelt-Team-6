@@ -35,6 +35,7 @@ class App extends Component {
       <BrowserRouter>
         <div className={'main-wrapper'}>
           <Navbar />
+          <CaseList user_id={8}/>
           <Route exact path="/my-page" render={() => <MyPage />} />
           <div className="content-wrapper">
             <Notify />

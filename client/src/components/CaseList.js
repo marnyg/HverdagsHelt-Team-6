@@ -9,15 +9,13 @@ import Notify from './Notify';
 
 // Constants used for colouring status fields in table
 
-const statusClosed = 3;
-const statusProcesing = 2;
-const statusOpen = 1;
-const green = { color: 'green' };
-const orange = { color: 'orange' };
-const red = { color: 'red' };
+const statusStyles = [{ color: 'red' }, { color: 'orange' }, { color: 'green' }]; // Constant used for colouring status fields in table.
+const ITEMS_PER_QUERY = 20;
 
-class CaseList extends Component<{ props: { user_id: number, region_id: number }  }> {
+class CaseList extends Component<{ user_id: number, region_id: number }> {
   cases = [];
+  offset: number = 0;
+  fetchButton = null;
 
   render() {
     if (!this.cases) {
@@ -50,6 +48,15 @@ class CaseList extends Component<{ props: { user_id: number, region_id: number }
             ))}
           </tbody>
         </table>
+        <button
+          ref={e => {
+            this.fetchButton = e;
+          }}
+          className={'btn btn-secondary'}
+          onClick={this.onClickButton}
+        >
+          Last mer
+        </button>
         <p id={'noEntries'} style={{ color: '#666' }} hidden>
           Ingen innlegg å vise.
         </p>
@@ -58,24 +65,21 @@ class CaseList extends Component<{ props: { user_id: number, region_id: number }
   }
 
   mounted() {
-    let id;
-    let cas = new CaseService();
-    let token = localStorage.getItem('token');
+    console.log('user_id: ' + this.props.user_id + ', region_id: ' + this.props.region_id);
+    this.fetchData();
+  }
 
-    console.log("user_id: " + this.props.user_id + ", region_id: " + this.props.region_id);
+  fetchData() {
+    let cas = new CaseService();
     if (this.props.user_id) {
       // Set up table for cases on per user basis
       cas
         .getAllCasesGivenUser(this.props.user_id)
         .then(cases => {
-          this.cases = cases;
-          console.log('Length of this.cases = ' + this.cases.length);
-          console.log(this.cases);
-          if (this.cases.length === 0) {
-            document.querySelector('#noEntries').hidden = false;
-            Notify.info(
-              "Vi fant ingen saker for denne brukeren. Du kan lage en ny sak ved å trykke 'Registrer Sak' øverst i navigasjonsbaren."
-            );
+          this.cases = cases.concat(cases);
+          this.offset += cases.length;
+          if (this.fetchButton && cases.length < ITEMS_PER_QUERY) {
+            this.fetchButton.hidden = true;
           }
         })
         .catch((err: Error) => {
@@ -83,19 +87,17 @@ class CaseList extends Component<{ props: { user_id: number, region_id: number }
             'Det oppstod en feil under henting av dine saker. Hvis feilen vedvarer kontakt oss. \n\nFeilmelding: ' +
               err.message
           );
-          console.log('Error when fetching cases for user with id ' + id + '.\nError message is: ' + err.message);
+          console.log('Error when fetching cases for user with id ' + this.props.user_id + '.\nError message is: ' + err.message);
         });
     } else if (this.props.region_id) {
       // Set up table for cases on per municipality/region basis
       cas
         .getAllCasesGivenRegionId(this.props.region_id)
         .then(cases => {
-          this.cases = cases;
-          console.log('Length of this.cases = ' + this.cases.length);
-          console.log(this.cases);
-          if (this.cases.length === 0) {
-            document.querySelector('#noEntries').hidden = false;
-            Notify.info('Vi fant ingen saker for denne kommunen.');
+          this.cases = cases.concat(cases);
+          this.offset += cases.length;
+          if (this.fetchButton && cases.length < ITEMS_PER_QUERY) {
+            this.fetchButton.hidden = true;
           }
         })
         .catch((err: Error) => {
@@ -103,7 +105,7 @@ class CaseList extends Component<{ props: { user_id: number, region_id: number }
             'Det oppstod en feil under henting av kommunens saker. Hvis feilen vedvarer kontakt oss. \n\nFeilmelding: ' +
               err.message
           );
-          console.log('Error when fetching cases for region with id ' + id + '.\nError message is: ' + err.message);
+          console.log('Error when fetching cases for region with id ' + this.props.region_id + '.\nError message is: ' + err.message);
         });
     } else {
       console.warn("Didn't find user_id or region_id");
@@ -112,28 +114,23 @@ class CaseList extends Component<{ props: { user_id: number, region_id: number }
       );
     }
   }
-
+  
   getStatusColour(status_id: number) {
-    switch (status_id) {
-      case statusClosed:
-        return green;
-      case statusProcesing:
-        return orange;
-      case statusOpen:
-        return red;
-    }
+    return statusStyles[status_id + 1];
   }
 
   onClickTableRow(event: SyntheticInputEvent<HTMLInputElement>) {
-    console.log("Trykket på tabell.");
+    console.log('Trykket på tabell.');
     if (event.target && event.target.parentElement instanceof HTMLTableRowElement) {
       let case_id = this.cases[event.target.parentElement.rowIndex - 1].case_id;
       console.log(case_id);
-     this.props.history.push('/case/' + case_id);
-    }else{
-      Notify.danger("Kunne ikke videresende deg til sak.");
+      this.props.history.push('/case/' + case_id);
+    } else {
+      Notify.danger('Kunne ikke videresende deg til sak.');
     }
   }
+
+  onClickButton(event: SyntheticInputEvent<HTMLButtonElement>) {}
 
   dateFormat(date: string) {
     if (date) {
