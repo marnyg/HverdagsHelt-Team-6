@@ -333,6 +333,7 @@ class NewCase extends Component {
       .then(e => {
         if (this.pos) {
           this.pos = e;
+          this.markerPos = e;
         }
       })
       .catch((err: Error) => {
