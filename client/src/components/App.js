@@ -43,6 +43,7 @@ class App extends Component {
       <BrowserRouter>
           <div className={'main-wrapper'}>
               <Navbar />
+              <h1>Dette er en test</h1>
               <Route exact path="/my-page" render={() => <MyPage />} />
               <div className="content-wrapper">
                   <Notify />
