@@ -28,7 +28,7 @@ class CaseItem extends Component {
             <div className="d-inline">
               <div className="card-body">
                 <div className="card-text text-muted">{this.props.case.region_name} {this.props.case.county_name}</div>
-                <h2 className="card-title">{this.props.case.title}</h2>
+                <h2 className="card-title">{this.props.case.category_name}</h2>
                 <div className=" d-inline">
                   <small className="text-muted">{this.getTimeString(this.props.case.createdAt)}</small>
                 </div>
@@ -63,11 +63,12 @@ class CaseItem extends Component {
                 </div>
                 <div className="col-md-8">
                   <div className="card-block">
-                    <h6 className="card-title">{this.props.case.title}</h6>
+                    <h2 className="card-title">{this.props.case.title}</h2>
                     <p className="card-text">
-                      <small className="text-muted">{this.props.case.region}</small>
+                      <small className="text-muted">{this.props.case.region_name}</small>
                     </p>
-                    <p className="card-text text-justify">{this.props.case.description}</p>
+
+                    <p className="card-text text-justify">{this.props.case.description ? this.props.case.description:"Ingen beskrivelse"}</p>
                     <p className="card-text">
                       <small className="text-muted">{this.getTimeString(this.props.case.createdAt)}</small>
                     </p>
