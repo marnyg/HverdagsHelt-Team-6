@@ -11,8 +11,6 @@ import '../styles/simple-sidebar.css';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell } from '@fortawesome/free-solid-svg-icons';
-library.add(faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell);
-
 import Navbar from './Navbar.js';
 import ContentWrapper from './ContentWrapper.js';
 import Footer from './Footer.js';
@@ -29,7 +27,7 @@ import Subscriptions from './Subscriptions.js';
 import InfoPage from './InfoPage.js';
 import About from './About.js';
 import NoLocationPage from "./NoLocationPage";
-
+library.add(faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell);
 axios.interceptors.response.use(response => response.data);
 
 class App extends Component {
