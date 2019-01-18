@@ -4,7 +4,6 @@ import { Component } from 'react-simplified';
 import { NavLink } from 'react-router-dom';
 
 import CaseItem from './CaseItem.js';
-//import CaseService from '../services/CaseServices.js'; REMOVE COMMENT WHEN SERVICES DONE
 import LocationService from '../services/LocationService.js';
 import CaseService from '../services/CaseService.js';
 import Location from '../classes/Location.js';

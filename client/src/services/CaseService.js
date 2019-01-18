@@ -25,7 +25,7 @@ class CaseService {
           if (logged_in === true) {
             let token = localStorage.getItem('token');
             axios
-              .get('/api/cases/' + case_id, c, {
+              .put('/api/cases/' + case_id, c, {
                 headers: {
                   Authorization: 'Bearer ' + token
                 }
@@ -86,14 +86,14 @@ class CaseService {
                 formData.append("images", e.value)
               }
             );
-            
+
             formData.append("title", c.title);
             formData.append("description", c.description);
             formData.append("lat", c.lat);
             formData.append("lon", c.lon);
             formData.append("category_id", c.category_id);
             formData.append("region_id", c.region_id);
-            
+
             let title = c.title;
             axios
               .post('/api/cases', formData, {
