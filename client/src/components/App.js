@@ -14,7 +14,7 @@ import { faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell } 
 library.add(faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell);
 
 import Navbar from './Navbar.js';
-import Content from './Content.js';
+import ContentWrapper from './ContentWrapper.js';
 import Footer from './Footer.js';
 import MyPage from './MyPage.js';
 import ViewCase from './ViewCase.js';
@@ -46,12 +46,12 @@ class App extends Component {
               <Route exact path="/my-page" render={() => <MyPage />} />
               <div className="content-wrapper">
                   <Notify />
-                  {visited ? <Route exact path="/" render={() => <Content />} /> : <Route exact path="/" render={() => <InfoPage/>}/>}
+                  {visited ? <Route exact path="/" render={() => <ContentWrapper />} /> : <Route exact path="/" render={() => <InfoPage/>}/>}
                   <Route exact path="/case/:case_id" render={() => <ViewCase/>} />
                   <Route exact path="/subscriptions" render={() => <Subscriptions/>} />
                   <Route exact path="/notifications" render={() => <h1>Coming soon!</h1>} />
                   <Route exact path="/new-case" render={() => <NewCase />} />
-                  <Route exact path="/search/:query" component={Content} />
+                  <Route exact path="/search/:query" component={ContentWrapper} />
                   <Route exact path="/welcome" render={() => <InfoPage/>} />
                   <Route exact path="/about" render={() => <About/>} />
               </div>

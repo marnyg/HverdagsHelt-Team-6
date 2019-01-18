@@ -82,6 +82,7 @@
     .toggle {
       display: none;
     }
+
     .content-wrapper {
           padding-top: 25px;
           margin-left: 5%;
@@ -126,9 +127,21 @@
     .megabutton {
         display: none;
     }
+    .mobile-region-select {
+        display: none;
+    }
+    .grid-list-control {
+        display: inline-block;
+    }
 }
 @media only screen and (max-width: 990px){
     .fullbar-notification {
+        display: none;
+    }
+    .grid-list-control {
+        display: none;
+    }
+    .desktop-region-select {
         display: none;
     }
 }
