@@ -23,7 +23,13 @@ module.exports = {
       user_id: req.body.user_id,
       region_id: Number(req.params.region_id),
       notify: req.body.notify
-    }).then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)));
+    })
+      .then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)))
+      .catch(err => {
+        err.description = 'Det finnes allerede et abonnement for denne brukeren, på den oppgitte regionen';
+        res.status(409).json(err);
+        console.log(err.parent.sqlMessage);
+      });
   },
   updateRegion_subscriptions: function(req: Request, res: Response) {
     let region_id = Number(req.params.region_id);
