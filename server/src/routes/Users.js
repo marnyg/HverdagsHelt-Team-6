@@ -125,7 +125,23 @@ module.exports = {
 
     return User.destroy({ where: { user_id: Number(req.params.user_id) } }).then(user =>
       user ? res.send() : res.status(400).send()
-    );
+    ).catch(() => {
+        User.update(
+            {
+                firstname: "Bruker",
+                lastname: "Slettet",
+                tlf: 0,
+                email: "",
+                hashed_password: "",
+                salt: "",
+                role_id: 5
+            },
+            { where: { user_id: Number(req.params.user_id) } }
+        ).then(() => {
+            res.status(200).send();
+            console.log("Sensitive user data wiped");
+        });
+    });
   },
   changePassword: async function(req: Request, res: Response) {
     if (

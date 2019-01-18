@@ -47,7 +47,7 @@ class App extends Component {
                   {visited ? <Route exact path="/" render={() => <ContentWrapper />} /> : <Route exact path="/" render={() => <InfoPage/>}/>}
                   <Route exact path="/case/:case_id" render={() => <ViewCase/>} />
                   <Route exact path="/subscriptions" render={() => <Subscriptions/>} />
-                  <Route exact path="/notifications" render={() => <h1>Coming soon!</h1>} />
+                  <Route exact path="/notifications" render={() => <Notifications/>} />
                   <Route exact path="/new-case" render={() => <NewCase />} />
                   <Route exact path="/search/:query" component={ContentWrapper} />
                   <Route exact path="/welcome" render={() => <InfoPage/>} />

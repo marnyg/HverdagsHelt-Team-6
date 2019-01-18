@@ -42,7 +42,6 @@ module.exports = {
 
   createNewCase: function(req: Request, res: Response) {
     reqAccessLevel(req, res, 4, () => true);
-    console.log('11111111111111111111111111 DENNE SKAL VI SE');
     if (req.body) {
       console.log(req.body);
       console.log(req.body.images);
@@ -111,14 +110,6 @@ module.exports = {
 
   getOneCase: async function(req: Request, res: Response) {
     if (!req.params || typeof Number(req.params.case_id) != 'number') return res.sendStatus(400);
-    /*
-    sequelize.query("Select case_id, title, description, c.lat as case_lat, c.lon as case_lon, r.name as region_name, CONCAT(u.firstname, ' ', u.lastname) as created_by, createdAt, updatedAt from Cases c natural join Regions r natural join Users u where c.case_id = ?",
-      { replacements: [req.params.case_id] },
-      { type: sequelize.QueryTypes.SELECT }).then(result => {
-        console.log(result);
-        return res.send(result);
-    })
-    */
     sequelize
       .query(rawQueryCases + ' WHERE c.case_id = ?;', {
         replacements: [req.params.case_id],
@@ -133,6 +124,59 @@ module.exports = {
         return res.status(500).send(err);
       });
   },
+
+  updateCase: function(req: Request, res: Response) {
+    if(
+      !req.body ||
+      !req.token ||
+      !req.params ||
+      typeof Number(req.params.case_id) != 'number' ||
+      typeof req.body.title != 'string' ||
+      typeof req.body.description != 'string' ||
+      typeof Number(req.body.lat) != 'number' ||
+      typeof Number(req.body.lon) != 'number' ||
+      typeof Number(req.body.reqion_id) != 'number' ||
+      typeof Number(req.body.category_id) != 'number' ||
+      typeof Number(req.body.status_id) != 'number'
+    ) return res.sendStatus(400);
+
+    let decoded_token = verifyToken(req.token);
+    let token_user_id = Number(decoded_token.user_id);
+    let token_access_level = Number(decoded_token.accesslevel);
+    let param_case_id = Number(req.params.case_id);
+    let b = req.body;
+    let update_body = {
+      title: b.title,
+      description: b.description,
+      lat: b.lat,
+      lon: b.lon,
+      region_id: b.region_id,
+    };
+    if(token_access_level <= 2) update_body['status_id'] = req.body.status_id;
+
+    return Case.findOne(
+      { where: { case_id: param_case_id } }
+    )
+    .then(cases => {
+      if(!cases) throw new TypeError("Case not found.");
+      if(cases.user_id !== token_user_id && token_access_level > 2){
+        return res.status(401).send({msg: "User not allowed to update case."})
+      }
+      Case.update(
+        update_body,
+        { where: { case_id: param_case_id } }
+      )
+        .then(newCase => {
+          return res.sendStatus(200);
+        })
+        .catch(error => { return res.status(500).send(error.message) });
+    })
+    .catch(error => {
+      if (error instanceof TypeError) return res.status(404).send(error.message);
+      else return res.status(500).send(error.message);
+    })
+  },
+
   getAllCasesInRegionByName: async function(req: Request, res: Response) {
     if (!req.params || typeof req.params.county_name != 'string' || typeof req.params.region_name != 'string')
       return res.sendStatus(400);

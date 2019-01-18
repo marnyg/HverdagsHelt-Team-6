@@ -111,32 +111,7 @@ app.delete('/api/cases/:case_id/status_comments/:status_comment_id', (req: Reque
 });
 
 app.put('/api/cases/:case_id', (req: Request, res: Response) => {
-  if (
-    !req.body ||
-    typeof req.body.title !== 'string' ||
-    typeof req.body.description !== 'string' ||
-    typeof req.body.lat != 'number' ||
-    typeof req.body.lon != 'number' ||
-    typeof req.body.region_id != 'number' ||
-    typeof req.body.user_id != 'number' ||
-    typeof req.body.category_id != 'number' ||
-    typeof req.body.status_id != 'number'
-  )
-    return res.sendStatus(400);
-
-  return Case.update(
-    {
-      title: req.body.title,
-      description: req.body.description,
-      lat: req.body.lat,
-      lon: req.body.lon,
-      region_id: req.body.region_id,
-      user_id: req.body.user_id,
-      category_id: req.body.category_id,
-      status_id: req.body.status_id
-    },
-    { where: { case_id: req.params.case_id } }
-  ).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+  reqAccessLevel(req, res, 4, Cases.updateCase);
 });
 
 app.delete('/api/cases/:case_id', (req: Request, res: Response) => {
@@ -152,6 +127,11 @@ app.get('/api/cases/subscriptions/:user_id', (req: Request, res: Response) => {
 app.get('/api/cases/subscriptions/:user_id/cases', (req: Request, res: Response) => {
   console.log(req.body);
   reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptionCases);
+});
+
+app.get('/api/cases/subscriptions/:user_id/cases/is_up_to_date', (req: Request, res: Response) => {
+  console.log(req.body);
+  reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptionCasesIs_up_to_date);
 });
 
 app.post('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
