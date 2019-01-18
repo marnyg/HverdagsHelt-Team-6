@@ -67,9 +67,9 @@ app.post('/api/uploads', upload.single('avatar'), (req, res) => {
   }
 });
 
-app.get('/', (req: Request, res: Response) => res.sendFile(public_path + '/index.html'));
-
 app.post('/api/cases', upload.array('images', 3), Cases.createNewCase);
+
+app.get('/', (req: Request, res: Response) => res.sendFile(public_path + '/index.html'));
 
 app.get('/api/cases', (req: Request, res: Response) => Cases.getAllCases(req, res));
 

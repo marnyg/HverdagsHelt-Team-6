@@ -36,7 +36,7 @@ describe('GET /api/cases', () => {
 });
 
 let caseid;
-describe('POST /api/cases', async () => {
+describe('POST /api/cases2', async () => {
   let data = {
     title: 'Glatt vei',
     description: 'Veldig glatt vei i Oslo',
@@ -45,10 +45,11 @@ describe('POST /api/cases', async () => {
     region_id: 1,
     user_id: 1,
     category_id: 1,
-    status_id: 1
+    status_id: 1,
+    images: null
   };
   test('200 status code for POST', function(done) {
-    request(application)
+    return request(application)
       .post('/api/cases')
       .send(data)
       .set('Authorization', `Bearer ${token}`)
@@ -61,8 +62,8 @@ describe('POST /api/cases', async () => {
   });
 });
 
-describe('GET /api/cases/user_cases/{user_id}', () => {
-  test('200 status code for GET case with case_id = 1', done => {
+describe('GET /api/cases/user_cases/{user_id}1', () => {
+  test('200 status code for GET case with case_id = 12', done => {
     request(application)
       .get('/api/cases/user_cases/1')
       .set('Authorization', `Bearer ${token}`)
@@ -73,7 +74,7 @@ describe('GET /api/cases/user_cases/{user_id}', () => {
   });
 });
 
-describe('GET /api/cases/{case_id}', () => {
+describe('GET /api/cases/{case_id}1', () => {
   test('200 status code for GET with case id = 1', done => {
     request(application)
       .get('/api/cases/user_cases/1')
@@ -96,9 +97,9 @@ describe('PUT /api/cases/{case_id}', () => {
     category_id: 1,
     status_id: 1
   };
-  test('200 status code for PUT with case_id = 1', done => {
+  test('200 status code for PUT with case_id = 2', done => {
     request(application)
-      .put('/api/cases/' + caseid)
+      .put('/api/cases/1')
       .send(data)
       .set('Authorization', `Bearer ${token}`)
       .then(response => {
