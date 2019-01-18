@@ -21,7 +21,7 @@ let rawQueryCases =
   'JOIN Statuses s ON c.status_id = s.status_id ' +
   'JOIN Categories cg ON c.category_id = cg.category_id ';
 
-let casesOrder =  'ORDER BY c.updatedAt DESC';
+let casesOrder = 'ORDER BY c.updatedAt DESC';
 
 module.exports = {
   getAllCases: async function(req: Request, res: Response) {
@@ -126,7 +126,7 @@ module.exports = {
   },
 
   updateCase: function(req: Request, res: Response) {
-    if(
+    if (
       !req.body ||
       !req.token ||
       !req.params ||
@@ -138,7 +138,8 @@ module.exports = {
       typeof Number(req.body.reqion_id) != 'number' ||
       typeof Number(req.body.category_id) != 'number' ||
       typeof Number(req.body.status_id) != 'number'
-    ) return res.sendStatus(400);
+    )
+      return res.sendStatus(400);
 
     let decoded_token = verifyToken(req.token);
     let token_user_id = Number(decoded_token.user_id);
@@ -150,31 +151,28 @@ module.exports = {
       description: b.description,
       lat: b.lat,
       lon: b.lon,
-      region_id: b.region_id,
+      region_id: b.region_id
     };
-    if(token_access_level <= 2) update_body['status_id'] = req.body.status_id;
+    if (token_access_level <= 2) update_body['status_id'] = req.body.status_id;
 
-    return Case.findOne(
-      { where: { case_id: param_case_id } }
-    )
-    .then(cases => {
-      if(!cases) throw new TypeError("Case not found.");
-      if(cases.user_id !== token_user_id && token_access_level > 2){
-        return res.status(401).send({msg: "User not allowed to update case."})
-      }
-      Case.update(
-        update_body,
-        { where: { case_id: param_case_id } }
-      )
-        .then(newCase => {
-          return res.sendStatus(200);
-        })
-        .catch(error => { return res.status(500).send(error.message) });
-    })
-    .catch(error => {
-      if (error instanceof TypeError) return res.status(404).send(error.message);
-      else return res.status(500).send(error.message);
-    })
+    return Case.findOne({ where: { case_id: param_case_id } })
+      .then(cases => {
+        if (!cases) throw new TypeError('Case not found.');
+        if (cases.user_id !== token_user_id && token_access_level > 2) {
+          return res.status(401).send({ msg: 'User not allowed to update case.' });
+        }
+        Case.update(update_body, { where: { case_id: param_case_id } })
+          .then(newCase => {
+            return res.sendStatus(200);
+          })
+          .catch(error => {
+            return res.status(500).send(error.message);
+          });
+      })
+      .catch(error => {
+        if (error instanceof TypeError) return res.status(404).send(error.message);
+        else return res.status(500).send(error.message);
+      });
   },
 
   getAllCasesInRegionByName: async function(req: Request, res: Response) {
@@ -237,6 +235,32 @@ module.exports = {
         replacements: [Number(req.params.user_id)],
         type: sequelize.QueryTypes.SELECT
       })
+      .then(async cases => {
+        const out = cases.map(async c => {
+          let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
+          c.img = pictures.map(img => img.path);
+          return c;
+        });
+        return Promise.all(out).then(cases => (cases ? res.send(cases) : res.sendStatus(404)));
+      })
+      .catch(err => {
+        return res.status(500).send(err);
+      });
+  },
+  search: function(req: Request, res: Response) {
+    let search = '%' + req.params.searchtext + '%';
+    sequelize
+      .query(
+        rawQueryCases +
+          'WHERE title LIKE ? ' +
+          'OR description LIKE ? ' +
+          'OR co.name LIKE ? ' +
+          'OR r.name LIKE ? ' +
+          'OR cg.name LIKE ? ' +
+          casesOrder +
+          ' LIMIT 20',
+        { replacements: [search, search, search, search, search], type: sequelize.QueryTypes.SELECT }
+      )
       .then(async cases => {
         const out = cases.map(async c => {
           let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
