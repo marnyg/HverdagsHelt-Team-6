@@ -754,6 +754,12 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(
               access_level: 4
             })
           )
+          .then(() =>
+            Role.create({
+              name: 'Slettet',
+              access_level: 10
+            })
+          )
           // ****************************** Users ******************************
           .then(() =>
             User.create({
@@ -944,6 +950,3 @@ export let sync = sequelize.sync({ force: production ? false : true }).then(
     console.log('Database connection failed');
   }
 );
-
-
-
