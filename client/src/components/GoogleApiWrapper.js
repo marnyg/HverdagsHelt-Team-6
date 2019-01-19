@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import { GoogleApiWrapper, InfoWindow, Map, Marker, SearchBox } from 'google-maps-react';
+import { GoogleApiWrapper, google, InfoWindow, Map, Marker } from 'google-maps-react';
 import { timingSafeEqual } from 'crypto';
+import SearchBox from './SearchBox'
 
 export class GoogleMapsContainer extends Component {
 
@@ -11,10 +12,7 @@ export class GoogleMapsContainer extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.centerPos !== this.props.centerPos) {
-      this.gmap.panTo(this.props.markerPos);
-      this.marker.setPosition(this.props.centerPos)
-    }
+    this.gmap.panTo(this.props.markerPos);
     if (!this.props.isClickable) {
       this.gmap.onClick = null;
       this.gmap.draggable = false
@@ -24,37 +22,46 @@ export class GoogleMapsContainer extends Component {
       this.gmap.onClick = (t, map, coord) => this.onClick(t, map, coord)
       this.gmap.setOptions({ styles: [{ stylers: [{ saturation: 0 }] }] })
     }
+    if (this.props.chosenMuni !== undefined && this.props.chosenMuni !== prevProps.chosenMuni) {
+
+      let pos = { lat: this.props.chosenMuni.lat, lon: this.props.chosenMuni.lon }
+      this.props.updatePos(pos)
+    }
   }
 
-
-
+  getSearchPlaces(res) {
+    let lok = res[0].geometry.location
+    let respos = { lat: lok.lat(), lon: lok.lng() }
+    this.props.updatePos(respos)
+  }
   render() {
     return (
-      <Map
-        ref="Gmap"
-        styles={[{ stylers: [{ saturation: -100 }] }]}
-        item
-        xs={12}
-        google={this.props.google}
-        onClick={this.props.isClickable ? (t, map, coord) => this.onClick(t, map, coord) : null}
-        zoom={14}
-        initialCenter={this.props.markerPos}
-        streetViewControl={false}
-        draggable={this.props.isClickable}
-      >
-        {/* <SearchBox
-          controlPosition={google.maps.ControlPosition.TOP_LEFT}
-        /> */}
-        < Marker ref="marker" position={this.props.markerPos} />
-      </Map >
+      <div reg="a">
+        <SearchBox ref="search" map={this.gmap} hide={!this.props.isClickable} callback={this.getSearchPlaces}></SearchBox>
+        <Map
+          ref="Gmap"
+          styles={[{ stylers: [{ saturation: -100 }] }]}
+          item
+          xs={12}
+          google={this.props.google}
+          onClick={this.props.isClickable ? (t, map, coord) => this.onClick(t, map, coord) : null}
+          zoom={14}
+          initialCenter={this.props.markerPos}
+          streetViewControl={false}
+          draggable={this.props.isClickable}
+        >
+          < Marker ref="marker" position={this.props.markerPos} />
+        </Map >
+      </div>
     );
   }
   mounted() {
-
     this.gmap = this.refs.Gmap.map
     this.marker = this.refs.marker.marker
+
   }
 }
+
 export default GoogleApiWrapper({
   apiKey: 'AIzaSyDhfEwBKYpfnkGiGMNV44wkKBtxI_oH_lo'
 })(GoogleMapsContainer);

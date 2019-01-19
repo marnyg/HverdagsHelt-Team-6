@@ -1,9 +1,11 @@
+// @flow
 import * as React from 'react';
 import {Component} from "react-simplified";
 import LocationService from "../services/LocationService";
 import CountyService from "../services/CountyService";
 import RegionService from "../services/RegionService";
 import Notify from './Notify.js';
+import RegionSelect from "./RegionSelect";
 
 class NoLocationPage extends Component {
     location = null;
@@ -27,27 +29,11 @@ class NoLocationPage extends Component {
                     <p>
                         Dersom dette ikke stemmer, kan du velge riktig fylke og kommune i menyen under.<br/>
                     </p>
-                    <form className={'form-group w-50'}>
-                        <select className={'form-control mb-3'} id={'county-selector'} onChange={this.countySelected}>
-                            <option value={'.null'} disabled>Velg fylke</option>
-                            {this.counties.map(e => (
-                                <option key={e.county_id} value={e.county_id}>
-                                    {' '}
-                                    {e.name}{' '}
-                                </option>
-                            ))}
-                        </select>
-                        <select className={'form-control mb-3'} id={'region-selector'} onChange={this.regionSelected} hidden>
-                            <option value={'.null'} disabled>Velg kommune</option>
-                            {this.regions.map(e => (
-                                <option key={e.region_id} value={e.region_id}>
-                                    {' '}
-                                    {e.name}{' '}
-                                </option>
-                            ))}
-                        </select>
-                        <button className={'form-control btn btn-primary mb-3'} onClick={this.submit}>Send</button>
-                    </form>
+                    <RegionSelect
+                        className={"region-select"}
+                        onSubmit={(region_id) => this.props.onSubmit(region_id)}
+                        elementsMargin={'mb-3'}
+                    />
                 </div>
             </div>
         );
@@ -60,39 +46,6 @@ class NoLocationPage extends Component {
                 this.location = location;
             })
             .catch((error: Error) => console.error(error));
-
-        let countyService = new CountyService();
-        countyService.getAllCounties()
-            .then((counties: County[]) => {
-                this.counties = counties;
-            })
-            .catch((error: Error) => console.error(error));
-    }
-
-    countySelected(event){
-        event.preventDefault();
-        let county_id = event.target.value;
-        let regionService = new RegionService();
-        regionService.getAllRegionGivenCounty(county_id)
-            .then((regions: Region[]) => {
-                document.querySelector('#region-selector').hidden = false;
-                this.regions = regions;
-            })
-            .catch((error: Error) => console.error(error));
-    }
-
-    regionSelected(event){
-        event.preventDefault();
-        this.region_id = event.target.value;
-    }
-
-    submit(event){
-        event.preventDefault();
-        if(this.region_id){
-            this.props.onSubmit(this.region_id);
-        } else {
-            Notify.danger('Du må velge både fylke og kommune før du kan sende skjemaet.');
-        }
     }
 }
 export default NoLocationPage;

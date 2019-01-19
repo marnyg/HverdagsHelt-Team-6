@@ -8,7 +8,7 @@ import EditPassword from './EditPassword';
 import EditProfile from './EditProfile';
 
 class DisplayProfile extends Component {
-    user = JSON.parse(localStorage.getItem("user"))
+    user = JSON.parse(localStorage.getItem("user"));
     render() {
         return (
             <div className={'card'}>

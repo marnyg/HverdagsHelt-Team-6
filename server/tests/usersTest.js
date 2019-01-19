@@ -34,7 +34,7 @@ describe('Create new user', () => {
         done();
       });
   });
-  test('409 status code for POST /api/users with already resgistered email', (done) => {
+  test('409 status code for POST /api/users with already registered email', (done) => {
     request(application)
       .post('/api/users')
       .send(data)
@@ -105,6 +105,53 @@ describe('Find a specific user', () => {
       .set('Authorization', `Bearer ${token}`)
       .then(response => {
         expect(response.statusCode).toBe(200);
+        done();
+      });
+  });
+});
+
+describe('Update data on a user', () => {
+  let data = {
+    firstname: 'Jest Jest',
+    lastname: 'Test Test',
+    tlf: 98123456,
+    email: 'jest@test.no',
+    password: 'passord123',
+    region_id: 1
+  };
+  test('400 status code for PUT /api/users/{user_id} without body', (done) => {
+    return request(application)
+      .put(`/api/users/${user_id}`)
+      .send()
+      .then(response => {
+        expect(response.statusCode).toBe(400);
+        done();
+      });
+  });
+  test('200 status code for PUT /api/users/{user_id}', (done) => {
+    return request(application)
+      .put(`/api/users/${user_id}`)
+      .send(data)
+      .set('Authorization', `Bearer ${token}`)
+      .then(response => {
+        expect(response.statusCode).toBe(200);
+        done();
+      });
+  });
+  test('409 status code for PUT /api/users/{user_id} with already registered email', (done) => {
+    request(application)
+      .put(`/api/users/${user_id}`)
+      .send({
+        firstname: 'Jest Jest',
+        lastname: 'Test Test',
+        tlf: 98123456,
+        email: 'ola.nordmann@gmail.com',
+        password: 'passord123',
+        region_id: 1
+      })
+      .set('Authorization', `Bearer ${token}`)
+      .then(response => {
+        expect(response.statusCode).toBe(409);
         done();
       });
   });

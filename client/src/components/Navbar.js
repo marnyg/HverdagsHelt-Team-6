@@ -1,3 +1,4 @@
+// @flow
 import * as React from 'react';
 import { Component } from 'react-simplified';
 import { NavLink } from 'react-router-dom';
@@ -14,7 +15,7 @@ import hverdagsheltLogo from '../../public/hverdagsheltLogo2Trans.png';
 
 class Navbar extends Component {
   logged_in = false;
-  notification_count = 1;
+  notification_count = 0;
   notifications = [];
   constructor() {
     super();
@@ -24,22 +25,22 @@ class Navbar extends Component {
   }
 
   render() {
-    let registerlink = null;
+    let loginlink = null;
     let user = JSON.parse(localStorage.getItem('user'));
     if(user === null){
-        registerlink = (
-            <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#register-modal">
+        loginlink = (
+            <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#login-modal">
                 Registrer sak
             </div>
         );
     } else if(this.logged_in === false){
-        registerlink = (
+        loginlink = (
             <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#login-modal">
                 Registrer sak
             </div>
         );
     } else {
-        registerlink = (
+        loginlink = (
             <NavLink to="/new-case" className="nav-link">
                 Registrer sak
             </NavLink>
@@ -71,7 +72,7 @@ class Navbar extends Component {
               </NavLink>
             </li>
 
-            <li className="nav-item">{registerlink}</li>
+            <li className="nav-item">{loginlink}</li>
             <li className="nav-item">
               {this.logged_in ? (
                 <NavLink to="/subscriptions" className="nav-link">
