@@ -10,10 +10,17 @@ import RegionService from '../services/RegionService.js';
 import Case from '../classes/Case.js';
 import Region from '../classes/Region.js';
 import RegionSubscriptionService from '../services/RegionSubscriptionService.js';
+import RegionSubscription from '../classes/RegionSubscription.js';
+import CaseService from '../services/CaseService.js';
+import Notify from './Notify.js';
 
-class Subscriptions extends Component {
-  temp=[];
+
+class Subscriptions extends Component<{ props: { region_id: number }  }> {
+  sub_temp=[];
+  reg_temp=[];
   subscriptions = [];
+  regions = [];
+  regionCases = [];
   user = JSON.parse(localStorage.getItem('user'));
 
   render() {
@@ -23,17 +30,36 @@ class Subscriptions extends Component {
 
     return(
       <div>
-        {this.temp.map(e => {
+        {this.sub_temp.map(e => {
           return <div className='card-body'>
             <h1>{e[0].region_name}</h1>
           {e.map(j => (
-            <div className='border'>
-              <p><b>{j.title}</b></p>
-              <p>Opprettet: {this.dateFormat(j.createdAt)}, oppdatert: {this.dateFormat(j.updatedAt)}</p>
-              <p><i>{j.description}</i></p>
-            </div>
+            <NavLink to={'/case/' + j.case_id} className="preview">
+              <div className='border' key={j.case_id}>
+                <p><b>{j.title}</b></p>
+                <p>Opprettet: {this.dateFormat(j.createdAt)}, oppdatert: {this.dateFormat(j.updatedAt)}</p>
+                <p><i>{j.description}</i></p>
+              </div>
+            </NavLink>
           ))
         }</div>})}
+        <div className='card-body'>
+        <h1>Saker fra abonnerende kommuner:</h1>
+          {this.subRegionCases().map(e => {
+            return <div className='card-body'>
+              <h1>{e[0].region_name}</h1>
+              {e.map(j => (
+                <NavLink to={'/case/' + j.case_id} className="preview">
+                  <div className='border' key={j.case_id}>
+                    <p><b>{j.title}</b></p>
+                    <p>Opprettet: {this.dateFormat(j.createdAt)}, oppdatert: {this.dateFormat(j.updatedAt)}</p>
+                    <p><i>{j.description}</i></p>
+                  </div>
+                </NavLink>
+              ))}
+            </div>
+          })}
+        </div>
       </div>
     )
   }
@@ -41,26 +67,52 @@ class Subscriptions extends Component {
   mounted() {
     let css = new CaseSubscriptionService();
     let rss = new RegionSubscriptionService();
+    let cs = new CaseService();
+
     css
     .getAllSubscribedCasesGivenUser(this.user.user_id)
     .then((subscriptions: Case[]) => {
       this.subscriptions = subscriptions;
-      console.log('tabell: ', subscriptions)
+      console.log('Subscriptions: ', subscriptions)
     })
     .then(() => {
-      this.indexerRegion().map(index => {
-        this.temp.push(this.subscriptions.filter(sub => sub.region_id === index));
+      this.divideSubscriptionCasesByRegion().map(index => {
+        this.sub_temp.push(this.subscriptions.filter(sub => sub.region_id === index));
       })
     })
     .catch((error: Error) => console.error(error));
 
-    
+    rss
+    .getSubscribedRegionsForUser(this.user.user_id)
+    .then((regions: RegionSubscription[]) => {
+      this.regions = regions.regions;
+      JSON.stringify(this.regions);
+      JSON.parse(JSON.stringify(this.regions));
+    })
+    .then(() => {
+      this.regions.map(e => {
+        cs
+        .getAllCasesGivenRegionId(e.region_id)
+        .then((regionCases: Case[]) => {
+          this.regionCases.push(regionCases);
+          JSON.stringify(this.regionCases);
+          JSON.parse(JSON.stringify(this.regionCases));
+        })
+      })
+    })
+    .catch((error: Error) => console.error(error));
   }
 
-  indexerRegion() {
+  divideSubscriptionCasesByRegion() {
     let unique = [...new Set(this.subscriptions.map(item => item.region_id))];
-    console.log(unique);
+    console.log('Unique subscription cases region_id: ', unique);
     return unique;
+  }
+
+  //For å fjerne abonnerenderegioner UTEN caser
+  subRegionCases(){
+    let res = this.regionCases.filter(e => e.length);
+    return res;
   }
 
   dateFormat(date: string) {
