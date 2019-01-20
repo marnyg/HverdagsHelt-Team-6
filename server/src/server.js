@@ -89,6 +89,10 @@ app.post('/api/pictures/:case_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Pictures.uploadPicture);
 });
 
+app.del('/api/pictures/:case_id/:image_name', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Pictures.delPicture);
+});
+
 app.get('/api/cases/:case_id', (req: Request, res: Response) => Cases.getOneCase(req, res));
 
 app.get('/api/cases/user_cases/:user_id', (req: Request, res: Response) => {
