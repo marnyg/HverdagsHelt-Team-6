@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Component } from 'react-simplified';
+import { NavLink } from 'react-router-dom';
 import { faCoffee } from '@fortawesome/free-solid-svg-icons/index';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -10,7 +11,7 @@ class Footer extends Component {
             <footer className="page-footer font-small blue pt-4">
                 <div className="container-fluid text-center text-md-left">
                     <div className="row">
-                        <div className="col-md-6 mt-md-0 mt-3">
+                        <div className="col-md-6 mt-md-0 mt-3 ml-3">
                             <h5 className="text-uppercase">Kontakt oss&ensp;
                                 <FontAwesomeIcon icon={faCoffee} />
                             </h5>
@@ -27,36 +28,13 @@ class Footer extends Component {
                             </p>
                         </div>
                         <div className="col-md-3 mb-md-0 mb-3">
-                            <h5 className="text-uppercase">Links</h5>
+                            <h5 className="text-uppercase">Lenker</h5>
                             <ul className="list-unstyled">
                                 <li>
-                                    <a href="#">Link 1</a>
+                                    <NavLink to={'/about'}>Om oss</NavLink>
                                 </li>
                                 <li>
-                                    <a href="#">Link 2</a>
-                                </li>
-                                <li>
-                                    <a href="#">Link 3</a>
-                                </li>
-                                <li>
-                                    <a href="#">Link 4</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div className="col-md-3 mb-md-0 mb-3">
-                            <h5 className="text-uppercase">Links</h5>
-                            <ul className="list-unstyled">
-                                <li>
-                                    <a href="#">Link 1</a>
-                                </li>
-                                <li>
-                                    <a href="#">Link 2</a>
-                                </li>
-                                <li>
-                                    <a href="#">Link 3</a>
-                                </li>
-                                <li>
-                                    <a href="#">Link 4</a>
+                                    <NavLink to={'/welcome'}>Velkomstside</NavLink>
                                 </li>
                             </ul>
                         </div>

@@ -1,3 +1,4 @@
+// @flow
 import * as React from 'react';
 import { Component } from 'react-simplified';
 import { NavLink } from 'react-router-dom';
@@ -14,7 +15,7 @@ import hverdagsheltLogo from '../../public/hverdagsheltLogo2Trans.png';
 
 class Navbar extends Component {
   logged_in = false;
-  notification_count = 1;
+  notification_count = 0;
   notifications = [];
   constructor() {
     super();
@@ -24,6 +25,27 @@ class Navbar extends Component {
   }
 
   render() {
+    let loginlink = null;
+    let user = JSON.parse(localStorage.getItem('user'));
+    if(user === null){
+        loginlink = (
+            <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#login-modal">
+                Registrer sak
+            </div>
+        );
+    } else if(this.logged_in === false){
+        loginlink = (
+            <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#login-modal">
+                Registrer sak
+            </div>
+        );
+    } else {
+        loginlink = (
+            <NavLink to="/new-case" className="nav-link">
+                Registrer sak
+            </NavLink>
+        );
+    }
     return (
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <NavLink to={'/'} className="navbar-left"><img src={hverdagsheltLogo} height={29.7} width={185}/></NavLink>
@@ -50,11 +72,7 @@ class Navbar extends Component {
               </NavLink>
             </li>
 
-            <li className="nav-item">
-              <NavLink to="/new-case" className="nav-link">
-                Registrer sak
-              </NavLink>
-            </li>
+            <li className="nav-item">{loginlink}</li>
             <li className="nav-item">
               {this.logged_in ? (
                 <NavLink to="/subscriptions" className="nav-link">
@@ -132,7 +150,7 @@ class Navbar extends Component {
             </NavLink>
           </li>
           <li className="nav-item">
-            <div className="nav-link" onClick={this.logout}>
+            <div className="nav-link" style={{cursor: 'pointer'}} onClick={this.logout}>
               Logg ut
             </div>
             <LoginModal onLogin={() => this.onLogin()} />
@@ -143,13 +161,13 @@ class Navbar extends Component {
       return (
         <ul className="navbar-nav">
           <li className="nav-item">
-            <div className="nav-link" data-toggle="modal" data-target="#register-modal">
+            <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#register-modal">
               Ny bruker
             </div>
             <RegisterModal onLogin={() => this.onLogin()}/>
           </li>
           <li className="nav-item">
-            <div className="nav-link" data-toggle="modal" data-target="#login-modal">
+            <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#login-modal">
               Logg inn
             </div>
             <LoginModal onLogin={() => this.onLogin()} />

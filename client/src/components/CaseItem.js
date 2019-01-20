@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Component } from 'react-simplified';
 import { NavLink } from 'react-router-dom';
+import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell, faCheck } from '@fortawesome/free-solid-svg-icons/index';
 import { withRouter } from 'react-router-dom';
@@ -27,18 +28,21 @@ class CaseItem extends Component {
             <div className="d-inline">
               <div className="card-body">
                 <div className="card-text text-muted">{this.props.case.region_name} {this.props.case.county_name}</div>
-                <h2 className="card-title">{this.props.case.title}</h2>
+                <h2 className="card-title">{this.props.case.category_name}</h2>
                 <div className=" d-inline">
                   <small className="text-muted">{this.getTimeString(this.props.case.createdAt)}</small>
                 </div>
-                <button onClick={this.subscribe.bind(this)} className={"btn btn-" + this.button_type + " float-right"}>
-                  <FontAwesomeIcon
-                    id={'subscribe'}
-                    icon={this.props.case.subscribed ? faCheck:faBell }
-                    alt="Klikk her for å få varsler om denne saken"
-                    className="float-right"
-                  />
-                </button>
+                {this.props.user ?
+                    <button onClick={this.subscribe.bind(this)} className={"btn btn-" + this.button_type + " float-right"}>
+                        <FontAwesomeIcon
+                            id={'subscribe'}
+                            icon={this.props.case.subscribed ? faCheck:faBell }
+                            alt="Klikk her for å få varsler om denne saken"
+                            className="float-right"
+                        />
+                    </button>
+                    :null
+                }
               </div>
             </div>
           </NavLink>
@@ -59,11 +63,12 @@ class CaseItem extends Component {
                 </div>
                 <div className="col-md-8">
                   <div className="card-block">
-                    <h6 className="card-title">{this.props.case.title}</h6>
+                    <h2 className="card-title">{this.props.case.title}</h2>
                     <p className="card-text">
-                      <small className="text-muted">{this.props.case.region}</small>
+                      <small className="text-muted">{this.props.case.region_name}</small>
                     </p>
-                    <p className="card-text text-justify">{this.props.case.description}</p>
+
+                    <p className="card-text text-justify">{this.props.case.description ? this.props.case.description:"Ingen beskrivelse"}</p>
                     <p className="card-text">
                       <small className="text-muted">{this.getTimeString(this.props.case.createdAt)}</small>
                     </p>
@@ -85,24 +90,25 @@ class CaseItem extends Component {
           this.button_type = "success";
       }
       this.images = this.props.case.img;
-      /*
-    this.images = [
-      {
-        path:
-          'https://res.cloudinary.com/simpleview/image/upload/v1504558184/clients/norway/6d185cb5_1903_43a6_bd2b_9771c44d25bc_3c270880-a51d-4199-a673-021a21c8d2a9.jpg'
-      }
-    ];
-    //console.log(this.images.length);
-    /* REMOVE COMMENTS WHEN SERVICES DONE
-        let pictureService = new PictureService();
 
-        pictureService.get(this.props.case.case_id)
-            .then((pictures: Picture[]) => {
-                this.pictures = pictures;
-            })
-            .catch((error: Error) => console.error(error));
-        */
+      if(this.images.length > 0){
+          // Check if image is delivered
+          this.checkImage(this.images[0], () => {
+              console.log('Image exists');
+          }, () => {
+              console.log('Image does not exist');
+              this.images = [];
+          })
+      }
   }
+
+  checkImage(src, resolve, reject){
+      let img = new Image();
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = src;
+  }
+
   subscribe(event) {
     event.preventDefault();
     let subscriptionService = new CaseSubscriptionService();

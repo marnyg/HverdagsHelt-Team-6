@@ -9,6 +9,7 @@ class LocationService{
                     .then(latlng => {
                         this.geocodeLatLng(latlng.lat, latlng.lng)
                             .then(locationdata => {
+                                console.log(locationdata);
                                 //console.log('Got location by browser navigator');
                                 //console.log('Line 14: nodata', locationdata.results[0]);
                                 if(locationdata.results){
@@ -74,7 +75,7 @@ class LocationService{
 
     getLocationCoords(){
         return new Promise((resolve, reject) => {
-            var location_timeout = setTimeout("geolocFail()", 10000);
+            var location_timeout = setTimeout(() => {reject('GPS timed out')}, 10000);
             if(navigator.geolocation){
                 navigator.geolocation.getCurrentPosition(function(position) {
                     clearTimeout(location_timeout);
@@ -88,9 +89,6 @@ class LocationService{
                     clearTimeout(location_timeout);
                     reject(error);
                 });
-                function geolocFail() {
-                    reject('Could not get location');
-                }
             } else {
                 reject({message: 'Navigator is not enabled in the browser'});
             }
@@ -104,6 +102,10 @@ class LocationService{
 
     geocodeCityCounty(city, county): Promise<any>{
         return axios.get('https://maps.googleapis.com/maps/api/geocode/json?address='+ city + ',region=' + county + '&key=' + key);
+    }
+
+    geolocFail(){
+        console.log('Fail');
     }
 }
 export default LocationService;

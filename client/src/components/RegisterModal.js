@@ -11,7 +11,8 @@ import User from '../classes/User.js';
 class RegisterModal extends Component {
     counties = [];
     regions = [];
-
+    validemail = true;
+    validpasswords = false;
     region_id = null;
 
 
@@ -31,6 +32,24 @@ class RegisterModal extends Component {
         this.phoneChange = this.phoneChange.bind(this);
         */
     }
+    getEmailStatus(){
+        if(this.email === undefined || this.email === null){
+            // email is good
+            return true;
+        } else {
+            // email might be bad
+            if(this.email === ""){
+                return true;
+            } else if(this.validate_email(this.email)){
+                // Email is good
+                return true;
+            } else {
+                // Email is definetly bad
+                return false;
+            }
+        }
+    }
+
     render() {
         return (
             <div className="modal fade" id="register-modal" tabIndex="-1" role="dialog"
@@ -38,9 +57,20 @@ class RegisterModal extends Component {
                 <div className="modal-dialog">
                     <div className="registermodal-container modal-content">
                         <h1>Lag ny bruker</h1><br/>
-                        <input className="error-input" type="text" name="email" placeholder="Epost" onChange={(event) => {this.email = event.target.value}}/>
+                        <form className={'form-group'}>
+                            <input className={"form-control " + (this.validemail ? '':'is-invalid')} type="email" id={'inputPassword'} placeholder="Epost" onChange={(event) => {
+                                this.email = event.target.value;
+                                this.validemail = this.getEmailStatus();
+                            }}/>
+                            {this.validemail ?
+                                null:
+                                <small id="emailHelp" className="form-text text-muted">
+                                    Eposten er ikke gyldig
+                                </small>
+                            }
+                        </form>
                         <input type="password" name="pass1" placeholder="Passord" onChange={(event) => {this.password1 = event.target.value}}/>
-                        <input type="password" name="pass2" placeholder="Gjenta passord" onChange={(event) => {this.password2 = event.target.value}}/>
+                        <input type="password" name="pass2" placeholder="Gjenta passord" onChange={(event) => {this.password2 = event.target.value;}}/>
                         <input type="text" name="firstname" placeholder="Fornavn" onChange={(event) => {this.fn = event.target.value}}/>
                         <input type="text" name="lastname" placeholder="Etternavn" onChange={(event) => {this.ln = event.target.value}}/>
                         <input type="text" name="adress" placeholder="Adresse" onChange={(event) => {this.address= event.target.value}}/>
@@ -107,13 +137,15 @@ class RegisterModal extends Component {
     }
 
     submit(event){
+        console.log('Is ' + this.email + ' a valid email?: ', this.validate_email(this.email));
         //user_id, role_id, region_id, firstname, lastname, tlf, email, hash_password, salt){
+        /*
         let user = new User(null, null, Number(this.region_id), this.fn, this.ln, Number(this.phone), this.email, this.password1);
 
-        if(this.notBlank(user) && this.validPW(this.password1, this.password2)){
+        if(this.notBlank(user)){
             // All required fields have been filled
-            if(this.validPW(this.password1, this.password2)){
-                if(this.validEmail(this.email)){
+            if(this.validate_passwords(this.password1, this.password2)){
+                if(this.validate_email(this.email)){
                     let userService = new UserService();
 
                     userService.createUser(user)
@@ -138,9 +170,10 @@ class RegisterModal extends Component {
             // One or more required fields have not been filled
             alert('Du må fylle ut alle feltene for å kunne registrere deg.');
         }
+        */
     }
 
-    validPW(pw1, pw2){
+    validate_passwords(pw1, pw2){
         if(pw1 !== pw2){
             return false;
         } else {
@@ -148,10 +181,10 @@ class RegisterModal extends Component {
         }
     }
 
-    validEmail(email){
-        return true;
-        //let re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        //return re.test(email);
+    validate_email(email){
+        let re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        //console.log(re + '.test(' + email + ') === ' + re.test(email));
+        return re.test(email);
     }
 
     notBlank(data){

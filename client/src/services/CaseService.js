@@ -25,7 +25,7 @@ class CaseService {
           if (logged_in === true) {
             let token = localStorage.getItem('token');
             axios
-              .get('/api/cases/' + case_id, c, {
+              .put('/api/cases/' + case_id, c, {
                 headers: {
                   Authorization: 'Bearer ' + token
                 }
@@ -97,7 +97,7 @@ class CaseService {
             formData.append("lon", c.lon);
             formData.append("category_id", c.category_id);
             formData.append("region_id", c.region_id);
-            
+
             let title = c.title;
             axios
               .post('/api/cases', formData, {
@@ -184,25 +184,7 @@ class CaseService {
   }
 
   getCaseGivenRegionId(region_id: number): Promise<Case> {
-    return new Promise((resolve, reject) => {
-        let loginService = new LoginService();
-        loginService.isLoggedIn()
-            .then((logged_in: Boolean) => {
-                if(logged_in === true){
-                    let token = localStorage.getItem('token');
-                    axios.get('/api/cases/region_cases/' + region_id, {}, {
-                        headers: {
-                            Authorization: 'Bearer ' + token
-                        }
-                    })
-                        .then((cases: Case[]) => resolve(cases))
-                        .catch((error: Error) => reject(error));
-                } else {
-                    reject('User is not logged in');
-                }
-            })
-            .catch((error: Error) => reject(error));
-    });
+      return axios.get('/api/cases/region_cases/' + region_id, {}, {});
   }
 }
 export default CaseService;

@@ -425,6 +425,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     let cascom = new StatusCommentService();
     let stat = new StatusService();
     let cat = new CategoryService();
+    let cassub = new CaseSubscriptionService();
     cas
       .getCase(this.props.match.params.case_id)
       .then((c: Case) => {

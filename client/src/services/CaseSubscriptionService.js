@@ -20,7 +20,6 @@ class CaseSubscriptionService {
                           }
                       })
                           .then((subscriptions: CaseSubscription[]) => {
-                            console.log(subscriptions);
                             resolve(subscriptions);
                           })
                           .catch((error: Error) => reject(error));
@@ -41,9 +40,6 @@ class CaseSubscriptionService {
                   if(logged_in === true){
                       let token = localStorage.getItem('token');
                       ///api/cases/:case_id/subscribe
-                      console.log('/api/cases/' + case_id + '/subscribe');
-                      console.log('user_id:', user_id);
-                      console.log('token:', token);
                       axios.delete('/api/cases/' + case_id + '/subscribe/' + user_id, {
                           headers: {
                               Authorization: 'Bearer ' + token
@@ -68,14 +64,12 @@ class CaseSubscriptionService {
                   if(logged_in === true){
                       let token = localStorage.getItem('token');
                       //'/api/cases/:case_id/subscribe'
-                      console.log('/api/cases/' + subscription.case_id + '/subscribe');
                       axios.post('/api/cases/' + subscription.case_id + '/subscribe', subscription, {
                           headers: {
                               Authorization: 'Bearer ' + token
                           }
                       })
                           .then(response => {
-                              console.log('Response got:', response);
                               resolve(response);
                           })
                           .catch((error: Error) => reject(error));
@@ -123,6 +117,33 @@ class CaseSubscriptionService {
             axios
               .get(
                 '/api/cases/subscriptions/' + user_id + '/cases',
+                {
+                  headers: {
+                    Authorization: 'Bearer ' + token
+                  }
+                }
+              )
+              .then((cases: Case[]) => resolve(cases))
+              .catch((error: Error) => reject(error));
+          } else {
+            reject('User is not logged in');
+          }
+        })
+        .catch((error: Error) => reject(error));
+    });
+  }
+
+  getAllOutdatedCaseSubscriptions(user_id: number): Promise<Case[]> {
+    return new Promise((resolve, reject) => {
+      let loginService = new LoginService();
+      loginService
+        .isLoggedIn()
+        .then((logged_in: Boolean) => {
+          if (logged_in === true) {
+            let token = localStorage.getItem('token');
+            axios
+              .get(
+                '/api/cases/subscriptions/' + user_id + '/cases/is_up_to_date',
                 {
                   headers: {
                     Authorization: 'Bearer ' + token
