@@ -11,30 +11,34 @@ import StatusCommentService from '../services/StatusCommentService';
 import Notify from './Notify';
 import GoogleApiWrapper from './GoogleApiWrapper';
 import Case from '../classes/Case';
+import Category from '../classes/Category';
+import Status from '../classes/Status';
 import StatusComment from '../classes/StatusComment';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons/index';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Picture from '../classes/Picture';
 import ToolService from '../services/ToolService';
 
-const statusStyles = [{ color: 'red' }, { color: 'orange' }, { color: 'green' }]; // Constant used for colouring status fields in table.
-const MAX_NUMBER_IMG: number = 3; // Maximum number of images allwed in a single case.
+const MAX_NUMBER_IMG: number = 3; // Maximum number of images allowed in a single case.
 const NOT_OWNER_NOT_EMPLOYEE: number = 3;
 const OWNER_NOT_EMPLOYEE: number = 2;
 const EMPLOYEE: number = 1;
 const EMPLOYEE_ACCESS_LEVEL: number = 2;
 const MAX_DESCRIPTION_LENGTH: number = 255;
 const STATUS_OPEN: number = 1;
+const COMMENTS_PER_QUERY = 5;
 
 class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   case: Case = null;
-  statusComment: StatusComment = null;
+  statusComment: StatusComment = new StatusComment();
+  offset: number = 0;
   deletedImages: string[] = [];
-  statuses = [];
-  categories = [];
-  statusMessages = [];
-  form = null;
-  fileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+  statuses: Status[] = [];
+  categories: Category[] = [];
+  statusMessages: StatusComment[] = [];
+  form: HTMLFormElement = null;
+  fetchButton: HTMLButtonElement = null;
+  fileTypes: string[] = ['image/jpeg', 'image/jpg', 'image/png'];
 
   render() {
     if (!this.case || !this.statusComment) {
@@ -58,7 +62,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   <tbody>
                     <tr>
                       <td>Status</td>
-                      <td style={this.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
+                      <td style={ToolService.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
                     </tr>
                     <tr>
                       <td>Kategori</td>
@@ -70,11 +74,11 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                     </tr>
                     <tr>
                       <td>Sak opprettet</td>
-                      <td>{this.dateFormat(this.case.createdAt)}</td>
+                      <td>{ToolService.dateFormat(this.case.createdAt)}</td>
                     </tr>
                     <tr>
                       <td>Sist oppdatert</td>
-                      <td>{this.dateFormat(this.case.updatedAt)}</td>
+                      <td>{ToolService.dateFormat(this.case.updatedAt)}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -172,13 +176,22 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   <li className={'list-group-item'} key={e.status_comment_id}>
                     <div>
                       <h4>{e.createdBy}</h4>
-                      <p>{this.dateFormat(e.createdAt)}</p>
+                      <p>{ToolService.dateFormat(e.createdAt)}</p>
                       <p>{e.comment}</p>
-                      <p style={this.getStatusColour(e.status_id)}>{e.status_name}</p>
+                      <p style={ToolService.getStatusColour(e.status_id)}>{e.status_name}</p>
                     </div>
                   </li>
                 ))}
               </ul>
+              <button
+                ref={e => {
+                  this.fetchButton = e;
+                }}
+                className={'btn btn-secondary'}
+                onClick={this.fetchStatusComments}
+              >
+                Hent mer
+              </button>
             </div>
           </div>
         );
@@ -198,7 +211,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   <tbody>
                     <tr>
                       <td>Status</td>
-                      <td style={this.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
+                      <td style={ToolService.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
                     </tr>
                     <tr>
                       <td>Kategori</td>
@@ -210,11 +223,11 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                     </tr>
                     <tr>
                       <td>Sak opprettet</td>
-                      <td>{this.dateFormat(this.case.createdAt)}</td>
+                      <td>{ToolService.dateFormat(this.case.createdAt)}</td>
                     </tr>
                     <tr>
                       <td>Sist oppdatert</td>
-                      <td>{this.dateFormat(this.case.updatedAt)}</td>
+                      <td>{ToolService.dateFormat(this.case.updatedAt)}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -305,11 +318,20 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                       <h4>{e.createdBy}</h4>
                       <p>{this.dateFormat(e.createdAt)}</p>
                       <p>{e.comment}</p>
-                      <p style={this.getStatusColour(e.status_id)}>{e.status_name}</p>
+                      <p style={ToolService.getStatusColour(e.status_id)}>{e.status_name}</p>
                     </div>
                   </li>
                 ))}
               </ul>
+              <button
+                ref={e => {
+                  this.fetchButton = e;
+                }}
+                className={'btn btn-secondary'}
+                onClick={this.fetchStatusComments}
+              >
+                Hent mer
+              </button>
             </div>
           </div>
         );
@@ -329,7 +351,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   <tbody>
                     <tr>
                       <td>Status</td>
-                      <td style={this.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
+                      <td style={ToolService.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
                     </tr>
                     <tr>
                       <td>Kategori</td>
@@ -341,11 +363,11 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                     </tr>
                     <tr>
                       <td>Sak opprettet</td>
-                      <td>{this.dateFormat(this.case.createdAt)}</td>
+                      <td>{ToolService.dateFormat(this.case.createdAt)}</td>
                     </tr>
                     <tr>
                       <td>Sist oppdatert</td>
-                      <td>{this.dateFormat(this.case.updatedAt)}</td>
+                      <td>{ToolService.dateFormat(this.case.updatedAt)}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -376,13 +398,22 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   <li className={'list-group-item'} key={e.status_comment_id}>
                     <div>
                       <h4>{e.createdBy}</h4>
-                      <p>{this.dateFormat(e.createdAt)}</p>
+                      <p>{ToolService.dateFormat(e.createdAt)}</p>
                       <p>{e.comment}</p>
-                      <p style={this.getStatusColour(e.status_id)}>{e.status_name}</p>
+                      <p style={ToolService.getStatusColour(e.status_id)}>{e.status_name}</p>
                     </div>
                   </li>
                 ))}
               </ul>
+              <button
+                ref={e => {
+                  this.fetchButton = e;
+                }}
+                className={'btn btn-secondary'}
+                onClick={this.fetchStatusComments}
+              >
+                Hent mer
+              </button>
             </div>
           </div>
         );
@@ -437,27 +468,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
         }
       })
       .then(() => {
-        cascom
-          .getAllStatusComments(this.props.match.params.case_id)
-          .then(e => {
-            this.statusMessages = e;
-            console.log('Statuskommentarer lengde = ' + this.statusMessages.length);
-            if (this.statusMessages.length === 0) {
-              let p = document.getElementById('noComments');
-              if (p && p instanceof HTMLElement) {
-                p.hidden = false;
-              }
-            }
-          })
-          .catch((err: Error) => {
-            console.log('Could not load case comments for case with id ' + this.props.match.params.case_id);
-            Notify.danger(
-              'Klarte ikke å hente kommentarer til sak med id ' +
-                this.props.match.params.case_id +
-                '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
-                err.message
-            );
-          });
+        this.fetchStatusComments();
         stat
           .getAllStatuses()
           .then(e => {
@@ -533,19 +544,6 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       } else {
         return -1;
       }
-    }
-  }
-
-  getStatusColour(status_id: number) {
-    return statusStyles[status_id + 1];
-  }
-
-  dateFormat(date: string) {
-    if (date) {
-      let a = date.split('.')[0].replace('T', ' ');
-      return a.substr(0, a.length - 3);
-    } else {
-      return 'Fant ikke dato.';
     }
   }
 
@@ -646,6 +644,34 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       .catch((err: Error) => {
         console.log('Could not delete case with id: ' + this.case.case_id, err);
         Notify.danger('Kunne ikke slette sak med id: ' + this.case.case_id + '. \n\nFeilmelding: ' + err.message);
+      });
+  }
+
+  fetchStatusComments() {
+    let cascom = new StatusCommentService();
+    cascom
+      .getAllStatusComments(this.props.match.params.case_id)
+      .then(e => {
+        this.statusMessages.push.apply(this.statusMessages, e);
+        this.offset += e.length;
+        if (this.fetchButton && e.length < COMMENTS_PER_QUERY) {
+          this.fetchButton.hidden = true;
+        }
+        if (this.statusMessages.length === 0) {
+          let p = document.getElementById('noComments');
+          if (p && p instanceof HTMLElement) {
+            p.hidden = false;
+          }
+        }
+      })
+      .catch((err: Error) => {
+        console.log('Could not load case comments for case with id ' + this.props.match.params.case_id);
+        Notify.danger(
+          'Klarte ikke å hente kommentarer til sak med id ' +
+            this.props.match.params.case_id +
+            '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+            err.message
+        );
       });
   }
 
