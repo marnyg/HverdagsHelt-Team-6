@@ -243,13 +243,13 @@ class NewCase extends Component {
               </div>
             </div>
             <div className="col-md-6 embed-responsive">
-              <GoogleApiWrapper
+              {/*<GoogleApiWrapper
                 centerPos={{ lat: this.case.lat, lng: this.case.lon }}
                 updatePos={this.updatePos}
                 markerPos={{ lat: this.markerPos.lat, lng: this.markerPos.lon }}
                 isClickable={this.isMapClickable}
                 chosenMuni={this.list2 ? this.municipalities[this.list2.selectedIndex - 1] : null}
-              />
+              />*/}
             </div>
           </div>
         </div>

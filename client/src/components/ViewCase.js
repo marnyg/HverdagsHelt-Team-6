@@ -8,6 +8,7 @@ import CategoryService from '../services/CategoryService';
 import CaseService from '../services/CaseService';
 import StatusService from '../services/StatusService';
 import StatusCommentService from '../services/StatusCommentService';
+import CaseSubscriptionService from '../services/CaseSubscriptionService';
 import Notify from './Notify';
 import GoogleApiWrapper from './GoogleApiWrapper';
 import Case from '../classes/Case';
@@ -29,7 +30,7 @@ const STATUS_OPEN: number = 1;
 const COMMENTS_PER_QUERY = 5;
 
 class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
-  case: Case = null;
+  case: Case = new Case();
   statusComment: StatusComment = new StatusComment();
   offset: number = 0;
   deletedImages: string[] = [];
@@ -163,7 +164,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                 Oppdater
               </button>
               <div className={'col-md-6 embed-responsive'}>
-                <GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.case.lat, lng: this.case.lon }} />
+                {/*<GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.case.lat, lng: this.case.lon }} /> */}
               </div>
             </div>
             <div className={'col-md-6'}>
@@ -196,7 +197,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           </div>
         );
       case OWNER_NOT_EMPLOYEE:
-        // View case as owner, not pleoyee. Cannot send status comment, but can edit case given that status is open/not processing/not closed.
+        // View case as owner, not employee. Cannot send status comment, but can edit case given that status is open/not processing/not closed.
         console.log('USER IS OWNER OF CASE');
         return (
           <div className={'modal-body row'}>
@@ -295,8 +296,8 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                 </div>
               </form>
               <div className={'col-md-6 embed-responsive'}>
-                <GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.case.lat, lng: this.case.lon }} />
-              </div>
+                {/* <GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.case.lat, lng: this.case.lon }} />
+              */}</div>
               <button className={'btn btn-primary mr-2'} onClick={this.submit}>
                 Oppdater
               </button>
@@ -316,7 +317,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   <li className={'list-group-item'} key={e.status_comment_id}>
                     <div>
                       <h4>{e.createdBy}</h4>
-                      <p>{this.dateFormat(e.createdAt)}</p>
+                      <p>{ToolService.dateFormat(e.createdAt)}</p>
                       <p>{e.comment}</p>
                       <p style={ToolService.getStatusColour(e.status_id)}>{e.status_name}</p>
                     </div>
@@ -385,8 +386,8 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                 </div>
               </form>
               <div className={'col-md-6 embed-responsive'}>
-                <GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.case.lat, lng: this.case.lon }} />
-              </div>
+                {/*<GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.case.lat, lng: this.case.lon }} />
+              */}</div>
             </div>
             <div className={'col-md-6'}>
               <h2>Statusmeldinger</h2>
