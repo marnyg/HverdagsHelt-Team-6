@@ -16,6 +16,7 @@ import NoLocationPage from "./NoLocationPage";
 import RegionService from "../services/RegionService";
 import CountyService from "../services/CountyService";
 import RegionSelect from "./RegionSelect";
+import LoginModal from './LoginModal';
 
 class Content extends Component {
   grid = true;
@@ -26,9 +27,26 @@ class Content extends Component {
   }
 
   render() {
+      let registerButton = null;
+      let user = JSON.parse(localStorage.getItem('user'));
+      if(user === null){
+          console.log('user is null');
+          registerButton = (
+              <div>
+                  <div className="btn btn-primary btn-lg w-100 mb-3 megabutton" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#content-login">
+                      Registrer sak
+                  </div>
+                  <LoginModal modal_id={'content-login'} onLogin={() => this.props.onLogin()} />
+              </div>
+          );
+      } else {
+          registerButton = (
+              <NavLink to={'/new-case'} className={'btn btn-primary btn-lg w-100 mb-3 megabutton'}>Registrer sak</NavLink>
+          );
+      }
       return (
           <div>
-              <NavLink to={'/new-case'} className={'btn btn-primary btn-lg w-100 mb-3 megabutton'}>Registrer sak</NavLink>
+              {registerButton}
               <RegionSelect
                   className={'mobile-region-select'}
                   classNameChild={'form-group'}
@@ -58,9 +76,10 @@ class Content extends Component {
                               onSubmit={(region_id) => this.props.onSubmit(region_id)}/>
                       </div>
                   </div>
-                  <div className={'ml-3 mb-3'}>
-                      <h4>Saker i {this.props.location.city} {this.props.location.region}</h4>
-                  </div>
+                  {this.props.location ?
+                      <div className={'ml-3 mb-3'}>
+                          <h4>Saker i {this.props.location.city} {this.props.location.region}</h4>
+                      </div>:null}
                   <div>
                       {this.grid ? (
                           <div className="content">

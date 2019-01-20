@@ -18,7 +18,7 @@ class CaseItem extends Component {
   render() {
     if (this.props.grid) {
       return (
-        <div className="item">
+        <div className="item bg-light">
           <NavLink to={'/case/' + this.props.case.case_id} className="preview">
             {this.images.length > 0 ? (
               <div className="thumb" style={{ backgroundImage: 'url(' + this.images[0] + ')' }} />
@@ -94,9 +94,7 @@ class CaseItem extends Component {
       if(this.images.length > 0){
           // Check if image is delivered
           this.checkImage(this.images[0], () => {
-              console.log('Image exists');
           }, () => {
-              console.log('Image does not exist');
               this.images = [];
           })
       }
