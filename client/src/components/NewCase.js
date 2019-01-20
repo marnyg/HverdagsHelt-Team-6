@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import * as React from 'react';
 import { Component } from 'react-simplified';
 import { NavLink, withRouter } from 'react-router-dom';
+import ToolService from '../services/ToolService';
 import CountyService from '../services/CountyService';
 import CaseService from '../services/CaseService';
 import RegionService from '../services/RegionService';
@@ -13,24 +14,30 @@ import LocationService from '../services/LocationService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons/index';
 import GoogleApiWrapper from './GoogleApiWrapper';
+import Location from '../classes/Location';
 import Case from '../classes/Case';
+import Region from '../classes/Region';
+import County from '../classes/County';
+import Category from '../classes/Category';
+
+const MAX_DESCRIPTION_LENGTH: number = 255;
 
 class NewCase extends Component {
   case: Case = new Case();
-  form = null;
-  counties = [];
-  municipalities = [];
-  categories = [];
+  form: HTMLFormElement = null;
+  counties: County[] = [];
+  municipalities: Region[] = [];
+  categories: Category[] = [];
   images = [];
-  list1 = null;
-  list2 = null;
-  lastResortAddress = null;
-  lastResortAddressLabel = null;
-  lastResortPos = { lat: 59.9138688, lon: 10.752245399999993 }; // Last resort position OSLO
-  pos = this.lastResortPos;
+  list1: HTMLSelectElement = null;
+  list2: HTMLSelectElement = null;
+  lastResortAddress: HTMLInputElement = null;
+  lastResortAddressLabel: HTMLLabelElement = null;
+  lastResortPos: Location = new Location(59.9138688, 10.752245399999993, 'Oslo', 'Oslo', 'Norway'); // Last resort position OSLO
+  pos: Location = this.lastResortPos;
   markerPos = this.lastResortPos;
   fileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-  isMapClickable = false;
+  isMapClickable: boolean = false;
 
   constructor() {
     super();
@@ -38,6 +45,10 @@ class NewCase extends Component {
   }
 
   render() {
+    if(!this.case){
+      return null;
+    }
+    
     return (
       <div>
         <div className="container">
@@ -50,7 +61,15 @@ class NewCase extends Component {
               >
                 <div className={'form-group'}>
                   <label htmlFor="category">Kategori</label>
-                  <select defaultValue={'.null'} className={'form-control'} id={'category'} required>
+                  <select
+                    defaultValue={'.null'}
+                    className={'form-control'}
+                    id={'category'}
+                    onChange={(event: SyntheticInputEvent<HTMLSelectElement>) =>
+                      (this.case.category_id = event.target.value)
+                    }
+                    required
+                  >
                     <option value={'.null'} disabled>
                       Kategori
                     </option>
@@ -66,10 +85,13 @@ class NewCase extends Component {
                   <label htmlFor="title">Tittel</label>
                   <input
                     className={'form-control'}
-                    id={'title'}
                     type="text"
                     pattern="^.{2,255}$"
                     autoComplete="off"
+                    value={this.case.title}
+                    onChange={(event: SyntheticInputEvent<HTMLInputElement>) => {
+                      this.case.title = event.target.value;
+                    }}
                     placeholder={'Gi saken din en beskrivende tittel'}
                     required
                   />
@@ -79,9 +101,14 @@ class NewCase extends Component {
                   <textarea
                     className={'form-control'}
                     id={'description'}
-                    maxLength={255}
+                    maxLength={MAX_DESCRIPTION_LENGTH}
+                    value={this.case.description}
+                    onChange={(event: SyntheticInputEvent<HTMLTextAreaElement>) =>
+                      (this.case.description = event.target.value)
+                    }
                     placeholder="Skriv en kort beskrivelse her, så blir det enklere for oss å hjelpe deg."
                   />
+                  { this.case.description ? this.case.description.length + ' av ' + MAX_DESCRIPTION_LENGTH + ' tegn brukt.' : null}
                 </div>
                 <div>
                   Posisjon
@@ -128,6 +155,9 @@ class NewCase extends Component {
                 </div>
                 <div className={'form-group ml-3 my-3'}>
                   <select
+                    ref={e => {
+                      this.list1 = e;
+                    }}
                     defaultValue={'.null'}
                     className={'form-control mb-3'}
                     id={'last-resort-county'}
@@ -145,10 +175,18 @@ class NewCase extends Component {
                     ))}
                   </select>
                   <select
+                    ref={e => {
+                      this.list2 = e;
+                    }}
                     defaultValue={'.null'}
                     className={'form-control mb-3'}
                     id={'last-resort-municipality'}
-                    onChange={this.municipalityListener}
+                    onChange={(event: SyntheticEvent<HTMLSelectElement>) => {
+                      this.case.region_id = this.municipalities[event.target.selectedIndex - 1].region_id;
+                      this.case.lat = this.municipalities[event.target.selectedIndex - 1].lat;
+                      this.case.lon = this.municipalities[event.target.selectedIndex - 1].lon;
+                      this.municipalityListener(event);
+                    }}
                     hidden
                   >
                     <option value={'.null'} disabled>
@@ -161,10 +199,20 @@ class NewCase extends Component {
                       </option>
                     ))}
                   </select>
-                  <label id={'last-resort-address-label'} htmlFor={'last-resort-address'} hidden>
+                  <label
+                    ref={e => {
+                      this.lastResortAddressLabel = e;
+                    }}
+                    id={'last-resort-address-label'}
+                    htmlFor={'last-resort-address'}
+                    hidden
+                  >
                     Adresse
                   </label>
                   <input
+                    ref={e => {
+                      this.lastResortAddress = e;
+                    }}
                     className={'form-control mb-3'}
                     id={'last-resort-address'}
                     type="text"
@@ -172,7 +220,7 @@ class NewCase extends Component {
                     hidden
                   />
                 </div>
-                {this.images.length < 3 ? (
+                {this.case.img.length < 3 ? (
                   <div className={'form-group'}>
                     <label htmlFor={'image-input'}>Legg ved bilder</label>
                     <input
@@ -196,7 +244,7 @@ class NewCase extends Component {
             </div>
             <div className="col-md-6 embed-responsive">
               <GoogleApiWrapper
-                centerPos={{ lat: this.pos.lat, lng: this.pos.lon }}
+                centerPos={{ lat: this.case.lat, lng: this.case.lon }}
                 updatePos={this.updatePos}
                 markerPos={{ lat: this.markerPos.lat, lng: this.markerPos.lon }}
                 isClickable={this.isMapClickable}
@@ -206,7 +254,7 @@ class NewCase extends Component {
         </div>
         <div className="container my-5">
           <div className="row">
-            {this.images.map(e => (
+            {this.case.img.map(e => (
               <div key={e.src} className="col-md-3">
                 <div className="card">
                   <img src={e.src} alt={e.alt} className="card-img-top" />
@@ -228,14 +276,14 @@ class NewCase extends Component {
   }
 
   mounted() {
-    this.list1 = document.getElementById('last-resort-county');
-    this.list2 = document.getElementById('last-resort-municipality');
-    this.lastResortAddress = document.getElementById('last-resort-address');
-    this.lastResortAddressLabel = document.getElementById('last-resort-address-label');
+    this.case.user_id = ToolService.getUserId();
     let locationService = new LocationService();
     locationService
       .getLocation()
       .then((location: Location) => {
+        this.case.lat = location.lat;
+        this.case.lon = location.lon;
+        this.case.region_name = location.city;
         this.pos = location;
         this.markerPos = location;
       })
@@ -244,9 +292,10 @@ class NewCase extends Component {
         reg
           .getAllRegions()
           .then(e => {
-            let region = e.find(e => e.name === this.pos.city);
+            // TODO Denne tar ikke hensyn til Bø i to fylker!
+            let region = e.find(e => e.name === this.case.region_name);
             this.case.region_id = region.region_id;
-            console.log('This.case.region_id: ' + this.case.region_id + '\nCity/region_name: ' + this.pos.city);
+            console.log('This.case.region_id: ' + this.case.region_id + '\nCity/region_name: ' + this.case.region_name);
           })
           .catch((err: Error) => {
             console.log('Could not load regions from server. Error: ' + err.message);
@@ -257,6 +306,8 @@ class NewCase extends Component {
       })
       .catch((error: Error) => {
         console.log(error);
+        this.case.lat = this.lastResortPos.lat;
+        this.case.lon = this.lastResortPos.lon;
         this.pos = this.lastResortPos;
       });
 
@@ -311,7 +362,7 @@ class NewCase extends Component {
     }
   }
 
-  radioSelector(): number {
+  radioSelector() {
     if (this.form) {
       let posSelector: NodeList<HTMLElement> = this.form.querySelectorAll('input[name="pos"]');
       let select = [...posSelector].find((e: HTMLElement) => e instanceof HTMLInputElement && e.checked === true);
@@ -359,15 +410,15 @@ class NewCase extends Component {
           .getAllRegions()
           .then(e => {
             let region = e.find(e => e.name === this.pos.city);
-            if(region){
+            if (region) {
               // Region detected by Google Location was found in database
               this.case.region_id = region.region_id;
               console.log('This.case.region_id: ' + this.case.region_id + '\nCity/region_name: ' + this.pos.city);
-            }else{
+            } else {
               // Region detected by Google Location was not found in databse
               // Proceeding to set this.pos = users home region's GPS position from localStorage object
               this.case.region_id = JSON.stringify(localStorage.getItem('user')).region_id;
-              console.log("this.case.region_id set to: " + this.case.region_id);
+              console.log('this.case.region_id set to: ' + this.case.region_id);
             }
           })
           .catch((err: Error) => {
@@ -498,12 +549,14 @@ class NewCase extends Component {
   }
 
   resetMunicipalityList() {
-    this.list2.selectedIndex = 0;
+    if (this.list2 instanceof HTMLSelectElement) {
+      this.list2.selectedIndex = 0;
+    }
   }
 
   fileInputListener(event: SyntheticInputEvent<HTMLInputElement>) {
     let files = Array.from(event.target.files);
-    console.log(files);
+    console.log('Files in file-input:', files);
 
     if (files.length === 0) {
       // No files were selected. No changes committed.
@@ -515,7 +568,7 @@ class NewCase extends Component {
       if (files.filter(e => this.fileTypes.includes(e.type))) {
         // File type is accepted.
         files.map(e => {
-          this.images.push({
+          this.case.img.push({
             value: e,
             alt: 'Bildenavn: ' + e.name,
             src: URL.createObjectURL(e)
@@ -530,7 +583,7 @@ class NewCase extends Component {
   }
 
   fileInputDeleteImage(event: SyntheticInputEvent<HTMLInputElement>, src) {
-    this.images = this.images.filter(e => e.src !== src);
+    this.case.img = this.case.img.filter(e => e.src !== src);
     console.log('Deleting image file with src = ' + src);
   }
 
@@ -588,17 +641,17 @@ class NewCase extends Component {
           }
         case 1:
           // Validate map marker position
-          if(this.pos && this.case.region_id){
+          if (this.pos && this.case.region_id) {
             return true;
           } else {
             Notify.warning(
               'Din posisjon (lat: ' +
-              this.pos.lat +
-              ', lon: ' +
-              this.pos.lon +
-              ') finner sted i ' +
-              this.pos.country +
-              ' og kan derfor ikke brukes som posisjon. Posisjon blir satt til Oslo. Vennligst benytt en annen metode for å velge posisjon.'
+                this.pos.lat +
+                ', lon: ' +
+                this.pos.lon +
+                ') finner sted i ' +
+                this.pos.country +
+                ' og kan derfor ikke brukes som posisjon. Posisjon blir satt til Oslo. Vennligst benytt en annen metode for å velge posisjon.'
             );
             console.warn('Position is not in Norway. Oslo has been selected as position.');
             this.pos = this.lastResortPos;
@@ -620,14 +673,14 @@ class NewCase extends Component {
     }
   }
 
+  // TODO Denne skal fjernes, og det skal KUN brukes send() og validate()
   submit() {
-    if (this.form && this.case) {
+    if (this.form && this.form instanceof HTMLFormElement && this.case) {
       console.log('Validating form input.');
       if (this.form.checkValidity() && this.pos) {
         // Basic Built-in HTML5 form validation succeeded. Proceeding to validate using JavaScript.
-        let index = this.radioSelector();
+        let index: number = this.radioSelector();
         let region_id = null;
-        let description = this.form.querySelector('#description').value;
         if (
           this.validate(index) &&
           this.list1 &&
@@ -671,29 +724,16 @@ class NewCase extends Component {
                   this.lastResortAddress.value +
                   '".'
               );
-              if(this.list2 instanceof HTMLSelectElement){
+              if (this.list2 instanceof HTMLSelectElement) {
                 this.pos = {
                   lat: this.municipalities[this.list2.selectedIndex - 1].lat,
                   lon: this.municipalities[this.list2.selectedIndex - 1].lon
                 };
+                region_id = this.municipalities[this.list2.selectedIndex - 1].region_id;
               }
-              region_id = this.municipalities[this.list2.selectedIndex - 1].region_id;
-              description +=
-                '\n\nAdresse gitt av bruker som følge av manuelt valg av kommune ved hjelp av liste: ' +
-                this.lastResortAddress.value;
               break;
           }
-          let user_id = null;
-          let newcase = {
-            category_id: this.categories[this.form.querySelector('#category').selectedIndex - 1].category_id,
-            title: this.form.querySelector('#title').value,
-            description: description,
-            region_id: region_id,
-            lat: this.pos.lat,
-            lon: this.pos.lon,
-            pictures: this.images
-          };
-          this.send(newcase);
+          this.send();
         } else {
           console.log('Secondary validation failed.');
         }
@@ -705,19 +745,21 @@ class NewCase extends Component {
     }
   }
 
-  send(obj: Case) {
+  send() {
     console.log('Sending form data to server.');
-    console.log('Case is ' + JSON.stringify(obj));
+    console.log('Case is ', this.case);
     let cas = new CaseService();
     cas
-      .createCase(obj, this.images)
+      .createCase(this.case, this.case.img)
       .then(e => {
-        if(e){
+        if (e) {
           Notify.success('Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id);
           console.log('Form data transmission success! Case ID: ' + e.case_id);
           this.props.history.push('/case/' + e.case_id);
-        }else{
-          Notify.danger("Det skjedde en feil ved prosessering av din nye sak. Du kan prøve å finne saken din på \'Min side\' > '\Mine Saker\'.");
+        } else {
+          Notify.danger(
+            "Det skjedde en feil ved prosessering av din nye sak. Du kan prøve å finne saken din på 'Min side' > 'Mine Saker'."
+          );
           console.log('Received case is undefined. Something went very wrong!');
         }
       })
@@ -750,15 +792,15 @@ class NewCase extends Component {
           .getAllRegions()
           .then(e => {
             let region = e.find(e => e.name === this.pos.city);
-            if(region){
+            if (region) {
               // Region detected by Google Location was found in database
               this.case.region_id = region.region_id;
               console.log('This.case.region_id: ' + this.case.region_id + '\nCity/region_name: ' + this.pos.city);
-            }else{
+            } else {
               // Region detected by Google Location was not found in databse
               // Proceeding to set this.pos = users home region's GPS position from localStorage object
               this.case.region_id = JSON.stringify(localStorage.getItem('user')).region_id;
-              console.log("this.case.region_id set to: " + this.case.region_id);
+              console.log('this.case.region_id set to: ' + this.case.region_id);
             }
           })
           .catch((err: Error) => {
@@ -769,7 +811,10 @@ class NewCase extends Component {
           });
       })
       .catch((err: Error) => {
-        Notify.danger('Det oppstod en feil ved sammenlikning av valgt posisjon og kommuner i databasen vår. \n\nFeilmelding: ' + err.message);
+        Notify.danger(
+          'Det oppstod en feil ved sammenlikning av valgt posisjon og kommuner i databasen vår. \n\nFeilmelding: ' +
+            err.message
+        );
       });
   }
 }

@@ -5,6 +5,7 @@ import * as React from 'react';
 import { Component } from 'react-simplified';
 import { NavLink, withRouter } from 'react-router-dom';
 import Notify from './Notify';
+import ToolService from '../services/ToolService';
 import Case from '../classes/Case';
 import CaseService from '../services/CaseService';
 import CaseSubscription from '../classes/CaseSubscription';
@@ -17,7 +18,7 @@ const ITEMS_PER_QUERY = 20;
 const STATUS_CAN_DELETE = 1;
 const subscriptionButtonStyles = ['btn btn-info', 'btn btn-outline-info'];
 
-class CaseList extends Component<{ user_id: number, region_id: number }> {
+class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
   cases: Case[] = [];
   subscriptions: CaseSubscription[] = [];
   offset: number = 0;
@@ -51,8 +52,8 @@ class CaseList extends Component<{ user_id: number, region_id: number }> {
                 </td>
                 <td onClick={this.onClickTableRow}>{c.region_name}</td>
                 <td onClick={this.onClickTableRow}>{c.createdBy}</td>
-                <td onClick={this.onClickTableRow}>{this.dateFormat(c.createdAt)}</td>
-                <td onClick={this.onClickTableRow}>{this.dateFormat(c.updatedAt)}</td>
+                <td onClick={this.onClickTableRow}>{ToolService.dateFormat(c.createdAt)}</td>
+                <td onClick={this.onClickTableRow}>{ToolService.dateFormat(c.updatedAt)}</td>
                 <td>
                   <button className={'btn btn-danger'} hidden={!this.canDelete(c)} onClick={this.onClickDeleteButton}>
                     Slett
@@ -142,7 +143,7 @@ class CaseList extends Component<{ user_id: number, region_id: number }> {
 
   fetchSubscriptions() {
     let sub = new CaseSubscriptionService();
-    let user_id = this.getUserId();
+    let user_id = ToolService.getUserId();
     sub
       .getAllCaseSubscriptions(user_id)
       .then(e => {
@@ -157,19 +158,8 @@ class CaseList extends Component<{ user_id: number, region_id: number }> {
       });
   }
 
-  getUserId() {
-    let userString = localStorage.getItem('user');
-    if (userString) {
-      return JSON.parse(userString).user_id;
-    } else {
-      console.log('User is not logged in!');
-      Notify.danger('Du må logge inn for å bruke denne tjenesten!');
-      return -1;
-    }
-  }
-
   isOwner(c: Case) {
-    return this.getUserId() === c.user_id;
+    return ToolService.getUserId() === c.user_id;
   }
 
   isSubscribed(c: Case) {
@@ -216,13 +206,13 @@ class CaseList extends Component<{ user_id: number, region_id: number }> {
       console.log('Requesting to delete case with id: ' + case_id);
       cas
         .deleteCase(case_id)
-        .then(e => {
-          console.log('Delete returned: ', e);
+        .then(() => {
+          console.log('Delete successful!');
           this.cases.filter(e => e.case_id !== case_id);
         })
         .catch((err: Error) => {
           console.log('Could not delete case with id ' + case_id + ': ', err);
-          Notify.danger('Kunne ikk slette sak. \n\nFeilmelding: ' + err.message);
+          Notify.danger('Kunne ikke slette sak. \n\nFeilmelding: ' + err.message);
         });
     } else {
       console.log('Did not find case_id to delete.');
@@ -238,10 +228,10 @@ class CaseList extends Component<{ user_id: number, region_id: number }> {
       if (this.isSubscribed(c)) {
         // Unsubscribe the user from this case
         sub
-          .deleteCaseSubscription(c.case_id, this.getUserId())
-          .then(e => {
+          .deleteCaseSubscription(c.case_id, ToolService.getUserId())
+          .then(() => {
             this.subscriptions.filter(f => f.case_id !== c.case_id);
-            console.log("Unsubscribed, returned: ",e);
+            //console.log("Unsubscribed, returned: ", e);
           })
           .catch((err: Error) => {
             console.log('Could not unsubscribe user from case with id ' + c.case_id);
@@ -249,7 +239,7 @@ class CaseList extends Component<{ user_id: number, region_id: number }> {
           });
       } else {
         // Subscribe this case to user
-        let s = new CaseSubscription(this.getUserId(), c.case_id, false, true);
+        let s = new CaseSubscription(ToolService.getUserId(), c.case_id, false, true);
         sub
           .createCaseSubscription(s)
           .then(e => {
@@ -266,14 +256,6 @@ class CaseList extends Component<{ user_id: number, region_id: number }> {
     }
   }
 
-  dateFormat(date: string) {
-    if (date) {
-      let a = date.split('.')[0].replace('T', ' ');
-      return a.substr(0, a.length - 3);
-    } else {
-      return 'Fant ikke dato.';
-    }
-  }
 }
 
 export default withRouter(CaseList);

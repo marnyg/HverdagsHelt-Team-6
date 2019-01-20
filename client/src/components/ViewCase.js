@@ -15,13 +15,16 @@ import StatusComment from '../classes/StatusComment';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons/index';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Picture from '../classes/Picture';
+import ToolService from '../services/ToolService';
 
 const statusStyles = [{ color: 'red' }, { color: 'orange' }, { color: 'green' }]; // Constant used for colouring status fields in table.
-const MAX_NUMBER_IMG = 3; // Maximum number of images allwed in a single case.
-const NOT_OWNER_NOT_EMPLOYEE = 3;
-const OWNER_NOT_EMPLOYEE = 2;
-const EMPLOYEE = 1;
-const EMPLOYEE_ACCESS_LEVEL = 2;
+const MAX_NUMBER_IMG: number = 3; // Maximum number of images allwed in a single case.
+const NOT_OWNER_NOT_EMPLOYEE: number = 3;
+const OWNER_NOT_EMPLOYEE: number = 2;
+const EMPLOYEE: number = 1;
+const EMPLOYEE_ACCESS_LEVEL: number = 2;
+const MAX_DESCRIPTION_LENGTH: number = 255;
+const STATUS_OPEN: number = 1;
 
 class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   case: Case = null;
@@ -40,7 +43,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
 
     switch (this.grantAccess()) {
       case EMPLOYEE:
-        // Kommuneansatt. Full tilgang.
+        // Employee, full access. May not edit case description or title.
         console.log('USER IS EMPLOYEE OR HIGHER');
         return (
           <div className={'modal-body row'}>
@@ -180,7 +183,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           </div>
         );
       case OWNER_NOT_EMPLOYEE:
-        // Eier, men ikke ansatt. Kan ikke sende kommentar, men kan editere saken som om den var ny før status blir satt til under behandling.
+        // View case as owner, not pleoyee. Cannot send status comment, but can edit case given that status is open/not processing/not closed.
         console.log('USER IS OWNER OF CASE');
         return (
           <div className={'modal-body row'}>
@@ -237,13 +240,14 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   <textarea
                     className={'form-control'}
                     id={'description'}
-                    maxLength={255}
-                    minLength={2}
+                    maxLength={MAX_DESCRIPTION_LENGTH}
                     placeholder="Gi din sak en beskrivende tittel, så blir det enklere for oss å hjelpe deg."
                     value={this.case.description}
                     onChange={this.textareaListener}
-                    required
                   />
+                  {this.case.description
+                    ? this.case.description.length + ' av ' + MAX_DESCRIPTION_LENGTH + ' tegn brukt.'
+                    : null}
                 </div>
                 {this.case.img.length < MAX_NUMBER_IMG ? (
                   <div className={'form-group'}>
@@ -277,12 +281,17 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   </div>
                 </div>
               </form>
-              <button className={'btn btn-primary mr-2'} onClick={this.submit}>
-                Oppdater
-              </button>
               <div className={'col-md-6 embed-responsive'}>
                 <GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.case.lat, lng: this.case.lon }} />
               </div>
+              <button className={'btn btn-primary mr-2'} onClick={this.submit}>
+                Oppdater
+              </button>
+              {this.isOwner(this.case) && this.case.status_id === STATUS_OPEN ? (
+                <button className={'btn btn-danger mr-2'} onClick={this.delete}>
+                  Slett
+                </button>
+              ) : null}
             </div>
             <div className={'col-md-6'}>
               <h2>Statusmeldinger</h2>
@@ -305,7 +314,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           </div>
         );
       case NOT_OWNER_NOT_EMPLOYEE:
-        // Kan ikke gjøre noe.
+        // Only view/read access.
         console.log('UNAUTHORIZED USER. MAY ONLy VIEW CASE.');
         return (
           <div className={'modal-body row'}>
@@ -540,6 +549,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  isOwner(c: Case) {
+    return ToolService.getUserId() === c.user_id;
+  }
+
   updatePos(newPos: Object) {
     this.case.lat = newPos.lat;
     this.case.lon = newPos.lon;
@@ -619,6 +632,21 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     console.log('Deleting image file with src = ' + src);
     console.log('this.deletedImages: ' + JSON.stringify(this.deletedImages));
     console.log('this.case.img: ' + JSON.stringify(this.case.img));
+  }
+
+  delete(event: SyntheticEvent<HTMLButtonElement>) {
+    console.log('Clicked delete button');
+    let cas = new CaseService();
+    cas
+      .deleteCase(this.case.case_id)
+      .then(() => {
+        Notify.success('Din sak med id ' + this.case.case_id + ' ble slettet.');
+        this.props.history.push('/');
+      })
+      .catch((err: Error) => {
+        console.log('Could not delete case with id: ' + this.case.case_id, err);
+        Notify.danger('Kunne ikke slette sak med id: ' + this.case.case_id + '. \n\nFeilmelding: ' + err.message);
+      });
   }
 
   submit() {

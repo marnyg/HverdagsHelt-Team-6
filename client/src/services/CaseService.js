@@ -52,7 +52,7 @@ class CaseService {
             let token = localStorage.getItem('token');
             axios
               .delete(
-                '/api/cases' + case_id,
+                '/api/cases/' + case_id,
                 {
                   headers: {
                     Authorization: 'Bearer ' + token
