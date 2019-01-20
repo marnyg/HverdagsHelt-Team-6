@@ -52,7 +52,7 @@ class CaseService {
             let token = localStorage.getItem('token');
             axios
               .delete(
-                '/api/cases' + case_id,
+                '/api/cases/' + case_id,
                 {
                   headers: {
                     Authorization: 'Bearer ' + token
@@ -82,11 +82,15 @@ class CaseService {
         .then((logged_in: Boolean) => {
           if (logged_in === true) {
             let token = localStorage.getItem('token');
-            pictures.map(e => {
-                formData.append("images", e.value)
-              }
-            );
-
+            if(pictures.length > 0){
+              pictures.map(e => {
+                  formData.append("images", e.value)
+                }
+              );
+            }else{
+              formData.append("images", null)
+            }
+            
             formData.append("title", c.title);
             formData.append("description", c.description);
             formData.append("lat", c.lat);
