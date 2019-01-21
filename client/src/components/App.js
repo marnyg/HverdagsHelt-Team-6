@@ -10,7 +10,7 @@ import '../styles/simple-sidebar.css';
 import '../styles/carousel.css';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell } from '@fortawesome/free-solid-svg-icons';
+import { faCaretDown, faEdit, faUsers, faChartLine, faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell } from '@fortawesome/free-solid-svg-icons';
 import Navbar from './Navbar.js';
 import ContentWrapper from './ContentWrapper.js';
 import Footer from './Footer.js';
@@ -33,7 +33,8 @@ import RegisterModal from './RegisterModal';
 import UserService from "../services/UserService";
 import LoginService from "../services/LoginService";
 import EmployeePage from "./Employee/EmployeePage";
-library.add(faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell);
+import AdminPage from "./Admin/AdminPage";
+library.add(faCaretDown,faEdit, faUsers, faChartLine, faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell);
 axios.interceptors.response.use(response => response.data);
 
 class App extends Component {
@@ -55,6 +56,7 @@ class App extends Component {
                         />
                         <Route path="/my-page" render={() => <MyPage />} />
                         <Route path="/employee" render={() => <EmployeePage/>} />
+                        <Route path="/admin" render={() => <AdminPage/>} />
                         <Route exact path="/subscriptions" render={() => <Subscriptions/>} />
                         <div className="content-wrapper">
                             <Notify />
