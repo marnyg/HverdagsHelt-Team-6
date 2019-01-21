@@ -631,33 +631,49 @@ class NewCase extends Component {
           }
         case 1:
           // Validate map marker position
+
           if (!this.case.region_id && this.pos.region) {
             let reg = new RegionService();
             let cs = new CountyService();
-            cs.getAllCounties().then(e => {
-              let county = e.find(f => f.county_name === this.pos.region);
-              if(county){
-                reg.getAllRegionGivenCounty(county.county_id).then(e => {
-                  let region = e.find(f => f.region_name === this.pos.city);
-                  if(region){
-                    this.case.region_id = region.region_id;
-                    return true;
-                  }else{
-                    console.log("Region " + this.pos.city + " was not found in county" + this.pos.county + " in database.");
-                    return false;
-                  }
-                }).catch((err: Error) => {
-                  Notify.danger("Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente kommunedata. Vennligst prøv igjen. \n\nFeilmelding: " + err.message);
+            cs.getAllCounties()
+              .then(e => {
+                let county = e.find(f => f.county_name === this.pos.region);
+                if (county) {
+                  reg
+                    .getAllRegionGivenCounty(county.county_id)
+                    .then(e => {
+                      let region = e.find(f => f.region_name === this.pos.city);
+                      if (region) {
+                        this.case.region_id = region.region_id;
+                        return true;
+                      } else {
+                        console.log(
+                          'Region ' + this.pos.city + ' was not found in county' + this.pos.region + ' in database.'
+                        );
+                        return false;
+                      }
+                    })
+                    .catch((err: Error) => {
+                      Notify.danger(
+                        'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente kommunedata. Vennligst prøv igjen. \n\nFeilmelding: ' +
+                          err.message
+                      );
+                      return false;
+                    });
+                } else {
+                  Notify.danger(
+                    'Fylket du trykket på finnes ikke i vår database. Dette kan komme som et resultat av kommunesammenslåing eller at geolokaliseringstjenesten vi benytter ikke bruker samme fylkesdata som oss.'
+                  );
                   return false;
-                })
-              }else{
-                Notify.danger("Fylket du trykket på finnes ikke i vår database. Dette kan komme som et resultat av kommunesammenslåing eller at geolokaliseringstjenesten vi benytter ikke bruker samme fylkesdata som oss.");
+                }
+              })
+              .catch((err: Error) => {
+                Notify.danger(
+                  'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente fylkesdata. Vennligst prøv igjen. \n\nFeilmelding: ' +
+                    err.message
+                );
                 return false;
-              }
-            }).catch((err: Error) => {
-              Notify.danger("Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente fylkesdata. Vennligst prøv igjen. \n\nFeilmelding: " + err.message);
-              return false;
-            });
+              });
           } else {
             Notify.warning(
               'Din posisjon (lat: ' +
@@ -691,10 +707,9 @@ class NewCase extends Component {
   }
 
   send() {
-    if(this.case && this.form){
+    if (this.case && this.form) {
       let index: number = this.radioSelector();
-      if(this.validate(index)){
-  
+      if (this.validate(index)) {
         console.log('Sending form data to server.');
         console.log('Case is ', this.case);
         let cas = new CaseService();
@@ -715,17 +730,17 @@ class NewCase extends Component {
           .catch((err: Error) => {
             Notify.danger(
               'Det oppstod en feil ved sending av saken til oss. Sørg for at alle felter er fyllt ut korrekt. ' +
-              'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
-              err.message
+                'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
+                err.message
             );
             console.warn('Error while transmitting form data to server with error message: ' + err.message);
           });
-      }else{
-        console.log("Form is not valid.");
-        Notify.warning("");
+      } else {
+        console.log('Form is not valid.');
+        Notify.warning('');
       }
-    }else{
-      Notify.warning("En kritisk feil har oppstått. Vennligst last sida på nytt.");
+    } else {
+      Notify.warning('En kritisk feil har oppstått. Vennligst last sida på nytt.');
     }
   }
 
