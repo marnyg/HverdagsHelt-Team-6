@@ -2,7 +2,6 @@ import { application } from '../src/server';
 import request from 'supertest';
 import { Region_subscriptions } from '../src/models';
 
-
 let admin_token;
 
 // ***************** Login admin *************
