@@ -19,6 +19,7 @@ import Status from './routes/Statuses.js';
 import Case_subscription from './routes/Case_subscriptions.js';
 import Status_comment from './routes/Status_comments.js';
 import Pictures from './routes/Pictures.js';
+import Stats from './routes/Stats.js';
 import { Case } from './models.js';
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
@@ -120,9 +121,12 @@ app.put('/api/cases/:case_id', (req: Request, res: Response) => {
 });
 
 app.delete('/api/cases/:case_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Cases.deleteCase);
+  /*
   return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(
     cases => (cases ? res.send() : res.status(500).send())
   );
+  */
 });
 
 app.get('/api/cases/subscriptions/:user_id', (req: Request, res: Response) => {
@@ -301,6 +305,22 @@ app.delete('/api/categories/:category_id', (req: Request, res: Response) => {
 
 app.get('/api/search/:searchtext', (req: Request, res: Response) => {
   Cases.search(req, res);
+});
+
+app.get('/api/stats/closed/:year', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Stats.getNationalStatsClosed);
+});
+
+app.get('/api/stats/opened/:year', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Stats.getNationalStatsOpened);
+});
+
+app.get('/api/stats/closed/:year/:region_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Stats.getNationalStatsClosedByRegion);
+});
+
+app.get('/api/stats/opened/:year/:region_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Stats.getNationalStatsOpenedByRegion);
 });
 
 app.get('/*', (req, res) => {
