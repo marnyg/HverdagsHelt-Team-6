@@ -29,68 +29,64 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
             return null;
         }
 
-        return (
-            <div className={'card mx-3'}>
-                <table className="table table-hover table-striped">
-                    <thead>
-                    <tr>
-                        <th scope="col">Tittel</th>
-                        <th scope="col">Status</th>
-                        <th scope="col" className={'desktop-table-column'}>Kommune</th>
-                        <th scope="col" className={'desktop-table-column'}>Eier</th>
-                        <th scope="col" className={'desktop-table-column'}>Dato opprettet</th>
-                        <th scope="col" className={'desktop-table-column'}>Siste oppdatering</th>
-                        <th scope="col" className={'desktop-table-column'}/>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {this.cases.map(c => (
-                        <tr key={c.case_id} style={{ cursor: 'pointer' }}>
-                            <td onClick={this.onClickTableRow}>
-                                {
-                                    c.title.trim().length > 25 ? c.title.trim().substring(0, 25) : c.title.trim()
-                                }
-                            </td>
-                            <td onClick={this.onClickTableRow} style={this.getStatusColour(c.status_id)}>
-                                {c.status_name}
-                            </td>
-                            <td className={'desktop-table-column'} onClick={this.onClickTableRow}>{c.region_name}</td>
-                            <td className={'desktop-table-column'} onClick={this.onClickTableRow}>{c.createdBy}</td>
-                            <td className={'desktop-table-column'} onClick={this.onClickTableRow}>{ToolService.dateFormat(c.createdAt)}</td>
-                            <td className={'desktop-table-column'} onClick={this.onClickTableRow}>{ToolService.dateFormat(c.updatedAt)}</td>
-                            <td>
-                                <button className={'btn btn-danger'} hidden={!this.canDelete(c)} onClick={this.onClickDeleteButton}>
-                                    Slett
-                                </button>
-                                <button className={this.getSubscriptionButtonStyles(c)} onClick={this.onClickSubscribeButton}>
-                                    Abonner
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-                <button
-                    ref={e => {
-                        this.fetchButton = e;
-                    }}
-                    className={'btn btn-secondary'}
-                    onClick={this.fetchCases}
-                >
-                    Last mer
-                </button>
-                <p id={'noEntries'} style={{ color: '#666' }} hidden>
-                    Ingen innlegg å vise.
-                </p>
-            </div>
-        );
-    }
+    return (
+      <div className={'card my-3 mx-3'}>
+        <table className="table table-hover table-striped">
+          <thead>
+            <tr>
+              <th scope="col">Tittel</th>
+              <th scope="col">Status</th>
+              <th scope="col">Kommune</th>
+              <th scope="col">Eier</th>
+              <th scope="col">Dato opprettet</th>
+              <th scope="col">Siste oppdatering</th>
+              <th scope="col" />
+            </tr>
+          </thead>
+          <tbody>
+            {this.cases.map(c => (
+              <tr key={c.case_id} style={{ cursor: 'pointer' }}>
+                <td onClick={this.onClickTableRow}>{c.title.trim()}</td>
+                <td onClick={this.onClickTableRow} style={this.getStatusColour(c.status_id)}>
+                  {c.status_name}
+                </td>
+                <td onClick={this.onClickTableRow}>{c.region_name}</td>
+                <td onClick={this.onClickTableRow}>{c.createdBy}</td>
+                <td onClick={this.onClickTableRow}>{ToolService.dateFormat(c.createdAt)}</td>
+                <td onClick={this.onClickTableRow}>{ToolService.dateFormat(c.updatedAt)}</td>
+                <td>
+                  <button className={'btn btn-danger'} hidden={!this.canDelete(c)} onClick={this.onClickDeleteButton}>
+                    Slett
+                  </button>
+                  <button className={this.getSubscriptionButtonStyles(c)} onClick={this.onClickSubscribeButton}>
+                    Abonner
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        { this.cases.length === 0 ? <p>Vi fant ingen saker for deg.</p> : null }
+        <button
+          ref={e => {
+            this.fetchButton = e;
+          }}
+          className={'btn btn-secondary'}
+          onClick={this.fetchCases}
+        >
+          Last mer
+        </button>
+        <p id={'noEntries'} style={{ color: '#666' }} hidden>
+          Ingen innlegg å vise.
+        </p>
+      </div>
+    );
+  }
 
-    mounted() {
-        console.log('user_id: ' + this.props.user_id + ', region_id: ' + this.props.region_id);
-        this.fetchCases();
-        this.fetchSubscriptions();
-    }
+  mounted() {
+    this.fetchCases();
+    this.fetchSubscriptions();
+  }
 
     fetchCases() {
         let cas = new CaseService();
@@ -201,63 +197,61 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
         }
     }
 
-    onClickDeleteButton(event: SyntheticInputEvent<HTMLButtonElement>) {
-        console.log('Trykket SLETT!');
-        let cas = new CaseService();
-        let td = event.target.parentElement;
-        if (td && td.parentElement && td.parentElement instanceof HTMLTableRowElement) {
-            let case_id = this.cases[td.parentElement.rowIndex - 1].case_id;
-            console.log('Requesting to delete case with id: ' + case_id);
-            cas
-                .deleteCase(case_id)
-                .then(() => {
-                    console.log('Delete successful!');
-                    this.cases.filter(e => e.case_id !== case_id);
-                })
-                .catch((err: Error) => {
-                    console.log('Could not delete case with id ' + case_id + ': ', err);
-                    Notify.danger('Kunne ikke slette sak. \n\nFeilmelding: ' + err.message);
-                });
-        } else {
-            console.log('Did not find case_id to delete.');
-        }
+  onClickDeleteButton(event: SyntheticInputEvent<HTMLButtonElement>) {
+    console.log('Trykket SLETT!');
+    let cas = new CaseService();
+    let td = event.target.parentElement;
+    if (td && td.parentElement && td.parentElement instanceof HTMLTableRowElement) {
+      let case_id = this.cases[td.parentElement.rowIndex - 1].case_id;
+      console.log('Requesting to delete case with id: ' + case_id);
+      cas
+        .deleteCase(case_id)
+        .then(() => {
+          console.log('Delete successful!');
+          this.cases = this.cases.filter(e => e.case_id !== case_id);
+        })
+        .catch((err: Error) => {
+          console.log('Could not delete case with id ' + case_id + ': ', err);
+          Notify.danger('Kunne ikke slette sak. \n\nFeilmelding: ' + err.message);
+        });
+    } else {
+      console.log('Did not find case_id to delete.');
     }
 
-    onClickSubscribeButton(event: SyntheticInputEvent<HTMLButtonElement>) {
-        console.log('Clicked subscribe button!');
-        let sub = new CaseSubscriptionService();
-        let td = event.target.parentElement;
-        if (td && td.parentElement && td.parentElement instanceof HTMLTableRowElement) {
-            let c = this.cases[td.parentElement.rowIndex - 1];
-            if (this.isSubscribed(c)) {
-                // Unsubscribe the user from this case
-                sub
-                    .deleteCaseSubscription(c.case_id, ToolService.getUserId())
-                    .then(() => {
-                        this.subscriptions.filter(f => f.case_id !== c.case_id);
-                        //console.log("Unsubscribed, returned: ", e);
-                    })
-                    .catch((err: Error) => {
-                        console.log('Could not unsubscribe user from case with id ' + c.case_id);
-                        Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
-                    });
-            } else {
-                // Subscribe this case to user
-                let s = new CaseSubscription(ToolService.getUserId(), c.case_id, false, true);
-                sub
-                    .createCaseSubscription(s)
-                    .then(e => {
-                        console.log("Subscribed, returned: ", e);
-                        this.subscriptions.push(e);
-                    })
-                    .catch((err: Error) => {
-                        console.log('Could not unsubscribe user from case with id ' + c.case_id);
-                        Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
-                    });
-            }
-        } else {
-            console.log('Did not find case_id to alter subscription.');
-        }
+  onClickSubscribeButton(event: SyntheticInputEvent<HTMLButtonElement>) {
+    console.log('Clicked subscribe button!');
+    let sub = new CaseSubscriptionService();
+    let td = event.target.parentElement;
+    if (td && td.parentElement && td.parentElement instanceof HTMLTableRowElement) {
+      let c = this.cases[td.parentElement.rowIndex - 1];
+      if (this.isSubscribed(c)) {
+        // Unsubscribe the user from this case
+        sub
+          .deleteCaseSubscription(c.case_id, ToolService.getUserId())
+          .then(() => {
+            this.subscriptions = this.subscriptions.filter(e => e.case_id !== c.case_id);
+            //console.log("Unsubscribed, returned: ", e);
+          })
+          .catch((err: Error) => {
+            console.log('Could not unsubscribe user from case with id ' + c.case_id);
+            Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
+          });
+      } else {
+        // Subscribe this case to user
+        let s = new CaseSubscription(ToolService.getUserId(), c.case_id, false, true);
+        sub
+          .createCaseSubscription(s)
+          .then(e => {
+            console.log("Subscribed, returned: ", e);
+            this.subscriptions.push(e);
+          })
+          .catch((err: Error) => {
+            console.log('Could not unsubscribe user from case with id ' + c.case_id);
+            Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
+          });
+      }
+    } else {
+      console.log('Did not find case_id to alter subscription.');
     }
 
 }
