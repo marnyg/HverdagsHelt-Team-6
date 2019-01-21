@@ -1,15 +1,11 @@
 import * as React from 'react';
 import { Component } from 'react-simplified';
 import { NavLink } from 'react-router-dom';
-import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell, faCheck } from '@fortawesome/free-solid-svg-icons/index';
-import { withRouter } from 'react-router-dom';
 import CaseSubscriptionService from "../services/CaseSubscriptionService";
 import CaseSubscription from "../classes/CaseSubscription";
 import LoginService from "../services/LoginService";
-//import PictureService from '../services/PictureService.js'; REMOVE COMMENTS WHEN SERVICES DONE
-//import Picture from '../classes/Picture.js'; REMOVE COMMENTS WHEN CLASSES DONE
 
 class CaseItem extends Component {
   images = [];
@@ -18,7 +14,7 @@ class CaseItem extends Component {
   render() {
     if (this.props.grid) {
       return (
-        <div className="item">
+        <div className="item bg-light">
           <NavLink to={'/case/' + this.props.case.case_id} className="preview">
             {this.images.length > 0 ? (
               <div className="thumb" style={{ backgroundImage: 'url(' + this.images[0] + ')' }} />
@@ -94,9 +90,7 @@ class CaseItem extends Component {
       if(this.images.length > 0){
           // Check if image is delivered
           this.checkImage(this.images[0], () => {
-              console.log('Image exists');
           }, () => {
-              console.log('Image does not exist');
               this.images = [];
           })
       }

@@ -24,10 +24,10 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
   offset: number = 0;
   fetchButton = null;
 
-  render() {
-    if (!this.cases) {
-      return null;
-    }
+    render() {
+        if (!this.cases) {
+            return null;
+        }
 
     return (
       <div className={'card my-3 mx-3'}>
@@ -139,7 +139,6 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
         'Kunne ikke finne bruker eller kommunedata for å hente saker fra server. Vennligst gå tilbake til hovedsida.'
       );
     }
-  }
 
   fetchSubscriptions() {
     let sub = new CaseSubscriptionService();
@@ -180,7 +179,6 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
     } else {
       return false;
     }
-  }
 
   getStatusColour(status_id: number) {
     return statusStyles[status_id + 1];
@@ -195,7 +193,6 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
     } else {
       Notify.danger('Kunne ikke videresende deg til sak.');
     }
-  }
 
   onClickDeleteButton(event: SyntheticInputEvent<HTMLButtonElement>) {
     console.log('Trykket SLETT!');

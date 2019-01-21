@@ -23,10 +23,10 @@ class Subscriptions extends Component<{ props: { region_id: number }  }> {
   regionCases = [];
   user = JSON.parse(localStorage.getItem('user'));
 
-  render() {
-    if (!this.subscriptions) {
-      return null;
-    }
+    render() {
+        if (!this.subscriptions) {
+            return null;
+        }
 
     return(
       <div>
@@ -122,7 +122,6 @@ class Subscriptions extends Component<{ props: { region_id: number }  }> {
     } else {
       return 'Fant ikke dato.';
     }
-  }
 }
 
 export default Subscriptions;

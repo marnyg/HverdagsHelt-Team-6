@@ -29,7 +29,7 @@
   border-radius: 3px;
 }
 
-input:focus {
+.registermodal-container input:focus {
   border-color: #cfdc00;
   box-shadow: 0 0 5px rgba(207, 220, 0, 0.4);
 }
