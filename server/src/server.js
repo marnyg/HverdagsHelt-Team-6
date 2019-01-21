@@ -226,6 +226,10 @@ app.post('/api/counties', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, County.addCounty);
 });
 
+app.get('/api/counties/:county_name', (req: Request, res: Response) => {
+  County.getOneCountyByName(req,res);
+});
+
 app.put('/api/counties/:county_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, County.updateCounty);
 });
