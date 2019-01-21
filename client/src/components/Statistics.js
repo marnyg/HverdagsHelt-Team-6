@@ -6,9 +6,11 @@ import User from '../classes/User';
 import { Bar, Doughnut, Pie, Line } from 'react-chartjs-2';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import StatService from "../services/StatsService"
 
 class Statistics extends Component {
   data = {};
+  statServ = new StatService()
   render() {
     return (
       <div ref="statPage" className="container" style={{ maxWidth: '210mm' }}>
@@ -42,7 +44,15 @@ class Statistics extends Component {
   }
   mounted() {
     this.changeData();
-    setInterval(this.changeData, 3000);
+    setInterval(this.changeData, 10000);
+    this.statServ.getNatCasesOpenedInYear(2018)
+      .then(e => console.log(e))
+    this.statServ.getNatCasesClosedInYear(2018)
+      .then(e => console.log(e))
+    this.statServ.getCasesClosedInYearInRegion(2018, 1)
+      .then(e => console.log(e))
+    this.statServ.getCasesOpenedInYearInRegion(2018, 1)
+      .then(e => console.log(e))
   }
   changeData() {
     this.data = {

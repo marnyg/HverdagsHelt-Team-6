@@ -10,6 +10,7 @@ import StatusService from '../services/StatusService';
 import StatusCommentService from '../services/StatusCommentService';
 import CaseSubscriptionService from '../services/CaseSubscriptionService';
 import Notify from './Notify';
+import ImageModal from './ImageModal';
 import GoogleApiWrapper from './GoogleApiWrapper';
 import Case from '../classes/Case';
 import Category from '../classes/Category';
@@ -30,7 +31,7 @@ const STATUS_OPEN: number = 1;
 const COMMENTS_PER_QUERY = 5;
 
 class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
-  case: Case = new Case();
+  case: Case = null;
   statusComment: StatusComment = new StatusComment();
   offset: number = 0;
   deletedImages: string[] = [];
@@ -145,7 +146,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                     {this.case.img.map(e => (
                       <div key={e.src} className="col-md-3">
                         <div className="card">
-                          <img src={e.src} alt={e.src} className="card-img-top" />
+                          <img src={e.src} alt={e.src} className="card-img-top"/>
                           <div className="card-img-overlay">
                             <button
                               className={'btn btn-danger img-overlay float-right align-text-bottom'}
@@ -338,7 +339,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
         );
       case NOT_OWNER_NOT_EMPLOYEE:
         // Only view/read access.
-        console.log('UNAUTHORIZED USER. MAY ONLy VIEW CASE.');
+        console.log('UNAUTHORIZED USER. MAY ONLY VIEW CASE.');
         return (
           <div className={'modal-body row'}>
             <div className={'col-md-6'}>
@@ -378,7 +379,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                     {this.case.img.map(e => (
                       <div key={e.src} className="col-md-3">
                         <div className="card">
-                          <img src={e.src} alt={e.src} className="card-img-top" />
+                          <img src={e.src} alt={e.src} className="card-img-top"/>
                         </div>
                       </div>
                     ))}
@@ -422,6 +423,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   }
 
   mounted() {
+    this.case = new Case();
     let cas = new CaseService();
     let cascom = new StatusCommentService();
     let stat = new StatusService();
