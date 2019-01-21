@@ -19,6 +19,7 @@ import Status from './routes/Statuses.js';
 import Case_subscription from './routes/Case_subscriptions.js';
 import Status_comment from './routes/Status_comments.js';
 import Pictures from './routes/Pictures.js';
+import Epost from './utils/Epost.js';
 import Stats from './routes/Stats.js';
 import { Case } from './models.js';
 import type { Model } from 'sequelize';
