@@ -641,19 +641,23 @@ class NewCase extends Component {
                   let region = e.find(f => f.region_name === this.pos.city);
                   if(region){
                     this.case.region_id = region.region_id;
+                    return true;
                   }else{
                     console.log("Region " + this.pos.city + " was not found in county" + this.pos.county + " in database.");
+                    return false;
                   }
                 }).catch((err: Error) => {
                   Notify.danger("Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente kommunedata. Vennligst prøv igjen. \n\nFeilmelding: " + err.message);
+                  return false;
                 })
               }else{
                 Notify.danger("Fylket du trykket på finnes ikke i vår database. Dette kan komme som et resultat av kommunesammenslåing eller at geolokaliseringstjenesten vi benytter ikke bruker samme fylkesdata som oss.");
+                return false;
               }
             }).catch((err: Error) => {
               Notify.danger("Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente fylkesdata. Vennligst prøv igjen. \n\nFeilmelding: " + err.message);
+              return false;
             });
-            return true;
           } else {
             Notify.warning(
               'Din posisjon (lat: ' +
