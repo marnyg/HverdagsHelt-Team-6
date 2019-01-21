@@ -3,8 +3,6 @@ import request from 'supertest';
 import Cases from '../src/routes/Cases';
 import FormData from 'form-data';
 
-
-
 let token;
 
 let data = {
@@ -40,17 +38,15 @@ describe('GET /api/cases', () => {
 
 let caseid;
 describe('POST /api/cases2', async () => {
+  let formData = new FormData();
 
-    let formData = new FormData();
-
-
-      formData.append("title", 'Glatt vei'),
-    formData.append("description", 'Veldig glatt vei i Oslo'),
-    formData.append("lat", 63.42846459999999),
-    formData.append("lon", 10.388523800000002),
-    formData.append("category_id", 1),
-    formData.append("region_id", 1),
-    formData.append("status_id", 1)
+  formData.append('title', 'Glatt vei');
+    formData.append('description', 'Veldig glatt vei i Oslo');
+    formData.append('lat', 63.42846459999999);
+    formData.append('lon', 10.388523800000002);
+    formData.append('category_id', 1);
+    formData.append('region_id', 1);
+    formData.append('status_id', 1);
 
   test('200 status code for POST', function(done) {
     return request(application)
