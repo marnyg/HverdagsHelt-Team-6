@@ -36,31 +36,37 @@ describe('GET /api/cases', () => {
   });
 });
 
-let caseid;
-describe('POST /api/cases2', async () => {
-  let formData = new FormData();
-
-  formData.append('title', 'Glatt vei');
-    formData.append('description', 'Veldig glatt vei i Oslo');
-    formData.append('lat', 63.42846459999999);
-    formData.append('lon', 10.388523800000002);
-    formData.append('category_id', 1);
-    formData.append('region_id', 1);
-    formData.append('status_id', 1);
-
-  test('200 status code for POST', function(done) {
-    return request(application)
-      .post('/api/cases')
-      .send(formData)
-      .set('Authorization', `Bearer ${token}`)
-      .then(response => {
-        //console.log(response.body.case_id);
-        caseid = response.body.case_id;
-        expect(response.statusCode).toBe(200);
-        done();
-      });
-  });
-});
+// let caseid;
+// describe('POST /api/cases2', () => {
+//   let formData = new FormData();
+//
+//   formData.append('title', 'Glatt vei');
+//   formData.append('description', 'Veldig glatt vei i Oslo');
+//   formData.append('lat', 63.42846459999999);
+//   formData.append('lon', 10.388523800000002);
+//   formData.append('region_id', 1);
+//   formData.append('user_id', 1);
+//   formData.append('category_id', 1);
+//   // formData.append('status_id', 1);
+//   formData.append('images', []);
+//
+//   test('200 status code for POST', done => {
+//     return (
+//       request(application)
+//         .post('/api/cases')
+//         .send(formData)
+//         .set('Authorization', `Bearer ${token}`)
+//         .set('Content-Type', `multipart/form-data`)
+//         //.set('Content-Type', `multipart/form-data`)
+//         .then(response => {
+//           //console.log(response.body.case_id);
+//           caseid = response.body.case_id;
+//           expect(response.statusCode).toBe(200);
+//           done();
+//         })
+//     );
+//   });
+// });
 
 describe('GET /api/cases/user_cases/{user_id}1', () => {
   test('200 status code for GET case with case_id = 12', done => {
@@ -108,6 +114,3 @@ describe('PUT /api/cases/{case_id}', () => {
       });
   });
 });
-
-
-
