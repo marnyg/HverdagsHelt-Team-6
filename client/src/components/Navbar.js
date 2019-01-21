@@ -9,7 +9,8 @@ import CaseSubscriptionService from "../services/CaseSubscriptionService";
 import CaseSubscription from "../classes/CaseSubscription";
 import hverdagsheltLogo from '../../public/hverdagsheltLogo2Trans.png';
 
-const region_employee_id = 4; // Change to 2 upon delivery
+const region_employee_id = 2; // Change to 2 upon delivery
+const admin_id = 1; // Change to 1 upon delivery
 
 class Navbar extends Component {
     notification_count = 0;
@@ -90,6 +91,13 @@ class Navbar extends Component {
                             <li className="nav-item">
                                 <NavLink exact to="/employee/inbox" className="nav-link">
                                     Behandle saker
+                                </NavLink>
+                            </li>
+                        ): null}
+                        {user && user.role_id === admin_id ? (
+                            <li className="nav-item">
+                                <NavLink exact to="/admin/regions" className="nav-link">
+                                    Admin
                                 </NavLink>
                             </li>
                         ): null}
