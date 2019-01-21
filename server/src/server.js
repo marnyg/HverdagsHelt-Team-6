@@ -120,9 +120,12 @@ app.put('/api/cases/:case_id', (req: Request, res: Response) => {
 });
 
 app.delete('/api/cases/:case_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Cases.deleteCase);
+  /*
   return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(
     cases => (cases ? res.send() : res.status(500).send())
   );
+  */
 });
 
 app.get('/api/cases/subscriptions/:user_id', (req: Request, res: Response) => {
