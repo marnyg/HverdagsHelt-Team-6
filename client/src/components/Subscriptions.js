@@ -24,11 +24,15 @@ class Subscriptions extends Component<{ props: { region_id: number }  }> {
     user = JSON.parse(localStorage.getItem('user'));
 
     render() {
-        if (!this.subscriptions) {
-            return null;
-        }
+      if (this.subscriptions.length === 0) {
+          return <div className = 'mt-4 ml-4'>
+            <h1>Du har foreløpig ingen saks-abonnementer.</h1>
+            <p>For å opprette et abonnement på en sak, trykk på den blå klokken,
+            nederst i høyre hjørne av en sak</p>
+          </div>
+      }
 
-        return (
+        return(
             <div className={'mycarousel-wrapper'}>
                 <div className={'mycarousel'}>
                     {this.sub_temp.map(e => {
