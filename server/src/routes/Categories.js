@@ -14,7 +14,7 @@ module.exports = {
     return Category.create({
       name: req.body.name
     })
-      .then(categories => (categories ? res.send(categories) : res.sendStatus(404)))
+      .then(categories => (categories ? res.send(categories) : res.sendStatus(500)))
       .catch(err => {
         err.description = 'Det finnes allerede en kategori med det oppgitte navnet';
         res.status(409).json(err);
