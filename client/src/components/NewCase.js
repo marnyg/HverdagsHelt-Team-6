@@ -238,7 +238,7 @@ class NewCase extends Component {
                 ) : null}
               </form>
               <div>
-                <button className={'btn btn-primary mr-2'} onClick={this.submit}>
+                <button className={'btn btn-primary mr-2'} onClick={this.send}>
                   Send sak
                 </button>
                 <NavLink className={'btn btn-secondary'} exact to="/">
@@ -609,6 +609,14 @@ class NewCase extends Component {
   }
 
   validate(index: number) {
+    if (!this.form.checkValidity()) {
+      console.log('Basic HTML Form validation failed!');
+      Notify.warning('Vennligst fyll in de påkrevde feltene og prøv igjen.');
+      return false;
+    }
+    
+    console.log('Basic HTML Form validation passed!');
+
     if (this.list1 && this.list2 && this.pos) {
       switch (index) {
         case 0:
@@ -737,7 +745,6 @@ class NewCase extends Component {
           });
       } else {
         console.log('Form is not valid.');
-        Notify.warning('');
       }
     } else {
       Notify.warning('En kritisk feil har oppstått. Vennligst last sida på nytt.');
