@@ -1,13 +1,13 @@
 //@flow
 class User {
-  user_id: Number;
-  role_id: Number;
-  region_id: Number;
-  firstname: String;
-  lastname: String;
-  tlf: Number;
-  email: String;
-  password: String;
+  user_id: number;
+  role_id: number;
+  region_id: number;
+  firstname: string;
+  lastname: string;
+  tlf: number;
+  email: string;
+  password: string;
 
   constructor(user_id: number, role_id: number, region_id: number, firstname: string, lastname: string, tlf: number, email: string, password: string){
     this.user_id = user_id;

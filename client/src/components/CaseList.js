@@ -66,6 +66,7 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
             ))}
           </tbody>
         </table>
+        { this.cases.length === 0 ? <p>Vi fant ingen saker for deg.</p> : null }
         <button
           ref={e => {
             this.fetchButton = e;
@@ -83,7 +84,6 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
   }
 
   mounted() {
-    console.log('user_id: ' + this.props.user_id + ', region_id: ' + this.props.region_id);
     this.fetchCases();
     this.fetchSubscriptions();
   }
@@ -208,7 +208,7 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
         .deleteCase(case_id)
         .then(() => {
           console.log('Delete successful!');
-          this.cases.filter(e => e.case_id !== case_id);
+          this.cases = this.cases.filter(e => e.case_id !== case_id);
         })
         .catch((err: Error) => {
           console.log('Could not delete case with id ' + case_id + ': ', err);
@@ -230,7 +230,7 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
         sub
           .deleteCaseSubscription(c.case_id, ToolService.getUserId())
           .then(() => {
-            this.subscriptions.filter(f => f.case_id !== c.case_id);
+            this.subscriptions = this.subscriptions.filter(e => e.case_id !== c.case_id);
             //console.log("Unsubscribed, returned: ", e);
           })
           .catch((err: Error) => {
