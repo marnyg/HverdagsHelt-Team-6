@@ -13,11 +13,12 @@ import RegionSubscriptionService from '../services/RegionSubscriptionService.js'
 import RegionSubscription from '../classes/RegionSubscription.js';
 import CaseService from '../services/CaseService.js';
 import Notify from './Notify.js';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import LoginService from '../services/LoginService.js';
+import { faBell, faCheck } from '@fortawesome/free-solid-svg-icons/index';
 
 class Subscriptions extends Component<{ props: { region_id: number }  }> {
   sub_temp=[];
-  reg_temp=[];
   subscriptions = [];
   regions = [];
   regionCases = [];
@@ -34,28 +35,35 @@ class Subscriptions extends Component<{ props: { region_id: number }  }> {
           return <div className='card-body'>
             <h1>{e[0].region_name}</h1>
           {e.map(j => (
-            <NavLink to={'/case/' + j.case_id} className="preview">
-              <div className='border' key={j.case_id}>
+            <div className='border' key={j.case_id}>
+              <NavLink to={'/case/' + j.case_id} className="preview">
                 <p><b>{j.title}</b></p>
                 <p>Opprettet: {this.dateFormat(j.createdAt)}, oppdatert: {this.dateFormat(j.updatedAt)}</p>
                 <p><i>{j.description}</i></p>
-              </div>
-            </NavLink>
+              </NavLink>
+              <button onClick={() => this.subscribe(j)} className={"btn btn-float-right"}>
+                Abonner
+              </button>
+            </div>
           ))
         }</div>})}
         <div className='card-body'>
+        {console.log('1: ', this.subRegionCases())}
         <h1>Saker fra abonnerende kommuner:</h1>
           {this.subRegionCases().map(e => {
             return <div className='card-body'>
               <h1>{e[0].region_name}</h1>
               {e.map(j => (
+                <div className='border' key={j.case_id}>
                 <NavLink to={'/case/' + j.case_id} className="preview">
-                  <div className='border' key={j.case_id}>
-                    <p><b>{j.title}</b></p>
-                    <p>Opprettet: {this.dateFormat(j.createdAt)}, oppdatert: {this.dateFormat(j.updatedAt)}</p>
-                    <p><i>{j.description}</i></p>
-                  </div>
+                  <p><b>{j.title}</b></p>
+                  <p>Opprettet: {this.dateFormat(j.createdAt)}, oppdatert: {this.dateFormat(j.updatedAt)}</p>
+                  <p><i>{j.description}</i></p>
                 </NavLink>
+                  <button onClick={() => this.subscribe(j)} className={"btn btn-float-right"}>
+                    Abonner
+                  </button>
+                </div>
               ))}
             </div>
           })}
@@ -121,6 +129,42 @@ class Subscriptions extends Component<{ props: { region_id: number }  }> {
       return a.substr(0, a.length - 3);
     } else {
       return 'Fant ikke dato.';
+    }
+  }
+
+  subscribe(j: Case) {
+    let subscriptionService = new CaseSubscriptionService();
+    let r = this.subscriptions.filter(e => e.case_id === j.case_id);
+    if(r.length > 0){
+      console.log('Jihaaaa! ');
+      j.subscribed = true;
+    } else {
+      console.log('Buhuu ');
+      j.subscribed = false;
+    }
+    console.log('Her ', j.subscribed);
+    if(j.subscribed === false){
+      console.log('jippi ', j.subscribed);
+      let subscription = new CaseSubscription(j.user_id, j.case_id, true, true);
+      console.log('Sub: ', subscription);
+      console.log('Hola! ', j.user_id + ' ' + j.case_id);
+      subscriptionService.createCaseSubscription(subscription)
+      .then((sub) => {
+        j.subscribed = !j.subscribed;
+      })
+      .catch((error: Error) => console.error(error));
+    } else if(j.subscribed === true) {
+      console.log('Slett', j.subscribed);
+      let loginService = new LoginService();
+      loginService.isLoggedIn()
+      .then((logged_in: Boolean) => {
+        subscriptionService.deleteCaseSubscription(j.case_id, this.user.user_id)
+        .then(res => {
+          j.subscribed = !j.subscribed;
+        })
+        .catch((error: Error) => console.error());
+      })
+      .catch((error: Error) => console.error(error));
     }
   }
 }
