@@ -6,20 +6,31 @@ import User from '../classes/User';
 import { Bar, Doughnut, Pie, Line } from 'react-chartjs-2';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import StatService from "../services/StatsService"
+import StatService from '../services/StatsService';
 
 class Statistics extends Component {
   data = {};
-  statServ = new StatService()
+  data1 = {};
+  openedNat = [];
+  openedRegional = [];
+  closedRegional = [];
+  closedNat = [];
+  natData = [];
+  regData = [];
+  options = null;
+
+  statServ = new StatService();
   render() {
     return (
       <div ref="statPage" className="container" style={{ maxWidth: '210mm' }}>
         <div className="row">
           <div className={'col-md'}>
             <Bar data={this.data} />
-            <Doughnut data={this.data} />
-            <Pie data={this.data} />
-            <Line data={this.data} />
+            <Bar data={this.data1} />
+            <div class="row">
+              <Pie class="col" data={this.data} />
+              <Pie class="col" data={this.data} />
+            </div>
           </div>
           <div className={'col-md'}>
             <p>
@@ -37,39 +48,83 @@ class Statistics extends Component {
             <button className="btn btn-primary" onClick={this.generatePdf}>
               Last ned som PDF
             </button>
+            <button
+              className="btn btn-primary"
+              onClick={() =>
+                console.log(this.refs.bar, this.openedNat, this.openedRegional, this.closedRegional, this.closedNat)
+              }
+            >
+              log
+            </button>
           </div>
         </div>
       </div>
     );
   }
   mounted() {
-    this.changeData();
-    setInterval(this.changeData, 10000);
-    this.statServ.getNatCasesOpenedInYear(2018)
-      .then(e => console.log(e))
-    this.statServ.getNatCasesClosedInYear(2018)
-      .then(e => console.log(e))
-    this.statServ.getCasesClosedInYearInRegion(2018, 1)
-      .then(e => console.log(e))
-    this.statServ.getCasesOpenedInYearInRegion(2018, 1)
-      .then(e => console.log(e))
+    this.getalldata();
   }
-  changeData() {
-    this.data = {
-      labels: ['January', 'February', 'March'],
+  getalldata() {
+    this.statServ
+      .getNatCasesOpenedInYear(2019)
+      .then(e => (this.openedNat = e))
+      .then(() => this.statServ.getNatCasesClosedInYear(2019).then(e => (this.closedNat = e)))
+      .then(() => this.statServ.getCasesClosedInYearInRegion(2019, 44).then(e => (this.closedRegional = e)))
+      .then(() => this.statServ.getCasesOpenedInYearInRegion(2019, 44).then(e => (this.openedRegional = e)))
+      .then(() => {
+        this.regData = this.joinData(this.openedRegional, this.closedRegional);
+        this.natData = this.joinData(this.openedNat, this.closedNat);
+      })
+      .then(() => {
+        this.data = this.formatData(this.natData);
+        this.data1 = this.formatData(this.regData);
+      });
+  }
+  joinData(opened, closed) {
+    let newt = [];
+    opened = JSON.parse(JSON.stringify(opened));
+    closed = JSON.parse(JSON.stringify(closed));
+    for (let i = 1; i < 13; i++) {
+      let closedNum = 0;
+      let openedNum = 0;
+      let tmp = opened.find(e => e.month === i);
+      if (tmp) {
+        openedNum = tmp.opened_cases;
+      }
+      tmp = closed.find(e => e.month === i);
+      if (tmp) {
+        closedNum = tmp.closed_cases;
+      }
+      newt.push({ closed_cases: closedNum, opened_cases: openedNum, month: i });
+    }
+    return newt;
+  }
+
+  formatData(data) {
+    return {
+      label: 'Nasjonalt',
+      labels: ['January', 'February', 'March', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'],
       datasets: [
         {
-          label: 'My First dataset',
-          backgroundColor: 'rgba(255,99,132,0.2)',
-          borderColor: 'rgba(255,99,132,1)',
-          borderWidth: 1,
-          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-          hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-          data: [this.getRandomInt(50, 200), this.getRandomInt(100, 150), this.getRandomInt(150, 250)]
+          label: 'Saker opprettet',
+          backgroundColor: 'rgba(255,99,132,0.8)',
+          // borderColor: 'rgba(255,99,132,1)',
+          // borderWidth: 1,
+          // backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+          // hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+          data: data.map(e => e.opened_cases)
+        },
+        {
+          label: 'Saker lukket ',
+          backgroundColor: 'rgba(100,225,132,0.8)',
+          // borderColor: 'rgba(255,99,132,1)',
+          // borderWidth: 1,
+          // backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+          // hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+          data: data.map(e => e.closed_cases)
         }
       ]
     };
-    console.log(this.data.datasets[0].data);
   }
 
   generatePdf() {
@@ -81,10 +136,6 @@ class Statistics extends Component {
       // pdf.output('dataurlnewwindow');
       pdf.save('download.pdf');
     });
-  }
-
-  getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 }
 
