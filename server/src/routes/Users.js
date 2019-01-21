@@ -15,6 +15,35 @@ module.exports = {
   },
 
   createUser: async function(req: Request, res: Response) {
+    let regexNames = /^[a-zA-ZæøåÆØÅ\-\s]+$/;
+    let regexNumber = /^[\d]{8}$/;
+    let regexEmail = /^[\wæøåÆØÅ]+([.]{1}[\wæøåÆØÅ]+)*@[\wæøåÆØÅ]+([.]{1}[\wæøåÆØÅ]+)+$/;
+    let regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+    let regexRegionId = /^[\d]+$/;
+    console.log('NAMES:');
+    console.log('true: ', regexNames.test('Magne'));
+    console.log('true: ', regexNames.test('ÆØÅæøå'));
+    console.log('true: ', regexNames.test('Æ-df'));
+    console.log('true: ', regexNames.test('ÆØÅ æøå'));
+    console.log('false: ', regexNames.test('.,!"#¤%%&¤@£$€{{[]]]{€'));
+    console.log('NUMBER:');
+    console.log('false: ', regexNumber.test('.,!"#¤%%&¤@£$€{{[]]]{€'));
+    console.log('false: ', regexNumber.test(' 123234 '));
+    console.log('true: ', regexNumber.test('12345678'));
+    console.log('false: ', regexNumber.test('113'));
+    console.log('false: ', regexNumber.test('12345678910'));
+    console.log('EMAIL:');
+    console.log('true: ', regexEmail.test('olaæøå.nord.mann@stud.ntnu.no'));
+    // 8 tegn
+    // Stor og liten bokstav, og tall
+    console.log('PASSWORD:');
+    console.log('false: ', regexPassword.test('12345678'));
+    console.log('false: ', regexPassword.test('1234567a'));
+    console.log('true: ', regexPassword.test('123456aB'));
+    console.log('REGION_ID:');
+    console.log('true: ', regexRegionId.test('1'));
+    console.log('false: ', regexRegionId.test(' 2334 '));
+    console.log('false: ', regexRegionId.test('en'));
     if (
       !req.body ||
       typeof req.body.firstname !== 'string' ||
@@ -123,25 +152,25 @@ module.exports = {
 
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
 
-    return User.destroy({ where: { user_id: Number(req.params.user_id) } }).then(user =>
-      user ? res.send() : res.status(400).send()
-    ).catch(() => {
+    return User.destroy({ where: { user_id: Number(req.params.user_id) } })
+      .then(user => (user ? res.send() : res.status(400).send()))
+      .catch(() => {
         User.update(
-            {
-                firstname: "Bruker",
-                lastname: "Slettet",
-                tlf: 0,
-                email: "",
-                hashed_password: "",
-                salt: "",
-                role_id: 5
-            },
-            { where: { user_id: Number(req.params.user_id) } }
+          {
+            firstname: 'Bruker',
+            lastname: 'Slettet',
+            tlf: 0,
+            email: '',
+            hashed_password: '',
+            salt: '',
+            role_id: 5
+          },
+          { where: { user_id: Number(req.params.user_id) } }
         ).then(() => {
-            res.status(200).send();
-            console.log("Sensitive user data wiped");
+          res.status(200).send();
+          console.log('Sensitive user data wiped');
         });
-    });
+      });
   },
   changePassword: async function(req: Request, res: Response) {
     if (
