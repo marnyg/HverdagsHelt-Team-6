@@ -98,7 +98,7 @@ class Navbar extends Component {
                         <input
                             className="form-control mr-sm-2"
                             type="search"
-                            placeholder="Search"
+                            placeholder="Søk i saker"
                             aria-label="Search"
                             onChange={e => (this.search = e.target.value)}
                         />
