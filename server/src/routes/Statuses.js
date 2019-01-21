@@ -14,7 +14,7 @@ module.exports = {
     return Status.create({
       name: req.body.name
     })
-      .then(count => (count ? res.sendStatus(200) : res.sendStatus(404)))
+      .then(stat => (stat ? res.send(stat) : res.sendStatus(404)))
       .catch(err => {
         err.description = 'Det finnes allerede en status med det oppgitte navnet';
         res.status(409).json(err);
