@@ -5,7 +5,7 @@ class Location{
     region: string; // County
     country: string;
 
-    constructor(lat, lng, city, region, country){
+    constructor(lat: number, lng: number, city: string, region: string, country: string){
         this.lat = lat;
         this.lon = lng;
         this.city = city;
