@@ -3,8 +3,6 @@ import * as React from 'react';
 import { Component } from 'react-simplified';
 import Navigation from './Navigation';
 import Inbox from './Inbox';
-import CaseService from "../../services/CaseService";
-import { NavLink , Route } from 'react-router-dom';
 import EmployeeService from "../../services/EmployeeService";
 
 class EmployeePage extends Component{

@@ -1,23 +1,15 @@
 //@flow
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import { NavLink } from 'react-router-dom';
-
-import CaseItem from './CaseItem.js';
-//import CaseService from '../services/CaseServices.js'; REMOVE COMMENT WHEN SERVICES DONE
 import LocationService from '../services/LocationService.js';
 import CaseService from '../services/CaseService.js';
 import Location from '../classes/Location.js';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faListUl, faTh } from '@fortawesome/free-solid-svg-icons/index';
 import Notify from './Notify.js';
 import CaseSubscriptionService from "../services/CaseSubscriptionService";
 import CaseSubscription from "../classes/CaseSubscription";
 import NoLocationPage from "./NoLocationPage";
 import RegionService from "../services/RegionService";
 import Content from './Content.js';
-import CountyService from "../services/CountyService";
-import RegionSelect from "./RegionSelect";
 
 class ContentWrapper extends Component {
     cases = null;

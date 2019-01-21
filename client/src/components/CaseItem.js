@@ -1,15 +1,11 @@
 import * as React from 'react';
 import { Component } from 'react-simplified';
 import { NavLink } from 'react-router-dom';
-import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell, faCheck } from '@fortawesome/free-solid-svg-icons/index';
-import { withRouter } from 'react-router-dom';
 import CaseSubscriptionService from "../services/CaseSubscriptionService";
 import CaseSubscription from "../classes/CaseSubscription";
 import LoginService from "../services/LoginService";
-//import PictureService from '../services/PictureService.js'; REMOVE COMMENTS WHEN SERVICES DONE
-//import Picture from '../classes/Picture.js'; REMOVE COMMENTS WHEN CLASSES DONE
 
 class CaseItem extends Component {
   images = [];

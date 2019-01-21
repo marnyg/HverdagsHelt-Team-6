@@ -32,7 +32,7 @@ class RegionSelect extends Component {
                             </option>
                         ))}
                     </select>
-                    <button className={'form-control btn btn-primary ' + this.props.elementsMargin} onClick={this.submit}>Send</button>
+                    <button className={'form-control btn btn-primary ' + this.props.elementsMargin} onClick={this.submit}>Filtrer</button>
                 </form>
             </div>
         );

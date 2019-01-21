@@ -3,12 +3,8 @@ import * as React from 'react';
 import { Component } from 'react-simplified';
 import { NavLink } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
-
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
-import Content from './Content.js';
-import UserService from '../services/UserService.js';
-import LoginService from "../services/LoginService";
 import CaseSubscriptionService from "../services/CaseSubscriptionService";
 import CaseSubscription from "../classes/CaseSubscription";
 import hverdagsheltLogo from '../../public/hverdagsheltLogo2Trans.png';

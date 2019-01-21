@@ -1,8 +1,5 @@
 // @flow
-import axios from 'axios';
 import Case from '../classes/Case.js';
-import LoginService from './LoginService.js';
-import FormData from 'form-data';
 import CaseService from "./CaseService";
 
 class EmployeeService {
