@@ -90,7 +90,7 @@ app.post('/api/pictures/:case_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Pictures.uploadPicture);
 });
 
-app.del('/api/pictures/:case_id/:image_name', (req: Request, res: Response) => {
+app.delete('/api/pictures/:case_id/:image_name', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Pictures.delPicture);
 });
 
