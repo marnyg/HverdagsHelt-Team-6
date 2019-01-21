@@ -29,36 +29,7 @@ class MyPage extends Component {
                     <NavLink className={'nav-link nav-item link-unstyled'} exact to={'/my-page/my-profile'}>Min Profil</NavLink>
                     <NavLink className={'nav-item nav-link link-unstyled'} exact to={'/my-page/my-regions'}>Mine Kommuner</NavLink>
                     <NavLink className={'nav-item nav-link link-unstyled'} exact to={'/my-page/my-cases'}>Mine Saker</NavLink>
-                        {/*this.menuItems.map(e => {
-                            if (e.selected === true) {
-                                return (
-                                    <li className={'nav-item'}
-                                        style={{cursor: 'pointer'}}
-                                        onClick={() => {
-                                            this.element.selected = false;
-                                            this.comp = e.component;
-                                            this.element = e;
-                                            this.element.selected = true;
-                                        }}>
-                                        <a className={'nav-link active'}>{e.name}</a>
-                                    </li>
-                                );
-                            } else {
-                                return (
-                                    <li className={'nav-item'}
-                                        style={{cursor: 'pointer'}}
-                                        onClick={() => {
-                                            this.element.selected = false;
-                                            this.comp = e.component;
-                                            this.element = e;
-                                            this.element.selected = true;
-                                        }}>
-                                        <a className={'nav-link disabled'}>{e.name}</a>
-                                    </li>
-                                );
-                            }
-                        })*/}
-                    </ul>
+                </ul>
             </div>
             <div>
                 <div className={'w-100 py-5 px-2'}>
@@ -67,9 +38,6 @@ class MyPage extends Component {
                     <Route exact path="/my-page/my-profile" render={() => <MyProfile/>} />
                 </div>
             </div>
-        </div>
-        <div>
-          <div className={'w-100 py-5 px-2'}>{this.element.component}</div>
         </div>
       </div>
     );

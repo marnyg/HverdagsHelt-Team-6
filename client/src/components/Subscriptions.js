@@ -13,115 +13,123 @@ import RegionSubscriptionService from '../services/RegionSubscriptionService.js'
 import RegionSubscription from '../classes/RegionSubscription.js';
 import CaseService from '../services/CaseService.js';
 import Notify from './Notify.js';
+import CaseItem from './CaseItem';
 
 
 class Subscriptions extends Component<{ props: { region_id: number }  }> {
-  sub_temp=[];
-  reg_temp=[];
-  subscriptions = [];
-  regions = [];
-  regionCases = [];
-  user = JSON.parse(localStorage.getItem('user'));
+    sub_temp = [];
+    reg_temp = [];
+    subscriptions = [];
+    regions = [];
+    regionCases = [];
+    user = JSON.parse(localStorage.getItem('user'));
 
     render() {
         if (!this.subscriptions) {
             return null;
         }
 
-    return(
-      <div>
-        {this.sub_temp.map(e => {
-          return <div className='card-body'>
-            <h1>{e[0].region_name}</h1>
-          {e.map(j => (
-            <NavLink to={'/case/' + j.case_id} className="preview">
-              <div className='border' key={j.case_id}>
-                <p><b>{j.title}</b></p>
-                <p>Opprettet: {this.dateFormat(j.createdAt)}, oppdatert: {this.dateFormat(j.updatedAt)}</p>
-                <p><i>{j.description}</i></p>
-              </div>
-            </NavLink>
-          ))
-        }</div>})}
-        <div className='card-body'>
-        <h1>Saker fra abonnerende kommuner:</h1>
-          {this.subRegionCases().map(e => {
-            return <div className='card-body'>
-              <h1>{e[0].region_name}</h1>
-              {e.map(j => (
-                <NavLink to={'/case/' + j.case_id} className="preview">
-                  <div className='border' key={j.case_id}>
-                    <p><b>{j.title}</b></p>
-                    <p>Opprettet: {this.dateFormat(j.createdAt)}, oppdatert: {this.dateFormat(j.updatedAt)}</p>
-                    <p><i>{j.description}</i></p>
-                  </div>
-                </NavLink>
-              ))}
+        return (
+            <div className={'mycarousel-wrapper'}>
+                <div className={'mycarousel'}>
+                    {this.sub_temp.map(e => {
+                        return (
+                            <div className='mt-5'>
+                                <h3 className={'mycarousel-row-title'}>{e[0].region_name}</h3>
+                                <div className={'mycarousel-row'}>
+                                    {e.map(j => {
+                                        j.subscribed = true;
+                                        return(
+                                            <div className={'mycarousel-tile'}>
+                                                <CaseItem case={j} key={j.case_id} grid={true} user={this.user}/>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+                <h1 className={'ml-5'}>Saker fra abonnerende kommuner:</h1>
+                <div className={'mycarousel'}>
+                    {this.subRegionCases().map(e => {
+                        return (
+                            <div className='mycarousel-row'>
+                                <h3 className={'mycarousel-row-title'}>{e[0].region_name}</h3>
+                                {e.map(j => {
+                                    j.subscribed = true;
+                                    return(
+                                        <div className={'mycarousel-tile'}>
+                                            <CaseItem case={j} key={j.case_id} grid={true} user={this.user}/>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
-          })}
-        </div>
-      </div>
-    )
-  }
+        )
+    }
 
-  mounted() {
-    let css = new CaseSubscriptionService();
-    let rss = new RegionSubscriptionService();
-    let cs = new CaseService();
+    mounted() {
+        let css = new CaseSubscriptionService();
+        let rss = new RegionSubscriptionService();
+        let cs = new CaseService();
 
-    css
-    .getAllSubscribedCasesGivenUser(this.user.user_id)
-    .then((subscriptions: Case[]) => {
-      this.subscriptions = subscriptions;
-      console.log('Subscriptions: ', subscriptions)
-    })
-    .then(() => {
-      this.divideSubscriptionCasesByRegion().map(index => {
-        this.sub_temp.push(this.subscriptions.filter(sub => sub.region_id === index));
-      })
-    })
-    .catch((error: Error) => console.error(error));
+        css
+            .getAllSubscribedCasesGivenUser(this.user.user_id)
+            .then((subscriptions: Case[]) => {
+                this.subscriptions = subscriptions;
+                console.log('Subscriptions: ', subscriptions)
+            })
+            .then(() => {
+                this.divideSubscriptionCasesByRegion().map(index => {
+                    this.sub_temp.push(this.subscriptions.filter(sub => sub.region_id === index));
+                })
+            })
+            .catch((error: Error) => console.error(error));
 
-    rss
-    .getSubscribedRegionsForUser(this.user.user_id)
-    .then((regions: RegionSubscription[]) => {
-      this.regions = regions.regions;
-      JSON.stringify(this.regions);
-      JSON.parse(JSON.stringify(this.regions));
-    })
-    .then(() => {
-      this.regions.map(e => {
-        cs
-        .getAllCasesGivenRegionId(e.region_id)
-        .then((regionCases: Case[]) => {
-          this.regionCases.push(regionCases);
-          JSON.stringify(this.regionCases);
-          JSON.parse(JSON.stringify(this.regionCases));
-        })
-      })
-    })
-    .catch((error: Error) => console.error(error));
-  }
+        rss
+            .getSubscribedRegionsForUser(this.user.user_id)
+            .then((regions: RegionSubscription[]) => {
+                this.regions = regions.regions;
+                JSON.stringify(this.regions);
+                JSON.parse(JSON.stringify(this.regions));
+            })
+            .then(() => {
+                this.regions.map(e => {
+                    cs
+                        .getAllCasesGivenRegionId(e.region_id)
+                        .then((regionCases: Case[]) => {
+                            this.regionCases.push(regionCases);
+                            JSON.stringify(this.regionCases);
+                            JSON.parse(JSON.stringify(this.regionCases));
+                        })
+                })
+            })
+            .catch((error: Error) => console.error(error));
+    }
 
-  divideSubscriptionCasesByRegion() {
-    let unique = [...new Set(this.subscriptions.map(item => item.region_id))];
-    console.log('Unique subscription cases region_id: ', unique);
-    return unique;
-  }
+    divideSubscriptionCasesByRegion() {
+        let unique = [...new Set(this.subscriptions.map(item => item.region_id))];
+        console.log('Unique subscription cases region_id: ', unique);
+        return unique;
+    }
 
-  //For å fjerne abonnerenderegioner UTEN caser
-  subRegionCases(){
-    let res = this.regionCases.filter(e => e.length);
-    return res;
-  }
+    //For å fjerne abonnerenderegioner UTEN caser
+    subRegionCases() {
+        let res = this.regionCases.filter(e => e.length);
+        return res;
+    }
 
-  dateFormat(date: string) {
-    if (date) {
-      let a = date.split('.')[0].replace('T', ' ');
-      return a.substr(0, a.length - 3);
-    } else {
-      return 'Fant ikke dato.';
+    dateFormat(date: string) {
+        if (date) {
+            let a = date.split('.')[0].replace('T', ' ');
+            return a.substr(0, a.length - 3);
+        } else {
+            return 'Fant ikke dato.';
+        }
     }
 }
-
 export default Subscriptions;
