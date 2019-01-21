@@ -19,10 +19,10 @@ const STATUS_CAN_DELETE = 1;
 const subscriptionButtonStyles = ['btn btn-info', 'btn btn-outline-info'];
 
 class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
-  cases: Case[] = [];
-  subscriptions: CaseSubscription[] = [];
-  offset: number = 0;
-  fetchButton = null;
+    cases: Case[] = [];
+    subscriptions: CaseSubscription[] = [];
+    offset: number = 0;
+    fetchButton = null;
 
     render() {
         if (!this.cases) {
@@ -66,6 +66,7 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
             ))}
           </tbody>
         </table>
+        { this.cases.length === 0 ? <p>Vi fant ingen saker for deg.</p> : null }
         <button
           ref={e => {
             this.fetchButton = e;
@@ -83,115 +84,117 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
   }
 
   mounted() {
-    console.log('user_id: ' + this.props.user_id + ', region_id: ' + this.props.region_id);
     this.fetchCases();
     this.fetchSubscriptions();
   }
 
-  fetchCases() {
-    let cas = new CaseService();
-    if (this.props.user_id) {
-      // Set up table for cases on per user basis
-      cas
-        .getAllCasesGivenUser(this.props.user_id)
-        .then(cases => {
-          this.cases.push.apply(this.cases, cases);
-          this.offset += cases.length;
-          if (this.fetchButton && cases.length < ITEMS_PER_QUERY) {
-            this.fetchButton.hidden = true;
-          }
-        })
-        .catch((err: Error) => {
-          Notify.danger(
-            'Det oppstod en feil under henting av dine saker. Hvis feilen vedvarer kontakt oss. \n\nFeilmelding: ' +
-              err.message
-          );
-          console.log(
-            'Error when fetching cases for user with id ' + this.props.user_id + '.\nError message is: ' + err.message
-          );
-        });
-    } else if (this.props.region_id) {
-      // Set up table for cases on per municipality/region basis
-      cas
-        .getAllCasesGivenRegionId(this.props.region_id)
-        .then(cases => {
-          this.cases.push.apply(this.cases, cases);
-          this.offset += cases.length;
-          if (this.fetchButton && cases.length < ITEMS_PER_QUERY) {
-            this.fetchButton.hidden = true;
-          }
-        })
-        .catch((err: Error) => {
-          Notify.danger(
-            'Det oppstod en feil under henting av kommunens saker. Hvis feilen vedvarer kontakt oss. \n\nFeilmelding: ' +
-              err.message
-          );
-          console.log(
-            'Error when fetching cases for region with id ' +
-              this.props.region_id +
-              '.\nError message is: ' +
-              err.message
-          );
-        });
-    } else {
-      console.warn("Didn't find user_id or region_id");
-      Notify.danger(
-        'Kunne ikke finne bruker eller kommunedata for å hente saker fra server. Vennligst gå tilbake til hovedsida.'
-      );
+    fetchCases() {
+        let cas = new CaseService();
+        if (this.props.user_id) {
+            // Set up table for cases on per user basis
+            cas
+                .getAllCasesGivenUser(this.props.user_id)
+                .then(cases => {
+                    this.cases.push.apply(this.cases, cases);
+                    this.offset += cases.length;
+                    if (this.fetchButton && cases.length < ITEMS_PER_QUERY) {
+                        this.fetchButton.hidden = true;
+                    }
+                })
+                .catch((err: Error) => {
+                    Notify.danger(
+                        'Det oppstod en feil under henting av dine saker. Hvis feilen vedvarer kontakt oss. \n\nFeilmelding: ' +
+                        err.message
+                    );
+                    console.log(
+                        'Error when fetching cases for user with id ' + this.props.user_id + '.\nError message is: ' + err.message
+                    );
+                });
+        } else if (this.props.region_id) {
+            // Set up table for cases on per municipality/region basis
+            cas
+                .getAllCasesGivenRegionId(this.props.region_id)
+                .then(cases => {
+                    this.cases.push.apply(this.cases, cases);
+                    this.offset += cases.length;
+                    if (this.fetchButton && cases.length < ITEMS_PER_QUERY) {
+                        this.fetchButton.hidden = true;
+                    }
+                })
+                .catch((err: Error) => {
+                    Notify.danger(
+                        'Det oppstod en feil under henting av kommunens saker. Hvis feilen vedvarer kontakt oss. \n\nFeilmelding: ' +
+                        err.message
+                    );
+                    console.log(
+                        'Error when fetching cases for region with id ' +
+                        this.props.region_id +
+                        '.\nError message is: ' +
+                        err.message
+                    );
+                });
+        } else {
+            console.warn("Didn't find user_id or region_id");
+            Notify.danger(
+                'Kunne ikke finne bruker eller kommunedata for å hente saker fra server. Vennligst gå tilbake til hovedsida.'
+            );
+        }
     }
 
-  fetchSubscriptions() {
-    let sub = new CaseSubscriptionService();
-    let user_id = ToolService.getUserId();
-    sub
-      .getAllCaseSubscriptions(user_id)
-      .then(e => {
-        this.subscriptions = e;
-      })
-      .then(() => console.log('this.subscriptions: ', this.subscriptions))
-      .catch((err: Error) => {
-        console.log('Could not fetch subscriptions for user with id: ' + user_id);
-        Notify.danger(
-          'Kunne ikke hente abonnement. Hvis problemet vedvarer kontakt oss. \n\nFeilmelding: ' + err.message
-        );
-      });
-  }
-
-  isOwner(c: Case) {
-    return ToolService.getUserId() === c.user_id;
-  }
-
-  isSubscribed(c: Case) {
-    return this.subscriptions.some(e => e.case_id === c.case_id);
-  }
-
-  getSubscriptionButtonStyles(c: Case) {
-    if (this.isSubscribed(c)) {
-      return subscriptionButtonStyles[1];
-    } else {
-      return subscriptionButtonStyles[0];
-    }
-  }
-
-  canDelete(c: Case) {
-    if (c.status_id === STATUS_CAN_DELETE) {
-      return this.isOwner(c);
-    } else {
-      return false;
+    fetchSubscriptions() {
+        let sub = new CaseSubscriptionService();
+        let user_id = ToolService.getUserId();
+        sub
+            .getAllCaseSubscriptions(user_id)
+            .then(e => {
+                this.subscriptions = e;
+            })
+            .then(() => console.log('this.subscriptions: ', this.subscriptions))
+            .catch((err: Error) => {
+                console.log('Could not fetch subscriptions for user with id: ' + user_id);
+                Notify.danger(
+                    'Kunne ikke hente abonnement. Hvis problemet vedvarer kontakt oss. \n\nFeilmelding: ' + err.message
+                );
+            });
     }
 
-  getStatusColour(status_id: number) {
-    return statusStyles[status_id + 1];
-  }
+    isOwner(c: Case) {
+        return ToolService.getUserId() === c.user_id;
+    }
 
-  onClickTableRow(event: SyntheticInputEvent<HTMLInputElement>) {
-    console.log('Trykket på tabell.');
-    if (event.target && event.target.parentElement instanceof HTMLTableRowElement) {
-      let case_id = this.cases[event.target.parentElement.rowIndex - 1].case_id;
-      console.log(case_id);
-      this.props.history.push('/case/' + case_id);
-    } else {
-      Notify.danger('Kunne ikke videresende deg til sak.');
+    isSubscribed(c: Case) {
+        return this.subscriptions.some(e => e.case_id === c.case_id);
+    }
+
+    getSubscriptionButtonStyles(c: Case) {
+        if (this.isSubscribed(c)) {
+            return subscriptionButtonStyles[1];
+        } else {
+            return subscriptionButtonStyles[0];
+        }
+    }
+
+    canDelete(c: Case) {
+        if (c.status_id === STATUS_CAN_DELETE) {
+            return this.isOwner(c);
+        } else {
+            return false;
+        }
+    }
+
+    getStatusColour(status_id: number) {
+        return statusStyles[status_id + 1];
+    }
+
+    onClickTableRow(event: SyntheticInputEvent<HTMLInputElement>) {
+        console.log('Trykket på tabell.');
+        if (event.target && event.target.parentElement instanceof HTMLTableRowElement) {
+            let case_id = this.cases[event.target.parentElement.rowIndex - 1].case_id;
+            console.log(case_id);
+            this.props.history.push('/case/' + case_id);
+        } else {
+            Notify.danger('Kunne ikke videresende deg til sak.');
+        }
     }
 
   onClickDeleteButton(event: SyntheticInputEvent<HTMLButtonElement>) {
@@ -205,7 +208,7 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
         .deleteCase(case_id)
         .then(() => {
           console.log('Delete successful!');
-          this.cases.filter(e => e.case_id !== case_id);
+          this.cases = this.cases.filter(e => e.case_id !== case_id);
         })
         .catch((err: Error) => {
           console.log('Could not delete case with id ' + case_id + ': ', err);
@@ -214,7 +217,6 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
     } else {
       console.log('Did not find case_id to delete.');
     }
-  }
 
   onClickSubscribeButton(event: SyntheticInputEvent<HTMLButtonElement>) {
     console.log('Clicked subscribe button!');
@@ -227,7 +229,7 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
         sub
           .deleteCaseSubscription(c.case_id, ToolService.getUserId())
           .then(() => {
-            this.subscriptions.filter(f => f.case_id !== c.case_id);
+            this.subscriptions = this.subscriptions.filter(e => e.case_id !== c.case_id);
             //console.log("Unsubscribed, returned: ", e);
           })
           .catch((err: Error) => {
@@ -251,7 +253,6 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
     } else {
       console.log('Did not find case_id to alter subscription.');
     }
-  }
 
 }
 
