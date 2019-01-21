@@ -238,7 +238,7 @@ class NewCase extends Component {
                 ) : null}
               </form>
               <div>
-                <button className={'btn btn-primary mr-2'} onClick={this.submit}>
+                <button className={'btn btn-primary mr-2'} onClick={this.send}>
                   Send sak
                 </button>
                 <NavLink className={'btn btn-secondary'} exact to="/">
@@ -247,13 +247,14 @@ class NewCase extends Component {
               </div>
             </div>
             <div className="col-md-6 embed-responsive">
-              {/*<GoogleApiWrapper
-                centerPos={{ lat: this.case.lat, lng: this.case.lon }}
+
+              <GoogleApiWrapper
+                centerPos={this.case.lat !== undefined && this.case.lon !== undefined ? { lat: this.case.lat, lng: this.case.lon } : { lat: this.lastResortPos.lat, lng: this.lastResortPos.lon }}
                 updatePos={this.updatePos}
-                markerPos={{ lat: this.markerPos.lat, lng: this.markerPos.lon }}
+                markerPos={this.case.lat !== undefined && this.case.lon !== undefined ? { lat: this.case.lat, lng: this.case.lon } : { lat: this.lastResortPos.lat, lng: this.lastResortPos.lon }}
                 isClickable={this.isMapClickable}
                 chosenMuni={this.list2 ? this.municipalities[this.list2.selectedIndex - 1] : null}
-              />*/}
+              />
             </div>
           </div>
         </div>
@@ -281,6 +282,7 @@ class NewCase extends Component {
   }
 
   mounted() {
+
     this.case.user_id = ToolService.getUserId();
     let locationService = new LocationService();
     locationService
@@ -291,6 +293,8 @@ class NewCase extends Component {
         this.case.region_name = location.city;
         this.pos = location;
         this.markerPos = location;
+        console.log(this.case, this.pos);
+
       })
       .then(() => {
         let reg = new RegionService();
@@ -328,9 +332,9 @@ class NewCase extends Component {
         console.warn('FEIL!' + err.toString());
         Notify.danger(
           'Det oppstod en feil under lasting av kategorier. ' +
-            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-            '\n\nFeilmelding: ' +
-            err.toString()
+          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+          '\n\nFeilmelding: ' +
+          err.toString()
         );
       });
     console.log('Fetchng counties.');
@@ -342,9 +346,9 @@ class NewCase extends Component {
         console.warn('FEIL!' + err.toString());
         Notify.danger(
           'Det oppstod en feil under lasting av fylker. ' +
-            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-            '\n\nFeilmelding: ' +
-            err.toString()
+          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+          '\n\nFeilmelding: ' +
+          err.toString()
         );
       });
   }
@@ -364,6 +368,7 @@ class NewCase extends Component {
         break;
     }
   }
+
 
   radioSelector(): number {
     if (this.form) {
@@ -403,6 +408,8 @@ class NewCase extends Component {
       .getLocation()
       .then(e => {
         if (this.pos) {
+          console.log(e);
+
           this.case.lat = e.lat;
           this.case.lon = e.lon;
           this.pos = e;
@@ -480,10 +487,10 @@ class NewCase extends Component {
       let county = event.target;
       console.log(
         'Slected ' +
-          event.target.options[event.target.selectedIndex].text +
-          ' with id = ' +
-          event.target.value +
-          ' as county from drop-down list.'
+        event.target.options[event.target.selectedIndex].text +
+        ' with id = ' +
+        event.target.value +
+        ' as county from drop-down list.'
       );
       this.list2.hidden = false;
       this.fetchMunicipalities(county.value);
@@ -501,10 +508,10 @@ class NewCase extends Component {
         console.log(
           muni,
           'Slected ' +
-            muni.options[muni.selectedIndex].text +
-            ' with id = ' +
-            muni.value +
-            ' as municipality from drop-down list.'
+          muni.options[muni.selectedIndex].text +
+          ' with id = ' +
+          muni.value +
+          ' as municipality from drop-down list.'
         );
       }
       this.lastResortAddress.hidden = false;
@@ -519,10 +526,10 @@ class NewCase extends Component {
     if (this.list1 && this.list1 instanceof HTMLSelectElement) {
       console.log(
         'Fetching municipalities for county: ' +
-          this.list1.options[this.list1.selectedIndex].text +
-          ' (county_id = ' +
-          county_id +
-          ').'
+        this.list1.options[this.list1.selectedIndex].text +
+        ' (county_id = ' +
+        county_id +
+        ').'
       );
       // Fetching logic here
       let reg = new RegionService();
@@ -535,11 +542,11 @@ class NewCase extends Component {
           if (this.list1 instanceof HTMLSelectElement) {
             Notify.danger(
               'Det oppstod en feil under lasting av kommuner fra fylke ' +
-                this.list1.options[this.list1.selectedIndex].text +
-                '. ' +
-                'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-                '\n\nFeilmelding: ' +
-                err.toString()
+              this.list1.options[this.list1.selectedIndex].text +
+              '. ' +
+              'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+              '\n\nFeilmelding: ' +
+              err.toString()
             );
           }
         });
@@ -602,13 +609,21 @@ class NewCase extends Component {
         console.log('Could not get regions.');
         Notify.danger(
           'Kunne ikke hente kommunedata fra server for å sammenlikne med din valgte kommune. \n\nFeilmelding: ' +
-            err.message
+          err.message
         );
         return null;
       });
   }
 
   validate(index: number) {
+    if (!this.form.checkValidity()) {
+      console.log('Basic HTML Form validation failed!');
+      Notify.warning('Vennligst fyll in de påkrevde feltene og prøv igjen.');
+      return false;
+    }
+    
+    console.log('Basic HTML Form validation passed!');
+
     if (this.list1 && this.list2 && this.pos) {
       switch (index) {
         case 0:
@@ -619,12 +634,12 @@ class NewCase extends Component {
           } else {
             Notify.warning(
               'Din automatisk detekterte posisjon (lat: ' +
-                this.pos.lat +
-                ', lon: ' +
-                this.pos.lon +
-                ') finner sted i ' +
-                this.pos.country +
-                ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'
+              this.pos.lat +
+              ', lon: ' +
+              this.pos.lon +
+              ') finner sted i ' +
+              this.pos.country +
+              ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'
             );
             console.log('Automatic position is not valid. this.pos: ', this.pos);
             return false;
@@ -656,7 +671,7 @@ class NewCase extends Component {
                     .catch((err: Error) => {
                       Notify.danger(
                         'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente kommunedata. Vennligst prøv igjen. \n\nFeilmelding: ' +
-                          err.message
+                        err.message
                       );
                       return false;
                     });
@@ -670,19 +685,19 @@ class NewCase extends Component {
               .catch((err: Error) => {
                 Notify.danger(
                   'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente fylkesdata. Vennligst prøv igjen. \n\nFeilmelding: ' +
-                    err.message
+                  err.message
                 );
                 return false;
               });
           } else {
             Notify.warning(
               'Din posisjon (lat: ' +
-                this.pos.lat +
-                ', lon: ' +
-                this.pos.lon +
-                ') finner sted i ' +
-                this.pos.country +
-                ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'
+              this.pos.lat +
+              ', lon: ' +
+              this.pos.lon +
+              ') finner sted i ' +
+              this.pos.country +
+              ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'
             );
             console.log('Automatic position is not valid.');
             return false;
@@ -730,14 +745,13 @@ class NewCase extends Component {
           .catch((err: Error) => {
             Notify.danger(
               'Det oppstod en feil ved sending av saken til oss. Sørg for at alle felter er fyllt ut korrekt. ' +
-                'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
-                err.message
+              'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
+              err.message
             );
             console.warn('Error while transmitting form data to server with error message: ' + err.message);
           });
       } else {
         console.log('Form is not valid.');
-        Notify.warning('');
       }
     } else {
       Notify.warning('En kritisk feil har oppstått. Vennligst last sida på nytt.');
@@ -745,48 +759,62 @@ class NewCase extends Component {
   }
 
   updatePos(newPos) {
-    this.markerPos = { lat: newPos.lat, lon: newPos.lon };
-    this.pos = this.markerPos;
+    this.pos.lon = newPos.lon;
+    this.pos.lat = newPos.lat;
+    this.case.lat = newPos.lat;
+    this.case.lon = newPos.lon;
+    this.case.region_id = undefined;
     console.log('got pos from map:', this.pos);
     let locator = new LocationService();
-    locator
-      .geocodeLatLng(this.pos.lat, this.pos.lon)
+
+    locator.geocodeLatLng(this.pos.lat, this.pos.lon)
       .then(e => {
-        if (this.pos) {
-          this.pos = e;
-          this.markerPos = location;
-        }
+        console.log(e)
+        console.log(e.results[0])
+        console.log(e.results[0].address_components)
+        console.log(e.results[0].address_components[0])
+        console.log(e.results[0].address_components.filter(e => e.types[0] === "administrative_area_level_2"))
+        console.log(e.results[0].address_components.filter(e => e.types[0] === "administrative_area_level_1"))
+        console.log(e)
+        console.log(e)
       })
-      .then(() => {
-        let reg = new RegionService();
-        reg
-          .getAllRegions()
-          .then(e => {
-            let region = e.find(e => e.name === this.pos.city);
-            if (region) {
-              // Region detected by Google Location was found in database
-              this.case.region_id = region.region_id;
-              console.log('This.case.region_id: ' + this.case.region_id + '\nCity/region_name: ' + this.pos.city);
-            } else {
-              // Region detected by Google Location was not found in databse
-              // Proceeding to set this.pos = users home region's GPS position from localStorage object
-              this.case.region_id = JSON.stringify(localStorage.getItem('user')).region_id;
-              console.log('this.case.region_id set to: ' + this.case.region_id);
-            }
-          })
-          .catch((err: Error) => {
-            console.log('Could not load regions from server. Error: ' + err.message);
-            throw new Error(
-              'Klarte ikke å sammenlikne automatisk posisjon med en kommune. \n\nFeilmelding: ' + err.message
-            );
-          });
-      })
-      .catch((err: Error) => {
-        Notify.danger(
-          'Det oppstod en feil ved sammenlikning av valgt posisjon og kommuner i databasen vår. \n\nFeilmelding: ' +
-            err.message
-        );
-      });
+    // locator
+    //   .geocodeLatLng(this.pos.lat, this.pos.lon)
+    //   .then(e => {
+    //     if (this.pos) {
+    //       this.pos = e;
+    //     }
+    //   })
+    //   .then(() => {
+    //     let reg = new RegionService();
+    //     reg
+    //       .getAllRegions()
+    //       .then(e => {
+    //         let region = e.find(e => e.name === this.pos.city);
+    //         if (region) {
+    //           // Region detected by Google Location was found in database
+    //           this.case.region_id = region.region_id;
+    //           console.log('This.case.region_id: ' + this.case.region_id + '\nCity/region_name: ' + this.pos.city);
+    //         } else {
+    //           // Region detected by Google Location was not found in databse
+    //           // Proceeding to set this.pos = users home region's GPS position from localStorage object
+    //           this.case.region_id = JSON.stringify(localStorage.getItem('user')).region_id;
+    //           console.log('this.case.region_id set to: ' + this.case.region_id);
+    //         }
+    //       })
+    //       .catch((err: Error) => {
+    //         console.log('Could not load regions from server. Error: ' + err.message);
+    //         throw new Error(
+    //           'Klarte ikke å sammenlikne automatisk posisjon med en kommune. \n\nFeilmelding: ' + err.message
+    //         );
+    //       });
+    //   })
+    //   .catch((err: Error) => {
+    //     Notify.danger(
+    //       'Det oppstod en feil ved sammenlikning av valgt posisjon og kommuner i databasen vår. \n\nFeilmelding: ' +
+    //       err.message
+    //     );
+    //   });
   }
 }
 
