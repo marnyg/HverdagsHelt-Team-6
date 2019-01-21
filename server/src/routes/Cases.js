@@ -3,6 +3,12 @@
 import { Case, sequelize } from '../models.js';
 import { reqAccessLevel, verifyToken } from '../auth';
 import { Picture } from '../models';
+import { promisify } from 'util';
+import path from "path";
+const fs = require('fs');
+const unlinkAsync = promisify(fs.unlink);
+
+const public_path = path.join(__dirname, '/../../../client/public');
 
 type Request = express$Request;
 type Response = express$Response;
@@ -87,7 +93,7 @@ module.exports = {
       })
         .then(newCase => {
           console.log(newCase.dataValues);
-          if (req.files.length !== 0){
+          if (req.files.length !== 0) {
             Picture.bulkCreate(
               filenames.map(filename => {
                 return {
@@ -101,7 +107,7 @@ module.exports = {
               .catch(error => {
                 return res.status(400).send(error);
               });
-          }else{
+          } else {
             return res.send(newCase);
           }
         })
@@ -176,6 +182,42 @@ module.exports = {
         if (error instanceof TypeError) return res.status(404).send(error.message);
         else return res.status(500).send(error.message);
       });
+  },
+
+  deleteCase: function(req: Request, res: Response) {
+    if (
+      !req.token ||
+      !req.params ||
+      !req.params.case_id ||
+      typeof Number(req.params.case_id) != 'number' ||
+      typeof req.token != 'string'
+    )
+      return res.sendStatus(400);
+
+    let decoded_token = verifyToken(req.token);
+    let token_user_id = Number(decoded_token.user_id);
+    let token_access_level = Number(decoded_token.accesslevel);
+    let params_case_id = Number(req.params.case_id);
+
+    if (token_access_level > 2) {
+      Case.findOne({ where: { case_id: params_case_id } })
+        .then(async cases => {
+          if(!cases) return res.status(404).send({ msg: "Case not found."});
+          if(Number(cases.user_id) !== token_user_id) return res.status(401).send({ msg: "User is unauthorized."});
+
+          let pictures = await Picture.findAll( { where: { case_id: params_case_id } } );
+          let path_array = await pictures.map(p => { return p.path });
+
+          Case.destroy( { where: { case_id: params_case_id } })
+            .then(async result => {
+              console.log(result);
+              await path_array.forEach(p => {
+                unlinkAsync(public_path + p);
+              });
+              return res.status(200).send({ msg: "Case deleted." })
+            }).catch(error => { return res.status(500).send(error)});
+        });
+    }
   },
 
   getAllCasesInRegionByName: async function(req: Request, res: Response) {
