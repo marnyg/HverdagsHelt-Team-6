@@ -1,10 +1,10 @@
 import axios from 'axios';
 import Location from '../classes/Location.js';
 const key = 'AIzaSyBfY2sQ7ZU-o-npnt8Ua5RSdV9-5ZCoriM';
-class LocationService{
-    getLocation(): Promise<Location>{
+class LocationService {
+    getLocation(): Promise<Location> {
         return new Promise((resolve, reject) => {
-            if(navigator.geolocation){
+            if (navigator.geolocation) {
                 this.getLocationCoords()
                     .then(latlng => {
                         this.geocodeLatLng(latlng.lat, latlng.lng)
@@ -12,22 +12,22 @@ class LocationService{
                                 console.log(locationdata);
                                 //console.log('Got location by browser navigator');
                                 //console.log('Line 14: nodata', locationdata.results[0]);
-                                if(locationdata.results){
-                                    if(locationdata.results.length > 0){
+                                if (locationdata.results) {
+                                    if (locationdata.results.length > 0) {
                                         //console.log('found a location!');
                                         //console.log('Line 18: ', location.data);
                                         let lat = locationdata.results[0].geometry.location.lat;
                                         let long = locationdata.results[0].geometry.location.lng;
-                                        let city = locationdata.results[0].address_components[3].long_name;
-                                        let region = locationdata.results[0].address_components[4].long_name;
-                                        let country = locationdata.results[0].address_components[5].long_name;
+                                        let city = locationdata.results[0].address_components.find(e => e.types[0] === "administrative_area_level_2").long_name;
+                                        let region = locationdata.results[0].address_components.find(e => e.types[0] === "administrative_area_level_1").long_name;
+                                        let country = locationdata.results[0].address_components.find(e => e.types[0] === "country").long_name;
                                         console.log(lat, long, city, region, country);
                                         resolve(new Location(lat, long, city, region, country));
                                     } else {
-                                        reject({message: 'Navigator received no results on location query'});
+                                        reject({ message: 'Navigator received no results on location query' });
                                     }
                                 } else {
-                                    reject({message: 'Navigator received no results on location query'});
+                                    reject({ message: 'Navigator received no results on location query' });
                                 }
                             })
                             .catch((error: Error) => {
@@ -73,38 +73,38 @@ class LocationService{
         return axios.get('http://ip-api.com/json');
     }
 
-    getLocationCoords(){
+    getLocationCoords() {
         return new Promise((resolve, reject) => {
-            var location_timeout = setTimeout(() => {reject('GPS timed out')}, 10000);
-            if(navigator.geolocation){
-                navigator.geolocation.getCurrentPosition(function(position) {
+            var location_timeout = setTimeout(() => { reject('GPS timed out') }, 10000);
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
                     clearTimeout(location_timeout);
 
                     var lat = position.coords.latitude;
                     var lng = position.coords.longitude;
 
-                    resolve({lat: lat, lng: lng});
+                    resolve({ lat: lat, lng: lng });
 
-                }, function(error) {
+                }, function (error) {
                     clearTimeout(location_timeout);
                     reject(error);
                 });
             } else {
-                reject({message: 'Navigator is not enabled in the browser'});
+                reject({ message: 'Navigator is not enabled in the browser' });
             }
         });
     }
 
-    geocodeLatLng(lat, lng): Promise<any>{
+    geocodeLatLng(lat, lng): Promise<any> {
         //https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=YOUR_API_KEY
-        return axios.get('https://maps.googleapis.com/maps/api/geocode/json?latlng='+ lat + ',' + lng + '&key=' + key);
+        return axios.get('https://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lng + '&key=' + key);
     }
 
-    geocodeCityCounty(city, county): Promise<any>{
-        return axios.get('https://maps.googleapis.com/maps/api/geocode/json?address='+ city + ',region=' + county + '&key=' + key);
+    geocodeCityCounty(city, county): Promise<any> {
+        return axios.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + city + ',region=' + county + '&key=' + key);
     }
 
-    geolocFail(){
+    geolocFail() {
         console.log('Fail');
     }
 }

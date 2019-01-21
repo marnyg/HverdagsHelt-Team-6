@@ -752,6 +752,8 @@ class NewCase extends Component {
   }
 
   updatePos(newPos) {
+    console.log(this.pos);
+
     this.pos.lon = newPos.lon;
     this.pos.lat = newPos.lat;
     this.case.lat = newPos.lat;
@@ -762,14 +764,40 @@ class NewCase extends Component {
 
     locator.geocodeLatLng(this.pos.lat, this.pos.lon)
       .then(e => {
-        console.log(e)
-        console.log(e.results[0])
-        console.log(e.results[0].address_components)
-        console.log(e.results[0].address_components[0])
-        console.log(e.results[0].address_components.filter(e => e.types[0] === "administrative_area_level_2"))
-        console.log(e.results[0].address_components.filter(e => e.types[0] === "administrative_area_level_1"))
-        console.log(e)
-        console.log(e)
+        console.log(e.results[0]);
+        let city = e.results[0].address_components.find(e => e.types[0] === "administrative_area_level_2").long_name;
+        let region = e.results[0].address_components.find(e => e.types[0] === "administrative_area_level_1").long_name;
+        let country = e.results[0].address_components.find(e => e.types[0] === "country").long_name;
+        let loc = new Location(this.pos.lat, this.pos.lon, city, region, country)
+        this.pos = loc
+      })
+      .then(() => {
+        console.log("nu e DU hæær");
+
+        let reg = new RegionService();
+        reg
+          .getAllRegions()
+          .then(e => {
+            let region = e.find(e => e.name === this.pos.city);
+            if (region) {
+              // Region detected by Google Location was found in database
+              this.case.region_id = region.region_id;
+              console.log('This.case.region_id: ' + this.case.region_id + '\nCity/region_name: ' + this.pos.city);
+            } else {
+              // Region detected by Google Location was not found in database
+              // Proceeding to set this.case_region_id = undefined. This'll enable the validate() method to tell the user that automatic positioning failed
+              this.case.region_id = undefined;
+              Notify.warning(
+                'Vi klarte ikke å plassere din posisjon i en kommune registrert hos oss. Vennligst benytt en annen metode for å sette din posisjon, ellers blir posisjonen satt til din angitte hjemkommune.'
+              );
+            }
+          })
+          .catch((err: Error) => {
+            console.log('Could not load regions from server. Error: ' + err.message);
+            throw new Error(
+              'Klarte ikke å sammenlikne automatisk posisjon med en kommune. \n\nFeilmelding: ' + err.message
+            );
+          });
       })
     // locator
     //   .geocodeLatLng(this.pos.lat, this.pos.lon)
