@@ -267,6 +267,10 @@ app.delete('/api/regions/:region_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, Region.delRegion);
 });
 
+app.get('/api/regions/:region_id/staff', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Region.getRegionStaff);
+});
+
 app.get('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, Region_subscriptions.getAllRegion_subscriptions);
 });
