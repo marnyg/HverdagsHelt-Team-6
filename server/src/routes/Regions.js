@@ -1,6 +1,6 @@
 // @flow
 
-import { Region } from '../models.js';
+import { Region, User } from '../models.js';
 import County from './Counties';
 
 type Request = express$Request;
@@ -80,5 +80,26 @@ module.exports = {
         res.status(409).json(err);
         console.log(err.parent.sqlMessage);
       });
+  },
+
+  getRegionStaff: function(req: Request, res: Response) {
+    if(
+      !req.params ||
+      typeof Number(req.params.region_id) != 'number'
+    ) return res.sendStatus(400);
+
+    const region_id = Number(req.params.region_id);
+    User.findAll(
+      { where: {
+        region_id: region_id,
+        role_id: 2
+        }
+      }
+    )
+      .then(users => { return res.send(users)})
+      .catch(error => {
+        console.log(error);
+        return res.status(500).json(error);
+      })
   }
 };
