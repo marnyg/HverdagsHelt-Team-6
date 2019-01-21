@@ -18,7 +18,6 @@ import CaseItem from './CaseItem';
 
 class Subscriptions extends Component<{ props: { region_id: number }  }> {
     sub_temp = [];
-    reg_temp = [];
     subscriptions = [];
     regions = [];
     regionCases = [];

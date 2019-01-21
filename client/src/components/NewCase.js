@@ -238,7 +238,7 @@ class NewCase extends Component {
                 ) : null}
               </form>
               <div>
-                <button className={'btn btn-primary mr-2'} onClick={this.submit}>
+                <button className={'btn btn-primary mr-2'} onClick={this.send}>
                   Send sak
                 </button>
                 <NavLink className={'btn btn-secondary'} exact to="/">
