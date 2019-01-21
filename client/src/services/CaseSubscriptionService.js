@@ -32,7 +32,7 @@ class CaseSubscriptionService {
   }
 
   //Delete subscription, given case
-  deleteCaseSubscription(case_id: number, user_id: number): Promise<any> {
+  deleteCaseSubscription(case_id: number, user_id: number): Promise<void> {
       return new Promise((resolve, reject) => {
           let loginService = new LoginService();
           loginService.isLoggedIn()

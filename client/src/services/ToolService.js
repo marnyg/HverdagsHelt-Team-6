@@ -1,6 +1,7 @@
 // @flow
 
 import Notify from '../components/Notify';
+import User from '../classes/User';
 
 const statusStyles = [{ color: 'red' }, { color: 'orange' }, { color: 'green' }]; // Constant used for colouring status fields in table.
 const dateMonths = ['jan', 'feb', 'mar', 'apr', 'mai', 'juni', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'];
@@ -29,6 +30,17 @@ class ToolService {
       console.log('User is not logged in!');
       Notify.danger('Du må logge inn for å bruke denne tjenesten!');
       return -1;
+    }
+  }
+  
+  static getUser(): ?User{
+    let userString = localStorage.getItem('user');
+    if (userString) {
+      return JSON.parse(userString);
+    } else {
+      console.log('User is not logged in!');
+      Notify.danger('Du må logge inn for å bruke denne tjenesten!');
+      return null;
     }
   }
 }

@@ -77,7 +77,6 @@ export async function loginOk(email, password) {
   if (!userObj) {
     return null;
   }
-  console.log(userObj);
   let salt = userObj.salt;
   let password_hash = userObj.hashed_password;
   let givenPassword = hashPassword(password, salt);

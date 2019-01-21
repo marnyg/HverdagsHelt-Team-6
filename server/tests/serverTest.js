@@ -32,62 +32,6 @@ describe('GET /api/users', () => {
   });
 });
 
-describe('GET /api/cases', () => {
-  test('200 status code for GET', done => {
-    request(application)
-      .get('/api/cases')
-      .then(response => {
-        expect(response.statusCode).toBe(200);
-        done();
-      });
-  });
-  test('GET method returns a list', done => {
-    request(application)
-      .get('/api/cases')
-      .then(response => {
-        expect(response.body).toBeInstanceOf(Array);
-        done();
-      });
-  });
-});
-
-let caseid;
-describe('POST /api/cases', async () => {
-  let data = {
-    title: 'Glatt vei',
-    description: 'Veldig glatt vei i Oslo',
-    lat: 63.42846459999999,
-    lon: 10.388523800000002,
-    region_id: 1,
-    user_id: 1,
-    category_id: 1,
-    status_id: 1
-  };
-  test('200 status code for POST', function(done) {
-    request(application)
-      .post('/api/cases')
-      .send(data)
-      .then(response => {
-        //console.log(response.body.case_id);
-        caseid = response.body.case_id;
-        expect(response.statusCode).toBe(200);
-        expect(caseid).toBeGreaterThan(10);
-        done();
-      });
-  });
-});
-
-describe('GET /api/cases/user_cases/{user_id}', () => {
-  test('200 status code for GET case with case_id = 1', done => {
-    request(application)
-      .get('/api/cases/user_cases/1')
-      .then(response => {
-        expect(response.statusCode).toBe(200);
-        done();
-      });
-  });
-});
-
 describe('GET /api/cases/:case_id/status_comments', () => {
   test('200 status code for GET comments for case_id = 1', done => {
     request(application)
@@ -116,38 +60,7 @@ describe('POST /api/cases/:case_id/status_comments', () => {
   });
 });
 
-describe('GET /api/cases/{case_id}', () => {
-  test('200 status code for GET with case id = ' + caseid, done => {
-    request(application)
-      .get('/api/cases/user_cases/' + caseid)
-      .then(response => {
-        expect(response.statusCode).toBe(200);
-        done();
-      });
-  });
-});
 
-describe('PUT /api/cases/{case_id}', () => {
-  let data = {
-    title: 'Istapper',
-    description: 'Det er såpeglatt',
-    lat: 63.42846459999999,
-    lon: 10.388523800000002,
-    region_id: 1,
-    user_id: 1,
-    category_id: 1,
-    status_id: 1
-  };
-  test('200 status code for PUT with case_id = ' + caseid, done => {
-    request(application)
-      .put('/api/cases/' + caseid)
-      .send(data)
-      .then(response => {
-        expect(response.statusCode).toBe(200);
-        done();
-      });
-  });
-});
 
 describe('DELETE /api/cases/{case_id}', () => {
   test('200 status code for GET with case_id = ' + caseid, done => {

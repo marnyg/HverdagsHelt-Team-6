@@ -1,8 +1,8 @@
 class Location{
     lat: number;
     lon: number;
-    city: string;
-    region: string;
+    city: string; // Municipality
+    region: string; // County
     country: string;
 
     constructor(lat, lng, city, region, country){
