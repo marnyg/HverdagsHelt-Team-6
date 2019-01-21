@@ -40,59 +40,63 @@ class CaseService {
         });
     }
 
-    //Delete one specific case
-    deleteCase(case_id: number): Promise<void> {
-        //return axios.delete('/api/cases/' + case_id);
-        return new Promise((resolve, reject) => {
-            let loginService = new LoginService();
-            loginService
-                .isLoggedIn()
-                .then((logged_in: Boolean) => {
-                    if (logged_in === true) {
-                        let token = localStorage.getItem('token');
-                        axios
-                            .delete(
-                                '/api/cases' + case_id,
-                                {
-                                    headers: {
-                                        Authorization: 'Bearer ' + token
-                                    }
-                                }
-                            )
-                            .then(response => resolve(response))
-                            .catch((error: Error) => reject(error));
-                    } else {
-                        reject('User is not logged in');
-                    }
-                })
-                .catch((error: Error) => reject(error));
-        });
-    }
+  //Delete one specific case
+  deleteCase(case_id: number): Promise<void> {
+    //return axios.delete('/api/cases/' + case_id);
+    return new Promise((resolve, reject) => {
+      let loginService = new LoginService();
+      loginService
+        .isLoggedIn()
+        .then((logged_in: Boolean) => {
+          if (logged_in === true) {
+            let token = localStorage.getItem('token');
+            axios
+              .delete(
+                '/api/cases/' + case_id,
+                {
+                  headers: {
+                    Authorization: 'Bearer ' + token
+                  }
+                }
+              )
+              .then(response => resolve(response))
+              .catch((error: Error) => reject(error));
+          } else {
+            reject('User is not logged in');
+          }
+        })
+        .catch((error: Error) => reject(error));
+    });
+  }
 
-    //Create case
-    createCase(c: Object, pictures): Promise<Case> {
-        console.log('Case:', c);
-        console.log('Pictures:', pictures);
-        //return axios.post('/api/cases', c);
-        let formData = new FormData();
-        return new Promise((resolve, reject) => {
-            let loginService = new LoginService();
-            loginService
-                .isLoggedIn()
-                .then((logged_in: Boolean) => {
-                    if (logged_in === true) {
-                        let token = localStorage.getItem('token');
-                        pictures.map(e => {
-                                formData.append("images", e.value)
-                            }
-                        );
-
-                        formData.append("title", c.title);
-                        formData.append("description", c.description);
-                        formData.append("lat", c.lat);
-                        formData.append("lon", c.lon);
-                        formData.append("category_id", c.category_id);
-                        formData.append("region_id", c.region_id);
+  //Create case
+  createCase(c: Object, pictures): Promise<Case> {
+      console.log('Case:', c);
+      console.log('Pictures:', pictures);
+    //return axios.post('/api/cases', c);
+    let formData = new FormData();
+    return new Promise((resolve, reject) => {
+      let loginService = new LoginService();
+      loginService
+        .isLoggedIn()
+        .then((logged_in: Boolean) => {
+          if (logged_in === true) {
+            let token = localStorage.getItem('token');
+            if(pictures.length > 0){
+              pictures.map(e => {
+                  formData.append("images", e.value)
+                }
+              );
+            }else{
+              formData.append("images", null)
+            }
+            
+            formData.append("title", c.title);
+            formData.append("description", c.description);
+            formData.append("lat", c.lat);
+            formData.append("lon", c.lon);
+            formData.append("category_id", c.category_id);
+            formData.append("region_id", c.region_id);
 
                         let title = c.title;
                         axios

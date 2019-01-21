@@ -6,9 +6,10 @@ import { Route } from 'react-router-dom';
 import CaseList from './CaseList.js';
 import MyProfile from './MyProfile';
 import NewCase from './NewCase';
-import MyRegions from './MyRegions'
+import MyRegions from './MyRegions';
 import { NavLink } from 'react-router-dom';
 import DisplayProfile from './DisplayProfile.js';
+import Statistics from './Statistics.js';
 
 class MyPage extends Component {
   menuItems = [
@@ -21,6 +22,7 @@ class MyPage extends Component {
   comp = <MyProfile />;
   render() {
     return (
+      <div>
         <div>
             <div>
                 <ul className={'nav nav-tabs bg-light pl-3'}>
@@ -66,6 +68,10 @@ class MyPage extends Component {
                 </div>
             </div>
         </div>
+        <div>
+          <div className={'w-100 py-5 px-2'}>{this.element.component}</div>
+        </div>
+      </div>
     );
   }
 }

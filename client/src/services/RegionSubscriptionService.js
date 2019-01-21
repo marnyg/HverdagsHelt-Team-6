@@ -102,7 +102,7 @@ class RegionSubscriptionService {
     });
   }
 
-  getSubscribedRegionsForUser(user_id: number): Promise<User[]> {
+  getSubscribedRegionsForUser(user_id: number): Promise<RegionSubscription[]> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
       loginService
