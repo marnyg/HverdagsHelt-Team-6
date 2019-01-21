@@ -187,7 +187,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   Oppdater
                 </button>
                 {(this.case.status_id === STATUS_OPEN && this.isOwner(this.case)) || privilege === ADMIN ? (
-                  <button className={'btn btn-danger mr-2'} onClick={this.submit}>
+                  <button className={'btn btn-danger mr-2'} onClick={this.delete}>
                     Slett
                   </button>
                 ) : null}
@@ -200,7 +200,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   <div key={e.src} className="col-md-3">
                     <div className="card">
                       <img src={e.src} alt={e.src} className="card-img-top" />
-                      {privilege < OWNER_NOT_EMPLOYEE  ||
+                      {privilege < OWNER_NOT_EMPLOYEE ||
                       !(this.case.status_id !== STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE) ? (
                         <div className="card-img-overlay">
                           <button
@@ -536,9 +536,61 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       });
   }
 
-  submit() {
+  validate() {
+    let privilege = this.grantAccess();
+    if ((this.case.status_id === STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE) || privilege <= EMPLOYEE) {
+      if (this.form.checkValidity()) {
+        console.log('Passed basic HTML form validation.');
+        return true;
+      } else {
+        console.log('Failed basic HTML form validation.');
+        Notify.warning('Vennligst fyll inn de påkrevde feltene.');
+        return false;
+      }
+    } else {
+      console.log('Case can no longer be updated by owner.');
+      return false;
+    }
+  }
+
+  submit(event: SyntheticEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    let privilege = this.grantAccess();
     console.log('Clicked submit! this.case:', this.case);
     console.log('this.statusComment: ', this.statusComment);
+    if (this.validate()) {
+      let cas = new CaseService();
+      cas
+        .updateCase(this.case.case_id, this.case)
+        .then(() => {
+          console.log("Case " + this.case.case_id + " was updated.");
+          if(this.case.img.length > 0){
+            // Pictures are present
+            console.log("Images are present. Proceeding to update images.");
+          }
+        }).then(() => {
+          if(privilege <= EMPLOYEE){
+            // Upload status comment
+            let statcom = new StatusCommentService();
+            statcom.createStatusComment(this.statusComment).then(() => {
+              console.log("HURRDURR HURHURHURRDURR");
+            }).catch((err: Error) => {
+              console.log('Uploading status comment failed for case ' + this.case.case_id + '. Error: ', err);
+              Notify.danger(
+                'Feil ved opplasting av statuskommentar. Saken har blitt oppdatert, men kommentaren din har ikke blitt lagret. \n\nFeilmelding: ' +
+                err.message
+              );
+            });
+          }
+        })
+        .catch((err: Error) => {
+          console.log('Updating case ' + this.case.case_id + ' failed. Error: ', err);
+          Notify.danger(
+            'Feil ved opplasting av oppdatert informasjon. Din sak har ikke blitt oppdatert. \n\nFeilmelding: ' +
+              err.message
+          );
+        });
+    }
   }
 }
 
