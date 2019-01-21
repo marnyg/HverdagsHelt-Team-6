@@ -179,15 +179,15 @@ User.belongsTo(Region, { foreignKey: { name: 'region_id', allowNull: false } });
 Status_comment.belongsTo(Case, { foreignKey: { name: 'case_id', allowNull: false } });
 Status_comment.belongsTo(Status, { foreignKey: { name: 'status_id', allowNull: false } });
 Status_comment.belongsTo(User, { foreignKey: { name: 'user_id', allowNull: false } });
-Picture.belongsTo(Case, { foreignKey: { name: 'case_id', allowNull: false } });
+Picture.belongsTo(Case, { foreignKey: { name: 'case_id', allowNull: false }, onDelete: 'CASCADE' });
 Case.belongsTo(Region, { foreignKey: { name: 'region_id', allowNull: false } });
 Case.belongsTo(User, { foreignKey: { name: 'user_id', allowNull: false } });
 Case.belongsTo(Category, { foreignKey: { name: 'category_id', allowNull: false } });
 Case.belongsTo(Status, { foreignKey: { name: 'status_id', allowNull: false } });
 Region_subscriptions.belongsTo(User, { foreignKey: { name: 'user_id', allowNull: false } });
 Region_subscriptions.belongsTo(Region, { foreignKey: { name: 'region_id', allowNull: false } });
-Case_subscriptions.belongsTo(User, { foreignKey: { name: 'user_id', allowNull: false } });
-Case_subscriptions.belongsTo(Case, { foreignKey: { name: 'case_id', allowNull: false } });
+Case_subscriptions.belongsTo(User, { foreignKey: { name: 'user_id', allowNull: false }, onDelete: 'CASCADE' });
+Case_subscriptions.belongsTo(Case, { foreignKey: { name: 'case_id', allowNull: false }, onDelete: 'CASCADE' });
 
 // Drop tables and create test data when not in production environment
 let production = process.env.NODE_ENV === 'production';
