@@ -139,7 +139,7 @@ class RegisterModal extends Component {
     submit(event){
         console.log('Is ' + this.email + ' a valid email?: ', this.validate_email(this.email));
         //user_id, role_id, region_id, firstname, lastname, tlf, email, hash_password, salt){
-        /*
+
         let user = new User(null, null, Number(this.region_id), this.fn, this.ln, Number(this.phone), this.email, this.password1);
 
         if(this.notBlank(user)){
@@ -170,7 +170,6 @@ class RegisterModal extends Component {
             // One or more required fields have not been filled
             alert('Du må fylle ut alle feltene for å kunne registrere deg.');
         }
-        */
     }
 
     validate_passwords(pw1, pw2){

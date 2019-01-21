@@ -15,7 +15,7 @@ class LoginModal extends Component {
     }
     render() {
         return (
-            <div className="modal fade" id="login-modal" tabIndex="-1" role="dialog"
+            <div className="modal fade" id={this.props.modal_id} tabIndex="-1" role="dialog"
                  aria-labelledby="myModalLabel" aria-hidden="true">
                 <div className="modal-dialog">
                     <div className="loginmodal-container modal-content">
@@ -56,7 +56,7 @@ class LoginModal extends Component {
             userService.login(this.email, this.password)
                 .then((user: User) => {
                     //document.getElementsByClassName("loading")[0].style.display = "none";
-                    $('#login-modal').modal('hide');
+                    $('#' + this.props.modal_id).modal('hide');
                     //this.props.history.push('/');
                     this.props.onLogin();
                 })
