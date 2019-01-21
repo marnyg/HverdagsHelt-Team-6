@@ -99,7 +99,8 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               </tbody>
             </table>
             <p>{this.case.description}</p>
-            {privilege < NOT_OWNER_NOT_EMPLOYEE ? (
+            {privilege < OWNER_NOT_EMPLOYEE ||
+            !(this.case.status_id !== STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE) ? (
               <section>
                 <h2>Rediger sak</h2>
                 <div className={'form-group'}>
@@ -185,7 +186,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                 <button className={'btn btn-primary mr-2'} onClick={this.submit}>
                   Oppdater
                 </button>
-                {this.case.status_id === STATUS_OPEN && this.isOwner(this.case) || privilege === ADMIN ? (
+                {(this.case.status_id === STATUS_OPEN && this.isOwner(this.case)) || privilege === ADMIN ? (
                   <button className={'btn btn-danger mr-2'} onClick={this.submit}>
                     Slett
                   </button>
@@ -199,7 +200,8 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   <div key={e.src} className="col-md-3">
                     <div className="card">
                       <img src={e.src} alt={e.src} className="card-img-top" />
-                      {privilege < NOT_OWNER_NOT_EMPLOYEE ? (
+                      {privilege < OWNER_NOT_EMPLOYEE  ||
+                      !(this.case.status_id !== STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE) ? (
                         <div className="card-img-overlay">
                           <button
                             className={'btn btn-danger img-overlay float-right align-text-bottom'}
