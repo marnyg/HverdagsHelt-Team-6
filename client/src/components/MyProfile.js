@@ -18,7 +18,11 @@ class MyProfile extends Component {
     if (this.user == null) {
       return <div>404</div>;
     }
-    return <div>{this.currentComponent}</div>;
+    return (
+        <div style={{'max-width': '400px'}} className={'mx-3'}>
+            {this.currentComponent}
+        </div>
+    );
   }
 
   setComponent(e, comp) {
