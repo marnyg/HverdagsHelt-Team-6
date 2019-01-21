@@ -9,6 +9,7 @@ import CaseService from '../services/CaseService';
 import StatusService from '../services/StatusService';
 import StatusCommentService from '../services/StatusCommentService';
 import CaseSubscriptionService from '../services/CaseSubscriptionService';
+import LoginService from '../services/LoginService';
 import Notify from './Notify';
 import ImageModal from './ImageModal';
 import GoogleApiWrapper from './GoogleApiWrapper';
@@ -16,16 +17,24 @@ import Case from '../classes/Case';
 import Category from '../classes/Category';
 import Status from '../classes/Status';
 import StatusComment from '../classes/StatusComment';
+import Location from '../classes/Location';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons/index';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Picture from '../classes/Picture';
 import ToolService from '../services/ToolService';
+import CaseSubscription from '../classes/CaseSubscription';
 
 const MAX_NUMBER_IMG: number = 3; // Maximum number of images allowed in a single case.
-const NOT_OWNER_NOT_EMPLOYEE: number = 3;
-const OWNER_NOT_EMPLOYEE: number = 2;
-const EMPLOYEE: number = 1;
+
+// Privilege levels
+const NOT_USER: number = 5;
+const NOT_OWNER_NOT_EMPLOYEE: number = 4;
+const OWNER_NOT_EMPLOYEE: number = 3;
+const EMPLOYEE: number = 2;
+const ADMIN: number = 1;
+
 const EMPLOYEE_ACCESS_LEVEL: number = 2;
+const ADMIN_ACCESS_LEVEL: number = 1;
 const MAX_DESCRIPTION_LENGTH: number = 255;
 const STATUS_OPEN: number = 1;
 const COMMENTS_PER_QUERY = 5;
@@ -33,6 +42,7 @@ const COMMENTS_PER_QUERY = 5;
 class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   case: Case = null;
   statusComment: StatusComment = new StatusComment();
+  pos: Location = null;
   offset: number = 0;
   deletedImages: string[] = [];
   statuses: Status[] = [];
@@ -47,88 +57,118 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       return null;
     }
 
-    switch (this.grantAccess()) {
-      case EMPLOYEE:
-        // Employee, full access. May not edit case description or title.
-        console.log('USER IS EMPLOYEE OR HIGHER');
-        return (
-          <div className={'modal-body row'}>
-            <div className={'col-md-6'}>
-              <form
-                ref={e => {
-                  this.form = e;
-                }}
-              >
-                <h1>{this.case.title}</h1>
-                <table className={'table'}>
-                  <tbody>
-                    <tr>
-                      <td>Status</td>
-                      <td style={ToolService.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
-                    </tr>
-                    <tr>
-                      <td>Kategori</td>
-                      <td>{this.case.category_name}</td>
-                    </tr>
-                    <tr>
-                      <td>Sak sendt av</td>
-                      <td>{this.case.createdBy}</td>
-                    </tr>
-                    <tr>
-                      <td>Sak opprettet</td>
-                      <td>{ToolService.dateFormat(this.case.createdAt)}</td>
-                    </tr>
-                    <tr>
-                      <td>Sist oppdatert</td>
-                      <td>{ToolService.dateFormat(this.case.updatedAt)}</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <p>{this.case.description}</p>
+    let privilege = this.grantAccess();
+
+    return (
+      <div className={'modal-body row'}>
+        <div className={'col-md-6'}>
+          <form
+            ref={e => {
+              this.form = e;
+            }}
+          >
+            <h1>{this.case.title}</h1>
+            <table className={'table'}>
+              <tbody>
+                <tr>
+                  <td>Status</td>
+                  <td style={ToolService.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
+                </tr>
+                <tr>
+                  <td>Sted</td>
+                  <td>
+                    {this.case.region_name} ({this.case.county_name})
+                  </td>
+                </tr>
+                <tr>
+                  <td>Kategori</td>
+                  <td>{this.case.category_name}</td>
+                </tr>
+                <tr>
+                  <td>Sak sendt av</td>
+                  <td>{this.case.createdBy}</td>
+                </tr>
+                <tr>
+                  <td>Sak opprettet</td>
+                  <td>{ToolService.dateFormat(this.case.createdAt)}</td>
+                </tr>
+                <tr>
+                  <td>Sist oppdatert</td>
+                  <td>{ToolService.dateFormat(this.case.updatedAt)}</td>
+                </tr>
+              </tbody>
+            </table>
+            <p>{this.case.description}</p>
+            {privilege < NOT_OWNER_NOT_EMPLOYEE ? (
+              <section>
                 <h2>Rediger sak</h2>
-                <h3>Sett kategori</h3>
-                <select
-                  defaultValue={this.getInitialCategory()}
-                  onChange={this.categoryListener}
-                  className={'form-control'}
-                  id={'category'}
-                  required
-                >
-                  {this.categories.map(e => (
-                    <option key={e.category_id} value={e.category_id}>
-                      {' '}
-                      {e.name}{' '}
-                    </option>
-                  ))}
-                </select>
-                <h3>Sett saksstatus</h3>
-                <select
-                  defaultValue={this.getInitialStatus()}
-                  onChange={this.statusListener}
-                  className={'form-control'}
-                  id={'category'}
-                  required
-                >
-                  {this.statuses.map(e => (
-                    <option key={e.status_id} value={e.status_id}>
-                      {' '}
-                      {e.name}{' '}
-                    </option>
-                  ))}
-                </select>
                 <div className={'form-group'}>
-                  <label htmlFor="description">Melding</label>
-                  <textarea
-                    className={'message'}
-                    id={'message'}
-                    maxLength={255}
-                    minLength={2}
-                    placeholder="Melding"
-                    value={this.statusComment.comment}
-                    onChange={this.textareaListener}
+                  <label htmlFor="category">Kategori</label>
+                  <select
+                    defaultValue={this.getInitialCategory()}
+                    onChange={this.categoryListener}
+                    className={'form-control'}
+                    id={'category'}
                     required
-                  />
+                  >
+                    {this.categories.map(e => (
+                      <option key={e.category_id} value={e.category_id}>
+                        {' '}
+                        {e.name}{' '}
+                      </option>
+                    ))}
+                  </select>
                 </div>
+                {privilege === EMPLOYEE ? (
+                  <div className={'form-group'}>
+                    <label htmlFor="status">Saksstatus</label>
+                    <select
+                      defaultValue={this.getInitialStatus()}
+                      onChange={this.statusListener}
+                      className={'form-control'}
+                      id={'status'}
+                      required
+                    >
+                      {this.statuses.map(e => (
+                        <option key={e.status_id} value={e.status_id}>
+                          {' '}
+                          {e.name}{' '}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ) : null}
+                {privilege === OWNER_NOT_EMPLOYEE || privilege === ADMIN ? (
+                  <div className={'form-group'}>
+                    <label htmlFor="description">Beskrivelse</label>
+                    <textarea
+                      className={'form-control'}
+                      id={'description'}
+                      maxLength={MAX_DESCRIPTION_LENGTH}
+                      placeholder="Gi din sak en beskrivende tittel, så blir det enklere for oss å hjelpe deg."
+                      value={this.case.description}
+                      onChange={this.textareaListener}
+                    />
+                    {this.case.description
+                      ? this.case.description.length + ' av ' + MAX_DESCRIPTION_LENGTH + ' tegn brukt.'
+                      : null}
+                  </div>
+                ) : null}
+                {privilege <= EMPLOYEE ? (
+                  <div className={'form-group'}>
+                    <label htmlFor="description">Melding</label>
+                    <textarea
+                      className={'form-control'}
+                      id={'message'}
+                      maxLength={255}
+                      minLength={2}
+                      placeholder="Melding om sak"
+                      value={this.statusComment.comment}
+                      onChange={this.textareaListener}
+                      required
+                    />
+                  </div>
+                ) : null}
                 {this.case.img.length < MAX_NUMBER_IMG ? (
                   <div className={'form-group'}>
                     <label htmlFor={'image-input'}>Legg ved bilder</label>
@@ -138,288 +178,76 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                       type={'file'}
                       accept={'.png, .jpg, .jpeg'}
                       onChange={this.fileInputListener}
+                      multiple
                     />
                   </div>
                 ) : null}
-                <div className="container my-5">
-                  <div className="row">
-                    {this.case.img.map(e => (
-                      <div key={e.src} className="col-md-3">
-                        <div className="card">
-                          <img src={e.src} alt={e.src} className="card-img-top"/>
-                          <div className="card-img-overlay">
-                            <button
-                              className={'btn btn-danger img-overlay float-right align-text-bottom'}
-                              onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
-                            >
-                              <FontAwesomeIcon icon={faTrashAlt} />
-                            </button>
-                          </div>
+                <button className={'btn btn-primary mr-2'} onClick={this.submit}>
+                  Oppdater
+                </button>
+                {this.case.status_id === STATUS_OPEN && this.isOwner(this.case) || privilege === ADMIN ? (
+                  <button className={'btn btn-danger mr-2'} onClick={this.submit}>
+                    Slett
+                  </button>
+                ) : null}
+              </section>
+            ) : null}
+
+            <div className="container my-5">
+              <div className="row">
+                {this.case.img.map(e => (
+                  <div key={e.src} className="col-md-3">
+                    <div className="card">
+                      <img src={e.src} alt={e.src} className="card-img-top" />
+                      {privilege < NOT_OWNER_NOT_EMPLOYEE ? (
+                        <div className="card-img-overlay">
+                          <button
+                            className={'btn btn-danger img-overlay float-right align-text-bottom'}
+                            onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
+                          >
+                            <FontAwesomeIcon icon={faTrashAlt} />
+                          </button>
                         </div>
-                      </div>
-                    ))}
+                      ) : null}
+                    </div>
                   </div>
-                </div>
-              </form>
-              <button className={'btn btn-primary mr-2'} onClick={this.submit}>
-                Oppdater
-              </button>
-              <div className={'col-md-6 embed-responsive'}>
-                {/*<GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.case.lat, lng: this.case.lon }} /> */}
+                ))}
               </div>
             </div>
-            <div className={'col-md-6'}>
-              <h2>Statusmeldinger</h2>
-              <p id={'noComments'} style={{ color: '#666' }} hidden>
-                Ingen har kommentert enda.
-              </p>
-              <ul className={'list-group'}>
-                {this.statusMessages.map(e => (
-                  <li className={'list-group-item'} key={e.status_comment_id}>
-                    <div>
-                      <h4>{e.createdBy}</h4>
-                      <p>{ToolService.dateFormat(e.createdAt)}</p>
-                      <p>{e.comment}</p>
-                      <p style={ToolService.getStatusColour(e.status_id)}>{e.status_name}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <button
-                ref={e => {
-                  this.fetchButton = e;
-                }}
-                className={'btn btn-secondary'}
-                onClick={this.fetchStatusComments}
-              >
-                Hent mer
-              </button>
-            </div>
+          </form>
+          <div className={'col-md-6 embed-responsive'}>
+            {/*<GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.case.lat, lng: this.case.lon }} /> */}
           </div>
-        );
-      case OWNER_NOT_EMPLOYEE:
-        // View case as owner, not employee. Cannot send status comment, but can edit case given that status is open/not processing/not closed.
-        console.log('USER IS OWNER OF CASE');
-        return (
-          <div className={'modal-body row'}>
-            <div className={'col-md-6'}>
-              <form
-                ref={e => {
-                  this.form = e;
-                }}
-              >
-                <h1>{this.case.title}</h1>
-                <table className={'table'}>
-                  <tbody>
-                    <tr>
-                      <td>Status</td>
-                      <td style={ToolService.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
-                    </tr>
-                    <tr>
-                      <td>Kategori</td>
-                      <td>{this.case.category_name}</td>
-                    </tr>
-                    <tr>
-                      <td>Sak sendt av</td>
-                      <td>{this.case.createdBy}</td>
-                    </tr>
-                    <tr>
-                      <td>Sak opprettet</td>
-                      <td>{ToolService.dateFormat(this.case.createdAt)}</td>
-                    </tr>
-                    <tr>
-                      <td>Sist oppdatert</td>
-                      <td>{ToolService.dateFormat(this.case.updatedAt)}</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <p>{this.case.description}</p>
-                <h2>Rediger sak</h2>
-                <h3>Sett kategori</h3>
-                <select
-                  defaultValue={this.getInitialCategory()}
-                  onChange={this.categoryListener}
-                  className={'form-control'}
-                  id={'category'}
-                  required
-                >
-                  {this.categories.map(e => (
-                    <option key={e.category_id} value={e.category_id}>
-                      {' '}
-                      {e.name}{' '}
-                    </option>
-                  ))}
-                </select>
-                <div className={'form-group'}>
-                  <label htmlFor="description">Beskrivelse</label>
-                  <textarea
-                    className={'form-control'}
-                    id={'description'}
-                    maxLength={MAX_DESCRIPTION_LENGTH}
-                    placeholder="Gi din sak en beskrivende tittel, så blir det enklere for oss å hjelpe deg."
-                    value={this.case.description}
-                    onChange={this.textareaListener}
-                  />
-                  {this.case.description
-                    ? this.case.description.length + ' av ' + MAX_DESCRIPTION_LENGTH + ' tegn brukt.'
-                    : null}
+        </div>
+        <div className={'col-md-6'}>
+          <h2>Statusmeldinger</h2>
+          <p id={'noComments'} style={{ color: '#666' }} hidden>
+            Ingen har kommentert enda.
+          </p>
+          <ul className={'list-group'}>
+            {this.statusMessages.map(e => (
+              <li className={'list-group-item'} key={e.status_comment_id}>
+                <div>
+                  <h4>{e.createdBy}</h4>
+                  <p>{ToolService.dateFormat(e.createdAt)}</p>
+                  <p>{e.comment}</p>
+                  <p style={ToolService.getStatusColour(e.status_id)}>{e.status_name}</p>
                 </div>
-                {this.case.img.length < MAX_NUMBER_IMG ? (
-                  <div className={'form-group'}>
-                    <label htmlFor={'image-input'}>Legg ved bilder</label>
-                    <input
-                      className={'form-control-file'}
-                      id={'image-input'}
-                      type={'file'}
-                      accept={'.png, .jpg, .jpeg'}
-                      onChange={this.fileInputListener}
-                    />
-                  </div>
-                ) : null}
-                <div className="container my-5">
-                  <div className="row">
-                    {this.case.img.map(e => (
-                      <div key={e.src} className="col-md-3">
-                        <div className="card">
-                          <img src={e.src} alt={e.src} className="card-img-top" />
-                          <div className="card-img-overlay">
-                            <button
-                              className={'btn btn-danger img-overlay float-right align-text-bottom'}
-                              onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
-                            >
-                              <FontAwesomeIcon icon={faTrashAlt} />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </form>
-              <div className={'col-md-6 embed-responsive'}>
-                {/* <GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.case.lat, lng: this.case.lon }} />
-              */}</div>
-              <button className={'btn btn-primary mr-2'} onClick={this.submit}>
-                Oppdater
-              </button>
-              {this.isOwner(this.case) && this.case.status_id === STATUS_OPEN ? (
-                <button className={'btn btn-danger mr-2'} onClick={this.delete}>
-                  Slett
-                </button>
-              ) : null}
-            </div>
-            <div className={'col-md-6'}>
-              <h2>Statusmeldinger</h2>
-              <p id={'noComments'} style={{ color: '#666' }} hidden>
-                Ingen har kommentert enda.
-              </p>
-              <ul className={'list-group'}>
-                {this.statusMessages.map(e => (
-                  <li className={'list-group-item'} key={e.status_comment_id}>
-                    <div>
-                      <h4>{e.createdBy}</h4>
-                      <p>{ToolService.dateFormat(e.createdAt)}</p>
-                      <p>{e.comment}</p>
-                      <p style={ToolService.getStatusColour(e.status_id)}>{e.status_name}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <button
-                ref={e => {
-                  this.fetchButton = e;
-                }}
-                className={'btn btn-secondary'}
-                onClick={this.fetchStatusComments}
-              >
-                Hent mer
-              </button>
-            </div>
-          </div>
-        );
-      case NOT_OWNER_NOT_EMPLOYEE:
-        // Only view/read access.
-        console.log('UNAUTHORIZED USER. MAY ONLY VIEW CASE.');
-        return (
-          <div className={'modal-body row'}>
-            <div className={'col-md-6'}>
-              <form
-                ref={e => {
-                  this.form = e;
-                }}
-              >
-                <h1>{this.case.title}</h1>
-                <table className={'table'}>
-                  <tbody>
-                    <tr>
-                      <td>Status</td>
-                      <td style={ToolService.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
-                    </tr>
-                    <tr>
-                      <td>Kategori</td>
-                      <td>{this.case.category_name}</td>
-                    </tr>
-                    <tr>
-                      <td>Sak sendt av</td>
-                      <td>{this.case.createdBy}</td>
-                    </tr>
-                    <tr>
-                      <td>Sak opprettet</td>
-                      <td>{ToolService.dateFormat(this.case.createdAt)}</td>
-                    </tr>
-                    <tr>
-                      <td>Sist oppdatert</td>
-                      <td>{ToolService.dateFormat(this.case.updatedAt)}</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <p>{this.case.description}</p>
-                <div className="container my-5">
-                  <div className="row">
-                    {this.case.img.map(e => (
-                      <div key={e.src} className="col-md-3">
-                        <div className="card">
-                          <img src={e.src} alt={e.src} className="card-img-top"/>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </form>
-              <div className={'col-md-6 embed-responsive'}>
-                {/*<GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.case.lat, lng: this.case.lon }} />
-              */}</div>
-            </div>
-            <div className={'col-md-6'}>
-              <h2>Statusmeldinger</h2>
-              <p id={'noComments'} style={{ color: '#666' }} hidden>
-                Ingen har kommentert enda.
-              </p>
-              <ul className={'list-group'}>
-                {this.statusMessages.map(e => (
-                  <li className={'list-group-item'} key={e.status_comment_id}>
-                    <div>
-                      <h4>{e.createdBy}</h4>
-                      <p>{ToolService.dateFormat(e.createdAt)}</p>
-                      <p>{e.comment}</p>
-                      <p style={ToolService.getStatusColour(e.status_id)}>{e.status_name}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <button
-                ref={e => {
-                  this.fetchButton = e;
-                }}
-                className={'btn btn-secondary'}
-                onClick={this.fetchStatusComments}
-              >
-                Hent mer
-              </button>
-            </div>
-          </div>
-        );
-    }
+              </li>
+            ))}
+          </ul>
+          <button
+            ref={e => {
+              this.fetchButton = e;
+            }}
+            className={'btn btn-secondary'}
+            onClick={this.fetchStatusComments}
+          >
+            Hent mer
+          </button>
+        </div>
+      </div>
+    );
   }
 
   mounted() {
@@ -457,15 +285,14 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           let statusCommentPoster: number;
           if (userObj) {
             statusCommentPoster = JSON.parse(userObj).user_id;
-          } else {
-            alert('HEI!');
+            this.statusComment = {
+              case_id: this.case.case_id,
+              status_id: this.case.status_id,
+              user_id: statusCommentPoster,
+              comment: ''
+            };
           }
-          this.statusComment = {
-            case_id: this.case.case_id,
-            status_id: this.case.status_id,
-            user_id: statusCommentPoster,
-            comment: ''
-          };
+          this.pos = new Location(a.lat, a.lon, a.region_name, a.county_name, 'Norway');
         } else {
           console.log('Case object was not returned encapsulated in an array. Using this.case = Case[0].');
           Notify.danger('Saken ble hentet i et ukjent format.');
@@ -499,6 +326,28 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             );
           });
       })
+      .then(() => {
+        let login = new LoginService();
+        login
+          .isLoggedIn()
+          .then(e => {
+            if (e) {
+              // TODO Sjekk om vi kan sende notify by email som null/undefined slik at vi slipper å spørre om tilstanden til ett subscriptionobjekt
+              let sub: CaseSubscription = new CaseSubscription(ToolService.getUserId(), this.case.case_id, false, true);
+              cassub
+                .updateCaseSubscription(sub)
+                .then(() => {
+                  console.log('Case with id ' + this.case.case_id + ' has been set up to date.');
+                })
+                .catch((err: Error) => {
+                  console.log('Could not set CaseSubscription is_up_to_date.');
+                });
+            }
+          })
+          .catch((err: Error) => {
+            console.log('User is not logged in. No need to set subscription state.');
+          });
+      })
       .catch((err: Error) => {
         console.log('Could not load case with id ' + this.props.match.params.case_id);
         Notify.danger(
@@ -516,7 +365,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       let user: Object = JSON.parse(userObj);
       console.log('User ' + user.firstname + ' ' + user.lastname + ' has privilege ' + user.access_level);
       console.log('user.user_id: ' + user.user_id + ', this.case.user_id: ' + this.case.user_id);
-      if (user.access_level <= EMPLOYEE_ACCESS_LEVEL && user.region_id === this.case.region_id) {
+      if (user.access_level === ADMIN_ACCESS_LEVEL) {
+        // User is Administrator, has full access
+        return ADMIN;
+      } else if (user.access_level === EMPLOYEE_ACCESS_LEVEL && user.region_id === this.case.region_id) {
         // User is a municipality employee or higher. May edit case.
         return EMPLOYEE;
       } else if (this.case.user_id === user.user_id) {
@@ -526,6 +378,9 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
         // User is not authorized to edit case.
         return NOT_OWNER_NOT_EMPLOYEE;
       }
+    } else {
+      // User is not logged. Has the least privileges possible.
+      return NOT_USER;
     }
   }
 

@@ -47,7 +47,7 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
             {this.cases.map(c => (
               <tr key={c.case_id} style={{ cursor: 'pointer' }}>
                 <td onClick={this.onClickTableRow}>{c.title.trim()}</td>
-                <td onClick={this.onClickTableRow} style={this.getStatusColour(c.status_id)}>
+                <td onClick={this.onClickTableRow} style={ToolService.getStatusColour(c.status_id)}>
                   {c.status_name}
                 </td>
                 <td onClick={this.onClickTableRow}>{c.region_name}</td>
@@ -66,7 +66,7 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
             ))}
           </tbody>
         </table>
-        { this.cases.length === 0 ? <p>Vi fant ingen saker for deg.</p> : null }
+        {this.cases.length === 0 ? <p>Vi fant ingen saker for deg.</p> : null}
         <button
           ref={e => {
             this.fetchButton = e;
@@ -107,7 +107,7 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
               err.message
           );
           console.log(
-            'Error when fetching cases for user with id ' + this.props.user_id + '.\nError message is: ' + err.message
+            'Error when fetching cases for user with id ' + this.props.user_id.toString() + '.\nError message is: ' + err.message
           );
         });
     } else if (this.props.region_id) {
@@ -128,7 +128,7 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
           );
           console.log(
             'Error when fetching cases for region with id ' +
-              this.props.region_id +
+              this.props.region_id.toString() +
               '.\nError message is: ' +
               err.message
           );
@@ -243,7 +243,7 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
         sub
           .createCaseSubscription(s)
           .then(e => {
-            console.log("Subscribed, returned: ", e);
+            console.log('Subscribed, returned: ', e);
             this.subscriptions.push(e);
           })
           .catch((err: Error) => {
@@ -255,7 +255,6 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
       console.log('Did not find case_id to alter subscription.');
     }
   }
-
 }
 
 export default withRouter(CaseList);
