@@ -1,10 +1,18 @@
 // @flow
 
-import { Case, Status_comment, User, sequelize } from '../models';
+import {Case, Status_comment, User, sequelize, Case_subscriptions} from '../models';
 import { verifyToken } from '../auth';
+import { send_subs_email} from '../utils/Epost.js';
 
 type Request = express$Request;
 type Response = express$Response;
+
+const email_subject = 'Oppdatering på sak!';
+const email_body = `Det har kommet en oppdatering på saken med tittel 'blah blah'`;
+
+let all_true = function(val) {
+  return val === true;
+};
 
 module.exports = {
   getAllStatus_comment: async function(req: Request, res: Response) {
@@ -70,7 +78,21 @@ module.exports = {
           user_id: decoded_token.user_id
         });
       })
-      .then(comment => (comment ? res.send(comment) : res.sendStatus(404)));
+      .then(comment => {
+        if(comment) {
+          Case_subscriptions.findAll(
+            {where: {case_id: Number(req.params.case_id), notify_by_email: 1}}
+          ).then(async subs => {
+            let all_ids = await subs.map(s => {
+              return s.user_id
+            });
+            let all_users = await User.findAll({where: {user_id: all_ids}});
+            let emails = all_users.map(u => u.email);
+            send_subs_email(emails, email_subject, email_body);
+            return res.send({comment: comment});
+          })
+        }
+      }).catch(error => { return res.status(500).json(error)});
   },
   // Kun den som skrev kommentaren og admin kan endre
   updateStatus_comment: function(req: Request, res: Response) {

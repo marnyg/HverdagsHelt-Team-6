@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 });
 
 module.exports = {
-  send_email: async function(recipient: String, subject: String, body: String) {
+  send_email: async function(recipient: string, subject: string, body: string) {
       const mailOptions = {
         from: 'hverdagshelt.team6@gmail.com',
         to: recipient,
@@ -28,5 +28,13 @@ module.exports = {
         console.log(err);
         return false
       }
+  },
+
+  send_subs_email: async function(recipients: Array<string>, subject: string, body: string) {
+    let emails_sent = await recipients.map(async rec => {
+      await module.exports.send_email(rec, subject, body);
+    });
+      return Promise.all(emails_sent);
+
   }
 };
