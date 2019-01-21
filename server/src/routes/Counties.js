@@ -11,7 +11,7 @@ module.exports = {
   },
   getOneCountyByName: function(req: Request, res: Response) {
     return County.findOne({ where: { name: req.params.county_name }, attributes: ['county_id'] }).then(counties =>
-      counties ? counties : res.sendStatus(404)
+      counties ? res.send(counties) : res.sendStatus(404)
     );
   },
   addCounty: function(req: Request, res: Response) {

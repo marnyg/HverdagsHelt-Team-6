@@ -87,7 +87,7 @@ module.exports = {
       })
         .then(newCase => {
           console.log(newCase.dataValues);
-          if (req.files.length !== 0)
+          if (req.files.length !== 0){
             Picture.bulkCreate(
               filenames.map(filename => {
                 return {
@@ -97,10 +97,13 @@ module.exports = {
                 };
               })
             )
-              .then(res.sendStatus(200))
+              .then(res.send(newCase))
               .catch(error => {
                 return res.status(400).send(error);
               });
+          }else{
+            return res.send(newCase);
+          }
         })
         .catch(error => {
           return res.status(500).send(error);

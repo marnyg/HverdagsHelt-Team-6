@@ -175,6 +175,7 @@
     .content {
         grid-template-columns: 1fr 1fr;
     }
+
     .item {
         background-color: var(--item-background);
         box-shadow: 0 4px 10px rgba(0,0,0,0.2);

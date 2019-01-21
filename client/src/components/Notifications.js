@@ -63,6 +63,7 @@ class Notifications extends Component {
   }
 
   mounted() {
+      console.log('Notifications found user:', this.user);
     let caseSubscriptionService = new CaseSubscriptionService();
     caseSubscriptionService
     .getAllOutdatedCaseSubscriptions(this.user.user_id)
