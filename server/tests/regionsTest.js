@@ -31,6 +31,8 @@ describe('Find all regions', () => {
   });
 });
 
+// Tested in countiesTest
+/*
 describe('Find all regions in county', () => {
   test('200 status code for GET /api/counties/:county_id/regions', done => {
     request(application)
@@ -41,6 +43,7 @@ describe('Find all regions in county', () => {
       });
   });
 });
+*/
 
 describe('Find one region', () => {
   test('200 status code for GET /api/regions/region_id', done => {
@@ -121,7 +124,7 @@ describe('Update one region', () => {
   });
   test('200 status code for PUT /api/regions/{region_id}', done => {
     return request(application)
-      .put(`/api/regions/${0}`)
+      .put(`/api/regions/${ny_region_id}`)
       .send({
         name: 'Nyeste region',
         lat: 66,
