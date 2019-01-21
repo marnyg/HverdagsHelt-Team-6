@@ -13,6 +13,7 @@ import LoginService from '../services/LoginService';
 import Notify from './Notify';
 import ImageModal from './ImageModal';
 import GoogleApiWrapper from './GoogleApiWrapper';
+import User from '../classes/User';
 import Case from '../classes/Case';
 import Category from '../classes/Category';
 import Status from '../classes/Status';
@@ -102,11 +103,11 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             {privilege < OWNER_NOT_EMPLOYEE ||
             !(this.case.status_id !== STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE) ? (
               <section>
-                <h2>Rediger sak</h2>
+                <h2>Oppdater sak</h2>
                 <div className={'form-group'}>
                   <label htmlFor="category">Kategori</label>
                   <select
-                    defaultValue={this.getInitialCategory()}
+                    defaultValue={this.case.category_id}
                     onChange={this.categoryListener}
                     className={'form-control'}
                     id={'category'}
@@ -124,7 +125,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   <div className={'form-group'}>
                     <label htmlFor="status">Saksstatus</label>
                     <select
-                      defaultValue={this.getInitialStatus()}
+                      defaultValue={this.case.status_id}
                       onChange={this.statusListener}
                       className={'form-control'}
                       id={'status'}
@@ -283,15 +284,18 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             a.lon
           );
           a.img.map(e => this.case.img.push({ src: e }));
-          let userObj = localStorage.getItem('user');
+          let userObj: User = ToolService.getUser();
           let statusCommentPoster: number;
           if (userObj) {
-            statusCommentPoster = JSON.parse(userObj).user_id;
+            statusCommentPoster = userObj.user_id;
             this.statusComment = {
               case_id: this.case.case_id,
               status_id: this.case.status_id,
               user_id: statusCommentPoster,
-              comment: ''
+              comment: '',
+              status_name: this.case.status_name,
+              createdBy: userObj.firstname + ' ' + userObj.lastname,
+              createdAt: null
             };
           }
           this.pos = new Location(a.lat, a.lon, a.region_name, a.county_name, 'Norway');
@@ -388,7 +392,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
 
   getInitialCategory() {
     if (this.case) {
-      let cat = this.categories.find(e => parseInt(e.category_id) === this.case.category_id);
+      let cat = this.categories.find(e => e.category_id === this.case.category_id);
       if (cat) {
         return cat.category_id;
       } else {
@@ -399,7 +403,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
 
   getInitialStatus() {
     if (this.case) {
-      let status = this.statuses.find(e => parseInt(e.status_id) === this.case.status_id);
+      let status = this.statuses.find(e => e.status_id === this.case.status_id);
       if (status) {
         return status.status_id;
       } else {
@@ -428,14 +432,14 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
-  categoryListener(event: SyntheticInputEvent<HTMLSelectElement>) {
+  categoryListener(event: SyntheticEvent<HTMLSelectElement>) {
     if (event.target && event.target instanceof HTMLSelectElement && this.case) {
       this.case.category_id = event.target.options[event.target.selectedIndex].value;
       console.log('this.case.category_id: ' + this.case.category_id);
     }
   }
 
-  statusListener(event: SyntheticInputEvent<HTMLSelectElement>) {
+  statusListener(event: SyntheticEvent<HTMLSelectElement>) {
     if (event.target && event.target instanceof HTMLSelectElement && this.case) {
       this.case.status_id = event.target.options[event.target.selectedIndex].value;
       console.log('this.case.status_id: ' + this.case.status_id);
@@ -563,24 +567,31 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       cas
         .updateCase(this.case.case_id, this.case)
         .then(() => {
-          console.log("Case " + this.case.case_id + " was updated.");
-          if(this.case.img.length > 0){
+          console.log('Case ' + this.case.case_id + ' was updated.');
+          if (this.case.img.length > 0) {
             // Pictures are present
-            console.log("Images are present. Proceeding to update images.");
+            console.log('Images are present. Proceeding to update images.');
           }
-        }).then(() => {
-          if(privilege <= EMPLOYEE){
+        })
+        .then(() => {
+          if (privilege <= EMPLOYEE) {
             // Upload status comment
             let statcom = new StatusCommentService();
-            statcom.createStatusComment(this.statusComment).then(() => {
-              console.log("HURRDURR HURHURHURRDURR");
-            }).catch((err: Error) => {
-              console.log('Uploading status comment failed for case ' + this.case.case_id + '. Error: ', err);
-              Notify.danger(
-                'Feil ved opplasting av statuskommentar. Saken har blitt oppdatert, men kommentaren din har ikke blitt lagret. \n\nFeilmelding: ' +
-                err.message
-              );
-            });
+            statcom
+              .createStatusComment(this.statusComment)
+              .then(e => {
+                console.log('Received StatusComment Object: ', e);
+                this.statusComment.createdAt = e.createdAt;
+                this.statusMessages.push(this.statusComment);
+                this.statusComment = new StatusComment();
+              })
+              .catch((err: Error) => {
+                console.log('Uploading status comment failed for case ' + this.case.case_id + '. Error: ', err);
+                Notify.danger(
+                  'Feil ved opplasting av statuskommentar. Saken har blitt oppdatert, men kommentaren din har ikke blitt lagret. \n\nFeilmelding: ' +
+                    err.message
+                );
+              });
           }
         })
         .catch((err: Error) => {
