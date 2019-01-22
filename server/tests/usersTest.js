@@ -1,5 +1,22 @@
 import { application } from '../src/server';
 import request from 'supertest';
+
+let admin_token;
+
+// ***************** Login admin *************
+beforeAll(done => {
+  return request(application)
+    .post('/api/login')
+    .send({
+      email: 'admin@admin.com',
+      password: 'passord123'
+    })
+    .end((err, res) => {
+      admin_token = res.body.token;
+      done();
+    });
+});
+
 // ***************************** USERS **************************************
 
 let token;
@@ -11,7 +28,7 @@ describe('Create new user', () => {
     lastname: 'Test',
     tlf: 98123456,
     email: 'jest@test.no',
-    password: 'passord123',
+    password: 'Passord123',
     region_id: 1
   };
   test('400 status code for POST /api/users without body', (done) => {
@@ -48,7 +65,7 @@ describe('Create new user', () => {
 describe('User login', () => {
   let data = {
     email: 'jest@test.no',
-    password: 'passord123'
+    password: 'Passord123'
   };
   test('400 status code for POST /api/login without body', (done) => {
     return request(application)
@@ -90,6 +107,15 @@ describe('Find a specific user', () => {
         done();
       });
   });
+  test('400 status code for GET /api/users/{user_id} with invalid user_id', done => {
+    return request(application)
+      .get(`/api/users/NaN`)
+      .set('Authorization', `Bearer ${token}`)
+      .then(response => {
+        expect(response.statusCode).toBe(400);
+        done();
+      });
+  });
   test('403 status code for GET /api/users/{user_id} with wrong token', done => {
     return request(application)
       .get(`/api/users/${user_id}`)
@@ -116,15 +142,37 @@ describe('Update data on a user', () => {
     lastname: 'Test Test',
     tlf: 98123456,
     email: 'jest@test.no',
-    password: 'passord123',
-    region_id: 1
+    password: 'Passord123',
+    region_id: 1,
+    role_id: 4
   };
   test('400 status code for PUT /api/users/{user_id} without body', (done) => {
     return request(application)
       .put(`/api/users/${user_id}`)
       .send()
+      .set('Authorization', `Bearer ${token}`)
       .then(response => {
         expect(response.statusCode).toBe(400);
+        done();
+      });
+  });
+  test('400 status code for PUT /api/users/{user_id} with invalid user_id', (done) => {
+    return request(application)
+      .put(`/api/users/NaN`)
+      .send(data)
+      .set('Authorization', `Bearer ${token}`)
+      .then(response => {
+        expect(response.statusCode).toBe(400);
+        done();
+      });
+  });
+  test('403 status code for PUT /api/users/{user_id} with invalid token', (done) => {
+    return request(application)
+      .put(`/api/users/${user_id}`)
+      .send(data)
+      .set('Authorization', `Bearer ${10000}`)
+      .then(response => {
+        expect(response.statusCode).toBe(403);
         done();
       });
   });
@@ -146,8 +194,9 @@ describe('Update data on a user', () => {
         lastname: 'Test Test',
         tlf: 98123456,
         email: 'ola.nordmann@gmail.com',
-        password: 'passord123',
-        region_id: 1
+        password: 'Passord123',
+        region_id: 1,
+        role_id: 4
       })
       .set('Authorization', `Bearer ${token}`)
       .then(response => {
@@ -158,7 +207,7 @@ describe('Update data on a user', () => {
 });
 
 describe('Delete a user', () => {
-  test('400 status code for DELETE /api/users/ without token', done => {
+  test('400 status code for DELETE /api/users/:user_id without token', done => {
     return request(application)
       .delete(`/api/users/${user_id}`)
       .then(response => {
@@ -166,7 +215,16 @@ describe('Delete a user', () => {
         done();
       });
   });
-  test('403 status code for DELETE /api/users/ with wrong token', done => {
+  test('400 status code for DELETE /api/users/:user_id with invalid user_id', done => {
+    return request(application)
+      .delete(`/api/users/NaN`)
+      .set('Authorization', `Bearer ${token}`)
+      .then(response => {
+        expect(response.statusCode).toBe(400);
+        done();
+      });
+  });
+  test('403 status code for DELETE /api/users/:user_id with invalid token', done => {
     return request(application)
       .delete(`/api/users/${user_id}`)
       .set('Authorization', `Bearer ${12345}`)
@@ -198,18 +256,33 @@ describe('Check that the user was deleted', () => {
   });
 });
 
-// GET all user, only for admins
-
-/*
-describe('GET /api/users', () => {
-  test('200 status code for GET', done => {
+describe('Find all users registered in the system (only admins)', () => {
+  test('400 status code for GET /api/users without token', done => {
     request(application)
       .get('/api/users')
+      .then(response => {
+        expect(response.statusCode).toBe(400);
+        done();
+      });
+  });
+  test('403 status code for GET /api/users for non-admins', done => {
+    request(application)
+      .get('/api/users')
+      .set('Authorization', `Bearer ${token}`)
+      .then(response => {
+        expect(response.statusCode).toBe(403);
+        done();
+      });
+  });
+  test('200 status code for GET /api/users', done => {
+    request(application)
+      .get('/api/users')
+      .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(200);
         done();
       });
   });
 });
-*/
+
 
