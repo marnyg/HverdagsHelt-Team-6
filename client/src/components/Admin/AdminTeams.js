@@ -27,20 +27,24 @@ class AdminTeams extends Component {
     }
 
     onUserCreated() {
-        console.log('user created');
-        let userService = new UserService();
-        userService.getAllUsers()
-            .then((users: User[]) => {
-                this.team = users;
-            })
-            .catch((error: Error) => console.error(error));
+        if(this.region){
+            console.log('user created');
+            let userService = new UserService();
+            userService.getAllEmployeesInRegion(this.region.region_id)
+                .then((users: User[]) => {
+                    this.team = users;
+                })
+                .catch((error: Error) => console.error(error));
+        } else {
+            console.error('Can\'t update user list, no region_id');
+        }
     }
 
     onRegionSelected(region) {
         console.log('Region selected!');
         this.region = region;
         let userService = new UserService();
-        userService.getAllUsers()
+        userService.getAllEmployeesInRegion(region.region_id)
             .then((users: User[]) => {
                 console.log(users);
                 console.log(users.filter(u => (u.role_id === region_employee_id && u.region_id === region.region_id)));
