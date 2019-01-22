@@ -49,13 +49,13 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   subscription: CaseSubscription = null;
   pos: Location = null;
   offset: number = 0;
-  deletedImages: string[] = [];
   statuses: Status[] = [];
   categories: Category[] = [];
   statusMessages: StatusComment[] = [];
   form: HTMLFormElement = null;
   fetchButton: HTMLButtonElement = null;
   fileTypes: string[] = ['image/jpeg', 'image/jpg', 'image/png'];
+  imgSync: boolean = false;
 
   render() {
     if (!this.case || !this.statusComment) {
@@ -205,7 +205,6 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                       type={'file'}
                       accept={'.png, .jpg, .jpeg'}
                       onChange={this.fileInputListener}
-                      multiple
                     />
                   </div>
                 ) : null}
@@ -219,31 +218,30 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                 ) : null}
               </section>
             ) : null}
-
-            <div className="container my-5">
-              <div className="row">
-                {this.case.img.map(e => (
-                  <div key={e.src} className="col-md-3">
-                    <div className="card">
-                      <img src={e.src} alt={e.src} className="card-img-top" />
-                      {(privilege <= OWNER_EMPLOYEE && this.case.status_id !== STATUS_CLOSED) ||
-                      (privilege === OWNER_NOT_EMPLOYEE && this.case.status_id === STATUS_OPEN) ||
-                      privilege === ADMIN ? (
-                        <div className="card-img-overlay">
-                          <button
-                            className={'btn btn-danger img-overlay float-right align-text-bottom'}
-                            onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
-                          >
-                            <FontAwesomeIcon icon={faTrashAlt} />
-                          </button>
-                        </div>
-                      ) : null}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </form>
+          <div className="container my-5">
+            <div className="row">
+              {this.case.img.map(e => (
+                <div key={e.src} className="col-md-3">
+                  <div className="card">
+                    <img src={e.src} alt={e.src} className="card-img-top" />
+                    {(privilege <= OWNER_EMPLOYEE && this.case.status_id !== STATUS_CLOSED) ||
+                    (privilege === OWNER_NOT_EMPLOYEE && this.case.status_id === STATUS_OPEN) ||
+                    privilege === ADMIN ? (
+                      <div className="card-img-overlay">
+                        <button
+                          className={'btn btn-danger img-overlay float-right align-text-bottom'}
+                          onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
+                        >
+                          <FontAwesomeIcon icon={faTrashAlt} />
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
           <div className={'col-md-6 embed-responsive'}>
             {/*<GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.case.lat, lng: this.case.lon }} /> */}
           </div>
@@ -451,9 +449,9 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   }
 
   isSubscribed(c: Case) {
-    if(this.subscription){
+    if (this.subscription) {
       return true;
-    }else{
+    } else {
       return false;
     }
   }
@@ -471,7 +469,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     let sub = new CaseSubscriptionService();
     if (this.isSubscribed(this.case)) {
       // Unsubscribe the user from this case
-      console.log("USER IS SUBSCRIBED");
+      console.log('USER IS SUBSCRIBED');
       sub
         .deleteCaseSubscription(this.case.case_id, ToolService.getUserId())
         .then(() => {
@@ -484,9 +482,9 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     } else {
       // Subscribe this case to user
       let s;
-      if(this.subscription){
+      if (this.subscription) {
         s = new CaseSubscription(ToolService.getUserId(), this.case.case_id, this.subscription.notify_by_email, true);
-      }else{
+      } else {
         s = new CaseSubscription(ToolService.getUserId(), this.case.case_id, false, true);
       }
       sub
@@ -529,54 +527,96 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   }
 
   fileInputListener(event: SyntheticInputEvent<HTMLInputElement>) {
-    let files = Array.from(event.target.files);
-    console.log(files);
+    if (!this.imgSync) {
+      let files = Array.from(event.target.files);
+      console.log(files);
 
-    if (files.length === 0) {
-      // No files were selected. No changes committed.
-      console.log('No files were selected.');
-    } else {
-      // Files selected. Processing changes.
-      console.log('Files were selected.');
-      // Redundant file type check.
-      if ((files = files.filter(e => this.fileTypes.includes(e.type)))) {
-        // File type is accepted.
-        if (files.length + this.case.img.length <= MAX_NUMBER_IMG) {
-          files.map(e => {
-            this.case.img.push({
-              value: e,
-              alt: 'Bildenavn: ' + e.name,
-              src: URL.createObjectURL(e)
-            });
-          });
-        } else {
-          console.log(
-            'Max number of pictures (' +
-              MAX_NUMBER_IMG +
-              ') reached. \nCurrent embedded images: ' +
-              this.case.img.length +
-              '\nTried to add: ' +
-              files.length +
-              ' new files.'
-          );
-          Notify.warning(
-            'Du kan maksimalt feste ' + MAX_NUMBER_IMG + ' til en sak. Noen bilder må slettes før du kan legge til nye.'
-          );
-        }
+      if (files.length === 0) {
+        // No files were selected. No changes committed.
+        console.log('No files were selected.');
       } else {
-        // File type not accepted.
-        console.warn('File type not accepted.');
-        Notify.warning('Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png.');
+        // Files selected. Processing changes.
+        console.log('Files were selected.');
+        // Redundant file type check.
+        if ((files = files.filter(e => this.fileTypes.includes(e.type)))) {
+          // File type is accepted.
+          if (files.length + this.case.img.length <= MAX_NUMBER_IMG) {
+            this.imgSync = true;
+            let cas = new CaseService();
+            cas
+              .uploadPicture(this.case.case_id, files[0])
+              .then(() => (this.imgSync = false))
+              .then(() => {
+                console.log('Image upload successful!');
+                this.case.img.push({
+                  value: files[0],
+                  alt: 'Bildenavn: ' + files[0].name,
+                  src: URL.createObjectURL(files[0])
+                });
+              })
+              .catch((err: Error) => {
+                this.imgSync = false;
+                console.log('Upload image failed. ', err);
+                Notify.danger(
+                  'Kunne ikke laste opp bildet. Hvis problemet vedvarer kontakt oss. \n\nFeilmelding: ' + err.message
+                );
+              });
+          } else {
+            console.log(
+              'Max number of pictures (' +
+                MAX_NUMBER_IMG +
+                ') reached. \nCurrent embedded images: ' +
+                this.case.img.length +
+                '\nTried to add: ' +
+                files.length +
+                ' new files.'
+            );
+            Notify.warning(
+              'Du kan maksimalt feste ' +
+                MAX_NUMBER_IMG +
+                ' til en sak. Noen bilder må slettes før du kan legge til nye.'
+            );
+          }
+        } else {
+          // File type not accepted.
+          console.warn('File type not accepted.');
+          Notify.warning('Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png.');
+        }
       }
+    } else {
+      Notify.warning('Synkronisering av bilder pågår. Vennligst vent 2-3 sekunder og prøv igjen.');
     }
   }
 
   fileInputDeleteImage(event: SyntheticInputEvent<HTMLInputElement>, src: string) {
-    this.deletedImages.push(this.case.img.find(e => e.src === src));
-    this.case.img = this.case.img.filter(e => e.src !== src);
-    console.log('Deleting image file with src = ' + src);
-    console.log('this.deletedImages: ' + JSON.stringify(this.deletedImages));
-    console.log('this.case.img: ' + JSON.stringify(this.case.img));
+    if (!this.imgSync) {
+      this.imgSync = true;
+      let url = this.formatImageURL(src);
+      let cas = new CaseService();
+      cas
+        .deletePicture(this.case.case_id, url)
+        .then(() => {
+          this.case.img = this.case.img.filter(e => e.src !== src);
+          console.log('Deleting image file with src = ' + src);
+          console.log('this.case.img: ' + JSON.stringify(this.case.img));
+          this.imgSync = false;
+        })
+        .catch((err: Error) => {
+          console.log('Delete image failed. ', err);
+          Notify.danger(
+            'Kunne ikke slette bildet. Hvis problemet vedvarer kontakt oss. \n\nFeilmelding: ' + err.message
+          );
+          this.imgSync = false;
+        });
+    } else {
+      Notify.warning('Synkronisering av bilder pågår. Vennligst vent 2-3 sekunder og prøv igjen.');
+    }
+  }
+
+  formatImageURL(src: string) {
+    let a = src.split('/')[2];
+    console.log(a);
+    return a;
   }
 
   delete(event: SyntheticEvent<HTMLButtonElement>) {
