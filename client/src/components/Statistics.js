@@ -7,32 +7,40 @@ import { Bar, Doughnut, Pie, Line } from 'react-chartjs-2';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import StatService from '../services/StatsService';
+import UserService from "../services/UserService"
 
 class Statistics extends Component {
-  data = {};
-  data1 = {};
+  nationalBar = {};
+  regionalBar = {};
   openedNat = [];
   openedRegional = [];
   closedRegional = [];
   closedNat = [];
   catStatNat = []
   catStatReg = []
-  natData = [];
-  regData = [];
+  natDataBar = [];
+  regDataBar = [];
+  nationalPie = []
+  regionalPie = []
+  year = 2019
 
   options = null;
 
   statServ = new StatService();
+  user = JSON.parse(localStorage.getItem("user"))
+  region_id = this.user.region_id
+
+
   render() {
     return (
       <div className="container">
-        <div className="row">
-          <div ref="statPage" className="col" style={{ maxWidth: '210mm', minWidth: '210mm' }}>
+        <div className="row ">
+          <div ref="statPage" className="col border p-5" style={{ maxHeight: '297mm', maxWidth: '210mm', minWidth: '210mm' }}>
             <div className="row">
-              <h2 className="row">National statistik</h2>
+              <h4 >National statistik</h4>
               <div className="row">
                 <div className="col" style={{ maxWidth: "150mm", minWidth: '150mm' }} >
-                  <Bar data={this.data} />
+                  <Bar ref="bar1" data={this.nationalBar} />
                 </div>
                 <p className="col" >
                   Ad consequat sit esse elit minim sint ad minim exercitation magna deserunt ipsum ad deserunt. Sunt ut do
@@ -42,10 +50,10 @@ class Statistics extends Component {
             </div>
 
             <div className="row">
-              <h2 className="row">Regional statistik</h2>
+              <h4 >Regional statistik</h4>
               <div className="row">
                 <div className="col" style={{ maxWidth: "150mm", minWidth: '150mm' }} >
-                  <Bar data={this.data1} />
+                  <Bar data={this.regionalBar} />
                 </div>
                 <p className="col" >
                   Ad consequat sit esse elit minim sint ad minim exercitation magna deserunt ipsum ad deserunt. Sunt ut do
@@ -53,27 +61,40 @@ class Statistics extends Component {
             </p>
               </div>
             </div>
-            {/* <div >
-                  <Pie className="col" data={this.data} />
-                  <Pie className="col" data={this.data} />
 
-                {/* </div> */}
-            {/* </div> */}
+            <div className="row">
+              <div className="row">
+                <div className="col" style={{ maxWidth: "100mm", minWidth: '100mm' }} >
+                  <h4 >National statistik</h4>
+                  <Pie data={this.nationalPie} />
+                </div>
+                <div className="col" style={{ maxWidth: "100mm", minWidth: '100mm' }} >
+                  <h4 >Regional statistik</h4>
+                  <Pie data={this.regionalPie} />
+                </div>
+                <p className="col" >
+                  Ad consequat sit esse elit minim sint ad minim exercitation magna deserunt ipsum ad deserunt. Sunt ut do
+                  anim nulla elit dolor do Lorem tempor magna sit non deserunt exercitation.
+            </p>
+              </div>
+            </div>
 
           </div>
           <div className="col">
             <h3>toolbar</h3>
-            <p>Eiusmod minim amet eiusmod adipisicing aliqua occaecat adipisicing reprehenderit voluptate sit occaecat laboris nostrud adipisicing. Id mollit reprehenderit ad magna incididunt minim irure et deserunt esse nisi. Minim occaecat est aliqua in magna sunt nostrud.</p>
+            <select ref="year" onChange={this.changeYear}>
+              <option value="2019">2019</option>
+              <option value="2020">2020</option>
+              <option value="2021">2021</option>
+            </select>
             <button className="btn btn-primary" onClick={this.generatePdf}>
               Last ned som PDF
             </button>
             <button
               className="btn btn-primary"
               onClick={() =>
-                console.log(this.refs.bar, this.catStatNat, this.catStatReg)
-              }
-            >
-            </button>
+                console.log(this.nationalBar, this.refs.bar1)
+              } > log </button>
           </div>
         </div>
       </div >
@@ -81,24 +102,37 @@ class Statistics extends Component {
   }
   mounted() {
     this.getalldata();
+
+  }
+  changeYear() {
+    this.year = this.refs.year.options[this.refs.year.selectedIndex].value
+
+    this.getalldata()
+    console.log(this.refs.bar1)
+    console.log(this.nationalBar)
+    console.log(this.regionalBar)
+    // this.refs.bar1.update()
+
   }
   getalldata() {
     this.statServ
-      .getNatCasesOpenedInYear(2019)
+      .getNatCasesOpenedInYear(this.year)
       .then(e => (this.openedNat = e))
-      .then(() => this.statServ.getNatCasesClosedInYear(2019).then(e => (this.closedNat = e)))
-      .then(() => this.statServ.getCasesClosedInYearInRegion(2019, 44).then(e => (this.closedRegional = e)))
-      .then(() => this.statServ.getCasesOpenedInYearInRegion(2019, 44).then(e => (this.openedRegional = e)))
-      .then(() => this.statServ.getStatsCatYearNational(2019).then(e => (this.catStatNat = e)))
-      .then(() => this.statServ.getStatsCatYearInRegion(2019, 44).then(e => (this.catStatReg = e)))
+      .then(() => this.statServ.getNatCasesClosedInYear(this.year).then(e => (this.closedNat = e)))
+      .then(() => this.statServ.getCasesClosedInYearInRegion(this.year, 44).then(e => (this.closedRegional = e)))
+      .then(() => this.statServ.getCasesOpenedInYearInRegion(this.year, 44).then(e => (this.openedRegional = e)))
+      .then(() => this.statServ.getStatsCatYearNational(this.year).then(e => (this.catStatNat = e)))
+      .then(() => this.statServ.getStatsCatYearInRegion(this.year, 44).then(e => (this.catStatReg = e)))
       .then(() => {
-        this.regData = this.joinData(this.openedRegional, this.closedRegional);
-        this.natData = this.joinData(this.openedNat, this.closedNat);
+        this.regDataBar = this.joinData(this.openedRegional, this.closedRegional);
+        this.natDataBar = this.joinData(this.openedNat, this.closedNat);
       })
       .then(() => {
-        this.data = this.formatBarData(this.natData);
-        this.data1 = this.formatBarData(this.regData);
-      });
+        this.nationalBar = this.formatBarData(this.natDataBar);
+        this.regionalBar = this.formatBarData(this.regDataBar);
+        this.nationalPie = this.formatPieData(this.catStatNat)
+        this.regionalPie = this.formatPieData(this.catStatReg)
+      })
   }
   joinData(opened, closed) {
     let newt = [];
@@ -120,9 +154,22 @@ class Statistics extends Component {
     return newt;
   }
 
-  formatBarData(data) {
+  formatPieData(data) {
+
     return {
-      label: 'Nasjonalt',
+      labels: data.map(e => e.category),
+      datasets: [
+        {
+          borderWidth: 1,
+          backgroundColor: ['#36A2EB', '#FFCE56', '#5bc0de', '#5cb85c', '#428bca'],
+          // hoverBackgroundColor: ['#36A2EB'],
+          data: data.map(e => e.count)
+        }
+      ]
+    };
+  }
+  formatBarData(data) {
+    let ds = {
       labels: ['January', 'February', 'March', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'],
       datasets: [
         {
@@ -141,14 +188,19 @@ class Statistics extends Component {
         }
       ]
     };
+    return ds
   }
 
   generatePdf() {
     let input = this.refs.statPage;
+    console.log(input);
+
     html2canvas(input).then(canvas => {
       const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF();
-      pdf.addImage(imgData, 'PNG', 0, 0);
+      console.log(imgData);
+
+      const pdf = new jsPDF(1, "mm", "a4")
+      pdf.addImage(imgData, 'PNG', 1, 0);
       // pdf.output('dataurlnewwindow');
       pdf.save('download.pdf');
     });
