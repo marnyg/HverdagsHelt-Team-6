@@ -3,7 +3,7 @@ import axios from 'axios';
 import Case from '../classes/Case.js';
 import LoginService from './LoginService.js';
 import FormData from 'form-data';
-import ToolService from "./ToolService";
+import ToolService from './ToolService';
 
 class CaseService {
   //Get all cases
@@ -203,18 +203,19 @@ class CaseService {
       }
     );
   }
-    //Get all cases given location
-    getCasesByLoc(county_name: string, region_name: string): Promise<Case[]> {
-        return axios.get(
-            '/api/cases/region_cases/'
-                + ToolService.cleanQueryString(region_name) + '/'
-                + ToolService.cleanQueryString(county_name),
-            {},
-            {
-                headers: { 'Content-Type': 'application/json' }
-            }
-        );
-    }
+  //Get all cases given location
+  getCasesByLoc(county_name: string, region_name: string): Promise<Case[]> {
+    return axios.get(
+      '/api/cases/region_cases/' +
+        ToolService.cleanQueryString(region_name) +
+        '/' +
+        ToolService.cleanQueryString(county_name),
+      {},
+      {
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
+  }
 
   getCaseGivenRegionId(region_id: number): Promise<Case> {
     return axios.get('/api/cases/region_cases/' + region_id, {}, {});

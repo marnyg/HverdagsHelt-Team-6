@@ -333,7 +333,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             .then(e => {
               this.statuses = e;
               let statList = this.form.querySelector('#status');
-              if(statList && statList instanceof HTMLSelectElement){
+              if (statList && statList instanceof HTMLSelectElement) {
                 statList.value = this.case.category_id;
               }
             })
@@ -351,7 +351,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           .then(e => {
             this.categories = e;
             let catList = this.form.querySelector('#category');
-            if(catList && catList instanceof HTMLSelectElement){
+            if (catList && catList instanceof HTMLSelectElement) {
               catList.value = this.case.category_id;
             }
           })
@@ -516,7 +516,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   delete(event: SyntheticEvent<HTMLButtonElement>) {
     event.preventDefault();
     console.log('Clicked delete button');
-    if(this.isOwner(this.case)){
+    if (this.isOwner(this.case)) {
       let cas = new CaseService();
       cas
         .deleteCase(this.case.case_id)
@@ -528,6 +528,9 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           console.log('Could not delete case with id: ' + this.case.case_id, err);
           Notify.danger('Kunne ikke slette sak med id: ' + this.case.case_id + '. \n\nFeilmelding: ' + err.message);
         });
+    }else{
+      console.log("You're not the owner of this case, nor admin! You cannot delete it.");
+      Notify.warning("Du eier ikke denne saken, og kan derfor ikke slette den.");
     }
   }
 
