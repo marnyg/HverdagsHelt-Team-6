@@ -16,7 +16,7 @@ class CaseService {
     }
 
     //Update one specific case
-    updateCase(case_id: number, c: Case): Promise<any> {
+    updateCase(case_id: number, c: Case): Promise<void> {
         return new Promise((resolve, reject) => {
             let loginService = new LoginService();
             loginService
