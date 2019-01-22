@@ -193,6 +193,25 @@ app.delete('/api/pictures/:case_id/:image_name', (req: Request, res: Response) =
   reqAccessLevel(req, res, 4, Pictures.delPicture);
 });
 
+// ***************************** Region_subscriptions *****************************
+
+app.get('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Region_subscriptions.getAllRegion_subscriptions);
+});
+
+app.post('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
+  console.log(req.body);
+  reqAccessLevel(req, res, 4, Region_subscriptions.addRegion_subscriptions);
+});
+
+app.put('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Region_subscriptions.updateRegion_subscriptions);
+});
+
+app.delete('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Region_subscriptions.delRegion_subscriptions);
+});
+
 // ***************************** Regions *****************************
 
 app.get('/api/regions', (req: Request, res: Response) => {
@@ -308,23 +327,6 @@ app.get('/api/regions/:region_id/staff', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, Region.getRegionStaff);
 });
 
-app.get('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, Region_subscriptions.getAllRegion_subscriptions);
-});
-
-app.post('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
-  console.log(req.body);
-  reqAccessLevel(req, res, 4, Region_subscriptions.addRegion_subscriptions);
-});
-
-app.put('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Region_subscriptions.updateRegion_subscriptions);
-});
-
-app.delete('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Region_subscriptions.delRegion_subscriptions);
-});
-
 app.get('/api/email_available', (req: Request, res: Response) => {
   return User.findAll().then(users => res.send(!users.some(user => user.email === req.body.email)));
 });
@@ -377,4 +379,3 @@ export let listen = new Promise<void>((resolve, reject) => {
     resolve();
   });
 });
-
