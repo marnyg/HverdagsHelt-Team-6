@@ -6,6 +6,7 @@ import RegionService from "../services/RegionService";
 import Region from '../classes/Region.js';
 import UserService from '../services/UserService.js';
 import User from '../classes/User.js';
+import Alert from './Alert.js';
 
 
 class RegisterModal extends Component {
@@ -58,6 +59,7 @@ class RegisterModal extends Component {
                 <div className="modal-dialog">
                     <div className="registermodal-container modal-content">
                         <h1>Lag ny bruker</h1><br/>
+                        {this.error}
                         <form className={'form-group'}>
                             <input className={"form-control " + (this.validemail ? '':'is-invalid')} type="email" id={'inputPassword'} placeholder="Epost" onChange={(event) => {
                                 this.email = event.target.value;
@@ -173,14 +175,24 @@ class RegisterModal extends Component {
                         })
                         .catch((error: Error) => {console.error(error)});
                 } else {
-                    alert('Epostadressen er ikke gyldig');
+                    this.error=<Alert
+                      type='danger'
+                      text='Epostadressen er ikke gyldig'
+                    />
+                    //alert('Epostadressen er ikke gyldig');
                 }
             } else {
-                alert('Passordene er ikke like');
+                this.error=<Alert
+                  type='danger'
+                  text='Passordene er ikke like'
+                />
             }
         } else {
             // One or more required fields have not been filled
-            alert('Du må fylle ut alle feltene for å kunne registrere deg.');
+            this.error=<Alert
+              type='danger'
+              text='Du må fylle ut alle feltene for å kunne registrere deg.'
+            />
         }
     }
 

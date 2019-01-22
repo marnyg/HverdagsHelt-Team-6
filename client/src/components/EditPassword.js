@@ -6,6 +6,7 @@ import User from '../classes/User';
 import UserService from '../services/UserService';
 import EditProfile from './EditProfile';
 import DisplayProfile from './DisplayProfile';
+import Alert from './Alert.js';
 
 class EditPassword extends Component {
     us = new UserService();
@@ -13,6 +14,7 @@ class EditPassword extends Component {
     // oldUser = JSON.parse(localStorage.getItem("user"))
     oldPass: string;
     oldPass = '';
+    error=null;
 
 
     render() {
@@ -35,6 +37,7 @@ class EditPassword extends Component {
     getEditFormVersion() {
         return (
             <form ref="form" className={'row list-group-item mx-5'}>
+            {this.error}
                 <div className={'row'}>
                     <div className={'col-sm'}>Gammelt Passord:</div>
                     <div className={'col-lg'}>

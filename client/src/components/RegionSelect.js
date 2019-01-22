@@ -4,13 +4,17 @@ import LocationService from "../services/LocationService";
 import CountyService from "../services/CountyService";
 import RegionService from "../services/RegionService";
 import Notify from './Notify.js';
+import Alert from './Alert.js';
 
 class RegionSelect extends Component {
     regions = [];
     counties = [];
+    error=null;
+
     render() {
         return(
             <div className={this.props.className}>
+              {this.error}
                 <form className={this.props.classNameChild}>
                     <select className={'form-control ' + this.props.elementsMargin} id={'county-selector' + this.props.selector_id} onChange={this.countySelected}
                             defaultValue={'.null'}>
@@ -76,7 +80,11 @@ class RegionSelect extends Component {
             document.querySelector('#region-selector' + this.props.selector_id).selectedIndex = 0;
             this.props.onSubmit(this.region_id);
         } else {
-            Notify.danger('Du må velge både fylke og kommune før du kan sende skjemaet.');
+            this.error=<Alert
+              type='danger'
+              text='Du må velge både fylke og kommune før du kan sende skjemaet.'
+            />
+            /*Notify.danger('Du må velge både fylke og kommune før du kan sende skjemaet.');*/
         }
     }
 }
