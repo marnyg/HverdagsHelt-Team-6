@@ -175,24 +175,14 @@ class RegisterModal extends Component {
                         })
                         .catch((error: Error) => {console.error(error)});
                 } else {
-                    this.error=<Alert
-                      type='danger'
-                      text='Epostadressen er ikke gyldig'
-                    />
-                    //alert('Epostadressen er ikke gyldig');
+                    alert('Epostadressen er ikke gyldig');
                 }
             } else {
-                this.error=<Alert
-                  type='danger'
-                  text='Passordene er ikke like'
-                />
+                alert('Passordene er ikke like')
             }
         } else {
             // One or more required fields have not been filled
-            this.error=<Alert
-              type='danger'
-              text='Du må fylle ut alle feltene for å kunne registrere deg.'
-            />
+            alert('Epostadressen er ikke gyldig');
         }
     }
 
