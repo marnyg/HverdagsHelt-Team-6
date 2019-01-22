@@ -15,50 +15,68 @@ class Statistics extends Component {
   openedRegional = [];
   closedRegional = [];
   closedNat = [];
+  catStatNat = []
+  catStatReg = []
   natData = [];
   regData = [];
+
   options = null;
 
   statServ = new StatService();
   render() {
     return (
-      <div ref="statPage" className="container" style={{ maxWidth: '210mm' }}>
+      <div className="container">
         <div className="row">
-          <div className={'col-md'}>
-            <Bar data={this.data} />
-            <Bar data={this.data1} />
-            <div class="row">
-              <Pie class="col" data={this.data} />
-              <Pie class="col" data={this.data} />
+          <div ref="statPage" className="col" style={{ maxWidth: '210mm', minWidth: '210mm' }}>
+            <div className="row">
+              <h2 className="row">National statistik</h2>
+              <div className="row">
+                <div className="col" style={{ maxWidth: "150mm", minWidth: '150mm' }} >
+                  <Bar data={this.data} />
+                </div>
+                <p className="col" >
+                  Ad consequat sit esse elit minim sint ad minim exercitation magna deserunt ipsum ad deserunt. Sunt ut do
+                  anim nulla elit dolor do Lorem tempor magna sit non deserunt exercitation.
+            </p>
+              </div>
             </div>
+
+            <div className="row">
+              <h2 className="row">Regional statistik</h2>
+              <div className="row">
+                <div className="col" style={{ maxWidth: "150mm", minWidth: '150mm' }} >
+                  <Bar data={this.data1} />
+                </div>
+                <p className="col" >
+                  Ad consequat sit esse elit minim sint ad minim exercitation magna deserunt ipsum ad deserunt. Sunt ut do
+                  anim nulla elit dolor do Lorem tempor magna sit non deserunt exercitation.
+            </p>
+              </div>
+            </div>
+            {/* <div >
+                  <Pie className="col" data={this.data} />
+                  <Pie className="col" data={this.data} />
+
+                {/* </div> */}
+            {/* </div> */}
+
           </div>
-          <div className={'col-md'}>
-            <p>
-              Ad consequat sit esse elit minim sint ad minim exercitation magna deserunt ipsum ad deserunt. Sunt ut do
-              anim nulla elit dolor do Lorem tempor magna sit non deserunt exercitation. Mollit fugiat amet qui quis
-              sint commodo qui. Ex irure ex eiusmod officia irure. Amet nisi laborum culpa cupidatat excepteur sit magna
-              exercitation. Exercitation nostrud tempor duis ut id et nisi aute veniam.
-            </p>
-            <p>
-              Id cillum duis irure consectetur est culpa nostrud voluptate consequat dolor nulla duis Lorem. Cillum
-              aliqua minim ullamco officia sint fugiat eiusmod labore ut aute veniam consectetur incididunt. Elit
-              voluptate velit non esse magna eu et veniam deserunt eu. Lorem dolor in minim sint Lorem est in veniam ex.
-              Esse ipsum sunt pariatur sint sit aliqua laborum commodo minim ut Lorem nulla.
-            </p>
+          <div className="col">
+            <h3>toolbar</h3>
+            <p>Eiusmod minim amet eiusmod adipisicing aliqua occaecat adipisicing reprehenderit voluptate sit occaecat laboris nostrud adipisicing. Id mollit reprehenderit ad magna incididunt minim irure et deserunt esse nisi. Minim occaecat est aliqua in magna sunt nostrud.</p>
             <button className="btn btn-primary" onClick={this.generatePdf}>
               Last ned som PDF
             </button>
             <button
               className="btn btn-primary"
               onClick={() =>
-                console.log(this.refs.bar, this.openedNat, this.openedRegional, this.closedRegional, this.closedNat)
+                console.log(this.refs.bar, this.catStatNat, this.catStatReg)
               }
             >
-              log
             </button>
           </div>
         </div>
-      </div>
+      </div >
     );
   }
   mounted() {
@@ -71,13 +89,15 @@ class Statistics extends Component {
       .then(() => this.statServ.getNatCasesClosedInYear(2019).then(e => (this.closedNat = e)))
       .then(() => this.statServ.getCasesClosedInYearInRegion(2019, 44).then(e => (this.closedRegional = e)))
       .then(() => this.statServ.getCasesOpenedInYearInRegion(2019, 44).then(e => (this.openedRegional = e)))
+      .then(() => this.statServ.getStatsCatYearNational(2019).then(e => (this.catStatNat = e)))
+      .then(() => this.statServ.getStatsCatYearInRegion(2019, 44).then(e => (this.catStatReg = e)))
       .then(() => {
         this.regData = this.joinData(this.openedRegional, this.closedRegional);
         this.natData = this.joinData(this.openedNat, this.closedNat);
       })
       .then(() => {
-        this.data = this.formatData(this.natData);
-        this.data1 = this.formatData(this.regData);
+        this.data = this.formatBarData(this.natData);
+        this.data1 = this.formatBarData(this.regData);
       });
   }
   joinData(opened, closed) {
@@ -100,27 +120,23 @@ class Statistics extends Component {
     return newt;
   }
 
-  formatData(data) {
+  formatBarData(data) {
     return {
       label: 'Nasjonalt',
       labels: ['January', 'February', 'March', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'],
       datasets: [
         {
           label: 'Saker opprettet',
-          backgroundColor: 'rgba(255,99,132,0.8)',
-          // borderColor: 'rgba(255,99,132,1)',
-          // borderWidth: 1,
-          // backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-          // hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+          borderWidth: 1,
+          backgroundColor: '#36A2EB',
+          // hoverBackgroundColor: ['#36A2EB'],
           data: data.map(e => e.opened_cases)
         },
         {
           label: 'Saker lukket ',
-          backgroundColor: 'rgba(100,225,132,0.8)',
-          // borderColor: 'rgba(255,99,132,1)',
-          // borderWidth: 1,
-          // backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-          // hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+          borderWidth: 1,
+          backgroundColor: '#FFCE56',
+          // hoverBackgroundColor: ['#FFCE56',
           data: data.map(e => e.closed_cases)
         }
       ]
