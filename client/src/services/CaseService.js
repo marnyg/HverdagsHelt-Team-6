@@ -90,7 +90,7 @@ class CaseService {
             }else{
               formData.append("images", null)
             }
-            
+
             formData.append("title", c.title);
             formData.append("description", c.description);
             formData.append("lat", c.lat);
@@ -196,5 +196,60 @@ class CaseService {
     //Get all cases in region, given region_id, limit and offset
     getCasesByRegionWithLimitOffset(region_id: number, limit: number, offset: number){
     }
+
+    uploadPicture(case_id: number): Promise<any>{
+      return new Promise((resolve, reject) => {
+          let loginService = new LoginService();
+          loginService
+              .isLoggedIn()
+              .then((logged_in: Boolean) => {
+                  if (logged_in === true) {
+                      let token = localStorage.getItem('token');
+                      axios
+                          .post(
+                              '/api/pictures/' + case_id,
+                              {
+                                  headers: {
+                                      Authorization: 'Bearer ' + token
+                                  }
+                              }
+                          )
+                          .then((response) => resolve(response))
+                          .catch((error: Error) => reject(error));
+                  } else {
+                      reject('User is not logged in');
+                  }
+              })
+              .catch((error: Error) => reject(error));
+      });
+    }
+
+    deletePicture(case_id: number, image_name: string): Promise<any>{
+      return new Promise((resolve, reject) => {
+          let loginService = new LoginService();
+          loginService
+              .isLoggedIn()
+              .then((logged_in: Boolean) => {
+                  if (logged_in === true) {
+                      let token = localStorage.getItem('token');
+                      axios
+                          .delete(
+                              '/api/pictures/' + case_id + '/' + image_name,
+                              {
+                                  headers: {
+                                      Authorization: 'Bearer ' + token
+                                  }
+                              }
+                          )
+                          .then((response) => resolve(response))
+                          .catch((error: Error) => reject(error));
+                  } else {
+                      reject('User is not logged in');
+                  }
+              })
+              .catch((error: Error) => reject(error));
+      });
+    }
+
 }
 export default CaseService;
