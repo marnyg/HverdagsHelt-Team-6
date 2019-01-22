@@ -9,8 +9,8 @@ import CaseSubscriptionService from "../services/CaseSubscriptionService";
 import CaseSubscription from "../classes/CaseSubscription";
 import hverdagsheltLogo from '../../public/hverdagsheltLogo2Trans.png';
 
-const region_employee_id = 2; // Change to 2 upon delivery
-const admin_id = 1; // Change to 1 upon delivery
+const region_employee_id = 4; // Change to 2 upon delivery
+const admin_id = 4 ; // Change to 1 upon delivery
 
 class Navbar extends Component {
     notification_count = 0;
@@ -23,7 +23,6 @@ class Navbar extends Component {
     render() {
         let loginlink = null;
         let user = JSON.parse(localStorage.getItem('user'));
-        console.log(user);
         if(user === null){
             loginlink = (
                 <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#login-modal">
@@ -159,7 +158,7 @@ class Navbar extends Component {
                         </NavLink>
                     </li>
                     <li className="nav-item">
-                        <NavLink exact to={'/'} className="nav-link" style={{cursor: 'pointer'}} onClick={(event) => this.props.logout(event)}>
+                        <NavLink exact to={'/'} className="nav-link" style={{cursor: 'pointer'}} onClick={(event) => this.logout(event)}>
                             Logg ut
                         </NavLink>
                     </li>
@@ -172,17 +171,25 @@ class Navbar extends Component {
                         <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#register-modal">
                             Ny bruker
                         </div>
-                        <RegisterModal onLogin={() => this.props.onLogin()}/>
+                        <RegisterModal onLogin={() => this.onLogin()}/>
                     </li>
                     <li className="nav-item">
                         <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#login-modal">
                             Logg inn
                         </div>
-                        <LoginModal modal_id={'login-modal'} onLogin={() => this.props.onLogin()} />
+                        <LoginModal modal_id={'login-modal'} onLogin={() => this.onLogin()} />
                     </li>
                 </ul>
             );
         }
+    }
+
+    onLogin() {
+        this.props.onLogin();
+    }
+
+    logout(event) {
+        this.props.logout(event);
     }
 }
 export default withRouter(Navbar);
