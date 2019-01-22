@@ -19,7 +19,7 @@ class MyProfile extends Component {
       return <div>404</div>;
     }
     return (
-        <div style={{'max-width': '400px'}} className={'mx-3'}>
+        <div style={{'maxWidth': '400px'}} className={'mx-3'}>
             {this.currentComponent}
         </div>
     );

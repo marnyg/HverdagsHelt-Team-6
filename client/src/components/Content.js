@@ -30,7 +30,6 @@ class Content extends Component {
       let registerButton = null;
       let user = JSON.parse(localStorage.getItem('user'));
       if(user === null){
-          console.log('user is null');
           registerButton = (
               <div>
                   <div className="btn btn-primary btn-lg w-100 mb-3 megabutton" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#content-login">

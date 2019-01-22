@@ -87,12 +87,12 @@ class App extends Component {
             .then(res => {
                 this.logged_in = false;
                 console.log('Loggin out');
-                this.props.history.push('/');
             })
             .catch((error: Error) => console.error(error));
     }
 
     onLogin = () => {
+        console.log('Logged in');
         this.logged_in = true;
     }
 }

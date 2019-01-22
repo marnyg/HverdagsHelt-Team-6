@@ -1,6 +1,7 @@
 // @flow
 
 import { Status } from '../models.js';
+import { regexNames } from './../utils/Regex.js';
 
 type Request = express$Request;
 type Response = express$Response;
@@ -10,7 +11,7 @@ module.exports = {
     return Status.findAll().then(statuses => res.send(statuses));
   },
   addStatus: function(req: Request, res: Response) {
-    if (!req.body || typeof req.body.name !== 'string') return res.sendStatus(400);
+    if (!req.body || typeof req.body.name !== 'string' || !regexNames.test(req.body.name)) return res.sendStatus(400);
     return Status.create({
       name: req.body.name
     })
@@ -22,7 +23,7 @@ module.exports = {
       });
   },
   updateStatus: function(req: Request, res: Response) {
-    if (!req.body || typeof req.body.name !== 'string') return res.sendStatus(400);
+    if (!req.body || typeof req.body.name !== 'string' || !regexNames.test(req.body.name)) return res.sendStatus(400);
     return Status.update(
       {
         name: req.body.name
