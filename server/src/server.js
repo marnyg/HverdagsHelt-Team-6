@@ -50,6 +50,14 @@ const storage = multer.diskStorage({
 
 let upload = multer({ storage: storage });
 
+app.post('/api/login', (req: Request, res: Response) => {
+  return login(req, res);
+});
+
+app.post('/api/logout', (req: Request, res: Response) => {
+  return logout(req, res);
+});
+
 app.post('/api/uploads', upload.single('avatar'), (req, res) => {
   if (!req.file) {
     console.log('No file received');
@@ -66,12 +74,6 @@ app.post('/api/uploads', upload.single('avatar'), (req, res) => {
   }
 });
 
-app.post('/api/cases', upload.array('images', 3), Cases.createNewCase);
-
-app.get('/', (req: Request, res: Response) => res.sendFile(public_path + '/index.html'));
-
-app.get('/api/cases', (req: Request, res: Response) => Cases.getAllCases(req, res));
-
 app.post('/api/verify', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, (req, res) => {
     console.log('------Token Verified!-------');
@@ -79,23 +81,26 @@ app.post('/api/verify', (req: Request, res: Response) => {
   });
 });
 
-app.post('/api/login', (req: Request, res: Response) => {
-  return login(req, res);
-});
+app.get('/', (req: Request, res: Response) => res.sendFile(public_path + '/index.html'));
 
-app.post('/api/logout', (req: Request, res: Response) => {
-  return logout(req, res);
-});
+app.get('/api/cases', (req: Request, res: Response) => Cases.getAllCases(req, res));
 
-app.post('/api/pictures/:case_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Pictures.uploadPicture);
-});
-
-app.delete('/api/pictures/:case_id/:image_name', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Pictures.delPicture);
-});
+app.post('/api/cases', upload.array('images', 3), Cases.createNewCase);
 
 app.get('/api/cases/:case_id', (req: Request, res: Response) => Cases.getOneCase(req, res));
+
+app.put('/api/cases/:case_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Cases.updateCase);
+});
+
+app.delete('/api/cases/:case_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Cases.deleteCase);
+  /*
+  return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(
+    cases => (cases ? res.send() : res.status(500).send())
+  );
+  */
+});
 
 app.get('/api/cases/user_cases/:user_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Cases.getAllCasesForUser);
@@ -117,17 +122,12 @@ app.delete('/api/cases/:case_id/status_comments/:status_comment_id', (req: Reque
   reqAccessLevel(req, res, 2, Status_comment.delStatus_comment);
 });
 
-app.put('/api/cases/:case_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Cases.updateCase);
+app.post('/api/pictures/:case_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Pictures.uploadPicture);
 });
 
-app.delete('/api/cases/:case_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Cases.deleteCase);
-  /*
-  return Case.destroy({ where: { case_id: Number(req.params.case_id) } }).then(
-    cases => (cases ? res.send() : res.status(500).send())
-  );
-  */
+app.delete('/api/pictures/:case_id/:image_name', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Pictures.delPicture);
 });
 
 app.get('/api/cases/subscriptions/:user_id', (req: Request, res: Response) => {
@@ -232,7 +232,7 @@ app.post('/api/counties', (req: Request, res: Response) => {
 });
 
 app.get('/api/counties/:county_name', (req: Request, res: Response) => {
-  County.getOneCountyByName(req,res);
+  County.getOneCountyByName(req, res);
 });
 
 app.put('/api/counties/:county_id', (req: Request, res: Response) => {
@@ -320,12 +320,20 @@ app.get('/api/stats/opened/:year', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 2, Stats.getNationalStatsOpened);
 });
 
+app.get('/api/stats/categories/:year', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Stats.getNationalStatsCategories);
+});
+
 app.get('/api/stats/closed/:year/:region_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 2, Stats.getNationalStatsClosedByRegion);
 });
 
 app.get('/api/stats/opened/:year/:region_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 2, Stats.getNationalStatsOpenedByRegion);
+});
+
+app.get('/api/stats/categories/:year/:region_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Stats.getStatsCategoriesByRegion);
 });
 
 app.get('/*', (req, res) => {
