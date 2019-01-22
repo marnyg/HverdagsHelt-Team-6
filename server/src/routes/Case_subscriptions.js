@@ -102,7 +102,7 @@ module.exports = {
       !req.params ||
       isNaN(Number(req.params.case_id)) ||
       typeof req.body.user_id !== 'number' ||
-      typeof req.body.notify_by_email !== 'boolean' ||
+      (typeof req.body.notify_by_email !== 'boolean' && req.body.notify_by_email !== null) ||
       typeof req.body.is_up_to_date !== 'boolean' ||
       typeof req.token !== 'string'
     )
@@ -111,14 +111,15 @@ module.exports = {
     let decoded_token = verifyToken(req.token);
     let user_id_token = decoded_token.user_id;
     let user_id_param = req.body.user_id;
+    let case_sub_obj = {
+      is_up_to_date: req.body.is_up_to_date
+    };
+    if(req.body.notify_by_email !== null) case_sub_obj['notify_by_email'] = req.body.notify_by_email;
 
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
 
     return Case_subscriptions.update(
-      {
-        notify_by_email: req.body.notify_by_email,
-        is_up_to_date: req.body.is_up_to_date
-      },
+      case_sub_obj,
       {
         where: { case_id: Number(req.params.case_id), user_id: req.body.user_id }
       }

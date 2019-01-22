@@ -36,7 +36,7 @@ class Notify extends Component {
     // To avoid 'Cannot update during an existing state transition' errors, run after current event through setTimeout
     setTimeout(() => {
       for (let instance of Notify.instances()) instance.alerts.push({ text: text, type: 'success' });
-    }, 10);
+    });
   }
 
   static info(text: React.Node) {
