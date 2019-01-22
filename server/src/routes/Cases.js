@@ -256,10 +256,25 @@ module.exports = {
     let county_check = {'Sør-Trøndelag': 'Trøndelag', 'Nord-Trøndelag': 'Trøndelag'};
     let county_name = req.params.county_name;
     if (req.params.county_name in county_check) county_name = county_check[req.params.county_name];
+
+    let page = 1;
+    let limit = 20;
+
+    if(
+      req.query &&
+      req.query.page &&
+      req.query.limit &&
+      Number(req.query.page) > 0 &&
+      Number(req.query.limit) > 0
+    ) {
+      page = Number(req.query.page);
+      limit = Number(req.query.limit);
+    }
+    let start_limit = (page - 1) * limit;
     
     return sequelize
-      .query(rawQueryCases + ' WHERE r.name = ? AND co.name = ? ' + casesOrder, {
-        replacements: [req.params.region_name, county_name],
+      .query(rawQueryCases + ' WHERE r.name = ? AND co.name = ? ' + casesOrder + ' Limit ?,?', {
+        replacements: [req.params.region_name, county_name, start_limit, limit],
         type: sequelize.QueryTypes.SELECT
       })
       .then(async cases => {
