@@ -1,6 +1,7 @@
 // @flow
 
 import { Role } from '../models.js';
+import { regexNames } from './../utils/Regex.js';
 
 type Request = express$Request;
 type Response = express$Response;
@@ -10,7 +11,12 @@ module.exports = {
     return Role.findAll().then(roles => res.send(roles));
   },
   addRole: function(req: Request, res: Response) {
-    if (!req.body || typeof req.body.name !== 'string' || typeof req.body.access_level !== 'number')
+    if (
+      !req.body ||
+      typeof req.body.name !== 'string' ||
+      typeof req.body.access_level !== 'number' ||
+      !regexNames.test(req.body.name)
+    )
       return res.sendStatus(400);
 
     return Role.create({
@@ -25,7 +31,12 @@ module.exports = {
       });
   },
   updateRole: function(req: Request, res: Response) {
-    if (!req.body || typeof req.body.name !== 'string' || typeof req.body.access_level !== 'number')
+    if (
+      !req.body ||
+      typeof req.body.name !== 'string' ||
+      typeof req.body.access_level !== 'number' ||
+      !regexNames.test(req.body.name)
+    )
       return res.sendStatus(400);
 
     return Role.update(
