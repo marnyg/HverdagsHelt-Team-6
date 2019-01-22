@@ -95,9 +95,6 @@ class Statistics extends Component {
               onClick={() =>
                 console.log(this.nationalBar, this.refs.bar1)
               } > log </button>
-            <div ref="tmp"></div>
-            <img ref="img" src="lol"></img>
-            <a ref="link" download="png.png" href="#">linki_Link</a>
           </div>
         </div>
       </div >
@@ -196,21 +193,13 @@ class Statistics extends Component {
 
   generatePdf() {
     let input = this.refs.statPage;
-    console.log(input);
 
-    html2canvas(input).then(canvas => {
+    html2canvas(input, { scale: 1 }).then(canvas => {
       const imgData = canvas.toDataURL('image/png');
-      console.log(imgData);
-
-      // window.location.href = imgData
-      // this.refs.ling.setAttribute("Downloade", "asd.png")
-      this.refs.img.setAttribute("src", imgData)
-      this.refs.link.setAttribute("href", imgData.replace("image/png", "image/octet-stream"))
 
       const pdf = new jsPDF(1, "mm", "a4")
       pdf.addImage(imgData, 'PNG', 1, 0);
-      // pdf.output('dataurlnewwindow');
-      // pdf.save('download.pdf');
+      pdf.save('download.pdf');
     });
   }
 }
