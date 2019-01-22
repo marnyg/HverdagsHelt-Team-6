@@ -8,10 +8,12 @@ type Response = express$Response;
 
 module.exports = {
   getAllRoles: function(req: Request, res: Response) {
+    if (!req.token) return res.sendStatus(400);
     return Role.findAll().then(roles => res.send(roles));
   },
   addRole: function(req: Request, res: Response) {
     if (
+      !req.token ||
       !req.body ||
       typeof req.body.name !== 'string' ||
       typeof req.body.access_level !== 'number' ||
@@ -32,7 +34,9 @@ module.exports = {
   },
   updateRole: function(req: Request, res: Response) {
     if (
+      !req.params ||
       !req.body ||
+      isNaN(Number(req.params.role_id)) ||
       typeof req.body.name !== 'string' ||
       typeof req.body.access_level !== 'number' ||
       !regexNames.test(req.body.name)
@@ -44,7 +48,7 @@ module.exports = {
         name: req.body.name,
         access_level: req.body.access_level
       },
-      { where: { role_id: req.params.role_id } }
+      { where: { role_id: Number(req.params.role_id) } }
     )
       .then(roles => (roles ? res.send(roles) : res.sendStatus(404)))
       .catch(err => {
@@ -54,6 +58,8 @@ module.exports = {
       });
   },
   delRole: function(req: Request, res: Response) {
+    if (!req.params || isNaN(Number(req.params.role_id))) return res.sendStatus(400);
+
     return Role.destroy({ where: { role_id: Number(req.params.role_id) } })
       .then(role => (role ? res.send() : res.status(500).send()))
       .catch(err => {
