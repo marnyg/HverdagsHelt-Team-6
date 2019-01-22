@@ -23,6 +23,7 @@ class Navbar extends Component {
     render() {
         let loginlink = null;
         let user = JSON.parse(localStorage.getItem('user'));
+        console.log(user);
         if(user === null){
             loginlink = (
                 <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#login-modal">
@@ -87,14 +88,14 @@ class Navbar extends Component {
                                 </NavLink>
                             ) : null}
                         </li>
-                        {user && user.role_id === region_employee_id ? (
+                        {user && user.role_id <= region_employee_id ? (
                             <li className="nav-item">
                                 <NavLink exact to="/employee/inbox" className="nav-link">
                                     Behandle saker
                                 </NavLink>
                             </li>
                         ): null}
-                        {user && user.role_id === admin_id ? (
+                        {user && user.role_id <= admin_id ? (
                             <li className="nav-item">
                                 <NavLink exact to="/admin/regions" className="nav-link">
                                     Admin
@@ -158,9 +159,9 @@ class Navbar extends Component {
                         </NavLink>
                     </li>
                     <li className="nav-item">
-                        <div className="nav-link" style={{cursor: 'pointer'}} onClick={(event) => this.props.logout(event)}>
+                        <NavLink exact to={'/'} className="nav-link" style={{cursor: 'pointer'}} onClick={(event) => this.props.logout(event)}>
                             Logg ut
-                        </div>
+                        </NavLink>
                     </li>
                 </ul>
             );
