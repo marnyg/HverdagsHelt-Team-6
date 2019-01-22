@@ -7,7 +7,7 @@ import Alert from './Alert.js';
 
 
 class LoginModal extends Component {
-    error = false;
+    error = null;
     constructor(){
         super();
         this.submit = this.submit.bind(this);
@@ -43,7 +43,6 @@ class LoginModal extends Component {
 
     submit(event){
         this.error = false;
-        console.log("Submitting login: ", this.email, this.password);
         event.preventDefault();
         let data = {
             email: this.email,
@@ -60,12 +59,14 @@ class LoginModal extends Component {
                     this.props.onLogin();
                 })
                 .catch((error: Error) => {
-                    console.error(error.message);
-                    console.log("Oppsey!");
-                    this.error = true;
+                    this.error = {
+                        message: 'Brukernavn og/eller passord er feil'
+                    };
                 });
         } else {
-            alert("Not valid data. Try again");
+            this.error = {
+              message: 'Du må fylle inn begge feltene for å sende skjemaet'
+            };
         }
     }
 
@@ -77,10 +78,12 @@ class LoginModal extends Component {
 
     pwChange(event){
         this.password = event.target.value;
+        this.error = null;
     }
 
     emailChange(event){
         this.email = event.target.value;
+        this.error = null;
     }
 
     valid(data){

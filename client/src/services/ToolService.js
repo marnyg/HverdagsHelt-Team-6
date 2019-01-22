@@ -43,6 +43,25 @@ class ToolService {
       return null;
     }
   }
+
+  static cleanQueryString(query: string) {
+      let check = {
+          'Nord-Trøndelag': 'Trøndelag',
+          'Sør-Trøndelag': 'Trøndelag',
+          'Øst-Trøndelag': 'Trøndelag',
+          'Vest-Trøndelag': 'Trøndelag'};
+      if(query in check) return check[query];
+      return query;
+
+      /*
+      let help = query;
+      if(help.split('-').length > 1){
+          let part = help.split('-');
+          help = part[part.length - 1];
+      }
+      return help;
+      */
+  }
 }
 
 export default ToolService;

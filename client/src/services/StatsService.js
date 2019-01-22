@@ -91,6 +91,48 @@ class StatService {
                 .catch((error: Error) => reject(error));
         });
     }
+    getStatsCatYearInRegion(year: number, region_id: number): Promise<Region> {
+        return new Promise((resolve, reject) => {
+            let loginService = new LoginService();
+            loginService.isLoggedIn()
+                .then((logged_in: Boolean) => {
+                    if (logged_in === true) {
+                        let token = localStorage.getItem('token');
+                        axios.get('/api/stats/categories/' + year + "/" + region_id, {
+                            headers: {
+                                Authorization: 'Bearer ' + token
+                            }
+                        })
+                            .then(response => resolve(response))
+                            .catch((error: Error) => reject(error));
+                    } else {
+                        reject('User is not registered and/or not logged in.');
+                    }
+                })
+                .catch((error: Error) => reject(error));
+        });
+    }
+    getStatsCatYearNational(year: number): Promise<Region> {
+        return new Promise((resolve, reject) => {
+            let loginService = new LoginService();
+            loginService.isLoggedIn()
+                .then((logged_in: Boolean) => {
+                    if (logged_in === true) {
+                        let token = localStorage.getItem('token');
+                        axios.get('/api/stats/categories/' + year, {
+                            headers: {
+                                Authorization: 'Bearer ' + token
+                            }
+                        })
+                            .then(response => resolve(response))
+                            .catch((error: Error) => reject(error));
+                    } else {
+                        reject('User is not registered and/or not logged in.');
+                    }
+                })
+                .catch((error: Error) => reject(error));
+        });
+    }
 }
 
 export default StatService

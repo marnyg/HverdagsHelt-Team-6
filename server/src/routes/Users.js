@@ -1,14 +1,15 @@
 // @flow
 
 import { User } from '../models.js';
-import { createToken, hashPassword, loginOk, verifyToken } from '../auth';
+import { remove_token, hashPassword, loginOk, verifyToken } from '../auth';
 import { Region_subscriptions, sequelize } from '../models';
-import Epost from './../utils/Epost.js'
+import { regexNames, regexNumber, regexEmail, regexPassword, regexRegionId } from './../utils/Regex.js';
+import Epost from './../utils/Epost.js';
 
 type Request = express$Request;
 type Response = express$Response;
 
-const email_subject = "Bruker opprettet - Hverdagshelt";
+const email_subject = 'Bruker opprettet - Hverdagshelt';
 
 module.exports = {
   getAllUsers: function(req: Request, res: Response) {
@@ -25,15 +26,21 @@ module.exports = {
       typeof req.body.tlf !== 'number' ||
       typeof req.body.email !== 'string' ||
       typeof req.body.password !== 'string' ||
-      typeof req.body.region_id !== 'number'
+      typeof req.body.region_id !== 'number' ||
+      typeof req.body.region_id !== 'number' ||
+      !regexNames.test(req.body.firstname) ||
+      !regexNames.test(req.body.lastname) ||
+      !regexNumber.test(req.body.tlf) ||
+      !regexEmail.test(req.body.email) ||
+      !regexPassword.test(req.body.password) ||
+      !regexRegionId.test(req.body.region_id)
     )
       return res.sendStatus(400);
 
     let hashedPassword = hashPassword(req.body.password);
     let password = hashedPassword['passwordHash'];
     let salt = hashedPassword['salt'];
-
-    return await User.create({
+    let update_user_obj = {
       firstname: req.body.firstname,
       lastname: req.body.lastname,
       tlf: req.body.tlf,
@@ -42,21 +49,28 @@ module.exports = {
       salt: salt,
       role_id: 4,
       region_id: req.body.region_id
-    }).then(async users => {
-      let body = `Epost-adressen ${users.email} har blitt brukt for å opprette en bruker på systemet til hverdagshelt\n` +
-      `Vennligst ta kontakt med vår support på support.hverdagshelt.team6@gmail.com hvis dette ikke var deg.`;
+    }
 
-      let email_info = await Epost.send_email(users.email, email_subject, body);
-      console.log(email_info);
-      if(email_info) res.send({
-        user_id: users.user_id,
-        msg: "Bruker opprettet, og epost sendt."
-      });
-      res.send({
-        user_id: users.user_id,
-        msg: "Bruker opprettet, men epost kunne ikke bli sendt."
-      });
-    })
+    if(req.token && Number(verifyToken(req.token).accesslevel) === 1) update_user_obj['role_id'] = Number(req.body.role_id);
+
+    return await User.create(update_user_obj)
+      .then(async users => {
+        let body =
+          `Epost-adressen ${users.email} har blitt brukt for å opprette en bruker på systemet til hverdagshelt\n` +
+          `Vennligst ta kontakt med vår support på support.hverdagshelt.team6@gmail.com hvis dette ikke var deg.`;
+
+        let email_info = await Epost.send_email(users.email, email_subject, body);
+        console.log(email_info);
+        if (email_info)
+          res.send({
+            user_id: users.user_id,
+            msg: 'Bruker opprettet, og epost sendt.'
+          });
+        res.send({
+          user_id: users.user_id,
+          msg: 'Bruker opprettet, men epost kunne ikke bli sendt.'
+        });
+      })
       .catch(err => {
         err.description = 'Det finnes allerede en bruker med den oppgitte e-posten, bruk en unik e-post';
         res.status(409).json(err);
@@ -90,13 +104,19 @@ module.exports = {
       !req.token ||
       !req.params.user_id ||
       !req.body ||
-      typeof Number(req.params.user_id) !== 'number' ||
-      typeof req.token !== 'string' ||
-      typeof req.body.firstname !== 'string' ||
-      typeof req.body.lastname !== 'string' ||
-      typeof req.body.tlf !== 'number' ||
-      typeof req.body.email !== 'string' ||
-      typeof req.body.region_id !== 'number'
+      typeof Number(req.params.user_id) != 'number' ||
+      typeof req.token !='string' ||
+      typeof req.body.firstname != 'string' ||
+      typeof req.body.lastname != 'string' ||
+      typeof Number(req.body.tlf) != 'number' ||
+      typeof req.body.email != 'string' ||
+      typeof Number(req.body.region_id) != 'number' ||
+      typeof Number(req.body.role_id) != 'number' ||
+      !regexNames.test(req.body.firstname) ||
+      !regexNames.test(req.body.lastname) ||
+      !regexNumber.test(req.body.tlf) ||
+      !regexEmail.test(req.body.email) ||
+      !regexRegionId.test(req.body.region_id)
     )
       return res.sendStatus(400);
 
@@ -106,17 +126,28 @@ module.exports = {
 
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
 
+    let user_update_obj = {
+      firstname: req.body.firstname,
+      lastname: req.body.lastname,
+      tlf: req.body.tlf,
+      email: req.body.email,
+      region_id: req.body.region_id,
+
+    };
+    if(decoded_token.accesslevel === 1) {
+      user_update_obj['role_id'] = Number(req.body.role_id);
+    }
+
     return User.update(
-      {
-        firstname: req.body.firstname,
-        lastname: req.body.lastname,
-        tlf: req.body.tlf,
-        email: req.body.email,
-        region_id: req.body.region_id
-      },
+      user_update_obj,
       { where: { user_id: req.params.user_id } }
     )
-      .then(users => (users ? res.send(users) : res.sendStatus(404)))
+      .then(users => {
+        if(users[0] === 1) {
+          return res.send({ msg: "User successfully updated"});
+        }
+        return res.sendStatus(404);
+      })
       .catch(err => {
         err.description = 'Det finnes allerede en bruker med den oppgitte eposten, bruk en unik epost';
         res.status(409).json(err);
@@ -139,25 +170,25 @@ module.exports = {
 
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
 
-    return User.destroy({ where: { user_id: Number(req.params.user_id) } }).then(user =>
-      user ? res.send() : res.status(400).send()
-    ).catch(() => {
+    return User.destroy({ where: { user_id: Number(req.params.user_id) } })
+      .then(user => (user ? res.send() : res.status(400).send()))
+      .catch(() => {
         User.update(
-            {
-                firstname: "Bruker",
-                lastname: "Slettet",
-                tlf: 0,
-                email: "",
-                hashed_password: "",
-                salt: "",
-                role_id: 5
-            },
-            { where: { user_id: Number(req.params.user_id) } }
+          {
+            firstname: 'Bruker',
+            lastname: 'Slettet',
+            tlf: 0,
+            email: '',
+            hashed_password: '',
+            salt: '',
+            role_id: 5
+          },
+          { where: { user_id: Number(req.params.user_id) } }
         ).then(() => {
-            res.status(200).send();
-            console.log("Sensitive user data wiped");
+          res.status(200).send();
+          console.log('Sensitive user data wiped');
         });
-    });
+      });
   },
   changePassword: async function(req: Request, res: Response) {
     if (
@@ -167,7 +198,8 @@ module.exports = {
       typeof Number(req.params.user_id) !== 'number' ||
       typeof req.token !== 'string' ||
       typeof req.body.old_password !== 'string' ||
-      typeof req.body.new_password !== 'string'
+      typeof req.body.new_password !== 'string' ||
+      !regexPassword.test(req.body.new_password)
     )
       return res.sendStatus(400);
 

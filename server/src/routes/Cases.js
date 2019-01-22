@@ -5,6 +5,7 @@ import { reqAccessLevel, verifyToken } from '../auth';
 import { Case_subscriptions, Picture } from '../models';
 import { promisify } from 'util';
 import path from 'path';
+import { regexNames } from '../utils/Regex';
 const fs = require('fs');
 const unlinkAsync = promisify(fs.unlink);
 
@@ -69,10 +70,11 @@ module.exports = {
         !req.token ||
         typeof req.body.title !== 'string' ||
         typeof req.body.description !== 'string' ||
-        typeof Number(req.body.lat) != 'number' ||
-        typeof Number(req.body.lon) != 'number' ||
-        typeof Number(req.body.region_id) != 'number' ||
-        typeof Number(req.body.category_id) != 'number'
+        typeof Number(req.body.lat) !== 'number' ||
+        typeof Number(req.body.lon) !== 'number' ||
+        typeof Number(req.body.region_id) !== 'number' ||
+        typeof Number(req.body.category_id) !== 'number' ||
+        !regexNames.test(req.body.title)
       ) {
         console.log(req.body);
         return res.sendStatus(400);
@@ -124,7 +126,7 @@ module.exports = {
   },
 
   getOneCase: async function(req: Request, res: Response) {
-    if (!req.params || typeof Number(req.params.case_id) != 'number') return res.sendStatus(400);
+    if (!req.params || typeof Number(req.params.case_id) !== 'number') return res.sendStatus(400);
     sequelize
       .query(rawQueryCases + ' WHERE c.case_id = ?;', {
         replacements: [req.params.case_id],
@@ -145,14 +147,15 @@ module.exports = {
       !req.body ||
       !req.token ||
       !req.params ||
-      typeof Number(req.params.case_id) != 'number' ||
-      typeof req.body.title != 'string' ||
-      typeof req.body.description != 'string' ||
-      typeof Number(req.body.lat) != 'number' ||
-      typeof Number(req.body.lon) != 'number' ||
-      typeof Number(req.body.reqion_id) != 'number' ||
-      typeof Number(req.body.category_id) != 'number' ||
-      typeof Number(req.body.status_id) != 'number'
+      typeof Number(req.params.case_id) !== 'number' ||
+      typeof req.body.title !== 'string' ||
+      typeof req.body.description !== 'string' ||
+      typeof Number(req.body.lat) !== 'number' ||
+      typeof Number(req.body.lon) !== 'number' ||
+      typeof Number(req.body.reqion_id) !== 'number' ||
+      typeof Number(req.body.category_id) !== 'number' ||
+      typeof Number(req.body.status_id) !== 'number' ||
+      !regexNames.test(req.body.title)
     )
       return res.sendStatus(400);
 
@@ -166,9 +169,10 @@ module.exports = {
       description: b.description,
       lat: b.lat,
       lon: b.lon,
-      region_id: b.region_id
+      region_id: b.region_id,
+      category_id: b.category_id
     };
-    if (token_access_level <= 2) update_body['status_id'] = req.body.status_id;
+    if (Number(token_access_level === 1)) update_body['status_id'] = req.body.status_id;
 
     return Case.findOne({ where: { case_id: param_case_id } })
       .then(cases => {
@@ -233,10 +237,13 @@ module.exports = {
   getAllCasesInRegionByName: async function(req: Request, res: Response) {
     if (!req.params || typeof req.params.county_name != 'string' || typeof req.params.region_name != 'string')
       return res.sendStatus(400);
-
+    let county_check = {'Sør-Trøndelag': 'Trøndelag', 'Nord-Trøndelag': 'Trøndelag'};
+    let county_name = req.params.county_name;
+    if (req.params.county_name in county_check) county_name = county_check[req.params.county_name];
+    
     return sequelize
       .query(rawQueryCases + ' WHERE r.name = ? AND co.name = ? ' + casesOrder, {
-        replacements: [req.params.region_name, req.params.county_name],
+        replacements: [req.params.region_name, county_name],
         type: sequelize.QueryTypes.SELECT
       })
       .then(async cases => {
@@ -253,6 +260,7 @@ module.exports = {
   },
   getAllCasesInRegionById: async function(req: Request, res: Response) {
     if (!req.params || typeof Number(req.params.region_id) != 'number') return res.sendStatus(400);
+
     sequelize
       .query(rawQueryCases + ' WHERE c.region_id = ? ' + casesOrder, {
         replacements: [Number(req.params.region_id)],

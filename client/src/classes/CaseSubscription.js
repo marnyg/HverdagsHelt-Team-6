@@ -1,7 +1,7 @@
 class CaseSubscription {
   user_id: number;
   case_id: number;
-  notify_by_email: boolean;
+  notify_by_email: ?boolean;
   is_up_to_date: boolean;
 
   constructor(user_id, case_id, notify_by_email, is_up_to_date){

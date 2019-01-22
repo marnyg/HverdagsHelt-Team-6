@@ -17,7 +17,7 @@ class EmployeePage extends Component{
         let inbox_tab = {
             path:'/employee/inbox', name: (
                 <div>
-                    Inbox
+                    Innboks
                     <div className="badge badge-danger ml-2">{this.inbox.length}</div>
                 </div>
             ),
@@ -26,7 +26,7 @@ class EmployeePage extends Component{
         let started_tab = {
             path:'/employee/started', name: (
                 <div>
-                    Started
+                    Under behandling
                     <div className="badge badge-warning ml-2">{this.started.length}</div>
                 </div>
             ), component: <Inbox cases={this.started}/>
@@ -34,7 +34,7 @@ class EmployeePage extends Component{
         let closed_tab = {
             path:'/employee/closed', name: (
                 <div>
-                    Closed
+                    Lukket
                     <div className="badge badge-success ml-2">{this.closed.length}</div>
                 </div>
             ), component: <Inbox cases={this.closed}/>
@@ -51,8 +51,8 @@ class EmployeePage extends Component{
             component: <Statistics/>,
         };
 
-        let admin_tab = {
-            path:'/employee/statistics',
+        let team_tab = {
+            path:'/employee/team',
             name: (
                 <div>
                     <div className="badge badge-primary">
@@ -64,7 +64,7 @@ class EmployeePage extends Component{
         };
 
         let left_tabs = [inbox_tab, started_tab, closed_tab];
-        let right_tabs = [statistics_tab, admin_tab];
+        let right_tabs = [statistics_tab, team_tab];
         return(
             <div className={'w-100'}>
                 <Navigation left_tabs={left_tabs} right_tabs={right_tabs}/>
@@ -73,7 +73,6 @@ class EmployeePage extends Component{
     }
 
     mounted() {
-        console.log('EmployeePage mounted');
         let user = JSON.parse(localStorage.getItem('user'));
         if(user){
             this.fetchCases(user.region_id);
