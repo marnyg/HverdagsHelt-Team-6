@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Location from '../classes/Location.js';
+import ToolService from "./ToolService";
 const key = 'AIzaSyBfY2sQ7ZU-o-npnt8Ua5RSdV9-5ZCoriM';
 class LocationService {
     getLocation(): Promise<Location> {
@@ -22,6 +23,8 @@ class LocationService {
                                         let country = locationdata.results[0].address_components.find(e => e.types[0] === "country").long_name;
                                         //
                                         // console.log(lat, long, city, region, country);
+                                        ToolService.cleanQueryString(city);
+                                        ToolService.cleanQueryString(region);
                                         resolve(new Location(lat, long, city, region, country));
                                     } else {
                                         reject({ message: 'Navigator received no results on location query' });
@@ -46,6 +49,8 @@ class LocationService {
                                 let lat = location.lat;
                                 let long = location.lon;
                                 //console.log(lat, long, city, region, country);
+                                ToolService.cleanQueryString(city);
+                                ToolService.cleanQueryString(region);
                                 resolve(new Location(lat, long, city, region, country));
                             })
                             .catch((error: Error) => reject(error));
@@ -61,6 +66,8 @@ class LocationService {
                         let country = location.data.country;
                         let lat = location.data.lat;
                         let long = location.data.lon;
+                        ToolService.cleanQueryString(city);
+                        ToolService.cleanQueryString(region);
                         resolve(new Location(lat, long, city, region, country));
                     })
                     .catch((error: Error) => reject(error));

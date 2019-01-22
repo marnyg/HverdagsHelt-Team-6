@@ -5,6 +5,7 @@ import User from "../../classes/User";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import UserService from "../../services/UserService";
+import ToolService from '../../services/ToolService';
 
 const region_employee_id = 2;
 
@@ -12,7 +13,18 @@ class AdminTeamForm extends Component {
     password_error = false;
 
     render() {
-        if(this.props.region === undefined || this.props.region === null) return null;
+        if(this.props.region === undefined || this.props.region === null){
+            return(
+                <div className={'card px-3 py-3 mb-2'}>
+                    <div className={''}>
+                        <h2>Velg en kommune fra listen</h2>
+                    </div>
+                    <div className={'text-muted'}>
+                        <strong>Kommune: </strong>
+                    </div>
+                </div>
+            );
+        }
         //User(null, null, Number(this.region_id), this.fn, this.ln, Number(this.phone), this.email, this.password1);
         return(
             <div className={'card px-3 py-3 mb-2'}>
@@ -37,10 +49,14 @@ class AdminTeamForm extends Component {
                     <label htmlFor={'email'} className={'mt-2'}>Epost</label>
                     <input className={'form-control'} type={'text'} id={'email'} placeholder={'Epost'}/>
 
-                    <label htmlFor={'phone'} className={'mt-2'}>Telefon</label>
+                    <label htmlFor={'phone'} className={'mt-3 mb-0'}>Telefon</label>
+                    <br/>
+                    <small className={'text-muted ml-3'}>Minimum 8 tall, uten landskode</small>
                     <input className={'form-control'} type={'text'} id={'phone'} placeholder={'Telefon'}/>
 
-                    <label htmlFor={'password1'} className={'mt-2'}>Passord</label>
+                    <label htmlFor={'password1'} className={'mt-3 mb-0'}>Passord</label>
+                    <br/>
+                    <small className={'text-muted ml-3'}>Må inneholde store og små bokstaver og tall</small>
                     <input className={'form-control'} type={'text'} id={'password1'} placeholder={'Passord'}/>
 
                     <label htmlFor={'password2'} className={'mt-2'}>Gjenta passord</label>
@@ -60,7 +76,8 @@ class AdminTeamForm extends Component {
         let lname = document.querySelector('#lastname').value;
         let email = document.querySelector('#email').value;
         let phone = document.querySelector('#phone').value;
-        let role_id = region_employee_id;
+        let role_id = ToolService.employee_role_id;
+        console.log('Empl role_id:', ToolService.employee_role_id);
 
         let user = null;
         if(pw1 !== undefined && pw1 !== null && pw1 !== "" && pw2 !== undefined && pw2 !== null && pw2 !== ""){
@@ -83,8 +100,9 @@ class AdminTeamForm extends Component {
                     }
                 }
                 if(valid){
+                    console.log(user);
                     let userService = new UserService();
-                    userService.createUser(user)
+                    userService.createEmployee(user)
                         .then(res => {
                             console.log(res);
                             document.querySelector('#password1').value = "";
