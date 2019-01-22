@@ -242,30 +242,6 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
             Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
           });
       } else {
-        console.log('Did not find case_id to delete.');
-      }
-    }
-  }
-
-  onClickSubscribeButton(event: SyntheticInputEvent<HTMLButtonElement>) {
-    console.log('Clicked subscribe button!');
-    let sub = new CaseSubscriptionService();
-    let td = event.target.parentElement;
-    if (td && td.parentElement && td.parentElement instanceof HTMLTableRowElement) {
-      let c = this.cases[td.parentElement.rowIndex - 1];
-      if (this.isSubscribed(c)) {
-        // Unsubscribe the user from this case
-        sub
-          .deleteCaseSubscription(c.case_id, ToolService.getUserId())
-          .then(() => {
-            this.subscriptions = this.subscriptions.filter(e => e.case_id !== c.case_id);
-            //console.log("Unsubscribed, returned: ", e);
-          })
-          .catch((err: Error) => {
-            console.log('Could not unsubscribe user from case with id ' + c.case_id);
-            Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
-          });
-      } else {
         // Subscribe this case to user
         let s = new CaseSubscription(ToolService.getUserId(), c.case_id, false, true);
         sub
@@ -275,8 +251,8 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
             this.subscriptions.push(e);
           })
           .catch((err: Error) => {
-            console.log('Could not unsubscribe user from case with id ' + c.case_id);
-            Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
+            console.log('Could not subscribe user from case with id ' + c.case_id);
+            Notify.warning('Det oppstod en feil ved oppretting av abonnement på saken. \n\nFeilmelding: ' + err.message);
           });
       }
     } else {

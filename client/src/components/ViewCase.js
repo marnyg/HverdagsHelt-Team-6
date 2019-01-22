@@ -26,6 +26,7 @@ import ToolService from '../services/ToolService';
 import CaseSubscription from '../classes/CaseSubscription';
 
 const MAX_NUMBER_IMG: number = 3; // Maximum number of images allowed in a single case.
+const subscriptionButtonStyles = ['btn btn-info', 'btn btn-outline-info'];
 
 // Privilege levels
 const NOT_USER: number = 6;
@@ -45,6 +46,7 @@ const COMMENTS_PER_QUERY = 5;
 class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   case: Case = null;
   statusComment: StatusComment = new StatusComment();
+  subscription: CaseSubscription = null;
   pos: Location = null;
   offset: number = 0;
   deletedImages: string[] = [];
@@ -65,6 +67,9 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     return (
       <div className={'modal-body row'}>
         <div className={'col-md-6'}>
+          <button className={this.getSubscriptionButtonStyles(this.case)} onClick={this.onClickSubscribeButton}>
+            Abonner
+          </button>
           <form
             ref={e => {
               this.form = e;
@@ -327,6 +332,21 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       })
       .then(() => this.fetchStatusComments())
       .then(() => {
+        let sub = new CaseSubscriptionService();
+        sub
+          .getAllCaseSubscriptions(this.case.user_id)
+          .then(e => {
+            this.subscription = e.find(e => e.case_id === this.case.case_id);
+          })
+          .catch((err: Error) => {
+            console.log('Could not load categories.');
+            Notify.danger(
+              'Klarte ikke å hente abbonnementene dine, vi får derfor ikke til å vise om du allerede er abonnement på denne saken eller ikke. Du kan likevel trykke på abonnerknappen for å enten legge til eller slette abonnement. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+                err.message
+            );
+          });
+      })
+      .then(() => {
         if (this.grantAccess() <= OWNER_EMPLOYEE) {
           stat
             .getAllStatuses()
@@ -370,7 +390,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           .then(e => {
             if (e) {
               // TODO Sjekk om vi kan sende notify by email som null/undefined slik at vi slipper å spørre om tilstanden til ett subscriptionobjekt
-              let sub: CaseSubscription = new CaseSubscription(ToolService.getUserId(), this.case.case_id, false, true);
+              let sub: CaseSubscription = new CaseSubscription(ToolService.getUserId(), this.case.case_id, null, true);
               cassub
                 .updateCaseSubscription(sub)
                 .then(() => {
@@ -430,10 +450,56 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     return ToolService.getUserId() === c.user_id;
   }
 
-  updatePos(newPos: Object) {
-    this.case.lat = newPos.lat;
-    this.case.lon = newPos.lon;
-    console.log('got pos from map: ', { lat: this.case.lat, lon: this.case.lon });
+  isSubscribed(c: Case) {
+    if(this.subscription){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  getSubscriptionButtonStyles(c: Case) {
+    if (this.isSubscribed(c)) {
+      return subscriptionButtonStyles[1];
+    } else {
+      return subscriptionButtonStyles[0];
+    }
+  }
+
+  onClickSubscribeButton(event: SyntheticInputEvent<HTMLButtonElement>) {
+    console.log('Clicked subscribe button!');
+    let sub = new CaseSubscriptionService();
+    if (this.isSubscribed(this.case)) {
+      // Unsubscribe the user from this case
+      console.log("USER IS SUBSCRIBED");
+      sub
+        .deleteCaseSubscription(this.case.case_id, ToolService.getUserId())
+        .then(() => {
+          this.subscription = null;
+        })
+        .catch((err: Error) => {
+          console.log('Could not unsubscribe user from case with id ' + this.case.case_id);
+          Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
+        });
+    } else {
+      // Subscribe this case to user
+      let s;
+      if(this.subscription){
+        s = new CaseSubscription(ToolService.getUserId(), this.case.case_id, this.subscription.notify_by_email, true);
+      }else{
+        s = new CaseSubscription(ToolService.getUserId(), this.case.case_id, false, true);
+      }
+      sub
+        .createCaseSubscription(s)
+        .then(e => {
+          console.log('Subscribed, returned: ', e);
+          this.subscription = e;
+        })
+        .catch((err: Error) => {
+          console.log('Could not subscribe user from case with id ' + this.case.case_id);
+          Notify.warning('Det oppstod en feil ved oppretting av abonnement på saken. \n\nFeilmelding: ' + err.message);
+        });
+    }
   }
 
   textareaListener(event: SyntheticInputEvent<HTMLInputElement>) {
@@ -528,9 +594,9 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           console.log('Could not delete case with id: ' + this.case.case_id, err);
           Notify.danger('Kunne ikke slette sak med id: ' + this.case.case_id + '. \n\nFeilmelding: ' + err.message);
         });
-    }else{
+    } else {
       console.log("You're not the owner of this case, nor admin! You cannot delete it.");
-      Notify.warning("Du eier ikke denne saken, og kan derfor ikke slette den.");
+      Notify.warning('Du eier ikke denne saken, og kan derfor ikke slette den.');
     }
   }
 
