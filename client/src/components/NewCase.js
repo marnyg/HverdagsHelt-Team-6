@@ -40,7 +40,7 @@ class NewCase extends Component {
   markerPos = this.lastResortPos;
   fileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
   isMapClickable: boolean = false;
-  error=null;
+  error = null;
 
 
   constructor() {
@@ -334,12 +334,12 @@ class NewCase extends Component {
       .then(e => console.log('Received ' + e.length + ' categories from server.'))
       .catch((err: Error) => {
         console.warn('FEIL!' + err.toString());
-        this.error=<Alert
+        this.error = <Alert
           type='danger'
-          text= {'Det oppstod en feil under lasting av kategorier. ' +
-          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-          '\n\nFeilmelding: ' +
-          err.toString()}
+          text={'Det oppstod en feil under lasting av kategorier. ' +
+            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+            '\n\nFeilmelding: ' +
+            err.toString()}
         />
         /*Notify.danger(
           'Det oppstod en feil under lasting av kategorier. ' +
@@ -355,12 +355,12 @@ class NewCase extends Component {
       .then(e => console.log('Received ' + e.length + ' counties from server.'))
       .catch((err: Error) => {
         console.warn('FEIL!' + err.toString());
-        this.error=<Alert
+        this.error = <Alert
           type='danger'
           text={'Det oppstod en feil under lasting av fylker. ' +
-          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-          '\n\nFeilmelding: ' +
-          err.toString()}
+            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+            '\n\nFeilmelding: ' +
+            err.toString()}
         />
         /*Notify.danger(
           'Det oppstod en feil under lasting av fylker. ' +
@@ -449,7 +449,7 @@ class NewCase extends Component {
               // Region detected by Google Location was not found in database
               // Proceeding to set this.case_region_id = undefined. This'll enable the validate() method to tell the user that automatic positioning failed
               this.case.region_id = undefined;
-              this.error=<Alert
+              this.error = <Alert
                 type='warning'
                 text='Vi klarte ikke å plassere din posisjon i en kommune registrert hos oss. Vennligst benytt en annen metode for å sette din posisjon, ellers blir posisjonen satt til din angitte hjemkommune.'
               />
@@ -466,7 +466,7 @@ class NewCase extends Component {
           });
       })
       .catch((err: Error) => {
-        this.error=<Alert
+        this.error = <Alert
           type='danger'
           text={'Det oppstod en feil ved henting av automatisk posisjon. \n\nFeilmelding: ' + err.message}
         />
@@ -566,14 +566,14 @@ class NewCase extends Component {
         .catch((err: Error) => {
           console.warn(err.toString());
           if (this.list1 instanceof HTMLSelectElement) {
-            this.error=<Alert
+            this.error = <Alert
               type='danger'
               text={'Det oppstod en feil under lasting av kommuner fra fylke ' +
-              this.list1.options[this.list1.selectedIndex].text +
-              '. ' +
-              'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-              '\n\nFeilmelding: ' +
-              err.toString()}
+                this.list1.options[this.list1.selectedIndex].text +
+                '. ' +
+                'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+                '\n\nFeilmelding: ' +
+                err.toString()}
             />
             /*Notify.danger(
               'Det oppstod en feil under lasting av kommuner fra fylke ' +
@@ -617,7 +617,7 @@ class NewCase extends Component {
       } else {
         // File type not accepted.
         console.warn('File type not accepted.');
-        this.error=<Alert
+        this.error = <Alert
           type='warning'
           text='Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png.'
         />
@@ -640,7 +640,7 @@ class NewCase extends Component {
         if (region) {
           return region.region_id;
         } else {
-          this.error=<Alert
+          this.error = <Alert
             type='danger'
             text='Ingen kommuner passer ditt valg.'
           />
@@ -650,7 +650,7 @@ class NewCase extends Component {
       })
       .catch((err: Error) => {
         console.log('Could not get regions.');
-        this.error=<Alert
+        this.error = <Alert
           type='danger'
           text={'Kunne ikke hente kommunedata fra server for å sammenlikne med din valgte kommune. \n\nFeilmelding: ' + err.message}
         />
@@ -665,7 +665,7 @@ class NewCase extends Component {
   validate(index: number) {
     if (!this.form.checkValidity()) {
       console.log('Basic HTML Form validation failed!');
-      this.error=<Alert
+      this.error = <Alert
         type='warning'
         text='Vennligst fyll in de påkrevde feltene og prøv igjen.'
       />
@@ -682,15 +682,15 @@ class NewCase extends Component {
           if (this.pos && this.case.region_id) {
             return true;
           } else {
-            this.error=<Alert
+            this.error = <Alert
               type='warning'
               text={'Din automatisk detekterte posisjon (lat: ' +
-              this.pos.lat +
-              ', lon: ' +
-              this.pos.lon +
-              ') finner sted i ' +
-              this.pos.country +
-              ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'}
+                this.pos.lat +
+                ', lon: ' +
+                this.pos.lon +
+                ') finner sted i ' +
+                this.pos.country +
+                ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'}
             />;
             /*Notify.warning(
               'Din automatisk detekterte posisjon (lat: ' +
@@ -706,20 +706,36 @@ class NewCase extends Component {
           }
         case 1:
           // Validate map marker position
+          console.log("asdds", this.case.region_id, this.pos.region);
 
-          if (!this.case.region_id && this.pos.region) {
+          console.log(true && this.case.region_id && this.pos.region)
+
+
+          if (this.case.region_id && this.pos.region) {
+            if (this.pos.region === "Sør-Trøndelag") {
+              console.log(this.pos.region);
+              this.pos.region = "Trøndelag"
+              console.log("mark", this.pos.region);
+
+            }
             let reg = new RegionService();
             let cs = new CountyService();
             cs.getAllCounties()
               .then(e => {
-                let county = e.find(f => f.county_name === this.pos.region);
+                let county = e.find(f => f.name === this.pos.region);
+                console.log(county);
+                console.log(e);
+
                 if (county) {
                   reg
                     .getAllRegionGivenCounty(county.county_id)
                     .then(e => {
-                      let region = e.find(f => f.region_name === this.pos.city);
+                      let region = e.find(f => f.name === this.pos.city);
+                      console.log(e)
                       if (region) {
                         this.case.region_id = region.region_id;
+                        console.log("val returned true");
+
                         return true;
                       } else {
                         console.log(
@@ -729,10 +745,10 @@ class NewCase extends Component {
                       }
                     })
                     .catch((err: Error) => {
-                      this.error=<Alert
+                      this.error = <Alert
                         type='danger'
                         text={'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente kommunedata. Vennligst prøv igjen. \n\nFeilmelding: ' +
-                        err.message}
+                          err.message}
                       />
                       /*Notify.danger(
                         'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente kommunedata. Vennligst prøv igjen. \n\nFeilmelding: ' +
@@ -741,7 +757,7 @@ class NewCase extends Component {
                       return false;
                     });
                 } else {
-                  this.error=<Alert
+                  this.error = <Alert
                     type='danger'
                     text={'Fylket du trykket på finnes ikke i vår database. Dette kan komme som et resultat av kommunesammenslåing eller at geolokaliseringstjenesten vi benytter ikke bruker samme fylkesdata som oss.'}
                   />
@@ -752,10 +768,10 @@ class NewCase extends Component {
                 }
               })
               .catch((err: Error) => {
-                this.error=<Alert
+                this.error = <Alert
                   type='danger'
                   text={'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente fylkesdata. Vennligst prøv igjen. \n\nFeilmelding: ' +
-                  err.message}
+                    err.message}
                 />
                 /*Notify.danger(
                   'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente fylkesdata. Vennligst prøv igjen. \n\nFeilmelding: ' +
@@ -764,15 +780,15 @@ class NewCase extends Component {
                 return false;
               });
           } else {
-            this.error=<Alert
+            this.error = <Alert
               type='warning'
               text={'Din posisjon (lat: ' +
-              this.pos.lat +
-              ', lon: ' +
-              this.pos.lon +
-              ') finner sted i ' +
-              this.pos.country +
-              ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'}
+                this.pos.lat +
+                ', lon: ' +
+                this.pos.lon +
+                ') finner sted i ' +
+                this.pos.country +
+                ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'}
             />
             /*Notify.warning(
               'Din posisjon (lat: ' +
@@ -786,6 +802,7 @@ class NewCase extends Component {
             console.log('Automatic position is not valid.');
             return false;
           }
+          break;
         case 2:
           // Validate last resort list selection
 
@@ -797,7 +814,7 @@ class NewCase extends Component {
             console.log('Last-resort-list validation is valid.');
             return true;
           } else {
-            this.error=<Alert
+            this.error = <Alert
               type='danger'
               text='Vennligst velg et fylke og en kommune hvor saken finner sted og prøv igjen.'
             />
@@ -812,7 +829,10 @@ class NewCase extends Component {
   send() {
     if (this.case && this.form) {
       let index: number = this.radioSelector();
-      if (this.validate(index)) {
+      let bool = this.validate(index)
+      console.log("valfunk", bool);
+
+      if (bool) {
         console.log('Sending form data to server.');
         console.log('Case is ', this.case);
         let cas = new CaseService();
@@ -820,7 +840,7 @@ class NewCase extends Component {
           .createCase(this.case, this.case.img)
           .then(e => {
             if (e) {
-              this.error=<Alert
+              this.error = <Alert
                 type='success'
                 text={'Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id}
               />
@@ -828,7 +848,7 @@ class NewCase extends Component {
               console.log('Form data transmission success! Case ID: ' + e.case_id);
               this.props.history.push('/case/' + e.case_id);
             } else {
-              this.error=<Alert
+              this.error = <Alert
                 type='danger'
                 text={'Det skjedde en feil ved prosessering av din nye sak. Du kan prøve å finne saken din på Min side > Mine Saker'}
               />
@@ -839,11 +859,11 @@ class NewCase extends Component {
             }
           })
           .catch((err: Error) => {
-            this.error=<Alert
+            this.error = <Alert
               type='danger'
               text={'Det oppstod en feil ved sending av saken til oss. Sørg for at alle felter er fyllt ut korrekt. ' +
-              'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
-              err.message}
+                'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
+                err.message}
             />
             /*Notify.danger(
               'Det oppstod en feil ved sending av saken til oss. Sørg for at alle felter er fyllt ut korrekt. ' +
@@ -856,7 +876,7 @@ class NewCase extends Component {
         console.log('Form is not valid.');
       }
     } else {
-      this.error=<Alert
+      this.error = <Alert
         type='warning'
         text={'En kritisk feil har oppstått. Vennligst last sida på nytt.'}
       />
@@ -900,7 +920,7 @@ class NewCase extends Component {
               // Region detected by Google Location was not found in database
               // Proceeding to set this.case_region_id = undefined. This'll enable the validate() method to tell the user that automatic positioning failed
               this.case.region_id = undefined;
-              this.error=<Alert
+              this.error = <Alert
                 type='warning'
                 text='Vi klarte ikke å plassere din posisjon i en kommune registrert hos oss. Vennligst benytt en annen metode for å sette din posisjon, ellers blir posisjonen satt til din angitte hjemkommune.'
               />
