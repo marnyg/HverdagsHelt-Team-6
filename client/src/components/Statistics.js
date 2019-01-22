@@ -119,10 +119,10 @@ class Statistics extends Component {
       .getNatCasesOpenedInYear(this.year)
       .then(e => (this.openedNat = e))
       .then(() => this.statServ.getNatCasesClosedInYear(this.year).then(e => (this.closedNat = e)))
-      .then(() => this.statServ.getCasesClosedInYearInRegion(this.year, 44).then(e => (this.closedRegional = e)))
-      .then(() => this.statServ.getCasesOpenedInYearInRegion(this.year, 44).then(e => (this.openedRegional = e)))
+      .then(() => this.statServ.getCasesClosedInYearInRegion(this.year, this.region_id).then(e => (this.closedRegional = e)))
+      .then(() => this.statServ.getCasesOpenedInYearInRegion(this.year, this.region_id).then(e => (this.openedRegional = e)))
       .then(() => this.statServ.getStatsCatYearNational(this.year).then(e => (this.catStatNat = e)))
-      .then(() => this.statServ.getStatsCatYearInRegion(this.year, 44).then(e => (this.catStatReg = e)))
+      .then(() => this.statServ.getStatsCatYearInRegion(this.year, this.region_id).then(e => (this.catStatReg = e)))
       .then(() => {
         this.regDataBar = this.joinData(this.openedRegional, this.closedRegional);
         this.natDataBar = this.joinData(this.openedNat, this.closedNat);
