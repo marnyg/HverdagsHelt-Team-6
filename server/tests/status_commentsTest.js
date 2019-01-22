@@ -21,10 +21,17 @@ let case_id = 1;
 
 // ***************** status_comments *****************
 describe('Find all status_comments for a case', () => {
+  test('400 status code for GET /api/cases/:case_id/status_comments without valid case id', done => {
+    return request(application)
+      .get('/api/cases/en/status_comments')
+      .then(response => {
+        expect(response.statusCode).toBe(400);
+        done();
+      });
+  });
   test('200 status code for GET /api/cases/:case_id/status_comments', done => {
     return request(application)
       .get(`/api/cases/${case_id}/status_comments`)
-      .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(200);
         done();
