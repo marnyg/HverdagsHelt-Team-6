@@ -17,7 +17,7 @@ class EmployeePage extends Component{
         let inbox_tab = {
             path:'/employee/inbox', name: (
                 <div>
-                    Inbox
+                    Innboks
                     <div className="badge badge-danger ml-2">{this.inbox.length}</div>
                 </div>
             ),
@@ -26,7 +26,7 @@ class EmployeePage extends Component{
         let started_tab = {
             path:'/employee/started', name: (
                 <div>
-                    Started
+                    Under behandling
                     <div className="badge badge-warning ml-2">{this.started.length}</div>
                 </div>
             ), component: <Inbox cases={this.started}/>
@@ -34,7 +34,7 @@ class EmployeePage extends Component{
         let closed_tab = {
             path:'/employee/closed', name: (
                 <div>
-                    Closed
+                    Lukket
                     <div className="badge badge-success ml-2">{this.closed.length}</div>
                 </div>
             ), component: <Inbox cases={this.closed}/>
