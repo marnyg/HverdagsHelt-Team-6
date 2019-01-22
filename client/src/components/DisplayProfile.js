@@ -10,6 +10,7 @@ import EditProfile from './EditProfile';
 class DisplayProfile extends Component {
     user = JSON.parse(localStorage.getItem("user"));
     render() {
+        console.log('This is the user:', this.user);
         return (
             <div className={'card'}>
                 <div className={'list-group list-group-flush'}>

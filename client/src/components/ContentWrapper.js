@@ -10,9 +10,10 @@ import CaseSubscription from "../classes/CaseSubscription";
 import NoLocationPage from "./NoLocationPage";
 import RegionService from "../services/RegionService";
 import Content from './Content.js';
+import ToolService from "../services/ToolService";
 
 class ContentWrapper extends Component {
-    cases = null;
+    cases = [];
     grid = true;
     region = null;
 
@@ -91,6 +92,8 @@ class ContentWrapper extends Component {
             locationService
                 .getLocation()
                 .then((location: Location) => {
+                    location.region = ToolService.cleanQueryString(location.region);
+                    location.city = ToolService.cleanQueryString(location.city);
                     this.location = location;
                     caseService.getCasesByLoc(location.city, location.region)
                         .then((cases: Case[]) => {

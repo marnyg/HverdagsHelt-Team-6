@@ -1,6 +1,7 @@
 // @flow
 
 import { Category } from '../models.js';
+import { regexNames } from '../utils/Regex';
 
 type Request = express$Request;
 type Response = express$Response;
@@ -10,7 +11,7 @@ module.exports = {
     return Category.findAll().then(category => res.send(category));
   },
   addCategory: function(req: Request, res: Response) {
-    if (!req.body || typeof req.body.name != 'string') return res.sendStatus(400);
+    if (!req.body || typeof req.body.name !== 'string' || !regexNames.test(req.body.name)) return res.sendStatus(400);
     return Category.create({
       name: req.body.name
     })
@@ -22,7 +23,7 @@ module.exports = {
       });
   },
   updateCategory: function(req: Request, res: Response) {
-    if (!req.body || typeof req.body.name != 'string') return res.sendStatus(400);
+    if (!req.body || typeof req.body.name !== 'string' || !regexNames.test(req.body.name)) return res.sendStatus(400);
     return Category.update(
       {
         name: req.body.name

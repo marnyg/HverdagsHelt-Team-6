@@ -9,8 +9,8 @@ import CaseSubscriptionService from "../services/CaseSubscriptionService";
 import CaseSubscription from "../classes/CaseSubscription";
 import hverdagsheltLogo from '../../public/hverdagsheltLogo2Trans.png';
 
-const region_employee_id = 2; // Change to 2 upon delivery
-const admin_id = 1; // Change to 1 upon delivery
+const region_employee_id = 4; // Change to 2 upon delivery
+const admin_id = 4 ; // Change to 1 upon delivery
 
 class Navbar extends Component {
     notification_count = 0;
@@ -87,14 +87,14 @@ class Navbar extends Component {
                                 </NavLink>
                             ) : null}
                         </li>
-                        {user && user.role_id === region_employee_id ? (
+                        {user && user.role_id <= region_employee_id ? (
                             <li className="nav-item">
                                 <NavLink exact to="/employee/inbox" className="nav-link">
                                     Behandle saker
                                 </NavLink>
                             </li>
                         ): null}
-                        {user && user.role_id === admin_id ? (
+                        {user && user.role_id <= admin_id ? (
                             <li className="nav-item">
                                 <NavLink exact to="/admin/regions" className="nav-link">
                                     Admin
@@ -158,9 +158,9 @@ class Navbar extends Component {
                         </NavLink>
                     </li>
                     <li className="nav-item">
-                        <div className="nav-link" style={{cursor: 'pointer'}} onClick={(event) => this.props.logout(event)}>
+                        <NavLink exact to={'/'} className="nav-link" style={{cursor: 'pointer'}} onClick={(event) => this.logout(event)}>
                             Logg ut
-                        </div>
+                        </NavLink>
                     </li>
                 </ul>
             );
@@ -171,17 +171,25 @@ class Navbar extends Component {
                         <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#register-modal">
                             Ny bruker
                         </div>
-                        <RegisterModal onLogin={() => this.props.onLogin()}/>
+                        <RegisterModal onLogin={() => this.onLogin()}/>
                     </li>
                     <li className="nav-item">
                         <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#login-modal">
                             Logg inn
                         </div>
-                        <LoginModal modal_id={'login-modal'} onLogin={() => this.props.onLogin()} />
+                        <LoginModal modal_id={'login-modal'} onLogin={() => this.onLogin()} />
                     </li>
                 </ul>
             );
         }
+    }
+
+    onLogin() {
+        this.props.onLogin();
+    }
+
+    logout(event) {
+        this.props.logout(event);
     }
 }
 export default withRouter(Navbar);

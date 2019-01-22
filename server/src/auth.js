@@ -121,6 +121,7 @@ export async function login(req: Request, res: Response) {
   }
 }
 
+
 export function logout(req: Request, res: Response) {
   if (!req.token) {
     return res.sendStatus(400);
@@ -129,4 +130,12 @@ export function logout(req: Request, res: Response) {
     delete tokens[token];
     return res.sendStatus(200);
   }
+}
+
+export function remove_token(token) {
+  if(token in tokens) {
+    delete tokens[token];
+    return true
+  }
+  return false
 }

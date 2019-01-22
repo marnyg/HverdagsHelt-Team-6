@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import UserService from "../../services/UserService";
 
+const region_employee_id = 2;
 
 class AdminTeamForm extends Component {
     password_error = false;
@@ -59,7 +60,7 @@ class AdminTeamForm extends Component {
         let lname = document.querySelector('#lastname').value;
         let email = document.querySelector('#email').value;
         let phone = document.querySelector('#phone').value;
-        let role_id = 2;
+        let role_id = region_employee_id;
 
         let user = null;
         if(pw1 !== undefined && pw1 !== null && pw1 !== "" && pw2 !== undefined && pw2 !== null && pw2 !== ""){

@@ -2,6 +2,7 @@
 
 import { Region, User } from '../models.js';
 import County from './Counties';
+import { regexNames } from '../utils/Regex';
 
 type Request = express$Request;
 type Response = express$Response;
@@ -34,7 +35,8 @@ module.exports = {
       typeof req.body.name !== 'string' ||
       typeof req.body.lat !== 'number' ||
       typeof req.body.lon !== 'number' ||
-      typeof req.body.county_id !== 'number'
+      typeof req.body.county_id !== 'number' ||
+      !regexNames.test(req.body.name)
     )
       return res.sendStatus(400);
     return Region.create({
@@ -57,7 +59,8 @@ module.exports = {
       typeof req.body.name !== 'string' ||
       typeof req.body.lat !== 'number' ||
       typeof req.body.lon !== 'number' ||
-      typeof req.body.county_id !== 'number'
+      typeof req.body.county_id !== 'number' ||
+      !regexNames.test(req.body.name)
     )
       return res.sendStatus(400);
 
@@ -83,23 +86,21 @@ module.exports = {
   },
 
   getRegionStaff: function(req: Request, res: Response) {
-    if(
-      !req.params ||
-      typeof Number(req.params.region_id) != 'number'
-    ) return res.sendStatus(400);
+    if (!req.params || typeof Number(req.params.region_id) != 'number') return res.sendStatus(400);
 
     const region_id = Number(req.params.region_id);
-    User.findAll(
-      { where: {
+    User.findAll({
+      where: {
         region_id: region_id,
         role_id: 2
-        }
       }
-    )
-      .then(users => { return res.send(users)})
+    })
+      .then(users => {
+        return res.send(users);
+      })
       .catch(error => {
         console.log(error);
         return res.status(500).json(error);
-      })
+      });
   }
 };
