@@ -1,7 +1,7 @@
 // @flow
 
 import { User } from '../models.js';
-import { createToken, hashPassword, loginOk, verifyToken } from '../auth';
+import { remove_token, hashPassword, loginOk, verifyToken } from '../auth';
 import { Region_subscriptions, sequelize } from '../models';
 import Epost from './../utils/Epost.js'
 
@@ -90,13 +90,14 @@ module.exports = {
       !req.token ||
       !req.params.user_id ||
       !req.body ||
-      typeof Number(req.params.user_id) !== 'number' ||
-      typeof req.token !== 'string' ||
-      typeof req.body.firstname !== 'string' ||
-      typeof req.body.lastname !== 'string' ||
-      typeof req.body.tlf !== 'number' ||
-      typeof req.body.email !== 'string' ||
-      typeof req.body.region_id !== 'number'
+      typeof Number(req.params.user_id) != 'number' ||
+      typeof req.token !='string' ||
+      typeof req.body.firstname != 'string' ||
+      typeof req.body.lastname != 'string' ||
+      typeof Number(req.body.tlf) != 'number' ||
+      typeof req.body.email != 'string' ||
+      typeof Number(req.body.region_id) != 'number' ||
+      typeof Number(req.body.role_id) != 'number'
     )
       return res.sendStatus(400);
 
@@ -106,17 +107,28 @@ module.exports = {
 
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
 
+    let user_update_obj = {
+      firstname: req.body.firstname,
+      lastname: req.body.lastname,
+      tlf: req.body.tlf,
+      email: req.body.email,
+      region_id: req.body.region_id,
+
+    };
+    if(decoded_token.accesslevel === 1) {
+      user_update_obj['role_id'] = Number(req.body.role_id);
+    }
+    
     return User.update(
-      {
-        firstname: req.body.firstname,
-        lastname: req.body.lastname,
-        tlf: req.body.tlf,
-        email: req.body.email,
-        region_id: req.body.region_id
-      },
+      user_update_obj,
       { where: { user_id: req.params.user_id } }
     )
-      .then(users => (users ? res.send(users) : res.sendStatus(404)))
+      .then(users => {
+        if(users[0] === 1) {
+          return res.send({ msg: "User successfully updated"});
+        }
+        return res.sendStatus(404);
+      })
       .catch(err => {
         err.description = 'Det finnes allerede en bruker med den oppgitte eposten, bruk en unik epost';
         res.status(409).json(err);
