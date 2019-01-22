@@ -3,6 +3,7 @@ import { Component } from 'react-simplified';
 import { withRouter } from 'react-router-dom';
 import UserService from '../services/UserService.js';
 import Notify from "./Notify";
+import Alert from './Alert.js';
 
 
 class LoginModal extends Component {
@@ -21,12 +22,10 @@ class LoginModal extends Component {
                     <div className="loginmodal-container modal-content">
                         <h1>Logg inn</h1><br/>
                         {this.error ?
-                            <div className={"alert alert-danger alert-dismissible fade show"} role="alert">
-                                <button type="button" className="close" onClick={(event) => this.error = null} data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                                {this.error.message}
-                            </div>
+                            <Alert
+                              type='danger'
+                              text='Brukernavn eller passord er feil'
+                            />
                             :null}
                         <input type="text" name="user" placeholder="Epost" onKeyPress={this.keyCheck} onChange={this.emailChange}></input>
                         <input type="password" name="pass" placeholder="Passord" onKeyPress={this.keyCheck} onChange={this.pwChange}></input>
