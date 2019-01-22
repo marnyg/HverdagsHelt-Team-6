@@ -13,6 +13,7 @@ const email_subject = 'Bruker opprettet - Hverdagshelt';
 
 module.exports = {
   getAllUsers: function(req: Request, res: Response) {
+    if (!req.token) return res.sendStatus(400);
     return User.findAll({ attributes: ['user_id', 'firstname', 'lastname', 'email', 'tlf', 'region_id'] }).then(users =>
       res.send(users)
     );
@@ -49,9 +50,10 @@ module.exports = {
       salt: salt,
       role_id: 4,
       region_id: req.body.region_id
-    }
+    };
 
-    if(req.token && Number(verifyToken(req.token).accesslevel) === 1) update_user_obj['role_id'] = Number(req.body.role_id);
+    if (req.token && Number(verifyToken(req.token).accesslevel) === 1)
+      update_user_obj['role_id'] = Number(req.body.role_id);
 
     return await User.create(update_user_obj)
       .then(async users => {
@@ -61,15 +63,17 @@ module.exports = {
 
         let email_info = await Epost.send_email(users.email, email_subject, body);
         console.log(email_info);
-        if (email_info)
+        if (email_info) {
           res.send({
             user_id: users.user_id,
             msg: 'Bruker opprettet, og epost sendt.'
           });
-        res.send({
-          user_id: users.user_id,
-          msg: 'Bruker opprettet, men epost kunne ikke bli sendt.'
-        });
+        } else {
+          res.send({
+            user_id: users.user_id,
+            msg: 'Bruker opprettet, men epost kunne ikke bli sendt.'
+          });
+        }
       })
       .catch(err => {
         err.description = 'Det finnes allerede en bruker med den oppgitte e-posten, bruk en unik e-post';
@@ -79,12 +83,7 @@ module.exports = {
   },
 
   getOneUser: function(req: Request, res: Response) {
-    if (
-      !req.token ||
-      !req.params.user_id ||
-      typeof Number(req.params.user_id) !== 'number' ||
-      typeof req.token !== 'string'
-    )
+    if (!req.token || !req.params.user_id || isNaN(Number(req.params.user_id)) || typeof req.token !== 'string')
       return res.sendStatus(400);
 
     let decoded_token = verifyToken(req.token);
@@ -104,14 +103,14 @@ module.exports = {
       !req.token ||
       !req.params.user_id ||
       !req.body ||
-      typeof Number(req.params.user_id) != 'number' ||
-      typeof req.token !='string' ||
-      typeof req.body.firstname != 'string' ||
-      typeof req.body.lastname != 'string' ||
-      typeof Number(req.body.tlf) != 'number' ||
-      typeof req.body.email != 'string' ||
-      typeof Number(req.body.region_id) != 'number' ||
-      typeof Number(req.body.role_id) != 'number' ||
+      isNaN(Number(req.params.user_id)) ||
+      typeof req.token !== 'string' ||
+      typeof req.body.firstname !== 'string' ||
+      typeof req.body.lastname !== 'string' ||
+      typeof req.body.tlf !== 'number' ||
+      typeof req.body.email !== 'string' ||
+      typeof req.body.region_id !== 'number' ||
+      typeof req.body.role_id !== 'number' ||
       !regexNames.test(req.body.firstname) ||
       !regexNames.test(req.body.lastname) ||
       !regexNumber.test(req.body.tlf) ||
@@ -131,22 +130,19 @@ module.exports = {
       lastname: req.body.lastname,
       tlf: req.body.tlf,
       email: req.body.email,
-      region_id: req.body.region_id,
-
+      region_id: req.body.region_id
     };
-    if(decoded_token.accesslevel === 1) {
+    if (decoded_token.accesslevel === 1) {
       user_update_obj['role_id'] = Number(req.body.role_id);
     }
 
-    return User.update(
-      user_update_obj,
-      { where: { user_id: req.params.user_id } }
-    )
+    return User.update(user_update_obj, { where: { user_id: req.params.user_id } })
       .then(users => {
-        if(users[0] === 1) {
-          return res.send({ msg: "User successfully updated"});
+        if (!users) return res.sendStatus(404);
+        if (users[0] === 1) {
+          return res.send({ msg: 'User successfully updated' });
         }
-        return res.sendStatus(404);
+        return res.sendStatus(200);
       })
       .catch(err => {
         err.description = 'Det finnes allerede en bruker med den oppgitte eposten, bruk en unik epost';
@@ -156,12 +152,7 @@ module.exports = {
   },
 
   deleteOneUser: function(req: Request, res: Response) {
-    if (
-      !req.token ||
-      !req.params.user_id ||
-      typeof Number(req.params.user_id) !== 'number' ||
-      typeof req.token !== 'string'
-    )
+    if (!req.token || !req.params.user_id || isNaN(Number(req.params.user_id)) || typeof req.token !== 'string')
       return res.sendStatus(400);
 
     let decoded_token = verifyToken(req.token);
@@ -195,7 +186,7 @@ module.exports = {
       !req.token ||
       !req.params.user_id ||
       !req.body ||
-      typeof Number(req.params.user_id) !== 'number' ||
+      isNaN(Number(req.params.user_id)) ||
       typeof req.token !== 'string' ||
       typeof req.body.old_password !== 'string' ||
       typeof req.body.new_password !== 'string' ||
@@ -236,12 +227,7 @@ module.exports = {
     }
   },
   getRegionSubscriptionsForUser: function(req: Request, res: Response) {
-    if (
-      !req.token ||
-      !req.params.user_id ||
-      typeof Number(req.params.user_id) !== 'number' ||
-      typeof req.token !== 'string'
-    ) {
+    if (!req.token || !req.params.user_id || isNaN(Number(req.params.user_id)) || typeof req.token !== 'string') {
       return res.sendStatus(400);
     }
 

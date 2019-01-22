@@ -24,6 +24,7 @@ import Stats from './routes/Stats.js';
 import { Case } from './models.js';
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
+const querystring = require('querystring');
 
 type Request = express$Request;
 type Response = express$Response;

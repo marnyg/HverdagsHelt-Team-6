@@ -1,6 +1,5 @@
 import { application } from '../src/server';
 import request from 'supertest';
-import { Region_subscriptions } from '../src/models';
 
 let admin_token;
 
@@ -37,6 +36,20 @@ describe('Create new region_subscriptions', () => {
     request(application)
       .post('/api/regions/44/subscribe')
       .send()
+      .set('Authorization', `Bearer ${admin_token}`)
+      .then(response => {
+        expect(response.statusCode).toBe(400);
+        done();
+      });
+  });
+  test('400 status code for POST /api/regions/:region_id/subscribe with invalid region_id', done => {
+    request(application)
+      .post('/api/regions/regionTwo/subscribe')
+      .send({
+        user_id: 1,
+        region_id: 44,
+        notify: true
+      })
       .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(400);
@@ -113,6 +126,20 @@ describe('Update one in region_subscriptions', () => {
         done();
       });
   });
+  test('400 status code for PUT /api/regions/:region_id/subscribe with invalid region_id', done => {
+    return request(application)
+      .put(`/api/regions/NaN/subscribe`)
+      .send({
+        user_id: 6,
+        region_id: 44,
+        notify: false
+      })
+      .set('Authorization', `Bearer ${admin_token}`)
+      .then(response => {
+        expect(response.statusCode).toBe(400);
+        done();
+      });
+  });
   test('403 status code for PUT /api/regions/:region_id/subscribe without valid token', done => {
     return request(application)
       .put(`/api/regions/44/subscribe`)
@@ -144,15 +171,25 @@ describe('Update one in region_subscriptions', () => {
 });
 
 describe('Delete one in region_subscriptions', () => {
-  test('400 status code for DELETE /api/regions/:region_id/subscribe with no token', done => {
+  test('400 status code for DELETE /api/regions/:region_id/subscribe invalid region_id', done => {
+    request(application)
+      .delete(`/api/regions/NaN/subscribe`)
+      .send({
+        user_id: 6
+      })
+      .set('Authorization', `Bearer ${admin_token}`)
+      .then(response => {
+        expect(response.statusCode).toBe(400);
+        done();
+      });
+  });
+  test('400 status code for DELETE /api/regions/:region_id/subscribe invalid user_id', done => {
     request(application)
       .delete(`/api/regions/44/subscribe`)
       .send({
-        user_id: 6,
-        region_id: 44,
-        notify: false
+        user_id: 'userSix'
       })
-      .set('Authorization', `Bearer ${''}`)
+      .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();
@@ -162,9 +199,7 @@ describe('Delete one in region_subscriptions', () => {
     request(application)
       .delete(`/api/regions/44/subscribe`)
       .send({
-        user_id: 6,
-        region_id: 44,
-        notify: false
+        user_id: 6
       })
       .set('Authorization', `Bearer ${12345}`)
       .then(response => {
@@ -175,7 +210,9 @@ describe('Delete one in region_subscriptions', () => {
   test('200 status code for DELETE /api/regions/:region_id/subscribe', done => {
     request(application)
       .delete(`/api/regions/44/subscribe`)
-      .send({ region_id: 44, user_id: 6 })
+      .send({
+        user_id: 6
+      })
       .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(200);

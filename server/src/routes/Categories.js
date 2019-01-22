@@ -23,7 +23,13 @@ module.exports = {
       });
   },
   updateCategory: function(req: Request, res: Response) {
-    if (!req.body || typeof req.body.name !== 'string' || !regexNames.test(req.body.name)) return res.sendStatus(400);
+    if (
+      !req.body ||
+      isNaN(Number(req.params.category_id)) ||
+      typeof req.body.name !== 'string' ||
+      !regexNames.test(req.body.name)
+    )
+      return res.sendStatus(400);
     return Category.update(
       {
         name: req.body.name
@@ -38,6 +44,7 @@ module.exports = {
       });
   },
   delCategory: function(req: Request, res: Response) {
+    if (!req.params || isNaN(Number(req.params.category_id))) return res.sendStatus(400);
     return Category.destroy({
       where: { category_id: Number(req.params.category_id) }
     })

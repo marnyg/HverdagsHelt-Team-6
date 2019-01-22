@@ -42,7 +42,7 @@ class StatusCommentService {
               .then((logged_in: Boolean) => {
                   if(logged_in === true){
                       let token = localStorage.getItem('token');
-                      axios.post('/api/cases/status_comments', sc, {
+                      axios.post('/api/cases/' + sc.case_id + '/status_comments', sc, {
                           headers: {
                               Authorization: 'Bearer ' + token
                           }
