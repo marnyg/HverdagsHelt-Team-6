@@ -132,7 +132,6 @@ module.exports = {
       tlf: req.body.tlf,
       email: req.body.email,
       region_id: req.body.region_id,
-
     };
     if(decoded_token.accesslevel === 1) {
       user_update_obj['role_id'] = Number(req.body.role_id);
@@ -143,10 +142,11 @@ module.exports = {
       { where: { user_id: req.params.user_id } }
     )
       .then(users => {
+        if(!users) return res.sendStatus(404);
         if(users[0] === 1) {
           return res.send({ msg: "User successfully updated"});
         }
-        return res.sendStatus(404);
+        return res.sendStatus(200);
       })
       .catch(err => {
         err.description = 'Det finnes allerede en bruker med den oppgitte eposten, bruk en unik epost';
