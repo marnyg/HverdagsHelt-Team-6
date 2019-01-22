@@ -24,6 +24,7 @@ import Stats from './routes/Stats.js';
 import { Case } from './models.js';
 import type { Model } from 'sequelize';
 import Sequelize from 'sequelize';
+const querystring = require('querystring');
 
 type Request = express$Request;
 type Response = express$Response;
@@ -83,6 +84,34 @@ app.post('/api/verify', (req: Request, res: Response) => {
 
 app.get('/', (req: Request, res: Response) => res.sendFile(public_path + '/index.html'));
 
+// ***************************** Case_subscriptions *****************************
+
+app.get('/api/cases/subscriptions/:user_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptions);
+});
+
+app.get('/api/cases/subscriptions/:user_id/cases', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptionCases);
+});
+
+app.post('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Case_subscription.addCase_subscriptions);
+});
+
+app.put('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Case_subscription.updateCase_subscriptions);
+});
+
+app.delete('/api/cases/:case_id/subscribe/:user_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Case_subscription.delCase_subscriptions);
+});
+
+app.get('/api/cases/subscriptions/:user_id/cases/is_up_to_date', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptionCasesIs_up_to_date);
+});
+
+// ***************************** Cases *****************************
+
 app.get('/api/cases', (req: Request, res: Response) => Cases.getAllCases(req, res));
 
 app.post('/api/cases', upload.array('images', 3), Cases.createNewCase);
@@ -106,21 +135,55 @@ app.get('/api/cases/user_cases/:user_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Cases.getAllCasesForUser);
 });
 
-app.get('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
-  Status_comment.getAllStatus_comment(req, res);
+app.get('/api/cases/region_cases/:county_name/:region_name', async (req: Request, res: Response) => {
+  return Cases.getAllCasesInRegionByName(req, res);
 });
 
-app.post('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 2, Status_comment.addStatus_comment);
+app.get('/api/cases/region_cases/:region_id', async (req: Request, res: Response) => {
+  return Cases.getAllCasesInRegionById(req, res);
 });
 
-app.put('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 2, Status_comment.updateStatus_comment);
+// ***************************** Categories *****************************
+
+app.get('/api/categories', (req: Request, res: Response) => {
+  Category.getAllCategories(req, res);
 });
 
-app.delete('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 2, Status_comment.delStatus_comment);
+app.post('/api/categories', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Category.addCategory);
 });
+
+app.put('/api/categories/:category_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Category.updateCategory);
+});
+
+app.delete('/api/categories/:category_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Category.delCategory);
+});
+
+// ***************************** Counties *****************************
+
+app.get('/api/counties', (req: Request, res: Response) => {
+  County.getAllCounties(req, res);
+});
+
+app.post('/api/counties', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, County.addCounty);
+});
+
+app.put('/api/counties/:county_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, County.updateCounty);
+});
+
+app.delete('/api/counties/:county_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, County.delCounty);
+});
+
+app.get('/api/counties/:county_name', (req: Request, res: Response) => {
+  County.getOneCountyByName(req, res);
+});
+
+// ***************************** Pictures *****************************
 
 app.post('/api/pictures/:case_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Pictures.uploadPicture);
@@ -130,37 +193,51 @@ app.delete('/api/pictures/:case_id/:image_name', (req: Request, res: Response) =
   reqAccessLevel(req, res, 4, Pictures.delPicture);
 });
 
-app.get('/api/cases/subscriptions/:user_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptions);
+// ***************************** Regions *****************************
+
+app.get('/api/regions', (req: Request, res: Response) => {
+  Region.getAllRegions(req, res);
 });
 
-app.get('/api/cases/subscriptions/:user_id/cases', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptionCases);
+app.post('/api/regions', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Region.addRegion);
 });
 
-app.get('/api/cases/subscriptions/:user_id/cases/is_up_to_date', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptionCasesIs_up_to_date);
+app.get('/api/regions/:region_id', (req: Request, res: Response) => {
+  Region.getRegion(req, res);
 });
 
-app.post('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Case_subscription.addCase_subscriptions);
+app.put('/api/regions/:region_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Region.updateRegion);
 });
 
-app.put('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Case_subscription.updateCase_subscriptions);
+app.delete('/api/regions/:region_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Region.delRegion);
 });
 
-app.delete('/api/cases/:case_id/subscribe/:user_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Case_subscription.delCase_subscriptions);
+app.get('/api/counties/:county_id/regions', (req: Request, res: Response) => {
+  Region.getAllRegionsInCounty(req, res);
 });
 
-app.get('/api/cases/region_cases/:county_name/:region_name', async (req: Request, res: Response) => {
-  return Cases.getAllCasesInRegionByName(req, res);
+// ***************************** Roles *****************************
+
+app.get('/api/roles', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Role.getAllRoles);
 });
 
-app.get('/api/cases/region_cases/:region_id', async (req: Request, res: Response) => {
-  return Cases.getAllCasesInRegionById(req, res);
+app.post('/api/roles', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Role.addRole);
 });
+
+app.put('/api/roles/:role_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Role.updateRole);
+});
+
+app.delete('/api/roles/:role_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Role.delRole);
+});
+
+// ***************************** Statuses *****************************
 
 app.get('/api/statuses', (req: Request, res: Response) => {
   Status.getAllStatuses(req, res);
@@ -178,21 +255,25 @@ app.delete('/api/statuses/:status_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, Status.delStatus);
 });
 
-app.get('/api/roles', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, Role.getAllRoles);
+// ***************************** Status_comments *****************************
+
+app.get('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
+  Status_comment.getAllStatus_comment(req, res);
 });
 
-app.post('/api/roles', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, Role.addRole);
+app.post('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Status_comment.addStatus_comment);
 });
 
-app.put('/api/roles/:role_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, Role.updateRole);
+app.put('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Status_comment.updateStatus_comment);
 });
 
-app.delete('/api/roles/:role_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, Role.delRole);
+app.delete('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Status_comment.delStatus_comment);
 });
+
+// ***************************** Users *****************************
 
 app.get('/api/users', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, Users.getAllUsers);
@@ -223,50 +304,6 @@ app.get('/api/users/:user_id/region_subscriptions', (req: Request, res: Response
   reqAccessLevel(req, res, 4, Users.getRegionSubscriptionsForUser);
 });
 
-app.get('/api/counties', (req: Request, res: Response) => {
-  County.getAllCounties(req, res);
-});
-
-app.post('/api/counties', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, County.addCounty);
-});
-
-app.get('/api/counties/:county_name', (req: Request, res: Response) => {
-  County.getOneCountyByName(req, res);
-});
-
-app.put('/api/counties/:county_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, County.updateCounty);
-});
-
-app.delete('/api/counties/:county_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, County.delCounty);
-});
-
-app.get('/api/counties/:county_id/regions', (req: Request, res: Response) => {
-  Region.getAllRegionsInCounty(req, res);
-});
-
-app.get('/api/regions', (req: Request, res: Response) => {
-  Region.getAllRegions(req, res);
-});
-
-app.post('/api/regions', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, Region.addRegion);
-});
-
-app.get('/api/regions/:region_id', (req: Request, res: Response) => {
-  Region.getRegion(req, res);
-});
-
-app.put('/api/regions/:region_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, Region.updateRegion);
-});
-
-app.delete('/api/regions/:region_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, Region.delRegion);
-});
-
 app.get('/api/regions/:region_id/staff', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, Region.getRegionStaff);
 });
@@ -290,22 +327,6 @@ app.delete('/api/regions/:region_id/subscribe', (req: Request, res: Response) =>
 
 app.get('/api/email_available', (req: Request, res: Response) => {
   return User.findAll().then(users => res.send(!users.some(user => user.email === req.body.email)));
-});
-
-app.get('/api/categories', (req: Request, res: Response) => {
-  Category.getAllCategories(req, res);
-});
-
-app.post('/api/categories', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, Category.addCategory);
-});
-
-app.put('/api/categories/:category_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, Category.updateCategory);
-});
-
-app.delete('/api/categories/:category_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, Category.delCategory);
 });
 
 app.get('/api/search/:searchtext', (req: Request, res: Response) => {
@@ -356,3 +377,4 @@ export let listen = new Promise<void>((resolve, reject) => {
     resolve();
   });
 });
+

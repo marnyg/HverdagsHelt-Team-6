@@ -10,11 +10,11 @@ module.exports = {
     return Region_subscriptions.findAll().then(subs => res.send(subs));
   },
   addRegion_subscriptions: function(req: Request, res: Response) {
-    let region_id = Number(req.params.region_id);
     if (
       !req.body ||
+      !req.params ||
+      isNaN(Number(req.params.region_id)) ||
       typeof req.body.user_id !== 'number' ||
-      typeof region_id !== 'number' ||
       typeof req.body.notify !== 'boolean'
     )
       return res.sendStatus(400);
@@ -32,11 +32,11 @@ module.exports = {
       });
   },
   updateRegion_subscriptions: function(req: Request, res: Response) {
-    let region_id = Number(req.params.region_id);
     if (
       !req.body ||
+      !req.params ||
+      isNaN(Number(req.params.region_id)) ||
       typeof req.body.user_id !== 'number' ||
-      typeof region_id !== 'number' ||
       typeof req.body.notify !== 'boolean'
     )
       return res.sendStatus(400);
@@ -44,10 +44,17 @@ module.exports = {
       {
         notify: req.body.notify
       },
-      { where: { region_id: region_id, user_id: req.body.user_id } }
+      { where: { region_id: Number(req.params.region_id), user_id: req.body.user_id } }
     ).then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)));
   },
   delRegion_subscriptions: function(req: Request, res: Response) {
+    if (
+      !req.body ||
+      !req.params ||
+      isNaN(Number(req.params.region_id)) ||
+      typeof req.body.user_id !== 'number'
+    )
+      return res.sendStatus(400);
     return Region_subscriptions.destroy({
       where: { region_id: Number(req.params.region_id), user_id: req.body.user_id }
     }).then(region => (region ? res.send() : res.status(500).send()));

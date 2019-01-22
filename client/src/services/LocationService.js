@@ -9,7 +9,6 @@ class LocationService {
                     .then(latlng => {
                         this.geocodeLatLng(latlng.lat, latlng.lng)
                             .then(locationdata => {
-                                console.log(locationdata);
                                 //console.log('Got location by browser navigator');
                                 //console.log('Line 14: nodata', locationdata.results[0]);
                                 if (locationdata.results) {
@@ -21,7 +20,8 @@ class LocationService {
                                         let city = locationdata.results[0].address_components.find(e => e.types[0] === "administrative_area_level_2").long_name;
                                         let region = locationdata.results[0].address_components.find(e => e.types[0] === "administrative_area_level_1").long_name;
                                         let country = locationdata.results[0].address_components.find(e => e.types[0] === "country").long_name;
-                                        console.log(lat, long, city, region, country);
+                                        //
+                                        // console.log(lat, long, city, region, country);
                                         resolve(new Location(lat, long, city, region, country));
                                     } else {
                                         reject({ message: 'Navigator received no results on location query' });
@@ -45,7 +45,7 @@ class LocationService {
                                 let country = location.country;
                                 let lat = location.lat;
                                 let long = location.lon;
-                                console.log(lat, long, city, region, country);
+                                //console.log(lat, long, city, region, country);
                                 resolve(new Location(lat, long, city, region, country));
                             })
                             .catch((error: Error) => reject(error));
@@ -55,7 +55,7 @@ class LocationService {
                 this.getLocationByIP()
                     .then(location => {
                         //console.log(location);
-                        console.log('Line 56: ', location.data);
+                        //console.log('Line 56: ', location.data);
                         let city = location.data.city;
                         let region = location.data.regionName;
                         let country = location.data.country;
@@ -105,7 +105,7 @@ class LocationService {
     }
 
     geolocFail() {
-        console.log('Fail');
+        return new Error('Geolocation failed');
     }
 }
 export default LocationService;

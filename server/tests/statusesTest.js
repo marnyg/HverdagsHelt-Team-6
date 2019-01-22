@@ -69,9 +69,21 @@ describe('Create new status', () => {
 });
 
 describe('Update one in statuses', () => {
-  test('400 status code for PUT /api/statuses/:status_id without body', done => {
+  test('400 status code for PUT /api/statuses/:status_id without body and token', done => {
     return request(application)
       .put(`/api/statuses/${status_id}`)
+      .then(response => {
+        expect(response.statusCode).toBe(400);
+        done();
+      });
+  });
+  test('400 status code for PUT /api/statuses/:status_id with invalid status_id', done => {
+    return request(application)
+      .put(`/api/statuses/NaN`)
+      .send({
+        name: 'Ny status'
+      })
+      .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();
@@ -106,7 +118,7 @@ describe('Update one in statuses', () => {
 describe('Delete one in statuses', () => {
   test('400 status code for DELETE /api/statuses/:status_id with invalid id', done => {
     request(application)
-      .delete(`/api/statuses/${'Not a number'}`)
+      .delete(`/api/statuses/NaN`)
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();

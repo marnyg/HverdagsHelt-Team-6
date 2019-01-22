@@ -49,7 +49,7 @@ class Navigation extends Component<{tabs: []}>{
         if(this.props.left_tabs){
             return(
                 this.props.left_tabs.map(tab =>
-                    <Route exact path={tab.path} render={() => tab.component} />
+                    <Route exact path={tab.path} key={tab.path} render={() => tab.component} />
                 )
             );
         } else {
@@ -59,22 +59,6 @@ class Navigation extends Component<{tabs: []}>{
 
     right(){
         if(this.props.right_tabs){
-            /*
-            return(
-                <div className={'ml-auto'}>
-                    <NavLink
-                        className={'nav-item nav-link link-unstyled d-inline-block'}
-                        exact to={'/employee/inbox'}>Test</NavLink>
-                    <NavLink
-                        className={'nav-item nav-link link-unstyled d-inline-block'}
-                        exact to={'/employee/inbox'}>Test</NavLink>
-                    <NavLink
-                        className={'nav-item nav-link link-unstyled d-inline-block'}
-                        exact to={'/employee/inbox'}>Test</NavLink>
-                </div>
-            );
-            */
-
             return(
                 <div className={'ml-auto mr-3'}>
                     {this.props.right_tabs.map(tab => (
@@ -85,7 +69,6 @@ class Navigation extends Component<{tabs: []}>{
                     ))}
                 </div>
             );
-
         } else {
             return null;
         }
@@ -95,7 +78,7 @@ class Navigation extends Component<{tabs: []}>{
         if(this.props.right_tabs){
             return(
                 this.props.right_tabs.map(tab =>
-                    <Route exact path={tab.path} render={() => tab.component} />
+                    <Route exact path={tab.path} key={tab.path} render={() => tab.component} />
                 )
             );
         } else {

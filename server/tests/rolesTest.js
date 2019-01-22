@@ -52,7 +52,8 @@ describe('Create new role', () => {
   test('400 status code for POST /api/roles without body', done => {
     request(application)
       .post('/api/roles')
-      .send()
+      .send({})
+      .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();
@@ -104,6 +105,19 @@ describe('Update one in roles', () => {
   test('400 status code for PUT /api/roles/:role_id without body', done => {
     return request(application)
       .put(`/api/roles/${role_id}`)
+      .set('Authorization', `Bearer ${admin_token}`)
+      .then(response => {
+        expect(response.statusCode).toBe(400);
+        done();
+      });
+  });
+  test('400 status code for PUT /api/roles/:role_id without valid role_id', done => {
+    return request(application)
+      .put(`/api/roles/NaN`)
+      .send({
+        name: 'New role',
+        access_level: 10
+      })
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();
@@ -140,7 +154,8 @@ describe('Update one in roles', () => {
 describe('Delete one in roles', () => {
   test('400 status code for DELETE /api/roles/:role_id with invalid id', done => {
     request(application)
-      .delete(`/api/roles/${'Not a number'}`)
+      .delete(`/api/roles/NaN`)
+      .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();

@@ -3,10 +3,11 @@ import { Component } from 'react-simplified';
 import { withRouter } from 'react-router-dom';
 import UserService from '../services/UserService.js';
 import Notify from "./Notify";
+import Alert from './Alert.js';
 
 
 class LoginModal extends Component {
-    error = false;
+    error = null;
     constructor(){
         super();
         this.submit = this.submit.bind(this);
@@ -21,12 +22,10 @@ class LoginModal extends Component {
                     <div className="loginmodal-container modal-content">
                         <h1>Logg inn</h1><br/>
                         {this.error ?
-                            <div className={"alert alert-danger alert-dismissible fade show"} role="alert">
-                                <button type="button" className="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                                Brukernavn og/eller passord er feil
-                            </div>
+                            <Alert
+                              type='danger'
+                              text='Brukernavn eller passord er feil'
+                            />
                             :null}
                         <input type="text" name="user" placeholder="Epost" onKeyPress={this.keyCheck} onChange={this.emailChange}></input>
                         <input type="password" name="pass" placeholder="Passord" onKeyPress={this.keyCheck} onChange={this.pwChange}></input>
@@ -44,7 +43,6 @@ class LoginModal extends Component {
 
     submit(event){
         this.error = false;
-        console.log("Submitting login: ", this.email, this.password);
         event.preventDefault();
         let data = {
             email: this.email,
@@ -61,12 +59,14 @@ class LoginModal extends Component {
                     this.props.onLogin();
                 })
                 .catch((error: Error) => {
-                    console.error(error.message);
-                    console.log("Oppsey!");
-                    this.error = true;
+                    this.error = {
+                        message: 'Brukernavn og/eller passord er feil'
+                    };
                 });
         } else {
-            alert("Not valid data. Try again");
+            this.error = {
+              message: 'Du må fylle inn begge feltene for å sende skjemaet'
+            };
         }
     }
 
@@ -78,10 +78,12 @@ class LoginModal extends Component {
 
     pwChange(event){
         this.password = event.target.value;
+        this.error = null;
     }
 
     emailChange(event){
         this.email = event.target.value;
+        this.error = null;
     }
 
     valid(data){

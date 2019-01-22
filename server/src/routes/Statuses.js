@@ -23,12 +23,20 @@ module.exports = {
       });
   },
   updateStatus: function(req: Request, res: Response) {
-    if (!req.body || typeof req.body.name !== 'string' || !regexNames.test(req.body.name)) return res.sendStatus(400);
+    if (
+      !req.body ||
+      !req.params ||
+      isNaN(Number(req.params.status_id)) ||
+      typeof req.body.name !== 'string' ||
+      !regexNames.test(req.body.name)
+    )
+      return res.sendStatus(400);
+
     return Status.update(
       {
         name: req.body.name
       },
-      { where: { status_id: req.params.status_id } }
+      { where: { status_id: Number(req.params.status_id) } }
     )
       .then(status => (status ? res.send(status) : res.sendStatus(404)))
       .catch(err => {
@@ -38,8 +46,14 @@ module.exports = {
       });
   },
   delStatus: function(req: Request, res: Response) {
+    if (
+      !req.params ||
+      isNaN(Number(req.params.status_id))
+    )
+      return res.sendStatus(400);
+
     return Status.destroy({ where: { status_id: Number(req.params.status_id) } })
-      .then(status => (status ? res.send() : res.status(500).send()))
+      .then(status => (status ? res.send() : res.sendStatus(500)))
       .catch(err => {
         err.description = 'Statusen kan ikke slettes, fordi den brukes av minst en status kommentar. Fiks dette først';
         res.status(409).json(err);
