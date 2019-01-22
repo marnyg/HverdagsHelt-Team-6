@@ -17,6 +17,20 @@ let all_true = function(val) {
 module.exports = {
   getAllStatus_comment: async function(req: Request, res: Response) {
     if (!req.params || isNaN(Number(req.params.case_id))) return res.sendStatus(400);
+
+    let page = 1;
+    let limit = 5;
+    console.log(limit);
+    if(
+      req.query &&
+      req.query.page !== undefined &&
+      req.query.limit !== undefined
+    ) {
+      page = Number(req.query.page);
+      limit = Number(req.query.limit);
+    }
+    let limit_start = (page - 1) * limit;
+
     sequelize
       .query(
         'Select sc.status_comment_id, sc.comment, sc.createdAt, sc.updatedAt, sc.case_id, sc.status_id, sc.user_id, ' +
@@ -25,9 +39,9 @@ module.exports = {
           'FROM Status_comments sc ' +
           'JOIN Users u ON sc.user_id = u.user_id ' +
           'JOIN Statuses s ON sc.status_id = s.status_id ' +
-          'WHERE case_id = ?;',
+          'WHERE case_id = ? Order By sc.updatedAt DESC Limit ?,?;',
         {
-          replacements: [Number(req.params.case_id)],
+          replacements: [Number(req.params.case_id), limit_start, limit],
           type: sequelize.QueryTypes.SELECT
         }
       )
@@ -35,7 +49,7 @@ module.exports = {
         return res.send(result);
       })
       .catch(err => {
-        return res.sendStatus(500).send(err);
+        return res.status(500).send(err);
       });
   },
   // Back up code:
