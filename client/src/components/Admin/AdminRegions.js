@@ -9,12 +9,14 @@ class AdminRegions extends Component {
     render() {
         return(
             <div>
-                <div className={'container mx-3'}>
+                <div className={'container'}>
                     <div className={'row'}>
                         <div className={'col-lg'}>
+                            <h2>Registrerte kommuner</h2>
                             <AdminRegionsList onRegionSelected={(region) => this.onRegionSelected(region)}/>
                         </div>
                         <div className={'col-lg'}>
+                            <h2>Diverse</h2>
                             <AdminRegionView region={this.viewing_region}/>
                         </div>
                     </div>
