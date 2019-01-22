@@ -20,6 +20,7 @@ import Region from '../classes/Region';
 import County from '../classes/County';
 import Category from '../classes/Category';
 import User from '../classes/User';
+import Alert from './Alert.js';
 
 const MAX_DESCRIPTION_LENGTH: number = 255;
 
@@ -39,6 +40,8 @@ class NewCase extends Component {
   markerPos = this.lastResortPos;
   fileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
   isMapClickable: boolean = false;
+  error=null;
+
 
   constructor() {
     super();
@@ -53,6 +56,7 @@ class NewCase extends Component {
     return (
       <div>
         <div className="container">
+          {this.error}
           <div className="row">
             <div className="col-md-6">
               <form
@@ -330,12 +334,19 @@ class NewCase extends Component {
       .then(e => console.log('Received ' + e.length + ' categories from server.'))
       .catch((err: Error) => {
         console.warn('FEIL!' + err.toString());
-        Notify.danger(
+        this.error=<Alert
+          type='danger'
+          text= {'Det oppstod en feil under lasting av kategorier. ' +
+          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+          '\n\nFeilmelding: ' +
+          err.toString()}
+        />
+        /*Notify.danger(
           'Det oppstod en feil under lasting av kategorier. ' +
           'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
           '\n\nFeilmelding: ' +
           err.toString()
-        );
+        );*/
       });
     console.log('Fetchng counties.');
     cout
@@ -344,12 +355,19 @@ class NewCase extends Component {
       .then(e => console.log('Received ' + e.length + ' counties from server.'))
       .catch((err: Error) => {
         console.warn('FEIL!' + err.toString());
-        Notify.danger(
+        this.error=<Alert
+          type='danger'
+          text={'Det oppstod en feil under lasting av fylker. ' +
+          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+          '\n\nFeilmelding: ' +
+          err.toString()}
+        />
+        /*Notify.danger(
           'Det oppstod en feil under lasting av fylker. ' +
           'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
           '\n\nFeilmelding: ' +
           err.toString()
-        );
+        );*/
       });
   }
 
@@ -431,9 +449,13 @@ class NewCase extends Component {
               // Region detected by Google Location was not found in database
               // Proceeding to set this.case_region_id = undefined. This'll enable the validate() method to tell the user that automatic positioning failed
               this.case.region_id = undefined;
-              Notify.warning(
+              this.error=<Alert
+                type='warning'
+                text='Vi klarte ikke å plassere din posisjon i en kommune registrert hos oss. Vennligst benytt en annen metode for å sette din posisjon, ellers blir posisjonen satt til din angitte hjemkommune.'
+              />
+              /*Notify.warning(
                 'Vi klarte ikke å plassere din posisjon i en kommune registrert hos oss. Vennligst benytt en annen metode for å sette din posisjon, ellers blir posisjonen satt til din angitte hjemkommune.'
-              );
+              );*/
             }
           })
           .catch((err: Error) => {
@@ -444,7 +466,11 @@ class NewCase extends Component {
           });
       })
       .catch((err: Error) => {
-        Notify.danger('Det oppstod en feil ved henting av automatisk posisjon. \n\nFeilmelding: ' + err.message);
+        this.error=<Alert
+          type='danger'
+          text={'Det oppstod en feil ved henting av automatisk posisjon. \n\nFeilmelding: ' + err.message}
+        />
+        /*Notify.danger('Det oppstod en feil ved henting av automatisk posisjon. \n\nFeilmelding: ' + err.message);*/
       });
     console.log('THIS.POS', JSON.stringify(this.pos));
   }
@@ -540,14 +566,23 @@ class NewCase extends Component {
         .catch((err: Error) => {
           console.warn(err.toString());
           if (this.list1 instanceof HTMLSelectElement) {
-            Notify.danger(
+            this.error=<Alert
+              type='danger'
+              text={'Det oppstod en feil under lasting av kommuner fra fylke ' +
+              this.list1.options[this.list1.selectedIndex].text +
+              '. ' +
+              'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+              '\n\nFeilmelding: ' +
+              err.toString()}
+            />
+            /*Notify.danger(
               'Det oppstod en feil under lasting av kommuner fra fylke ' +
               this.list1.options[this.list1.selectedIndex].text +
               '. ' +
               'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
               '\n\nFeilmelding: ' +
               err.toString()
-            );
+            );*/
           }
         });
     }
@@ -582,7 +617,11 @@ class NewCase extends Component {
       } else {
         // File type not accepted.
         console.warn('File type not accepted.');
-        Notify.warning('Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png.');
+        this.error=<Alert
+          type='warning'
+          text='Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png.'
+        />
+        /*Notify.warning('Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png.');*/
       }
     }
   }
@@ -601,16 +640,24 @@ class NewCase extends Component {
         if (region) {
           return region.region_id;
         } else {
-          Notify.danger('Ingen kommuner passer ditt valg.');
+          this.error=<Alert
+            type='danger'
+            text='Ingen kommuner passer ditt valg.'
+          />
+          /*Notify.danger('Ingen kommuner passer ditt valg.');*/
           return null;
         }
       })
       .catch((err: Error) => {
         console.log('Could not get regions.');
-        Notify.danger(
+        this.error=<Alert
+          type='danger'
+          text={'Kunne ikke hente kommunedata fra server for å sammenlikne med din valgte kommune. \n\nFeilmelding: ' + err.message}
+        />
+        /*Notify.danger(
           'Kunne ikke hente kommunedata fra server for å sammenlikne med din valgte kommune. \n\nFeilmelding: ' +
           err.message
-        );
+        );*/
         return null;
       });
   }
@@ -618,21 +665,34 @@ class NewCase extends Component {
   validate(index: number) {
     if (!this.form.checkValidity()) {
       console.log('Basic HTML Form validation failed!');
-      Notify.warning('Vennligst fyll in de påkrevde feltene og prøv igjen.');
+      this.error=<Alert
+        type='warning'
+        text='Vennligst fyll in de påkrevde feltene og prøv igjen.'
+      />
+      //Notify.warning('Vennligst fyll in de påkrevde feltene og prøv igjen.');
       return false;
     }
-    
+
     console.log('Basic HTML Form validation passed!');
 
     if (this.list1 && this.list2 && this.pos) {
       switch (index) {
         case 0:
           // Validate automatic position
-
           if (this.pos && this.case.region_id) {
             return true;
           } else {
-            Notify.warning(
+            this.error=<Alert
+              type='warning'
+              text={'Din automatisk detekterte posisjon (lat: ' +
+              this.pos.lat +
+              ', lon: ' +
+              this.pos.lon +
+              ') finner sted i ' +
+              this.pos.country +
+              ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'}
+            />;
+            /*Notify.warning(
               'Din automatisk detekterte posisjon (lat: ' +
               this.pos.lat +
               ', lon: ' +
@@ -640,7 +700,7 @@ class NewCase extends Component {
               ') finner sted i ' +
               this.pos.country +
               ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'
-            );
+            );*/
             console.log('Automatic position is not valid. this.pos: ', this.pos);
             return false;
           }
@@ -669,28 +729,52 @@ class NewCase extends Component {
                       }
                     })
                     .catch((err: Error) => {
-                      Notify.danger(
+                      this.error=<Alert
+                        type='danger'
+                        text={'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente kommunedata. Vennligst prøv igjen. \n\nFeilmelding: ' +
+                        err.message}
+                      />
+                      /*Notify.danger(
                         'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente kommunedata. Vennligst prøv igjen. \n\nFeilmelding: ' +
                         err.message
-                      );
+                      );*/
                       return false;
                     });
                 } else {
-                  Notify.danger(
+                  this.error=<Alert
+                    type='danger'
+                    text={'Fylket du trykket på finnes ikke i vår database. Dette kan komme som et resultat av kommunesammenslåing eller at geolokaliseringstjenesten vi benytter ikke bruker samme fylkesdata som oss.'}
+                  />
+                  /*Notify.danger(
                     'Fylket du trykket på finnes ikke i vår database. Dette kan komme som et resultat av kommunesammenslåing eller at geolokaliseringstjenesten vi benytter ikke bruker samme fylkesdata som oss.'
-                  );
+                  );*/
                   return false;
                 }
               })
               .catch((err: Error) => {
-                Notify.danger(
+                this.error=<Alert
+                  type='danger'
+                  text={'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente fylkesdata. Vennligst prøv igjen. \n\nFeilmelding: ' +
+                  err.message}
+                />
+                /*Notify.danger(
                   'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente fylkesdata. Vennligst prøv igjen. \n\nFeilmelding: ' +
                   err.message
-                );
+                );*/
                 return false;
               });
           } else {
-            Notify.warning(
+            this.error=<Alert
+              type='warning'
+              text={'Din posisjon (lat: ' +
+              this.pos.lat +
+              ', lon: ' +
+              this.pos.lon +
+              ') finner sted i ' +
+              this.pos.country +
+              ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'}
+            />
+            /*Notify.warning(
               'Din posisjon (lat: ' +
               this.pos.lat +
               ', lon: ' +
@@ -698,7 +782,7 @@ class NewCase extends Component {
               ') finner sted i ' +
               this.pos.country +
               ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'
-            );
+            );*/
             console.log('Automatic position is not valid.');
             return false;
           }
@@ -713,7 +797,11 @@ class NewCase extends Component {
             console.log('Last-resort-list validation is valid.');
             return true;
           } else {
-            Notify.danger('Vennligst velg et fylke og en kommune hvor saken finner sted og prøv igjen.');
+            this.error=<Alert
+              type='danger'
+              text='Vennligst velg et fylke og en kommune hvor saken finner sted og prøv igjen.'
+            />
+            /*Notify.danger('Vennligst velg et fylke og en kommune hvor saken finner sted og prøv igjen.');*/
             console.warn('County or municipality has not been set.');
             return false;
           }
@@ -732,29 +820,47 @@ class NewCase extends Component {
           .createCase(this.case, this.case.img)
           .then(e => {
             if (e) {
-              Notify.success('Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id);
+              this.error=<Alert
+                type='success'
+                text={'Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id}
+              />
+              //Notify.success('Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id);
               console.log('Form data transmission success! Case ID: ' + e.case_id);
               this.props.history.push('/case/' + e.case_id);
             } else {
-              Notify.danger(
+              this.error=<Alert
+                type='danger'
+                text={'Det skjedde en feil ved prosessering av din nye sak. Du kan prøve å finne saken din på Min side > Mine Saker'}
+              />
+              /*Notify.danger(
                 "Det skjedde en feil ved prosessering av din nye sak. Du kan prøve å finne saken din på 'Min side' > 'Mine Saker'."
-              );
+              );*/
               console.log('Received case is undefined. Something went very wrong!');
             }
           })
           .catch((err: Error) => {
-            Notify.danger(
+            this.error=<Alert
+              type='danger'
+              text={'Det oppstod en feil ved sending av saken til oss. Sørg for at alle felter er fyllt ut korrekt. ' +
+              'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
+              err.message}
+            />
+            /*Notify.danger(
               'Det oppstod en feil ved sending av saken til oss. Sørg for at alle felter er fyllt ut korrekt. ' +
               'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
               err.message
-            );
+            );*/
             console.warn('Error while transmitting form data to server with error message: ' + err.message);
           });
       } else {
         console.log('Form is not valid.');
       }
     } else {
-      Notify.warning('En kritisk feil har oppstått. Vennligst last sida på nytt.');
+      this.error=<Alert
+        type='warning'
+        text={'En kritisk feil har oppstått. Vennligst last sida på nytt.'}
+      />
+      /*Notify.warning('En kritisk feil har oppstått. Vennligst last sida på nytt.');*/
     }
   }
 
@@ -794,9 +900,13 @@ class NewCase extends Component {
               // Region detected by Google Location was not found in database
               // Proceeding to set this.case_region_id = undefined. This'll enable the validate() method to tell the user that automatic positioning failed
               this.case.region_id = undefined;
-              Notify.warning(
+              this.error=<Alert
+                type='warning'
+                text='Vi klarte ikke å plassere din posisjon i en kommune registrert hos oss. Vennligst benytt en annen metode for å sette din posisjon, ellers blir posisjonen satt til din angitte hjemkommune.'
+              />
+              /*Notify.warning(
                 'Vi klarte ikke å plassere din posisjon i en kommune registrert hos oss. Vennligst benytt en annen metode for å sette din posisjon, ellers blir posisjonen satt til din angitte hjemkommune.'
-              );
+              );*/
             }
           })
           .catch((err: Error) => {

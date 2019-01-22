@@ -211,6 +211,7 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
         .deleteCase(case_id)
         .then(() => {
           console.log('Delete successful!');
+          Notify.success('Din sak med id ' + case_id + ' ble slettet.');
           this.cases = this.cases.filter(e => e.case_id !== case_id);
         })
         .catch((err: Error) => {

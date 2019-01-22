@@ -6,6 +6,8 @@ import User from '../classes/User';
 import UserService from '../services/UserService';
 import EditPassword from './EditPassword';
 import DisplayProfile from './DisplayProfile';
+import CountyService from '../services/CountyService';
+import RegionService from '../services/RegionService';
 
 class EditProfile extends Component<{}, { isEditing: boolean }> {
   isEditing = false;
@@ -109,7 +111,18 @@ class EditProfile extends Component<{}, { isEditing: boolean }> {
                 <input type="password" required id="password" onChange={this.handleChange} className="form-control" />
               </div>
             </div>
+            <div className={'row list-group-item d-flex'}>
+              <div className={'col-sm'}>HEIME KOMUNE!!!!!!</div>
+              <div className={'col-lg'}>
+                <RegionSelect
+                  className={"region-select"}
+                  onRegionSelect={this.setRegionID}
+                  elementsMargin={'mb-3'}
+                />
+              </div>
+            </div>
           </div>
+
           <div className={'d-flex'}>
             <div className={'col-lg btn btn-primary'} onClick={this.validateForm}>
               Lagre
@@ -124,6 +137,9 @@ class EditProfile extends Component<{}, { isEditing: boolean }> {
         </form>
       </div>
     );
+  }
+  setRegionID(regID) {
+    this.user.region_id = regID
   }
   validateForm(event: Event) {
     event.preventDefault();
@@ -146,3 +162,79 @@ class EditProfile extends Component<{}, { isEditing: boolean }> {
 }
 
 export default EditProfile;
+
+class RegionSelect extends Component {
+  regions = [];
+  counties = [];
+  render() {
+    return (
+      <div className={this.props.className}>
+        <div className={this.props.classNameChild}>
+          <select className={'form-control ' + this.props.elementsMargin} id={'county-selector' + this.props.selector_id} onChange={this.countySelected}
+            defaultValue={'.null'}>
+            <option value={'.null'} disabled>Velg fylke</option>
+            {this.counties.map(e => (
+              <option key={e.county_id} value={e.county_id}>
+                {' '}
+                {e.name}{' '}
+              </option>
+            ))}
+          </select>
+          <select className={'form-control ' + this.props.elementsMargin} id={'region-selector' + this.props.selector_id} onChange={this.regionSelected}
+            defaultValue={'.null'}>
+            <option value={'.null'} disabled>Velg kommune</option>
+            {this.regions.map(e => (
+              <option key={e.region_id} value={e.region_id}>
+                {' '}
+                {e.name}{' '}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+    );
+  }
+
+  mounted() {
+    let countyService = new CountyService();
+    countyService.getAllCounties()
+      .then((counties: County[]) => {
+        this.counties = counties;
+      })
+      .catch((error: Error) => console.error(error));
+  }
+
+  countySelected(event) {
+    event.preventDefault();
+    let county_id = event.target.value;
+    let regionService = new RegionService();
+    regionService.getAllRegionGivenCounty(county_id)
+      .then((regions: Region[]) => {
+        document.querySelector('#region-selector' + this.props.selector_id).hidden = false;
+        this.regions = regions;
+      })
+      .catch((error: Error) => console.error(error));
+  }
+
+  regionSelected(event) {
+    event.preventDefault();
+    this.region_id = event.target.value;
+    this.props.onRegionSelect(Number(this.region_id))
+  }
+
+  // submit(event) {
+  //   event.preventDefault();
+  //   if (this.region_id) {
+  //     if (this.props.selector_id === 'mobile') {
+  //       document.querySelector('#county-selector' + this.props.selector_id).hidden = false;
+  //       document.querySelector('#region-selector' + this.props.selector_id).hidden = true;
+  //     }
+  //     this.regions = [];
+  //     document.querySelector('#county-selector' + this.props.selector_id).selectedIndex = 0;
+  //     document.querySelector('#region-selector' + this.props.selector_id).selectedIndex = 0;
+  //     this.props.onSubmit(this.region_id);
+  //   } else {
+  //     Notify.danger('Du må velge både fylke og kommune før du kan sende skjemaet.');
+  //   }
+  // }
+}
