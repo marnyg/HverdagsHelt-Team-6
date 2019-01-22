@@ -237,14 +237,29 @@ module.exports = {
 
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
 
+    let page = 1;
+    let limit = 20;
+
+    if(
+      req.query &&
+      req.query.page &&
+      req.query.limit &&
+      Number(req.query.page) > 0 &&
+      Number(req.query.limit) > 0
+    ) {
+      page = Number(req.query.page);
+      limit = Number(req.query.limit);
+    }
+    let start_limit = (page - 1) * limit;
+
     const subscr = { user_id: Number(req.params.user_id) };
     sequelize
       .query(
         'Select sub.region_id, r.name as region_name, sub.notify ' +
           'FROM Region_subscriptions sub JOIN Regions r ON sub.region_id = r.region_id ' +
-          'WHERE sub.user_id = ?;',
+          'WHERE sub.user_id = ? LIMIT ?,?;',
         {
-          replacements: [Number(req.params.user_id)],
+          replacements: [Number(req.params.user_id), start_limit, limit],
           type: sequelize.QueryTypes.SELECT
         }
       )
