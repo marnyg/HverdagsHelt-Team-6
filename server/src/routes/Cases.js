@@ -194,7 +194,7 @@ module.exports = {
       });
   },
 
-  deleteCase: function(req: Request, res: Response) {
+  deleteCase: async function(req: Request, res: Response) {
     if (
       !req.token ||
       !req.params ||
@@ -232,6 +232,22 @@ module.exports = {
           });
       });
     }
+    let pictures = await Picture.findAll({ where: { case_id: params_case_id } });
+    let path_array = await pictures.map(p => {
+      return p.path;
+    });
+
+    Case.destroy({ where: { case_id: params_case_id } })
+      .then(async result => {
+        console.log(result);
+        await path_array.forEach(p => {
+          unlinkAsync(public_path + p);
+        });
+        return res.status(200).send({ msg: 'Case deleted.' });
+      })
+      .catch(error => {
+        return res.status(500).send(error);
+      });
   },
 
   getAllCasesInRegionByName: async function(req: Request, res: Response) {
