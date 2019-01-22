@@ -1,9 +1,12 @@
 //@flow
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import Navigation from './Navigation';
+import Navigation from '../Navigation';
 import Inbox from './Inbox';
 import EmployeeService from "../../services/EmployeeService";
+import Statistics from "../Statistics";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChartLine, faUsers } from '@fortawesome/free-solid-svg-icons/index';
 
 class EmployeePage extends Component{
     inbox = [];
@@ -36,11 +39,35 @@ class EmployeePage extends Component{
                 </div>
             ), component: <Inbox cases={this.closed}/>
         };
+        let statistics_tab = {
+            path:'/employee/statistics',
+            name: (
+                <div>
+                    <div className="badge badge-primary">
+                        <FontAwesomeIcon icon={faChartLine}/>
+                    </div> Statistikk
+                </div>
+            ),
+            component: <Statistics/>,
+        };
 
-        let tabs = [inbox_tab, started_tab, closed_tab];
+        let admin_tab = {
+            path:'/employee/statistics',
+            name: (
+                <div>
+                    <div className="badge badge-primary">
+                        <FontAwesomeIcon icon={faUsers}/>
+                    </div> Ditt Team
+                </div>
+            ),
+            component: <Statistics/>
+        };
+
+        let left_tabs = [inbox_tab, started_tab, closed_tab];
+        let right_tabs = [statistics_tab, admin_tab];
         return(
-            <div>
-                <Navigation tabs={tabs}/>
+            <div className={'w-100'}>
+                <Navigation left_tabs={left_tabs} right_tabs={right_tabs}/>
             </div>
         );
     }

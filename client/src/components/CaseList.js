@@ -66,7 +66,7 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
             ))}
           </tbody>
         </table>
-        { this.cases.length === 0 ? <p>Vi fant ingen saker for deg.</p> : null }
+        {this.cases.length === 0 ? <p>Vi fant ingen saker for deg.</p> : null}
         <button
           ref={e => {
             this.fetchButton = e;
@@ -107,7 +107,10 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
               err.message
           );
           console.log(
-            'Error when fetching cases for user with id ' + this.props.user_id.toString() + '.\nError message is: ' + err.message
+            'Error when fetching cases for user with id ' +
+              this.props.user_id.toString() +
+              '.\nError message is: ' +
+              err.message
           );
         });
     } else if (this.props.region_id) {
@@ -238,52 +241,46 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
             Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
           });
       } else {
-          console.log('Did not find case_id to delete.');
+        console.log('Did not find case_id to delete.');
       }
+    }
   }
 
-  onClickSubscribeButton(event: SyntheticInputEvent<HTMLButtonElement>)
-      {
-          console.log('Clicked subscribe button!');
-          let sub = new CaseSubscriptionService();
-          let td = event.target.parentElement;
-          if (td && td.parentElement && td.parentElement instanceof HTMLTableRowElement) {
-              let c = this.cases[td.parentElement.rowIndex - 1];
-              if (this.isSubscribed(c)) {
-                  // Unsubscribe the user from this case
-                  sub
-                      .deleteCaseSubscription(c.case_id, ToolService.getUserId())
-                      .then(() => {
-                          this.subscriptions = this.subscriptions.filter(e => e.case_id !== c.case_id);
-                          //console.log("Unsubscribed, returned: ", e);
-                      })
-                      .catch((err: Error) => {
-                          console.log('Could not unsubscribe user from case with id ' + c.case_id);
-                          Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
-                      });
-              } else {
-                  // Subscribe this case to user
-                  let s = new CaseSubscription(ToolService.getUserId(), c.case_id, false, true);
-                  sub
-                      .createCaseSubscription(s)
-                      .then(e => {
-                          console.log("Subscribed, returned: ", e);
-                          this.subscriptions.push(e);
-                      })
-                      .catch((err: Error) => {
-                          console.log('Could not unsubscribe user from case with id ' + c.case_id);
-                          Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
-                      });
-              }
-          } else {
-              console.log('Did not find case_id to alter subscription.');
-          }
+  onClickSubscribeButton(event: SyntheticInputEvent<HTMLButtonElement>) {
+    console.log('Clicked subscribe button!');
+    let sub = new CaseSubscriptionService();
+    let td = event.target.parentElement;
+    if (td && td.parentElement && td.parentElement instanceof HTMLTableRowElement) {
+      let c = this.cases[td.parentElement.rowIndex - 1];
+      if (this.isSubscribed(c)) {
+        // Unsubscribe the user from this case
+        sub
+          .deleteCaseSubscription(c.case_id, ToolService.getUserId())
+          .then(() => {
+            this.subscriptions = this.subscriptions.filter(e => e.case_id !== c.case_id);
+            //console.log("Unsubscribed, returned: ", e);
+          })
+          .catch((err: Error) => {
+            console.log('Could not unsubscribe user from case with id ' + c.case_id);
+            Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
+          });
+      } else {
+        // Subscribe this case to user
+        let s = new CaseSubscription(ToolService.getUserId(), c.case_id, false, true);
+        sub
+          .createCaseSubscription(s)
+          .then(e => {
+            console.log('Subscribed, returned: ', e);
+            this.subscriptions.push(e);
+          })
+          .catch((err: Error) => {
+            console.log('Could not unsubscribe user from case with id ' + c.case_id);
+            Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
+          });
       }
     } else {
       console.log('Did not find case_id to alter subscription.');
     }
   }
-
 }
-
 export default withRouter(CaseList);
