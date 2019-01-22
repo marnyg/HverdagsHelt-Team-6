@@ -1,7 +1,7 @@
 // @flow
 
 import { User } from '../models.js';
-import { createToken, hashPassword, loginOk, verifyToken } from '../auth';
+import { remove_token, hashPassword, loginOk, verifyToken } from '../auth';
 import { Region_subscriptions, sequelize } from '../models';
 import Epost from './../utils/Epost.js'
 
@@ -18,6 +18,35 @@ module.exports = {
   },
 
   createUser: async function(req: Request, res: Response) {
+    let regexNames = /^[a-zA-ZæøåÆØÅ\-\s]+$/;
+    let regexNumber = /^[\d]{8}$/;
+    let regexEmail = /^[\wæøåÆØÅ]+([.]{1}[\wæøåÆØÅ]+)*@[\wæøåÆØÅ]+([.]{1}[\wæøåÆØÅ]+)+$/;
+    let regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+    let regexRegionId = /^[\d]+$/;
+    console.log('NAMES:');
+    console.log('true: ', regexNames.test('Magne'));
+    console.log('true: ', regexNames.test('ÆØÅæøå'));
+    console.log('true: ', regexNames.test('Æ-df'));
+    console.log('true: ', regexNames.test('ÆØÅ æøå'));
+    console.log('false: ', regexNames.test('.,!"#¤%%&¤@£$€{{[]]]{€'));
+    console.log('NUMBER:');
+    console.log('false: ', regexNumber.test('.,!"#¤%%&¤@£$€{{[]]]{€'));
+    console.log('false: ', regexNumber.test(' 123234 '));
+    console.log('true: ', regexNumber.test('12345678'));
+    console.log('false: ', regexNumber.test('113'));
+    console.log('false: ', regexNumber.test('12345678910'));
+    console.log('EMAIL:');
+    console.log('true: ', regexEmail.test('olaæøå.nord.mann@stud.ntnu.no'));
+    // 8 tegn
+    // Stor og liten bokstav, og tall
+    console.log('PASSWORD:');
+    console.log('false: ', regexPassword.test('12345678'));
+    console.log('false: ', regexPassword.test('1234567a'));
+    console.log('true: ', regexPassword.test('123456aB'));
+    console.log('REGION_ID:');
+    console.log('true: ', regexRegionId.test('1'));
+    console.log('false: ', regexRegionId.test(' 2334 '));
+    console.log('false: ', regexRegionId.test('en'));
     if (
       !req.body ||
       typeof req.body.firstname !== 'string' ||
@@ -90,13 +119,14 @@ module.exports = {
       !req.token ||
       !req.params.user_id ||
       !req.body ||
-      typeof Number(req.params.user_id) !== 'number' ||
-      typeof req.token !== 'string' ||
-      typeof req.body.firstname !== 'string' ||
-      typeof req.body.lastname !== 'string' ||
-      typeof req.body.tlf !== 'number' ||
-      typeof req.body.email !== 'string' ||
-      typeof req.body.region_id !== 'number'
+      typeof Number(req.params.user_id) != 'number' ||
+      typeof req.token !='string' ||
+      typeof req.body.firstname != 'string' ||
+      typeof req.body.lastname != 'string' ||
+      typeof Number(req.body.tlf) != 'number' ||
+      typeof req.body.email != 'string' ||
+      typeof Number(req.body.region_id) != 'number' ||
+      typeof Number(req.body.role_id) != 'number'
     )
       return res.sendStatus(400);
 
@@ -106,17 +136,28 @@ module.exports = {
 
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
 
+    let user_update_obj = {
+      firstname: req.body.firstname,
+      lastname: req.body.lastname,
+      tlf: req.body.tlf,
+      email: req.body.email,
+      region_id: req.body.region_id,
+
+    };
+    if(decoded_token.accesslevel === 1) {
+      user_update_obj['role_id'] = Number(req.body.role_id);
+    }
+    
     return User.update(
-      {
-        firstname: req.body.firstname,
-        lastname: req.body.lastname,
-        tlf: req.body.tlf,
-        email: req.body.email,
-        region_id: req.body.region_id
-      },
+      user_update_obj,
       { where: { user_id: req.params.user_id } }
     )
-      .then(users => (users ? res.send(users) : res.sendStatus(404)))
+      .then(users => {
+        if(users[0] === 1) {
+          return res.send({ msg: "User successfully updated"});
+        }
+        return res.sendStatus(404);
+      })
       .catch(err => {
         err.description = 'Det finnes allerede en bruker med den oppgitte eposten, bruk en unik epost';
         res.status(409).json(err);
@@ -139,25 +180,25 @@ module.exports = {
 
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
 
-    return User.destroy({ where: { user_id: Number(req.params.user_id) } }).then(user =>
-      user ? res.send() : res.status(400).send()
-    ).catch(() => {
+    return User.destroy({ where: { user_id: Number(req.params.user_id) } })
+      .then(user => (user ? res.send() : res.status(400).send()))
+      .catch(() => {
         User.update(
-            {
-                firstname: "Bruker",
-                lastname: "Slettet",
-                tlf: 0,
-                email: "",
-                hashed_password: "",
-                salt: "",
-                role_id: 5
-            },
-            { where: { user_id: Number(req.params.user_id) } }
+          {
+            firstname: 'Bruker',
+            lastname: 'Slettet',
+            tlf: 0,
+            email: '',
+            hashed_password: '',
+            salt: '',
+            role_id: 5
+          },
+          { where: { user_id: Number(req.params.user_id) } }
         ).then(() => {
-            res.status(200).send();
-            console.log("Sensitive user data wiped");
+          res.status(200).send();
+          console.log('Sensitive user data wiped');
         });
-    });
+      });
   },
   changePassword: async function(req: Request, res: Response) {
     if (

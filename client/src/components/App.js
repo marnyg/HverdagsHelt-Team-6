@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import { BrowserRouter, Route } from 'react-router-dom';
+import { BrowserRouter, Route, withRouter} from 'react-router-dom';
 import '../styles/styles.css';
 import '../styles/loginmodal.css';
 import '../styles/registermodal.css';
@@ -11,30 +11,24 @@ import '../styles/carousel.css';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown, faEdit, faUsers, faChartLine, faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell } from '@fortawesome/free-solid-svg-icons';
+library.add(faCaretDown,faEdit, faUsers, faChartLine, faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell);
 import Navbar from './Navbar.js';
 import ContentWrapper from './ContentWrapper.js';
 import Footer from './Footer.js';
 import MyPage from './MyPage.js';
 import ViewCase from './ViewCase.js';
-import CaseList from './CaseList.js';
 import NewCase from './NewCase.js';
-import MyCases from './CaseList.js';
-import Subscription from './Subscriptions.js';
 import axios from 'axios';
-import MyRegions from "./MyRegions";
 import Notify from './Notify.js';
 import Subscriptions from './Subscriptions.js';
 import InfoPage from './InfoPage.js';
 import About from './About.js';
-import NoLocationPage from "./NoLocationPage";
 import Notifications from './Notifications.js';
-import LoginModal from './LoginModal';
-import RegisterModal from './RegisterModal';
 import UserService from "../services/UserService";
 import LoginService from "../services/LoginService";
 import EmployeePage from "./Employee/EmployeePage";
 import AdminPage from "./Admin/AdminPage";
-library.add(faCaretDown,faEdit, faUsers, faChartLine, faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell);
+
 axios.interceptors.response.use(response => response.data);
 
 class App extends Component {
@@ -92,6 +86,7 @@ class App extends Component {
         userService.logout()
             .then(res => {
                 this.logged_in = false;
+                console.log('Loggin out');
                 this.props.history.push('/');
             })
             .catch((error: Error) => console.error(error));
