@@ -6,6 +6,7 @@ import { Case_subscriptions, Picture } from '../models';
 import { promisify } from 'util';
 import path from 'path';
 import { regexNames } from '../utils/Regex';
+import { duplicateCheck } from '../utils/DuplicateChecker';
 const fs = require('fs');
 const unlinkAsync = promisify(fs.unlink);
 
@@ -47,13 +48,13 @@ module.exports = {
       });
   },
 
-  createNewCase: function(req: Request, res: Response) {
+  createNewCase: async function(req: Request, res: Response) {
     reqAccessLevel(req, res, 4, () => true);
     if (req.body) {
       console.log(req.body);
       console.log(req.body.images);
     }
-    if (!req.files) {
+    /*if (!req.files) {
       console.log('No file received');
       return res.send({
         success: false
@@ -63,66 +64,69 @@ module.exports = {
       let filenames = req.files.map(file => {
         return file.filename;
       });
-      console.log(filenames);
+      console.log(filenames);*/
 
-      if (
-        !req.body ||
-        !req.token ||
-        typeof req.body.title !== 'string' ||
-        typeof req.body.description !== 'string' ||
-        typeof Number(req.body.lat) !== 'number' ||
-        typeof Number(req.body.lon) !== 'number' ||
-        typeof Number(req.body.region_id) !== 'number' ||
-        typeof Number(req.body.category_id) !== 'number' ||
-        !regexNames.test(req.body.title)
-      ) {
-        console.log(req.body);
-        return res.sendStatus(400);
-      }
-
-      let decoded = verifyToken(req.token);
-      let user_id = decoded.user_id;
-
-      Case.create({
-        title: req.body.title,
-        description: req.body.description,
-        lat: req.body.lat,
-        lon: req.body.lon,
-        region_id: req.body.region_id,
-        user_id: user_id,
-        category_id: req.body.category_id,
-        status_id: 1
-      })
-        .then(newCase => {
-          Case_subscriptions.create({
-            user_id: user_id,
-            case_id: newCase.dataValues.case_id,
-            notify_by_email: 1,
-            is_up_to_date: 1
-          });
-          console.log(newCase.dataValues);
-          if (req.files.length !== 0) {
-            Picture.bulkCreate(
-              filenames.map(filename => {
-                return {
-                  path: '/uploads/' + filename,
-                  alt: 'alternerende text',
-                  case_id: newCase.dataValues.case_id
-                };
-              })
-            )
-              .then(res.send(newCase))
-              .catch(error => {
-                return res.status(400).send(error);
-              });
-          } else {
-            return res.send(newCase);
-          }
-        })
-        .catch(error => {
-          return res.status(500).send(error);
-        });
+    if (
+      !req.body ||
+      !req.token ||
+      typeof req.body.title !== 'string' ||
+      typeof req.body.description !== 'string' ||
+      typeof Number(req.body.lat) !== 'number' ||
+      typeof Number(req.body.lon) !== 'number' ||
+      typeof Number(req.body.region_id) !== 'number' ||
+      typeof Number(req.body.category_id) !== 'number' ||
+      !regexNames.test(req.body.title)
+    ) {
+      // console.log(req.body);
+      return res.status(400).send();
     }
+
+    let duplicate = await duplicateCheck(req.body.lat, req.body.lon, req.body.category_id, req.body.region_id);
+    //console.log('Duplicate check: ', duplicate);
+    if (duplicate) return res.status(418).send('En lignende sak i nærheten eksisterer allerede');
+
+    let decoded = verifyToken(req.token);
+    let user_id = decoded.user_id;
+
+    Case.create({
+      title: req.body.title,
+      description: req.body.description,
+      lat: req.body.lat,
+      lon: req.body.lon,
+      region_id: req.body.region_id,
+      user_id: user_id,
+      category_id: req.body.category_id,
+      status_id: 1
+    })
+      .then(newCase => {
+        Case_subscriptions.create({
+          user_id: user_id,
+          case_id: newCase.dataValues.case_id,
+          notify_by_email: 1,
+          is_up_to_date: 1
+        });
+        console.log(newCase.dataValues);
+        if (req.files.length !== 0) {
+          Picture.bulkCreate(
+            filenames.map(filename => {
+              return {
+                path: '/uploads/' + filename,
+                alt: 'alternerende text',
+                case_id: newCase.dataValues.case_id
+              };
+            })
+          )
+            .then(res.send(newCase))
+            .catch(error => {
+              return res.status(400).send(error);
+            });
+        } else {
+          return res.send(newCase);
+        }
+      })
+      .catch(error => {
+        return res.status(500).send(error);
+      });
   },
 
   getOneCase: async function(req: Request, res: Response) {
