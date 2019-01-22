@@ -276,6 +276,10 @@ app.delete('/api/statuses/:status_id', (req: Request, res: Response) => {
 
 // ***************************** Status_comments *****************************
 
+app.post('/api/users/new_password', (req: Request, res: Response) => {
+  return Users.set_new_password(req, res);
+});
+
 app.get('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
   Status_comment.getAllStatus_comment(req, res);
 });
