@@ -166,9 +166,10 @@ module.exports = {
       description: b.description,
       lat: b.lat,
       lon: b.lon,
-      region_id: b.region_id
+      region_id: b.region_id,
+      category_id: b.category_id
     };
-    if (token_access_level <= 2) update_body['status_id'] = req.body.status_id;
+    if (Number(token_access_level === 1)) update_body['status_id'] = req.body.status_id;
 
     return Case.findOne({ where: { case_id: param_case_id } })
       .then(cases => {
@@ -233,10 +234,13 @@ module.exports = {
   getAllCasesInRegionByName: async function(req: Request, res: Response) {
     if (!req.params || typeof req.params.county_name != 'string' || typeof req.params.region_name != 'string')
       return res.sendStatus(400);
+    let county_check ={'Sør-Trøndelag': 'Trøndelag', 'Nord-Trøndelag': 'Trøndelag'};
+    let county_name = req.params.county_name;
+    if (req.params.county_name in county_check) county_name = county_check[req.params.county_name];
 
     return sequelize
       .query(rawQueryCases + ' WHERE r.name = ? AND co.name = ? ' + casesOrder, {
-        replacements: [req.params.region_name, req.params.county_name],
+        replacements: [req.params.region_name, county_name],
         type: sequelize.QueryTypes.SELECT
       })
       .then(async cases => {
@@ -253,6 +257,7 @@ module.exports = {
   },
   getAllCasesInRegionById: async function(req: Request, res: Response) {
     if (!req.params || typeof Number(req.params.region_id) != 'number') return res.sendStatus(400);
+
     sequelize
       .query(rawQueryCases + ' WHERE c.region_id = ? ' + casesOrder, {
         replacements: [Number(req.params.region_id)],
