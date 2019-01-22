@@ -5,6 +5,7 @@ import { reqAccessLevel, verifyToken } from '../auth';
 import { Case_subscriptions, Picture } from '../models';
 import { promisify } from 'util';
 import path from 'path';
+import { regexNames } from '../utils/Regex';
 const fs = require('fs');
 const unlinkAsync = promisify(fs.unlink);
 
@@ -69,10 +70,11 @@ module.exports = {
         !req.token ||
         typeof req.body.title !== 'string' ||
         typeof req.body.description !== 'string' ||
-        typeof Number(req.body.lat) != 'number' ||
-        typeof Number(req.body.lon) != 'number' ||
-        typeof Number(req.body.region_id) != 'number' ||
-        typeof Number(req.body.category_id) != 'number'
+        typeof Number(req.body.lat) !== 'number' ||
+        typeof Number(req.body.lon) !== 'number' ||
+        typeof Number(req.body.region_id) !== 'number' ||
+        typeof Number(req.body.category_id) !== 'number' ||
+        !regexNames.test(req.body.title)
       ) {
         console.log(req.body);
         return res.sendStatus(400);
@@ -124,7 +126,7 @@ module.exports = {
   },
 
   getOneCase: async function(req: Request, res: Response) {
-    if (!req.params || typeof Number(req.params.case_id) != 'number') return res.sendStatus(400);
+    if (!req.params || typeof Number(req.params.case_id) !== 'number') return res.sendStatus(400);
     sequelize
       .query(rawQueryCases + ' WHERE c.case_id = ?;', {
         replacements: [req.params.case_id],
@@ -145,14 +147,15 @@ module.exports = {
       !req.body ||
       !req.token ||
       !req.params ||
-      typeof Number(req.params.case_id) != 'number' ||
-      typeof req.body.title != 'string' ||
-      typeof req.body.description != 'string' ||
-      typeof Number(req.body.lat) != 'number' ||
-      typeof Number(req.body.lon) != 'number' ||
-      typeof Number(req.body.reqion_id) != 'number' ||
-      typeof Number(req.body.category_id) != 'number' ||
-      typeof Number(req.body.status_id) != 'number'
+      typeof Number(req.params.case_id) !== 'number' ||
+      typeof req.body.title !== 'string' ||
+      typeof req.body.description !== 'string' ||
+      typeof Number(req.body.lat) !== 'number' ||
+      typeof Number(req.body.lon) !== 'number' ||
+      typeof Number(req.body.reqion_id) !== 'number' ||
+      typeof Number(req.body.category_id) !== 'number' ||
+      typeof Number(req.body.status_id) !== 'number' ||
+      !regexNames.test(req.body.title)
     )
       return res.sendStatus(400);
 

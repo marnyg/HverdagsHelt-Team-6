@@ -102,7 +102,7 @@ export let Status_comment: Class<
   Model<{ status_comment_id?: number, comment: string, case_id?: number, status_id?: number, user_id?: number }>
 > = sequelize.define('Status_comment', {
   status_comment_id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-  comment: { type: Sequelize.STRING, allowNull: false, unique: true }
+  comment: { type: Sequelize.STRING, allowNull: false }
 });
 
 export let Case: Class<
