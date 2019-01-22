@@ -28,16 +28,18 @@ import CaseSubscription from '../classes/CaseSubscription';
 const MAX_NUMBER_IMG: number = 3; // Maximum number of images allowed in a single case.
 
 // Privilege levels
-const NOT_USER: number = 5;
-const NOT_OWNER_NOT_EMPLOYEE: number = 4;
-const OWNER_NOT_EMPLOYEE: number = 3;
-const EMPLOYEE: number = 2;
+const NOT_USER: number = 6;
+const NOT_OWNER_NOT_EMPLOYEE: number = 5;
+const OWNER_NOT_EMPLOYEE: number = 4;
+const OWNER_EMPLOYEE = 3;
+const NOT_OWNER_EMPLOYEE: number = 2;
 const ADMIN: number = 1;
 
 const EMPLOYEE_ACCESS_LEVEL: number = 2;
 const ADMIN_ACCESS_LEVEL: number = 1;
 const MAX_DESCRIPTION_LENGTH: number = 255;
 const STATUS_OPEN: number = 1;
+const STATUS_CLOSED: number = 3;
 const COMMENTS_PER_QUERY = 5;
 
 class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
@@ -99,9 +101,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                 </tr>
               </tbody>
             </table>
-            <p>{this.case.description}</p>
-            {privilege < OWNER_NOT_EMPLOYEE ||
-            !(this.case.status_id !== STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE) ? (
+            <h3>Beskrivelse</h3>
+            {this.case.description ? <p>{this.case.description}</p> : <p>INGEN BESKRIVELSE GITT</p>}
+            {privilege <= OWNER_EMPLOYEE ||
+            (this.case.status_id === STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE) ? (
               <section>
                 <h2>Oppdater sak</h2>
                 <div className={'form-group'}>
@@ -121,7 +124,24 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                     ))}
                   </select>
                 </div>
-                {privilege === EMPLOYEE ? (
+                {(this.case.status_id === STATUS_OPEN && this.isOwner(this.case)) || privilege === ADMIN ? (
+                  <div className={'form-group'}>
+                    <label htmlFor="title">Tittel</label>
+                    <input
+                      className={'form-control'}
+                      type="text"
+                      pattern="^.{2,255}$"
+                      autoComplete="off"
+                      value={this.case.title}
+                      onChange={(event: SyntheticInputEvent<HTMLInputElement>) => {
+                        this.case.title = event.target.value;
+                      }}
+                      placeholder={'Gi saken din en beskrivende tittel'}
+                      required
+                    />
+                  </div>
+                ) : null}
+                {privilege <= OWNER_EMPLOYEE ? (
                   <div className={'form-group'}>
                     <label htmlFor="status">Saksstatus</label>
                     <select
@@ -140,14 +160,14 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                     </select>
                   </div>
                 ) : null}
-                {privilege === OWNER_NOT_EMPLOYEE || privilege === ADMIN ? (
+                {this.case.status_id === STATUS_OPEN || privilege === ADMIN ? (
                   <div className={'form-group'}>
                     <label htmlFor="description">Beskrivelse</label>
                     <textarea
                       className={'form-control'}
                       id={'description'}
                       maxLength={MAX_DESCRIPTION_LENGTH}
-                      placeholder="Gi din sak en beskrivende tittel, så blir det enklere for oss å hjelpe deg."
+                      placeholder="Gi din sak en beskrivende beskrivelse, så blir det enklere for oss å hjelpe deg."
                       value={this.case.description}
                       onChange={this.textareaListener}
                     />
@@ -156,7 +176,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                       : null}
                   </div>
                 ) : null}
-                {privilege <= EMPLOYEE ? (
+                {privilege <= OWNER_EMPLOYEE ? (
                   <div className={'form-group'}>
                     <label htmlFor="description">Melding</label>
                     <textarea
@@ -201,8 +221,9 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   <div key={e.src} className="col-md-3">
                     <div className="card">
                       <img src={e.src} alt={e.src} className="card-img-top" />
-                      {privilege < OWNER_NOT_EMPLOYEE ||
-                      !(this.case.status_id !== STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE) ? (
+                      {(privilege <= OWNER_EMPLOYEE && this.case.status_id !== STATUS_CLOSED) ||
+                      (privilege === OWNER_NOT_EMPLOYEE && this.case.status_id === STATUS_OPEN) ||
+                      privilege === ADMIN ? (
                         <div className="card-img-overlay">
                           <button
                             className={'btn btn-danger img-overlay float-right align-text-bottom'}
@@ -304,25 +325,35 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           Notify.danger('Saken ble hentet i et ukjent format.');
         }
       })
+      .then(() => this.fetchStatusComments())
       .then(() => {
-        this.fetchStatusComments();
-        stat
-          .getAllStatuses()
-          .then(e => {
-            this.statuses = e;
-          })
-          .catch((err: Error) => {
-            console.log('Could not load statuses.');
-            Notify.danger(
-              'Klarte ikke å hente statuser. ' +
-                'Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
-                err.message
-            );
-          });
+        if (this.grantAccess() <= OWNER_EMPLOYEE) {
+          stat
+            .getAllStatuses()
+            .then(e => {
+              this.statuses = e;
+              let statList = this.form.querySelector('#status');
+              if(statList && statList instanceof HTMLSelectElement){
+                statList.value = this.case.category_id;
+              }
+            })
+            .catch((err: Error) => {
+              console.log('Could not load statuses.');
+              Notify.danger(
+                'Klarte ikke å hente statuser. ' +
+                  'Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+                  err.message
+              );
+            });
+        }
         cat
           .getAllCategories()
           .then(e => {
             this.categories = e;
+            let catList = this.form.querySelector('#category');
+            if(catList && catList instanceof HTMLSelectElement){
+              catList.value = this.case.category_id;
+            }
           })
           .catch((err: Error) => {
             console.log('Could not load categories.');
@@ -369,14 +400,19 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     let userObj = localStorage.getItem('user');
     if (this.case && userObj) {
       let user: Object = JSON.parse(userObj);
-      console.log('User ' + user.firstname + ' ' + user.lastname + ' has privilege ' + user.access_level);
-      console.log('user.user_id: ' + user.user_id + ', this.case.user_id: ' + this.case.user_id);
       if (user.access_level === ADMIN_ACCESS_LEVEL) {
         // User is Administrator, has full access
         return ADMIN;
+      } else if (
+        user.access_level === EMPLOYEE_ACCESS_LEVEL &&
+        user.region_id === this.case.region_id &&
+        this.case.user_id === user.user_id
+      ) {
+        // User is a municipality employee and owns this case.
+        return OWNER_EMPLOYEE;
       } else if (user.access_level === EMPLOYEE_ACCESS_LEVEL && user.region_id === this.case.region_id) {
-        // User is a municipality employee or higher. May edit case.
-        return EMPLOYEE;
+        // User is a municipality employee. May edit case.
+        return NOT_OWNER_EMPLOYEE;
       } else if (this.case.user_id === user.user_id) {
         // User is owner of case, may not send messages, but can edit until process or closed status.
         return OWNER_NOT_EMPLOYEE;
@@ -387,28 +423,6 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     } else {
       // User is not logged. Has the least privileges possible.
       return NOT_USER;
-    }
-  }
-
-  getInitialCategory() {
-    if (this.case) {
-      let cat = this.categories.find(e => e.category_id === this.case.category_id);
-      if (cat) {
-        return cat.category_id;
-      } else {
-        return -1;
-      }
-    }
-  }
-
-  getInitialStatus() {
-    if (this.case) {
-      let status = this.statuses.find(e => e.status_id === this.case.status_id);
-      if (status) {
-        return status.status_id;
-      } else {
-        return -1;
-      }
     }
   }
 
@@ -434,14 +448,16 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
 
   categoryListener(event: SyntheticEvent<HTMLSelectElement>) {
     if (event.target && event.target instanceof HTMLSelectElement && this.case) {
-      this.case.category_id = event.target.options[event.target.selectedIndex].value;
+      this.case.category_id = this.categories[event.target.selectedIndex].category_id;
+      this.case.category_name = this.categories[event.target.selectedIndex].name;
       console.log('this.case.category_id: ' + this.case.category_id);
     }
   }
 
   statusListener(event: SyntheticEvent<HTMLSelectElement>) {
     if (event.target && event.target instanceof HTMLSelectElement && this.case) {
-      this.case.status_id = event.target.options[event.target.selectedIndex].value;
+      this.case.status_id = this.statuses[event.target.selectedIndex].status_id;
+      this.case.status_name = this.statuses[event.target.selectedIndex].name;
       console.log('this.case.status_id: ' + this.case.status_id);
     }
   }
@@ -498,18 +514,21 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   }
 
   delete(event: SyntheticEvent<HTMLButtonElement>) {
+    event.preventDefault();
     console.log('Clicked delete button');
-    let cas = new CaseService();
-    cas
-      .deleteCase(this.case.case_id)
-      .then(() => {
-        Notify.success('Din sak med id ' + this.case.case_id + ' ble slettet.');
-        this.props.history.push('/');
-      })
-      .catch((err: Error) => {
-        console.log('Could not delete case with id: ' + this.case.case_id, err);
-        Notify.danger('Kunne ikke slette sak med id: ' + this.case.case_id + '. \n\nFeilmelding: ' + err.message);
-      });
+    if(this.isOwner(this.case)){
+      let cas = new CaseService();
+      cas
+        .deleteCase(this.case.case_id)
+        .then(() => {
+          Notify.success('Din sak med id ' + this.case.case_id + ' ble slettet.');
+          this.props.history.goBack();
+        })
+        .catch((err: Error) => {
+          console.log('Could not delete case with id: ' + this.case.case_id, err);
+          Notify.danger('Kunne ikke slette sak med id: ' + this.case.case_id + '. \n\nFeilmelding: ' + err.message);
+        });
+    }
   }
 
   fetchStatusComments() {
@@ -542,7 +561,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
 
   validate() {
     let privilege = this.grantAccess();
-    if ((this.case.status_id === STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE) || privilege <= EMPLOYEE) {
+    if ((this.case.status_id === STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE) || privilege <= NOT_OWNER_EMPLOYEE) {
       if (this.form.checkValidity()) {
         console.log('Passed basic HTML form validation.');
         return true;
@@ -568,13 +587,15 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
         .updateCase(this.case.case_id, this.case)
         .then(() => {
           console.log('Case ' + this.case.case_id + ' was updated.');
+          Notify.success('Sak med id ' + this.case.case_id + ' ble oppdatert.');
           if (this.case.img.length > 0) {
             // Pictures are present
+            // TODO Fortsett her
             console.log('Images are present. Proceeding to update images.');
           }
         })
         .then(() => {
-          if (privilege <= EMPLOYEE) {
+          if (privilege <= NOT_OWNER_EMPLOYEE) {
             // Upload status comment
             let statcom = new StatusCommentService();
             statcom
