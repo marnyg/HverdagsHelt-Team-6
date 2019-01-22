@@ -27,6 +27,7 @@ module.exports = {
       typeof req.body.email !== 'string' ||
       typeof req.body.password !== 'string' ||
       typeof req.body.region_id !== 'number' ||
+      typeof req.body.region_id !== 'number' ||
       !regexNames.test(req.body.firstname) ||
       !regexNames.test(req.body.lastname) ||
       !regexNumber.test(req.body.tlf) ||
@@ -39,8 +40,7 @@ module.exports = {
     let hashedPassword = hashPassword(req.body.password);
     let password = hashedPassword['passwordHash'];
     let salt = hashedPassword['salt'];
-
-    return await User.create({
+    let update_user_obj = {
       firstname: req.body.firstname,
       lastname: req.body.lastname,
       tlf: req.body.tlf,
@@ -49,7 +49,11 @@ module.exports = {
       salt: salt,
       role_id: 4,
       region_id: req.body.region_id
-    })
+    }
+
+    if(req.token && Number(verifyToken(req.token).accesslevel) === 1) update_user_obj['role_id'] = Number(req.body.role_id);
+
+    return await User.create(update_user_obj)
       .then(async users => {
         let body =
           `Epost-adressen ${users.email} har blitt brukt for å opprette en bruker på systemet til hverdagshelt\n` +
