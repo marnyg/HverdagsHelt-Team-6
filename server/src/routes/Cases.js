@@ -343,6 +343,22 @@ module.exports = {
   },
   search: function(req: Request, res: Response) {
     let search = '%' + req.params.searchtext + '%';
+
+    let page = 1;
+    let limit = 20;
+
+    if(
+      req.query &&
+      req.query.page &&
+      req.query.limit &&
+      Number(req.query.page) > 0 &&
+      Number(req.query.limit) > 0
+    ) {
+      page = Number(req.query.page);
+      limit = Number(req.query.limit);
+    }
+    let start_limit = (page - 1) * limit;
+
     sequelize
       .query(
         rawQueryCases +
@@ -352,8 +368,8 @@ module.exports = {
           'OR r.name LIKE ? ' +
           'OR cg.name LIKE ? ' +
           casesOrder +
-          ' LIMIT 20',
-        { replacements: [search, search, search, search, search], type: sequelize.QueryTypes.SELECT }
+          ' LIMIT ?,?;',
+        { replacements: [search, search, search, search, search, start_limit, limit], type: sequelize.QueryTypes.SELECT }
       )
       .then(async cases => {
         const out = cases.map(async c => {
