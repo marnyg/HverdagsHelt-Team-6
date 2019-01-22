@@ -93,12 +93,27 @@ class EditPassword extends Component {
 
         if (passInput1.value === passInput2.value && this.refs.form.checkValidity()) {
             console.log('pass OK');
+            this.error=<Alert
+              type='success'
+              text='Passord ble oppdatert!'
+            />
             passInput2.setCustomValidity('');
             this.us
                 .updatePassword(this.user.user_id, this.oldPass, this.user.password)
                 .then(() => this.props.callback(null, <DisplayProfile callback={this.props.callback} />))
-                .catch((error: Error) => console.error(error));
+                .catch((error: Error) => {
+                  this.error=<Alert
+                    type='danger'
+                    text='Feil oppstod! Passord ble ikke oppdatert, prøv igjen.'
+                  />
+                });
+                //console.error(error));
+
         } else {
+            this.error=<Alert
+              type='danger'
+              text='Feil oppstod! Passord ble ikke oppdatert, prøv igjen.'
+            />
             passInput2.setCustomValidity('Passwords must match');
             this.refs.form.reportValidity();
             passInput2.setCustomValidity('');
