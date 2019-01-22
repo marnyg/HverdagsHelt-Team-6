@@ -35,10 +35,14 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
                       <div className={'card'}>
                           <div className={'card-header'}> Dine kommuner</div>
                           <table className={'table'}>
-                              <th itemScope={'col'}>#</th>
-                              <th itemScope={'col'}>Kommune</th>
-                              <th itemScope={'col'}>Få epost varsler</th>
-                              <th itemScope={'col'}>Slett fra varsler</th>
+                              <thead>
+                                  <tr>
+                                      <th itemScope={'col'}>#</th>
+                                      <th itemScope={'col'}>Kommune</th>
+                                      <th itemScope={'col'}>Få epost varsler</th>
+                                      <th itemScope={'col'}>Slett fra varsler</th>
+                                  </tr>
+                              </thead>
                               <tbody>{this.getYourRegionListEllement(this.followedRegions)}</tbody>
                           </table>
                       </div>

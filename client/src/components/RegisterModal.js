@@ -9,6 +9,7 @@ import User from '../classes/User.js';
 
 
 class RegisterModal extends Component {
+    _isMounted = false; // Used to not update state (promise resolve) when component has unmounted
     counties = [];
     regions = [];
     validemail = true;
@@ -111,12 +112,23 @@ class RegisterModal extends Component {
         );
     }
 
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
+
+
     mounted(){
+        this._isMounted = true;
         let countyService = new CountyService();
         countyService.getAllCounties()
-            .then((counties: County[]) => this.counties = counties)
+            .then((counties: County[]) => {
+                if(this._isMounted) {
+                    this.counties = counties;
+                }
+            })
             .catch((error: Error) => console.error(error));
     }
+
 
     countyListener(event) {
         let county = event.target.options[event.target.selectedIndex];
