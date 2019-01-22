@@ -166,9 +166,10 @@ module.exports = {
       description: b.description,
       lat: b.lat,
       lon: b.lon,
-      region_id: b.region_id
+      region_id: b.region_id,
+      category_id: b.category_id
     };
-    if (token_access_level <= 2) update_body['status_id'] = req.body.status_id;
+    if (token_access_level == 1) update_body['status_id'] = req.body.status_id;
 
     return Case.findOne({ where: { case_id: param_case_id } })
       .then(cases => {
