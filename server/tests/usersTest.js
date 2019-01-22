@@ -206,6 +206,81 @@ describe('Update data on a user', () => {
   });
 });
 
+describe('Change password', () => {
+  test('400 status code for PUT /api/users/:user_id/password without body and token', done => {
+    request(application)
+      .put(`/api/users/${user_id}/password`)
+      .then(response => {
+        expect(response.statusCode).toBe(400);
+        done();
+      });
+  });
+  test('403 status code for PUT /api/users/:user_id/password for invalid token', done => {
+    request(application)
+      .put(`/api/users/${user_id}/password`)
+      .send({
+        old_password: "Passord123",
+        new_password: "PASSord123"
+      })
+      .set('Authorization', `Bearer ${1000}`)
+      .then(response => {
+        expect(response.statusCode).toBe(403);
+        done();
+      });
+  });
+  test('200 status code for GET /api/users', done => {
+    request(application)
+      .put(`/api/users/${user_id}/password`)
+      .send({
+        old_password: "Passord123",
+        new_password: "PASSord123"
+      })
+      .set('Authorization', `Bearer ${token}`)
+      .then(response => {
+        expect(response.statusCode).toBe(200);
+        done();
+      });
+  });
+});
+
+describe('Find all region subscriptions for a user', () => {
+  test('400 status code for GET /api/users/:user_id/region_subscriptions without token', done => {
+    return request(application)
+      .get(`/api/users/${user_id}/region_subscriptions`)
+      .then(response => {
+        expect(response.statusCode).toBe(400);
+        done();
+      });
+  });
+  test('400 status code for GET /api/users/:user_id/region_subscriptions with invalid user_id', done => {
+    return request(application)
+      .get(`/api/users/NaN/region_subscriptions`)
+      .set('Authorization', `Bearer ${token}`)
+      .then(response => {
+        expect(response.statusCode).toBe(400);
+        done();
+      });
+  });
+  test('403 status code for GET /api/users/:user_id/region_subscriptions with wrong token', done => {
+    return request(application)
+      .get(`/api/users/${user_id}/region_subscriptions`)
+      .set('Authorization', `Bearer ${12345}`)
+      .then(response => {
+        expect(response.statusCode).toBe(403);
+        done();
+      });
+  });
+  test('200 status code for GET /api/users/:user_id/region_subscriptions', done => {
+    return request(application)
+      .get(`/api/users/${user_id}/region_subscriptions`)
+      .set('Authorization', `Bearer ${token}`)
+      .then(response => {
+        expect(response.statusCode).toBe(200);
+        done();
+      });
+  });
+});
+
 describe('Delete a user', () => {
   test('400 status code for DELETE /api/users/:user_id without token', done => {
     return request(application)
@@ -284,5 +359,4 @@ describe('Find all users registered in the system (only admins)', () => {
       });
   });
 });
-
 

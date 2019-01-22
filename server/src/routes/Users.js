@@ -50,9 +50,10 @@ module.exports = {
       salt: salt,
       role_id: 4,
       region_id: req.body.region_id
-    }
+    };
 
-    if(req.token && Number(verifyToken(req.token).accesslevel) === 1) update_user_obj['role_id'] = Number(req.body.role_id);
+    if (req.token && Number(verifyToken(req.token).accesslevel) === 1)
+      update_user_obj['role_id'] = Number(req.body.role_id);
 
     return await User.create(update_user_obj)
       .then(async users => {
@@ -82,12 +83,7 @@ module.exports = {
   },
 
   getOneUser: function(req: Request, res: Response) {
-    if (
-      !req.token ||
-      !req.params.user_id ||
-      isNaN(Number(req.params.user_id)) ||
-      typeof req.token !== 'string'
-    )
+    if (!req.token || !req.params.user_id || isNaN(Number(req.params.user_id)) || typeof req.token !== 'string')
       return res.sendStatus(400);
 
     let decoded_token = verifyToken(req.token);
@@ -142,9 +138,9 @@ module.exports = {
 
     return User.update(user_update_obj, { where: { user_id: req.params.user_id } })
       .then(users => {
-        if(!users) return res.sendStatus(404);
-        if(users[0] === 1) {
-          return res.send({ msg: "User successfully updated"});
+        if (!users) return res.sendStatus(404);
+        if (users[0] === 1) {
+          return res.send({ msg: 'User successfully updated' });
         }
         return res.sendStatus(200);
       })
@@ -156,12 +152,7 @@ module.exports = {
   },
 
   deleteOneUser: function(req: Request, res: Response) {
-    if (
-      !req.token ||
-      !req.params.user_id ||
-      isNaN(Number(req.params.user_id)) ||
-      typeof req.token !== 'string'
-    )
+    if (!req.token || !req.params.user_id || isNaN(Number(req.params.user_id)) || typeof req.token !== 'string')
       return res.sendStatus(400);
 
     let decoded_token = verifyToken(req.token);
@@ -195,7 +186,7 @@ module.exports = {
       !req.token ||
       !req.params.user_id ||
       !req.body ||
-      typeof Number(req.params.user_id) !== 'number' ||
+      isNaN(Number(req.params.user_id)) ||
       typeof req.token !== 'string' ||
       typeof req.body.old_password !== 'string' ||
       typeof req.body.new_password !== 'string' ||
@@ -236,12 +227,7 @@ module.exports = {
     }
   },
   getRegionSubscriptionsForUser: function(req: Request, res: Response) {
-    if (
-      !req.token ||
-      !req.params.user_id ||
-      typeof Number(req.params.user_id) !== 'number' ||
-      typeof req.token !== 'string'
-    ) {
+    if (!req.token || !req.params.user_id || isNaN(Number(req.params.user_id)) || typeof req.token !== 'string') {
       return res.sendStatus(400);
     }
 
