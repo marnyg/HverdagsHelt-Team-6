@@ -320,12 +320,20 @@ app.get('/api/stats/opened/:year', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 2, Stats.getNationalStatsOpened);
 });
 
+app.get('/api/stats/categories/:year', (req: Request, res: Response) => {
+    reqAccessLevel(req, res, 2, Stats.getNationalStatsCategories);
+});
+
 app.get('/api/stats/closed/:year/:region_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 2, Stats.getNationalStatsClosedByRegion);
 });
 
 app.get('/api/stats/opened/:year/:region_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 2, Stats.getNationalStatsOpenedByRegion);
+});
+
+app.get('/api/stats/categories/:year/:region_id', (req: Request, res: Response) => {
+    reqAccessLevel(req, res, 2, Stats.getStatsCategoriesByRegion);
 });
 
 app.get('/*', (req, res) => {
