@@ -5,6 +5,31 @@ import ToolService from '../../services/ToolService';
 
 class AdminCaseList extends Component {
     render() {
+        if(this.props.cases === undefined || this.props.cases === null){
+            return(
+                <div className={'card mt-3'} style={{'overflow':'scroll','maxHeight': '500px'}}>
+                    <div>Velg en kommune fra listen</div>
+                </div>
+            );
+        }
+        if(this.props.cases.length === 0){
+            return(
+                <div className={'card mt-3'} style={{'overflow':'scroll','maxHeight': '500px'}}>
+                    <table className="table table-hover table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col">Sak ID</th>
+                            <th scope="col">Eier</th>
+                            <th scope="col">Publisert</th>
+                            <th scope="col">Sist endret</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            );
+        }
         return(
             <div className={'card mt-3'} style={{'overflow':'scroll','maxHeight': '500px'}}>
                 <table className="table table-hover table-striped">

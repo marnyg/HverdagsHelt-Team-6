@@ -28,6 +28,7 @@ import UserService from "../services/UserService";
 import LoginService from "../services/LoginService";
 import EmployeePage from "./Employee/EmployeePage";
 import AdminPage from "./Admin/AdminPage";
+import VerificationModal from "./VerificationModal";
 
 axios.interceptors.response.use(response => response.data);
 
@@ -48,6 +49,7 @@ class App extends Component {
                             onLogin={() => this.onLogin()}
                             logout={(event) => this.logout(event)}
                         />
+                        <VerificationModal/>
                         <Route path="/my-page" render={() => <MyPage />} />
                         <Route path="/employee" render={() => <EmployeePage/>} />
                         <Route path="/admin" render={() => <AdminPage/>} />
