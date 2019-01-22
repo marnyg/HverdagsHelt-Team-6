@@ -16,10 +16,13 @@ class AdminTeams extends Component {
             <div className={'container'}>
                 <div className={'row'}>
                     <div className={'col-lg'}>
+                        <h3>Velg en kommune fra listen</h3>
                         <AdminRegionsList onRegionSelected={(region) => this.onRegionSelected(region)}/>
                     </div>
-                    <div className={'col-lg'}>
-                        <AdminTeamView region={this.region} team={this.team} onUserCreated={() => this.onUserCreated()}/>
+                    <div className={'col-lg mt-5'}>
+                        <AdminTeamView region={this.region} team={this.team} onUserCreated={() => this.onUserCreated()}
+                            onTeamChange={(user) => this.onTeamChange(user)}
+                        />
                     </div>
                 </div>
             </div>
@@ -41,14 +44,21 @@ class AdminTeams extends Component {
     }
 
     onRegionSelected(region) {
-        console.log('Region selected!');
         this.region = region;
         let userService = new UserService();
         userService.getAllEmployeesInRegion(region.region_id)
             .then((users: User[]) => {
-                console.log(users);
-                console.log(users.filter(u => (u.role_id === region_employee_id && u.region_id === region.region_id)));
                 //this.team = users.filter(u => (u.role_id === region_employee_id && u.region_id === region.region_id));
+                this.team = users;
+            })
+            .catch((error: Error) => console.error(error));
+    }
+
+    onTeamChange(user: User) {
+        console.log('Team changed');
+        let userService = new UserService();
+        userService.getAllEmployeesInRegion(this.region.region_id)
+            .then((users: User[]) => {
                 this.team = users;
             })
             .catch((error: Error) => console.error(error));

@@ -31,26 +31,20 @@ describe('Find all regions', () => {
   });
 });
 
-// Tested in countiesTest
-/*
-describe('Find all regions in county', () => {
-  test('200 status code for GET /api/counties/:county_id/regions', done => {
-    request(application)
-      .get(`/api/counties/${county_id}/regions`)
-      .then(response => {
-        expect(response.statusCode).toBe(200);
-        done();
-      });
-  });
-});
-*/
-
 describe('Find one region', () => {
   test('200 status code for GET /api/regions/region_id', done => {
     request(application)
       .get(`/api/regions/${region_id}`)
       .then(response => {
         expect(response.statusCode).toBe(200);
+        done();
+      });
+  });
+  test('400 status code for GET /api/regions/region_id with invalid id', done => {
+    request(application)
+      .get(`/api/regions/NaN`)
+      .then(response => {
+        expect(response.statusCode).toBe(400);
         done();
       });
   });
@@ -112,6 +106,14 @@ describe('Update one region', () => {
         done();
       });
   });
+  test('400 status code for PUT /api/regions/{region_id} with invalid region_id', done => {
+    return request(application)
+      .put(`/api/regions/NaN`)
+      .then(response => {
+        expect(response.statusCode).toBe(400);
+        done();
+      });
+  });
   test('403 status code for PUT /api/regions/{region_id} without valid token', done => {
     return request(application)
       .put(`/api/regions/${ny_region_id}`)
@@ -142,7 +144,7 @@ describe('Update one region', () => {
 describe('Delete one region', () => {
   test('400 status code for DELETE /api/regions/:region_id with invalid id', done => {
     request(application)
-      .delete(`/api/regions/${0}`)
+      .delete(`/api/regions/NaN`)
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();
@@ -168,6 +170,27 @@ describe('Delete one region', () => {
   test('200 status code for DELETE /api/regions/:region_id', done => {
     request(application)
       .delete(`/api/regions/${ny_region_id}`)
+      .set('Authorization', `Bearer ${admin_token}`)
+      .then(response => {
+        expect(response.statusCode).toBe(200);
+        done();
+      });
+  });
+});
+
+describe('Find all staff for a region', () => {
+  test('400 status code for GET /api/regions/:region_id/staff with invalid id', done => {
+    request(application)
+      .get(`/api/regions/NaN/staff`)
+      .set('Authorization', `Bearer ${admin_token}`)
+      .then(response => {
+        expect(response.statusCode).toBe(400);
+        done();
+      });
+  });
+  test('200 status code for DELETE /api/regions/:region_id', done => {
+    request(application)
+      .get(`/api/regions/${44}/staff`)
       .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(200);

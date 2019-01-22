@@ -193,15 +193,12 @@ class Statistics extends Component {
 
   generatePdf() {
     let input = this.refs.statPage;
-    console.log(input);
 
-    html2canvas(input, {scale: 1}).then(canvas => {
+    html2canvas(input, { scale: 1 }).then(canvas => {
       const imgData = canvas.toDataURL('image/png');
-      
 
       const pdf = new jsPDF(1, "mm", "a4")
       pdf.addImage(imgData, 'PNG', 1, 0);
-      // pdf.output('dataurlnewwindow');
       pdf.save('download.pdf');
 
     });
