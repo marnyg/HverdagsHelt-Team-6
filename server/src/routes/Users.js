@@ -3,12 +3,13 @@
 import { User } from '../models.js';
 import { createToken, hashPassword, loginOk, verifyToken } from '../auth';
 import { Region_subscriptions, sequelize } from '../models';
-import Epost from './../utils/Epost.js'
+import { regexNames, regexNumber, regexEmail, regexPassword, regexRegionId } from './../utils/Regex.js';
+import Epost from './../utils/Epost.js';
 
 type Request = express$Request;
 type Response = express$Response;
 
-const email_subject = "Bruker opprettet - Hverdagshelt";
+const email_subject = 'Bruker opprettet - Hverdagshelt';
 
 module.exports = {
   getAllUsers: function(req: Request, res: Response) {
@@ -18,35 +19,6 @@ module.exports = {
   },
 
   createUser: async function(req: Request, res: Response) {
-    let regexNames = /^[a-zA-ZæøåÆØÅ\-\s]+$/;
-    let regexNumber = /^[\d]{8}$/;
-    let regexEmail = /^[\wæøåÆØÅ]+([.]{1}[\wæøåÆØÅ]+)*@[\wæøåÆØÅ]+([.]{1}[\wæøåÆØÅ]+)+$/;
-    let regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
-    let regexRegionId = /^[\d]+$/;
-    console.log('NAMES:');
-    console.log('true: ', regexNames.test('Magne'));
-    console.log('true: ', regexNames.test('ÆØÅæøå'));
-    console.log('true: ', regexNames.test('Æ-df'));
-    console.log('true: ', regexNames.test('ÆØÅ æøå'));
-    console.log('false: ', regexNames.test('.,!"#¤%%&¤@£$€{{[]]]{€'));
-    console.log('NUMBER:');
-    console.log('false: ', regexNumber.test('.,!"#¤%%&¤@£$€{{[]]]{€'));
-    console.log('false: ', regexNumber.test(' 123234 '));
-    console.log('true: ', regexNumber.test('12345678'));
-    console.log('false: ', regexNumber.test('113'));
-    console.log('false: ', regexNumber.test('12345678910'));
-    console.log('EMAIL:');
-    console.log('true: ', regexEmail.test('olaæøå.nord.mann@stud.ntnu.no'));
-    // 8 tegn
-    // Stor og liten bokstav, og tall
-    console.log('PASSWORD:');
-    console.log('false: ', regexPassword.test('12345678'));
-    console.log('false: ', regexPassword.test('1234567a'));
-    console.log('true: ', regexPassword.test('123456aB'));
-    console.log('REGION_ID:');
-    console.log('true: ', regexRegionId.test('1'));
-    console.log('false: ', regexRegionId.test(' 2334 '));
-    console.log('false: ', regexRegionId.test('en'));
     if (
       !req.body ||
       typeof req.body.firstname !== 'string' ||
@@ -54,7 +26,13 @@ module.exports = {
       typeof req.body.tlf !== 'number' ||
       typeof req.body.email !== 'string' ||
       typeof req.body.password !== 'string' ||
-      typeof req.body.region_id !== 'number'
+      typeof req.body.region_id !== 'number' ||
+      !regexNames.test(req.body.firstname) ||
+      !regexNames.test(req.body.lastname) ||
+      !regexNumber.test(req.body.tlf) ||
+      !regexEmail.test(req.body.email) ||
+      !regexPassword.test(req.body.password) ||
+      !regexRegionId.test(req.body.region_id)
     )
       return res.sendStatus(400);
 
@@ -71,21 +49,24 @@ module.exports = {
       salt: salt,
       role_id: 4,
       region_id: req.body.region_id
-    }).then(async users => {
-      let body = `Epost-adressen ${users.email} har blitt brukt for å opprette en bruker på systemet til hverdagshelt\n` +
-      `Vennligst ta kontakt med vår support på support.hverdagshelt.team6@gmail.com hvis dette ikke var deg.`;
-
-      let email_info = await Epost.send_email(users.email, email_subject, body);
-      console.log(email_info);
-      if(email_info) res.send({
-        user_id: users.user_id,
-        msg: "Bruker opprettet, og epost sendt."
-      });
-      res.send({
-        user_id: users.user_id,
-        msg: "Bruker opprettet, men epost kunne ikke bli sendt."
-      });
     })
+      .then(async users => {
+        let body =
+          `Epost-adressen ${users.email} har blitt brukt for å opprette en bruker på systemet til hverdagshelt\n` +
+          `Vennligst ta kontakt med vår support på support.hverdagshelt.team6@gmail.com hvis dette ikke var deg.`;
+
+        let email_info = await Epost.send_email(users.email, email_subject, body);
+        console.log(email_info);
+        if (email_info)
+          res.send({
+            user_id: users.user_id,
+            msg: 'Bruker opprettet, og epost sendt.'
+          });
+        res.send({
+          user_id: users.user_id,
+          msg: 'Bruker opprettet, men epost kunne ikke bli sendt.'
+        });
+      })
       .catch(err => {
         err.description = 'Det finnes allerede en bruker med den oppgitte e-posten, bruk en unik e-post';
         res.status(409).json(err);
@@ -125,7 +106,12 @@ module.exports = {
       typeof req.body.lastname !== 'string' ||
       typeof req.body.tlf !== 'number' ||
       typeof req.body.email !== 'string' ||
-      typeof req.body.region_id !== 'number'
+      typeof req.body.region_id !== 'number' ||
+      !regexNames.test(req.body.firstname) ||
+      !regexNames.test(req.body.lastname) ||
+      !regexNumber.test(req.body.tlf) ||
+      !regexEmail.test(req.body.email) ||
+      !regexRegionId.test(req.body.region_id)
     )
       return res.sendStatus(400);
 
@@ -196,7 +182,8 @@ module.exports = {
       typeof Number(req.params.user_id) !== 'number' ||
       typeof req.token !== 'string' ||
       typeof req.body.old_password !== 'string' ||
-      typeof req.body.new_password !== 'string'
+      typeof req.body.new_password !== 'string' ||
+      !regexPassword.test(req.body.new_password)
     )
       return res.sendStatus(400);
 
