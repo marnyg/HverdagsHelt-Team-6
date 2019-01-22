@@ -400,8 +400,6 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     let userObj = localStorage.getItem('user');
     if (this.case && userObj) {
       let user: Object = JSON.parse(userObj);
-      console.log('User ' + user.firstname + ' ' + user.lastname + ' has privilege ' + user.access_level);
-      console.log('user.user_id: ' + user.user_id + ', this.case.user_id: ' + this.case.user_id);
       if (user.access_level === ADMIN_ACCESS_LEVEL) {
         // User is Administrator, has full access
         return ADMIN;
@@ -516,19 +514,21 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   }
 
   delete(event: SyntheticEvent<HTMLButtonElement>) {
-    // TODO FUNGERER IKKE!
+    event.preventDefault();
     console.log('Clicked delete button');
-    let cas = new CaseService();
-    cas
-      .deleteCase(this.case.case_id)
-      .then(() => {
-        Notify.success('Din sak med id ' + this.case.case_id + ' ble slettet.');
-        this.props.history.push('/');
-      })
-      .catch((err: Error) => {
-        console.log('Could not delete case with id: ' + this.case.case_id, err);
-        Notify.danger('Kunne ikke slette sak med id: ' + this.case.case_id + '. \n\nFeilmelding: ' + err.message);
-      });
+    if(this.isOwner(this.case)){
+      let cas = new CaseService();
+      cas
+        .deleteCase(this.case.case_id)
+        .then(() => {
+          Notify.success('Din sak med id ' + this.case.case_id + ' ble slettet.');
+          this.props.history.goBack();
+        })
+        .catch((err: Error) => {
+          console.log('Could not delete case with id: ' + this.case.case_id, err);
+          Notify.danger('Kunne ikke slette sak med id: ' + this.case.case_id + '. \n\nFeilmelding: ' + err.message);
+        });
+    }
   }
 
   fetchStatusComments() {
