@@ -1,8 +1,8 @@
 // @flow
 
-import {Case, Status_comment, User, sequelize, Case_subscriptions} from '../models';
+import { Case, Status_comment, User, sequelize, Case_subscriptions } from '../models';
 import { verifyToken } from '../auth';
-import { send_subs_email} from '../utils/Epost.js';
+import { send_subs_email } from '../utils/Epost.js';
 
 type Request = express$Request;
 type Response = express$Response;
@@ -16,6 +16,7 @@ let all_true = function(val) {
 
 module.exports = {
   getAllStatus_comment: async function(req: Request, res: Response) {
+    if (!req.params || isNaN(Number(req.params.case_id))) return res.sendStatus(400);
     sequelize
       .query(
         'Select sc.status_comment_id, sc.comment, sc.createdAt, sc.updatedAt, sc.case_id, sc.status_id, sc.user_id, ' +
@@ -53,7 +54,8 @@ module.exports = {
       !req.token ||
       typeof req.body.comment !== 'string' ||
       typeof req.body.status_id !== 'number' ||
-      typeof req.token !== 'string'
+      typeof req.token !== 'string' ||
+      isNaN(Number(req.params.case_id))
     )
       return res.sendStatus(400);
 
@@ -79,20 +81,24 @@ module.exports = {
         });
       })
       .then(comment => {
-        if(comment) {
-          Case_subscriptions.findAll(
-            {where: {case_id: Number(req.params.case_id), notify_by_email: 1}}
-          ).then(async subs => {
-            let all_ids = await subs.map(s => {
-              return s.user_id
-            });
-            let all_users = await User.findAll({where: {user_id: all_ids}});
-            let emails = all_users.map(u => u.email);
-            send_subs_email(emails, email_subject, email_body);
-            return res.send({comment: comment});
-          })
+        if (comment) {
+          Case.update({status_id: req.body.status_id},{where: {case_id: Number(req.params.case_id)}});
+          Case_subscriptions.findAll({ where: { case_id: Number(req.params.case_id), notify_by_email: 1 } }).then(
+            async subs => {
+              let all_ids = await subs.map(s => {
+                return s.user_id;
+              });
+              let all_users = await User.findAll({ where: { user_id: all_ids } });
+              let emails = all_users.map(u => u.email);
+              send_subs_email(emails, email_subject, email_body);
+              return res.send({ comment: comment });
+            }
+          );
         }
-      }).catch(error => { return res.status(500).json(error)});
+      })
+      .catch(error => {
+        return res.status(500).json(error);
+      });
   },
   // Kun den som skrev kommentaren og admin kan endre
   updateStatus_comment: function(req: Request, res: Response) {
@@ -101,7 +107,9 @@ module.exports = {
       !req.token ||
       typeof req.body.comment !== 'string' ||
       typeof req.body.status_id !== 'number' ||
-      typeof req.token !== 'string'
+      typeof req.token !== 'string' ||
+      isNaN(Number(req.params.status_comment_id)) ||
+      isNaN(Number(req.params.case_id))
     )
       return res.sendStatus(400);
 
@@ -131,7 +139,14 @@ module.exports = {
   },
   // Kun den som skrev kommentaren og admin kan slette
   delStatus_comment: function(req: Request, res: Response) {
-    if (!req.token || typeof req.body.user_id !== 'number' || typeof req.token !== 'string') return res.sendStatus(400);
+    if (
+      !req.token ||
+      typeof req.body.user_id !== 'number' ||
+      typeof req.token !== 'string' ||
+      isNaN(Number(req.params.status_comment_id)) ||
+      isNaN(Number(req.params.case_id))
+    )
+      return res.sendStatus(400);
 
     let decoded_token = verifyToken(req.token);
     let user_id_token = decoded_token.user_id;
