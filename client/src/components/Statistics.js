@@ -7,78 +7,132 @@ import { Bar, Doughnut, Pie, Line } from 'react-chartjs-2';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import StatService from '../services/StatsService';
+import UserService from "../services/UserService"
 
 class Statistics extends Component {
-  data = {};
-  data1 = {};
+  nationalBar = {};
+  regionalBar = {};
   openedNat = [];
   openedRegional = [];
   closedRegional = [];
   closedNat = [];
-  natData = [];
-  regData = [];
+  catStatNat = []
+  catStatReg = []
+  natDataBar = [];
+  regDataBar = [];
+  nationalPie = []
+  regionalPie = []
+  year = 2019
+
   options = null;
 
   statServ = new StatService();
+  user = JSON.parse(localStorage.getItem("user"))
+  region_id = this.user.region_id
+
+
   render() {
     return (
-      <div ref="statPage" className="container" style={{ maxWidth: '210mm' }}>
-        <div className="row">
-          <div className={'col-md'}>
-            <Bar data={this.data} />
-            <Bar data={this.data1} />
-            <div class="row">
-              <Pie class="col" data={this.data} />
-              <Pie class="col" data={this.data} />
+      <div className="container">
+        <div className="row ">
+          <div ref="statPage" className="col border p-5" style={{ maxHeight: '297mm', maxWidth: '210mm', minWidth: '210mm' }}>
+            <div className="row">
+              <h4 >National statistik</h4>
+              <div className="row">
+                <div className="col" style={{ maxWidth: "150mm", minWidth: '150mm' }} >
+                  <Bar ref="bar1" data={this.nationalBar} />
+                </div>
+                <p className="col" >
+                  Ad consequat sit esse elit minim sint ad minim exercitation magna deserunt ipsum ad deserunt. Sunt ut do
+                  anim nulla elit dolor do Lorem tempor magna sit non deserunt exercitation.
+            </p>
+              </div>
             </div>
+
+            <div className="row">
+              <h4 >Regional statistik</h4>
+              <div className="row">
+                <div className="col" style={{ maxWidth: "150mm", minWidth: '150mm' }} >
+                  <Bar data={this.regionalBar} />
+                </div>
+                <p className="col" >
+                  Ad consequat sit esse elit minim sint ad minim exercitation magna deserunt ipsum ad deserunt. Sunt ut do
+                  anim nulla elit dolor do Lorem tempor magna sit non deserunt exercitation.
+            </p>
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="row">
+                <div className="col" style={{ maxWidth: "100mm", minWidth: '100mm' }} >
+                  <h4 >National statistik</h4>
+                  <Pie data={this.nationalPie} />
+                </div>
+                <div className="col" style={{ maxWidth: "100mm", minWidth: '100mm' }} >
+                  <h4 >Regional statistik</h4>
+                  <Pie data={this.regionalPie} />
+                </div>
+                <p className="col" >
+                  Ad consequat sit esse elit minim sint ad minim exercitation magna deserunt ipsum ad deserunt. Sunt ut do
+                  anim nulla elit dolor do Lorem tempor magna sit non deserunt exercitation.
+            </p>
+              </div>
+            </div>
+
           </div>
-          <div className={'col-md'}>
-            <p>
-              Ad consequat sit esse elit minim sint ad minim exercitation magna deserunt ipsum ad deserunt. Sunt ut do
-              anim nulla elit dolor do Lorem tempor magna sit non deserunt exercitation. Mollit fugiat amet qui quis
-              sint commodo qui. Ex irure ex eiusmod officia irure. Amet nisi laborum culpa cupidatat excepteur sit magna
-              exercitation. Exercitation nostrud tempor duis ut id et nisi aute veniam.
-            </p>
-            <p>
-              Id cillum duis irure consectetur est culpa nostrud voluptate consequat dolor nulla duis Lorem. Cillum
-              aliqua minim ullamco officia sint fugiat eiusmod labore ut aute veniam consectetur incididunt. Elit
-              voluptate velit non esse magna eu et veniam deserunt eu. Lorem dolor in minim sint Lorem est in veniam ex.
-              Esse ipsum sunt pariatur sint sit aliqua laborum commodo minim ut Lorem nulla.
-            </p>
+          <div className="col">
+            <h3>toolbar</h3>
+            <select ref="year" onChange={this.changeYear}>
+              <option value="2019">2019</option>
+              <option value="2020">2020</option>
+              <option value="2021">2021</option>
+            </select>
             <button className="btn btn-primary" onClick={this.generatePdf}>
               Last ned som PDF
             </button>
             <button
               className="btn btn-primary"
               onClick={() =>
-                console.log(this.refs.bar, this.openedNat, this.openedRegional, this.closedRegional, this.closedNat)
-              }
-            >
-              log
-            </button>
+                console.log(this.nationalBar, this.refs.bar1)
+              } > log </button>
           </div>
         </div>
-      </div>
+      </div >
     );
   }
   mounted() {
     this.getalldata();
+
+  }
+  changeYear() {
+    this.year = this.refs.year.options[this.refs.year.selectedIndex].value
+
+    this.getalldata()
+    console.log(this.refs.bar1)
+    console.log(this.nationalBar)
+    console.log(this.regionalBar)
+    // this.refs.bar1.update()
+
   }
   getalldata() {
     this.statServ
-      .getNatCasesOpenedInYear(2019)
+      .getNatCasesOpenedInYear(this.year)
       .then(e => (this.openedNat = e))
-      .then(() => this.statServ.getNatCasesClosedInYear(2019).then(e => (this.closedNat = e)))
-      .then(() => this.statServ.getCasesClosedInYearInRegion(2019, 44).then(e => (this.closedRegional = e)))
-      .then(() => this.statServ.getCasesOpenedInYearInRegion(2019, 44).then(e => (this.openedRegional = e)))
+      .then(() => this.statServ.getNatCasesClosedInYear(this.year).then(e => (this.closedNat = e)))
+      .then(() => this.statServ.getCasesClosedInYearInRegion(this.year, 44).then(e => (this.closedRegional = e)))
+      .then(() => this.statServ.getCasesOpenedInYearInRegion(this.year, 44).then(e => (this.openedRegional = e)))
+      .then(() => this.statServ.getStatsCatYearNational(this.year).then(e => (this.catStatNat = e)))
+      .then(() => this.statServ.getStatsCatYearInRegion(this.year, 44).then(e => (this.catStatReg = e)))
       .then(() => {
-        this.regData = this.joinData(this.openedRegional, this.closedRegional);
-        this.natData = this.joinData(this.openedNat, this.closedNat);
+        this.regDataBar = this.joinData(this.openedRegional, this.closedRegional);
+        this.natDataBar = this.joinData(this.openedNat, this.closedNat);
       })
       .then(() => {
-        this.data = this.formatData(this.natData);
-        this.data1 = this.formatData(this.regData);
-      });
+        this.nationalBar = this.formatBarData(this.natDataBar);
+        this.regionalBar = this.formatBarData(this.regDataBar);
+        this.nationalPie = this.formatPieData(this.catStatNat)
+        this.regionalPie = this.formatPieData(this.catStatReg)
+      })
   }
   joinData(opened, closed) {
     let newt = [];
@@ -100,39 +154,53 @@ class Statistics extends Component {
     return newt;
   }
 
-  formatData(data) {
+  formatPieData(data) {
+
     return {
-      label: 'Nasjonalt',
-      labels: ['January', 'February', 'March', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'],
+      labels: data.map(e => e.category),
       datasets: [
         {
-          label: 'Saker opprettet',
-          backgroundColor: 'rgba(255,99,132,0.8)',
-          // borderColor: 'rgba(255,99,132,1)',
-          // borderWidth: 1,
-          // backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-          // hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-          data: data.map(e => e.opened_cases)
-        },
-        {
-          label: 'Saker lukket ',
-          backgroundColor: 'rgba(100,225,132,0.8)',
-          // borderColor: 'rgba(255,99,132,1)',
-          // borderWidth: 1,
-          // backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-          // hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-          data: data.map(e => e.closed_cases)
+          borderWidth: 1,
+          backgroundColor: ['#36A2EB', '#FFCE56', '#5bc0de', '#5cb85c', '#428bca'],
+          // hoverBackgroundColor: ['#36A2EB'],
+          data: data.map(e => e.count)
         }
       ]
     };
   }
+  formatBarData(data) {
+    let ds = {
+      labels: ['January', 'February', 'March', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'],
+      datasets: [
+        {
+          label: 'Saker opprettet',
+          borderWidth: 1,
+          backgroundColor: '#36A2EB',
+          // hoverBackgroundColor: ['#36A2EB'],
+          data: data.map(e => e.opened_cases)
+        },
+        {
+          label: 'Saker lukket ',
+          borderWidth: 1,
+          backgroundColor: '#FFCE56',
+          // hoverBackgroundColor: ['#FFCE56',
+          data: data.map(e => e.closed_cases)
+        }
+      ]
+    };
+    return ds
+  }
 
   generatePdf() {
     let input = this.refs.statPage;
+    console.log(input);
+
     html2canvas(input).then(canvas => {
       const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF();
-      pdf.addImage(imgData, 'PNG', 0, 0);
+      console.log(imgData);
+
+      const pdf = new jsPDF(1, "mm", "a4")
+      pdf.addImage(imgData, 'PNG', 1, 0);
       // pdf.output('dataurlnewwindow');
       pdf.save('download.pdf');
     });
