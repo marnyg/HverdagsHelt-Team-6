@@ -237,10 +237,10 @@ module.exports = {
   getAllCasesInRegionByName: async function(req: Request, res: Response) {
     if (!req.params || typeof req.params.county_name != 'string' || typeof req.params.region_name != 'string')
       return res.sendStatus(400);
-    let county_check ={'Sør-Trøndelag': 'Trøndelag', 'Nord-Trøndelag': 'Trøndelag'};
+    let county_check = {'Sør-Trøndelag': 'Trøndelag', 'Nord-Trøndelag': 'Trøndelag'};
     let county_name = req.params.county_name;
     if (req.params.county_name in county_check) county_name = county_check[req.params.county_name];
-
+    
     return sequelize
       .query(rawQueryCases + ' WHERE r.name = ? AND co.name = ? ' + casesOrder, {
         replacements: [req.params.region_name, county_name],
