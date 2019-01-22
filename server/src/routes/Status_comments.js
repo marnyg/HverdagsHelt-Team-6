@@ -34,7 +34,7 @@ module.exports = {
         return res.send(result);
       })
       .catch(err => {
-        return res.status(500).send(err);
+        return res.sendStatus(500).send(err);
       });
   },
   // Back up code:
@@ -141,6 +141,6 @@ module.exports = {
 
     return Status_comment.destroy({
       where: { status_comment_id: Number(req.params.status_comment_id) }
-    }).then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)));
+    }).then(subscr => (subscr ? res.send() : res.sendStatus(404)));
   }
 };
