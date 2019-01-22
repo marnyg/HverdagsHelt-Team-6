@@ -77,7 +77,7 @@ class StatService {
                 .then((logged_in: Boolean) => {
                     if (logged_in === true) {
                         let token = localStorage.getItem('token');
-                        axios.get('/api/stats/closed/' + year + "/" + region_id, {
+                        axios.get('/api/stats/opened/' + year + "/" + region_id, {
                             headers: {
                                 Authorization: 'Bearer ' + token
                             }

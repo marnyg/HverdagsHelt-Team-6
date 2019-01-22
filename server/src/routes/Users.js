@@ -3,9 +3,12 @@
 import { User } from '../models.js';
 import { createToken, hashPassword, loginOk, verifyToken } from '../auth';
 import { Region_subscriptions, sequelize } from '../models';
+import Epost from './../utils/Epost.js'
 
 type Request = express$Request;
 type Response = express$Response;
+
+const email_subject = "Bruker opprettet - Hverdagshelt";
 
 module.exports = {
   getAllUsers: function(req: Request, res: Response) {
@@ -39,8 +42,21 @@ module.exports = {
       salt: salt,
       role_id: 4,
       region_id: req.body.region_id
+    }).then(async users => {
+      let body = `Epost-adressen ${users.email} har blitt brukt for å opprette en bruker på systemet til hverdagshelt\n` +
+      `Vennligst ta kontakt med vår support på support.hverdagshelt.team6@gmail.com hvis dette ikke var deg.`;
+
+      let email_info = await Epost.send_email(users.email, email_subject, body);
+      console.log(email_info);
+      if(email_info) res.send({
+        user_id: users.user_id,
+        msg: "Bruker opprettet, og epost sendt."
+      });
+      res.send({
+        user_id: users.user_id,
+        msg: "Bruker opprettet, men epost kunne ikke bli sendt."
+      });
     })
-      .then(users => (users ? res.send({ user_id: users.user_id }) : res.sendStatus(404)))
       .catch(err => {
         err.description = 'Det finnes allerede en bruker med den oppgitte e-posten, bruk en unik e-post';
         res.status(409).json(err);

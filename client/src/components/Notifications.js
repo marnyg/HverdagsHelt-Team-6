@@ -18,12 +18,18 @@ import { faListUl, faTh } from '@fortawesome/free-solid-svg-icons/index';
 
 class Notifications extends Component {
   grid = true;
-  cases = null;
+  cases = [];
   user = JSON.parse(localStorage.getItem('user'));
 
   render() {
-    if (!this.cases) {
-      return null;
+    if (this.cases.length === 0) {
+      return <div>
+        <h1>Vi vil holde deg oppdatert!</h1>
+        <p>Alle våre ansatte gjør sitt yttertste for å løse dine saker.
+        Så fort det oppstår endringer i din sak, eller saker du har abonnert på, vil disse dukke opp på denne siden.
+        Vennligst kom tilbake senere.</p>
+        <p><strong>Vi i Hverdagshelter ønsker deg fin dag videre!</strong></p>
+      </div>
     }
 
     return(
@@ -63,7 +69,6 @@ class Notifications extends Component {
   }
 
   mounted() {
-      console.log('Notifications found user:', this.user);
     let caseSubscriptionService = new CaseSubscriptionService();
     caseSubscriptionService
     .getAllOutdatedCaseSubscriptions(this.user.user_id)

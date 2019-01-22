@@ -19,6 +19,7 @@ import Status from './routes/Statuses.js';
 import Case_subscription from './routes/Case_subscriptions.js';
 import Status_comment from './routes/Status_comments.js';
 import Pictures from './routes/Pictures.js';
+import Epost from './utils/Epost.js';
 import Stats from './routes/Stats.js';
 import { Case } from './models.js';
 import type { Model } from 'sequelize';
@@ -90,7 +91,7 @@ app.post('/api/pictures/:case_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Pictures.uploadPicture);
 });
 
-app.del('/api/pictures/:case_id/:image_name', (req: Request, res: Response) => {
+app.delete('/api/pictures/:case_id/:image_name', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Pictures.delPicture);
 });
 
@@ -264,6 +265,10 @@ app.put('/api/regions/:region_id', (req: Request, res: Response) => {
 
 app.delete('/api/regions/:region_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, Region.delRegion);
+});
+
+app.get('/api/regions/:region_id/staff', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Region.getRegionStaff);
 });
 
 app.get('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
