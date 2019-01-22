@@ -11,8 +11,9 @@ module.exports = {
     return County.findAll().then(counties => res.send(counties));
   },
   getOneCountyByName: function(req: Request, res: Response) {
-    return County.findOne({ where: { name: req.params.county_name }, attributes: ['county_id'] }).then(counties =>
-      counties ? res.send(counties) : res.sendStatus(404)
+    if (!req.params || !isNaN(Number(req.params.county_name))) return res.sendStatus(400);
+    return County.findOne({ where: { name: req.params.county_name }, attributes: ['county_id'] }).then(
+      counties => (counties ? res.send(counties) : res.sendStatus(404))
     );
   },
   addCounty: function(req: Request, res: Response) {
@@ -28,7 +29,14 @@ module.exports = {
       });
   },
   updateCounty: function(req: Request, res: Response) {
-    if (!req.body || typeof req.body.name !== 'string' || !regexNames.test(req.body.name)) return res.sendStatus(400);
+    if (
+      !req.body ||
+      !req.params ||
+      isNaN(Number(req.params.county_id)) ||
+      typeof req.body.name !== 'string' ||
+      !regexNames.test(req.body.name)
+    )
+      return res.sendStatus(400);
     return County.update(
       {
         name: req.body.name
@@ -45,6 +53,7 @@ module.exports = {
       });
   },
   delCounty: function(req: Request, res: Response) {
+    if (!req.params || isNaN(Number(req.params.county_id))) return res.sendStatus(400);
     return County.destroy({ where: { county_id: Number(req.params.county_id) } })
       .then(counties => (counties ? res.send() : res.status(500).send()))
       .catch(err => {
