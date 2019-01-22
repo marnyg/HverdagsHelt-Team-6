@@ -242,6 +242,10 @@ app.delete('/api/users/:user_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Users.deleteOneUser);
 });
 
+app.post('/api/users/new_password', (req: Request, res: Response) => {
+  return Users.set_new_password(req, res);
+});
+
 app.get('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
   Status_comment.getAllStatus_comment(req, res);
 });
