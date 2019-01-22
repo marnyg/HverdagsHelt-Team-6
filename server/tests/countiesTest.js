@@ -68,6 +68,14 @@ describe('Create one county', () => {
 });
 
 describe('Find all regions in county', () => {
+  test('400 status code for GET /api/counties/:county_id/regions with invalid county_id', done => {
+    request(application)
+      .get(`/api/counties/NaN/regions`)
+      .then(response => {
+        expect(response.statusCode).toBe(400);
+        done();
+      });
+  });
   test('200 status code for GET /api/counties/:county_id/regions', done => {
     request(application)
       .get(`/api/counties/${county_id}/regions`)
