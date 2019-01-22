@@ -1,6 +1,7 @@
 // @flow
 
 import { County, sequelize } from '../models.js';
+import { regexNames } from '../utils/Regex';
 
 type Request = express$Request;
 type Response = express$Response;
@@ -15,7 +16,7 @@ module.exports = {
     );
   },
   addCounty: function(req: Request, res: Response) {
-    if (!req.body || typeof req.body.name !== 'string') return res.sendStatus(400);
+    if (!req.body || typeof req.body.name !== 'string' || !regexNames.test(req.body.name)) return res.sendStatus(400);
     return County.create({
       name: req.body.name
     })
@@ -27,7 +28,7 @@ module.exports = {
       });
   },
   updateCounty: function(req: Request, res: Response) {
-    if (!req.body || typeof req.body.name !== 'string') return res.sendStatus(400);
+    if (!req.body || typeof req.body.name !== 'string' || !regexNames.test(req.body.name)) return res.sendStatus(400);
     return County.update(
       {
         name: req.body.name
