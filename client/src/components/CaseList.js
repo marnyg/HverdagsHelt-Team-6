@@ -274,7 +274,7 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
             console.log('Could not unsubscribe user from case with id ' + c.case_id);
             this.error=<Alert
               type='warning'
-              text='Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message
+              text={'Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message}
             />
             //Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
           });
