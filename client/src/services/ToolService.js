@@ -5,10 +5,12 @@ import User from '../classes/User';
 
 const statusStyles = [{ color: 'red' }, { color: 'orange' }, { color: 'green' }]; // Constant used for colouring status fields in table.
 const dateMonths = ['jan', 'feb', 'mar', 'apr', 'mai', 'juni', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'];
-
 // Frequently used static methods are put here to reduce overall duplicate code
 
 class ToolService {
+  static employee_role_id = 2;
+  static private_user_role_id = 4;
+
   static getStatusColour(status_id: number) {
     return statusStyles[status_id + 1];
   }
@@ -20,6 +22,10 @@ class ToolService {
     } else {
       return 'Fant ikke dato.';
     }
+  }
+
+  static employeeRole(){
+    return 2;
   }
 
   static getUserId() {
