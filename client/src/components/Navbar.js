@@ -12,7 +12,7 @@ import ToolService from '../services/ToolService';
 import hverdagsheltLogo from '../../public/hverdagsheltLogo2Trans.png';
 import LoginService from "../services/LoginService";
 
-const SERVER_IP: string = '10.22.152.121'; //'localhost';
+const SERVER_IP: string = 'localhost';
 const SERVER_PORT: number = 3000;
 
 class Navbar extends Component<{ logged_in: boolean }> {
