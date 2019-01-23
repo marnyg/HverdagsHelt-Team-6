@@ -33,6 +33,21 @@ module.exports = {
 
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
 
+    let page = 1;
+    let limit = 20;
+
+    if(
+      req.query &&
+      req.query.page &&
+      req.query.limit &&
+      Number(req.query.page) > 0 &&
+      Number(req.query.limit) > 0
+    ) {
+      page = Number(req.query.page);
+      limit = Number(req.query.limit);
+    }
+    let start_limit = (page - 1) * limit;
+
     sequelize
       .query(
         'Select c.case_id, c.title, c.description, c.lat, c.lon, c.user_id, ' +
@@ -48,8 +63,8 @@ module.exports = {
           'JOIN Users u ON c.user_id = u.user_id ' +
           'JOIN Statuses s ON c.status_id = s.status_id ' +
           'JOIN Categories cg ON c.category_id = cg.category_id ' +
-          'WHERE csubs.user_id = ?',
-        { replacements: [req.params.user_id], type: sequelize.QueryTypes.SELECT }
+          'WHERE csubs.user_id = ? Order By c.updatedAt DESC LIMIT ?,?',
+        { replacements: [req.params.user_id, start_limit, limit], type: sequelize.QueryTypes.SELECT }
       )
       .then(async cases => {
         const out = cases.map(async c => {
