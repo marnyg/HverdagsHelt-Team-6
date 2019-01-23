@@ -285,15 +285,15 @@ app.get('/api/cases/:case_id/status_comments', (req: Request, res: Response) => 
 });
 
 app.post('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 2, Status_comment.addStatus_comment);
+  reqAccessLevel(req, res, 3, Status_comment.addStatus_comment);
 });
 
 app.put('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 2, Status_comment.updateStatus_comment);
+  reqAccessLevel(req, res, 3, Status_comment.updateStatus_comment);
 });
 
 app.delete('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 2, Status_comment.delStatus_comment);
+  reqAccessLevel(req, res, 3, Status_comment.delStatus_comment);
 });
 
 // ***************************** Users *****************************

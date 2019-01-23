@@ -21,11 +21,7 @@ module.exports = {
     let page = 1;
     let limit = 5;
     console.log(limit);
-    if(
-      req.query &&
-      req.query.page !== undefined &&
-      req.query.limit !== undefined
-    ) {
+    if (req.query && req.query.page !== undefined && req.query.limit !== undefined) {
       page = Number(req.query.page);
       limit = Number(req.query.limit);
     }
@@ -75,9 +71,13 @@ module.exports = {
 
     let decoded_token = verifyToken(req.token);
 
+    let case_status;
     let the_user;
-    let the_case = Case.findOne({ where: { case_id: Number(req.params.case_id) } })
-      .then(() => {
+    let create_body;
+    let the_case = Case.findOne({ where: { case_id: Number(req.params.case_id) }, attributes: ['region_id', 'status_id'] })
+      .then((result) => {
+        console.log(result);
+        case_status = result.dataValues.status_id;
         the_user = User.findOne({ where: { user_id: decoded_token.user_id } });
       })
       .then(() => {
@@ -87,16 +87,23 @@ module.exports = {
         if (decoded_token.accesslevel !== 1 && region_id_user !== region_id_case) return res.sendStatus(403);
       })
       .then(() => {
-        return Status_comment.create({
+        create_body = {
           comment: req.body.comment,
           case_id: Number(req.params.case_id),
-          status_id: req.body.status_id,
           user_id: decoded_token.user_id
-        });
+        };
+        console.log(req.body.status_id, case_status);
+        if (decoded_token.accesslevel <= 2) create_body['status_id'] = req.body.status_id;
+        else create_body['status_id'] = case_status;
+
+        console.log(create_body);
+
+        return Status_comment.create(create_body);
       })
       .then(comment => {
         if (comment) {
-          Case.update({status_id: req.body.status_id},{where: {case_id: Number(req.params.case_id)}});
+          if (decoded_token.accesslevel <= 2)
+            Case.update({ status_id: req.body.status_id }, { where: { case_id: Number(req.params.case_id) } });
           Case_subscriptions.findAll({ where: { case_id: Number(req.params.case_id), notify_by_email: 1 } }).then(
             async subs => {
               let all_ids = await subs.map(s => {
