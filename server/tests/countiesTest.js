@@ -36,17 +36,27 @@ describe('Create one county', () => {
   test('400 status code for POST /api/counties without body', done => {
     request(application)
       .post('/api/counties')
+      .set('Authorization', `Bearer ${admin_token}`)
       .send()
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();
       });
   });
-  test('403 status code for POST /api/counties without valid token', done => {
+  test('401 status code for POST /api/counties without valid token', done => {
+    request(application)
+      .post('/api/counties')
+      .set('Authorization', `Bearer ${12345}`)
+      .send({ name: 'Nytt fylke' })
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for POST /api/counties without token', done => {
     request(application)
       .post('/api/counties')
       .send({ name: 'Nytt fylke' })
-      .set('Authorization', `Bearer ${12345}`)
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();
@@ -117,16 +127,26 @@ describe('Update one county', () => {
   test('400 status code for PUT /api/counties/{county_id} without body', done => {
     return request(application)
       .put(`/api/counties/${ny_id}`)
+      .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();
       });
   });
-  test('403 status code for PUT /api/counties/{county_id} without valid token', done => {
+  test('401 status code for PUT /api/counties/{county_id} without valid token', done => {
     return request(application)
       .put(`/api/counties/${ny_id}`)
       .send({ name: 'Nyeste fylke' })
       .set('Authorization', `Bearer ${12345}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for PUT /api/counties/{county_id} without token', done => {
+    return request(application)
+      .put(`/api/counties/${ny_id}`)
+      .send({ name: 'Nyeste fylke' })
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();
@@ -150,15 +170,24 @@ describe('Delete one county', () => {
   test('400 status code for DELETE /api/counties/{county_id} with invalid id', done => {
     request(application)
       .delete(`/api/counties/${'Not a number'}`)
+      .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();
       });
   });
-  test('403 status code for DELETE /api/counties/{county_id} without valid token', done => {
+  test('401 status code for DELETE /api/counties/{county_id} without valid token', done => {
     request(application)
       .delete(`/api/counties/${ny_id}`)
       .set('Authorization', `Bearer ${0}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for DELETE /api/counties/{county_id} without token', done => {
+    request(application)
+      .delete(`/api/counties/${ny_id}`)
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();

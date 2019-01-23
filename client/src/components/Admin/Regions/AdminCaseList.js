@@ -1,7 +1,7 @@
 //@flow
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import ToolService from '../../services/ToolService';
+import ToolService from '../../../services/ToolService';
 
 class AdminCaseList extends Component {
     render() {

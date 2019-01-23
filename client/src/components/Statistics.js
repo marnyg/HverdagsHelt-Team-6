@@ -81,7 +81,7 @@ class Statistics extends Component {
 
           </div>
           <div className="col">
-            <h3>toolbar</h3>
+            {/* <h3>toolbar</h3> */}
             <select ref="year" onChange={this.changeYear}>
               <option value="2019">2019</option>
               <option value="2020">2020</option>
@@ -90,11 +90,6 @@ class Statistics extends Component {
             <button className="btn btn-primary" onClick={this.generatePdf}>
               Last ned som PDF
             </button>
-            <button
-              className="btn btn-primary"
-              onClick={() =>
-                console.log(this.nationalBar, this.refs.bar1)
-              } > log </button>
           </div>
         </div>
       </div >

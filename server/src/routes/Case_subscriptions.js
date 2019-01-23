@@ -15,7 +15,7 @@ module.exports = {
     let user_id_token = decoded_token.user_id;
     let user_id_param = Number(req.params.user_id);
 
-    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(401);
 
     return Case_subscriptions.findAll({
       where: {
@@ -31,7 +31,7 @@ module.exports = {
     let user_id_token = decoded_token.user_id;
     let user_id_param = Number(req.params.user_id);
 
-    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(401);
 
     let page = 1;
     let limit = 20;
@@ -95,7 +95,7 @@ module.exports = {
     let user_id_token = decoded_token.user_id;
     let user_id_param = req.body.user_id;
 
-    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(401);
 
     return Case_subscriptions.create({
       user_id: req.body.user_id,
@@ -131,7 +131,7 @@ module.exports = {
     };
     if(req.body.notify_by_email !== null) case_sub_obj['notify_by_email'] = req.body.notify_by_email;
 
-    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(401);
 
     return Case_subscriptions.update(
       case_sub_obj,
@@ -148,7 +148,7 @@ module.exports = {
     let user_id_token = decoded_token.user_id;
     let user_id_param = Number(req.params.user_id);
 
-    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(401);
 
     return Case_subscriptions.destroy({
       where: { case_id: Number(req.params.case_id), user_id: Number(req.params.user_id) }
@@ -167,7 +167,7 @@ module.exports = {
     let user_id_token = decoded_token.user_id;
     let user_id_param = Number(req.params.user_id);
 
-    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(401);
 
     sequelize
       .query(

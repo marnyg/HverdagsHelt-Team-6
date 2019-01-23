@@ -34,19 +34,31 @@ describe('Create new status', () => {
   test('400 status code for POST /api/statuses without body', done => {
     request(application)
       .post('/api/statuses')
+      .set('Authorization', `Bearer ${admin_token}`)
       .send()
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();
       });
   });
-  test('403 status code for POST /api/statuses without valid token', done => {
+  test('401 status code for POST /api/statuses without valid token', done => {
     request(application)
       .post('/api/statuses')
       .send({
         name: 'Ny status'
       })
       .set('Authorization', `Bearer ${100}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for POST /api/statuses without token', done => {
+    request(application)
+      .post('/api/statuses')
+      .send({
+        name: 'Ny status'
+      })
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();
@@ -72,6 +84,7 @@ describe('Update one in statuses', () => {
   test('400 status code for PUT /api/statuses/:status_id without body and token', done => {
     return request(application)
       .put(`/api/statuses/${status_id}`)
+      .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();
@@ -89,13 +102,24 @@ describe('Update one in statuses', () => {
         done();
       });
   });
-  test('403 status code for PUT /api/statuses/:status_id without valid token', done => {
+  test('401 status code for PUT /api/statuses/:status_id without valid token', done => {
     return request(application)
       .put(`/api/statuses/${status_id}`)
       .send({
         name: 'Ny status'
       })
       .set('Authorization', `Bearer ${12345}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for PUT /api/statuses/:status_id without token', done => {
+    return request(application)
+      .put(`/api/statuses/${status_id}`)
+      .send({
+        name: 'Ny status'
+      })
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();
@@ -119,15 +143,24 @@ describe('Delete one in statuses', () => {
   test('400 status code for DELETE /api/statuses/:status_id with invalid id', done => {
     request(application)
       .delete(`/api/statuses/NaN`)
+      .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();
       });
   });
-  test('403 status code for DELETE /api/statuses/:status_id without valid token', done => {
+  test('401 status code for DELETE /api/statuses/:status_id without valid token', done => {
     request(application)
       .delete(`/api/statuses/${status_id}`)
       .set('Authorization', `Bearer ${0}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for DELETE /api/statuses/:status_id without token', done => {
+    request(application)
+      .delete(`/api/statuses/${status_id}`)
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();

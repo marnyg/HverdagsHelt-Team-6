@@ -21,11 +21,7 @@ module.exports = {
     let page = 1;
     let limit = 5;
     console.log(limit);
-    if(
-      req.query &&
-      req.query.page !== undefined &&
-      req.query.limit !== undefined
-    ) {
+    if (req.query && req.query.page !== undefined && req.query.limit !== undefined) {
       page = Number(req.query.page);
       limit = Number(req.query.limit);
     }
@@ -84,7 +80,7 @@ module.exports = {
         let region_id_user = the_user.region_id;
         let region_id_case = the_case.region_id;
 
-        if (decoded_token.accesslevel !== 1 && region_id_user !== region_id_case) return res.sendStatus(403);
+        if (decoded_token.accesslevel !== 1 && region_id_user !== region_id_case) return res.sendStatus(401);
       })
       .then(() => {
         return Status_comment.create({
@@ -96,7 +92,7 @@ module.exports = {
       })
       .then(comment => {
         if (comment) {
-          Case.update({status_id: req.body.status_id},{where: {case_id: Number(req.params.case_id)}});
+          Case.update({ status_id: req.body.status_id }, { where: { case_id: Number(req.params.case_id) } });
           Case_subscriptions.findAll({ where: { case_id: Number(req.params.case_id), notify_by_email: 1 } }).then(
             async subs => {
               let all_ids = await subs.map(s => {
@@ -135,7 +131,7 @@ module.exports = {
     })
       .then(sc => {
         status_comment = sc.toJSON();
-        if (decoded_token.accesslevel !== 1 && user_id_token !== status_comment.user_id) return res.sendStatus(403);
+        if (decoded_token.accesslevel !== 1 && user_id_token !== status_comment.user_id) return res.sendStatus(401);
       })
       .then(() => {
         return Status_comment.update(
@@ -166,10 +162,10 @@ module.exports = {
     let user_id_token = decoded_token.user_id;
     let user_id_param = req.body.user_id;
 
-    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(401);
 
     return Status_comment.destroy({
       where: { status_comment_id: Number(req.params.status_comment_id) }
-    }).then(subscr => (subscr ? res.send() : res.sendStatus(404)));
+    }).then(subscr => {return (subscr ? res.send() : res.sendStatus(404))});
   }
 };

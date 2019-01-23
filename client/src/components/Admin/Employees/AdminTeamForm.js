@@ -1,11 +1,11 @@
 //@flow
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import User from "../../classes/User";
+import User from "../../../classes/User";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
-import UserService from "../../services/UserService";
-import ToolService from '../../services/ToolService';
+import UserService from "../../../services/UserService";
+import ToolService from '../../../services/ToolService';
 
 const region_employee_id = 2;
 
