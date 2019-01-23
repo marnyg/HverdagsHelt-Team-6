@@ -17,7 +17,9 @@ class Alert extends Component<{type: string, text: any}>{
         const differentType = this.props.type !== nextProps.type;
         const differentText = this.props.text !== nextProps.text;
         return differentType || differentText;
-    }
+  }
+
+
   render() {
     if(!this.props){
       return null;
