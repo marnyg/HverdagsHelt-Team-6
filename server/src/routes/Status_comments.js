@@ -74,8 +74,11 @@ module.exports = {
     let case_status;
     let the_user;
     let create_body;
-    let the_case = Case.findOne({ where: { case_id: Number(req.params.case_id) }, attributes: ['region_id', 'status_id'] })
-      .then((result) => {
+    let the_case = Case.findOne({
+      where: { case_id: Number(req.params.case_id) },
+      attributes: ['region_id', 'status_id']
+    })
+      .then(result => {
         console.log(result);
         case_status = result.dataValues.status_id;
         the_user = User.findOne({ where: { user_id: decoded_token.user_id } });
@@ -117,6 +120,10 @@ module.exports = {
           );
         }
       })
+      .then(() => {
+        console.log("Kommer hit");
+        Case_subscriptions.update({ is_up_to_date: false }, { where: { case_id: Number(req.params.case_id) } });
+      })
       .catch(error => {
         return res.status(500).json(error);
       });
@@ -149,21 +156,18 @@ module.exports = {
         if (decoded_token.accesslevel !== 1 && user_id_token !== status_comment.user_id) return res.sendStatus(403);
       })
       .then(() => {
-          update_body = {
-              comment: req.body.comment,
-              case_id: Number(req.params.case_id),
-              user_id: decoded_token.user_id
-          };
-          console.log(req.body.status_id, case_status);
-          if (decoded_token.accesslevel <= 2) update_body['status_id'] = req.body.status_id;
-          else update_body['status_id'] = case_status;
+        update_body = {
+          comment: req.body.comment,
+          case_id: Number(req.params.case_id),
+          user_id: decoded_token.user_id
+        };
+        console.log(req.body.status_id, case_status);
+        if (decoded_token.accesslevel <= 2) update_body['status_id'] = req.body.status_id;
+        else update_body['status_id'] = case_status;
 
-        return Status_comment.update(
-          update_body,
-          {
-            where: { status_comment_id: Number(req.params.status_comment_id) }
-          }
-        ).then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)));
+        return Status_comment.update(update_body, {
+          where: { status_comment_id: Number(req.params.status_comment_id) }
+        }).then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)));
       });
   },
   // Kun den som skrev kommentaren og admin kan slette
