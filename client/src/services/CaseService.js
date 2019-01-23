@@ -230,7 +230,7 @@ class CaseService {
     getCasesByRegionWithLimitOffset(region_id: number, limit: number, offset: number){
     }
 
-    uploadPicture(case_id: number): Promise<any>{
+    uploadPicture(case_id: number, picture): Promise<any>{
       return new Promise((resolve, reject) => {
           let loginService = new LoginService();
           loginService
@@ -240,7 +240,7 @@ class CaseService {
                       let token = localStorage.getItem('token');
                       axios
                           .post(
-                              '/api/pictures/' + case_id,
+                              '/api/pictures/' + case_id, picture,
                               {
                                   headers: {
                                       Authorization: 'Bearer ' + token

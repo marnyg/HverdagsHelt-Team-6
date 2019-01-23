@@ -10,6 +10,7 @@ import MyRegions from './MyRegions';
 import { NavLink } from 'react-router-dom';
 import DisplayProfile from './DisplayProfile.js';
 import Statistics from './Statistics.js';
+import Alert from './Alert.js';
 
 class MyPage extends Component {
   menuItems = [
@@ -17,6 +18,7 @@ class MyPage extends Component {
     { name: 'Mine Kommuner', component: <MyRegions />, selected: false},
     { name: 'Mine Saker', component: <CaseList user_id={JSON.parse(localStorage.getItem('user')).user_id} />, selected: false }
   ];
+  error=null;
 
   element = this.menuItems[0];
   comp = <MyProfile />;
@@ -38,6 +40,7 @@ class MyPage extends Component {
                     <Route exact path="/my-page/my-profile" render={() => <MyProfile/>} />
                 </div>
             </div>
+            {this.error}
         </div>
       </div>
     );
