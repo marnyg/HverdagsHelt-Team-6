@@ -4,6 +4,7 @@ import request from 'supertest';
 let admin_token;
 let user_token;
 let user_id;
+let user_token_invalid;
 
 // ***************** Login *************
 beforeAll(done => {
@@ -26,6 +27,16 @@ beforeAll(done => {
     .end((err, res) => {
       user_token = res.body.token;
       user_id = res.body.user.user_id;
+      done();
+    });
+  request(application)
+    .post('/api/login')
+    .send({
+      email: 'ole.nordmann@gmail.com',
+      password: 'passord123'
+    })
+    .end((err, res) => {
+      user_token_invalid = res.body.token;
       done();
     });
 });
@@ -126,17 +137,35 @@ describe('Update one case', () => {
     return request(application)
       .put(`/api/cases/NaN`)
       .set('Authorization', `Bearer ${user_token}`)
-      .accept('application/json')
-      .field('title', 'Ny sak')
-      .field('description', 'Test test')
-      .field('lat', 10)
-      .field('lon', 12)
-      .field('category_id', 1)
-      .field('region_id', 44)
-      .field('status_id', 1)
-      .attach('images', null)
+      .send({
+        title: "Oppdaterer",
+        description: "test test på sak",
+        lat: 10,
+        lon: 12,
+        region_id: 44,
+        category_id: 1,
+        status_id: 1
+      })
       .then(response => {
         expect(response.statusCode).toBe(400);
+        done();
+      });
+  });
+  test('401 status code for PUT /api/cases/:case_id with invalid user_id', done => {
+    return request(application)
+      .put(`/api/cases/${case_id}`)
+      .set('Authorization', `Bearer ${user_token_invalid}`)
+      .send({
+        title: "Oppdaterer",
+        description: "test test på sak",
+        lat: 10,
+        lon: 12,
+        region_id: 44,
+        category_id: 1,
+        status_id: 1
+      })
+      .then(response => {
+        expect(response.statusCode).toBe(401);
         done();
       });
   });
@@ -144,33 +173,33 @@ describe('Update one case', () => {
     return request(application)
       .put(`/api/cases/${case_id}`)
       .set('Authorization', `Bearer ${100}`)
-      .accept('application/json')
-      .field('title', 'Ny sak')
-      .field('description', 'Test test')
-      .field('lat', 10)
-      .field('lon', 12)
-      .field('category_id', 1)
-      .field('region_id', 44)
-      .field('status_id', 1)
-      .attach('images', null)
+      .send({
+        title: "Oppdaterer",
+        description: "test test på sak",
+        lat: 10,
+        lon: 12,
+        region_id: 44,
+        category_id: 1,
+        status_id: 1
+      })
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();
       });
   });
-  // Not working yet
   test('200 status code for PUT /api/cases/:case_id', done => {
     return request(application)
       .put(`/api/cases/${case_id}`)
-      .set('Authorization', `Bearer ${admin_token}`)
-      .accept('application/json')
-      .field('title', 'Ny sak oppdatert')
-      .field('description', 'Test test')
-      .field('lat', 10)
-      .field('lon', 12)
-      .field('category_id', 1)
-      .field('region_id', 44)
-      .field('status_id', 1)
+      .set('Authorization', `Bearer ${user_token}`)
+      .send({
+          title: "Oppdaterer",
+          description: "test test på sak",
+          lat: 10,
+          lon: 12,
+          region_id: 44,
+          category_id: 1,
+          status_id: 1
+      })
       .then(response => {
         expect(response.statusCode).toBe(200);
         done();
@@ -197,7 +226,6 @@ describe('Delete one case', () => {
       });
   });
   // DELETE not working yet
-  /*
   test('404 status code for DELETE /api/cases/:case_id} without valid case_id', done => {
     request(application)
       .delete(`/api/cases/0`)
@@ -216,5 +244,4 @@ describe('Delete one case', () => {
         done();
       });
   });
-  */
 });
