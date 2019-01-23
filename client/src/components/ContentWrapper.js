@@ -16,6 +16,8 @@ class ContentWrapper extends Component {
     cases = [];
     grid = true;
     region = null;
+    limit = 20;
+    page = 1;
 
     constructor() {
         super();
@@ -26,27 +28,37 @@ class ContentWrapper extends Component {
         if (this.location){
             if(this.cases !== null && this.cases.length > 0){ // No response from the locationservice has been given, wait before showing
                 return (
-                    <Content
-                        user={this.user}
-                        onSubmit={(region_id) => this.onRegionSelected(region_id)}
-                        location={this.location}
-                        cases={this.cases}
-                        loadResults={(lim, offset) => this.loadResults(lim, offset)}
-                        logged_in={this.props.logged_in}
-                        onLogin={() => this.props.onLogin()}
-                    />
-                );
-            } else {
-                if(this.cases !== null){ // cases.length === 0
-                    return(
+                    <div>
                         <Content
                             user={this.user}
                             onSubmit={(region_id) => this.onRegionSelected(region_id)}
                             location={this.location}
                             cases={this.cases}
+                            loadResults={(lim, offset) => this.loadResults()}
                             logged_in={this.props.logged_in}
                             onLogin={() => this.props.onLogin()}
                         />
+                        <button className={'btn btn-primary w-100 mt-5'} onClick={() => this.loadResults()}>
+                            Last inn flere saker
+                        </button>
+                    </div>
+                );
+            } else {
+                if(this.cases !== null){ // cases.length === 0
+                    return(
+                        <div>
+                            <Content
+                                user={this.user}
+                                onSubmit={(region_id) => this.onRegionSelected(region_id)}
+                                location={this.location}
+                                cases={this.cases}
+                                logged_in={this.props.logged_in}
+                                onLogin={() => this.props.onLogin()}
+                            />
+                            <button className={'btn btn-primary w-100 mt-5'} onClick={() => this.loadResults()}>
+                                Last inn flere saker
+                            </button>
+                        </div>
                     );
                 } else {
                     return(
@@ -57,13 +69,18 @@ class ContentWrapper extends Component {
         } else {
             if(this.cases !== null && this.cases.length > 0){
                 return(
-                    <Content
-                        user={this.user}
-                        onSubmit={(region_id) => this.onRegionSelected(region_id)}
-                        cases={this.cases}
-                        logged_in={this.props.logged_in}
-                        onLogin={() => this.props.onLogin()}
-                    />
+                    <div>
+                        <Content
+                            user={this.user}
+                            onSubmit={(region_id) => this.onRegionSelected(region_id)}
+                            cases={this.cases}
+                            logged_in={this.props.logged_in}
+                            onLogin={() => this.props.onLogin()}
+                        />
+                        <button className={'btn btn-primary w-100 mt-5'} onClick={() => this.loadResults()}>
+                            Last inn flere saker
+                        </button>
+                    </div>
                 );
             } else {
                 return(
@@ -141,6 +158,7 @@ class ContentWrapper extends Component {
                 //   lat: number;
                 //   lon: number;
                 this.location = new Location(region.lat, region.lon, region.name, null, null);
+                this.region = region.region_id;
             })
             .catch((error: Error) => console.error(error));
 
@@ -152,11 +170,14 @@ class ContentWrapper extends Component {
             .catch((error: Error) => console.error(error));
     }
 
-    loadResults(limit, offset){
+    loadResults(){
+        this.page = this.page + 1;
+        console.log('Loading page: ', this.page);
         let caseService = new CaseService();
-        caseService.getAllCasesGivenRegionId(this.region.region_id)
+        caseService.getCasePageByRegion(this.limit, this.page, this.region)
             .then((cases: Case[]) => {
                 this.cases = cases;
+                console.log('Number of cases loaded:', this.cases.length);
             })
             .catch((error: Error) => console.error(error));
     }

@@ -124,7 +124,7 @@ module.exports = {
   },
 
   getOneCase: async function(req: Request, res: Response) {
-    if (!req.params || typeof Number(req.params.case_id) !== 'number') return res.sendStatus(400);
+    if (!req.params || isNaN(Number(req.params.case_id))) return res.sendStatus(400);
     sequelize
       .query(rawQueryCases + ' WHERE c.case_id = ?;', {
         replacements: [req.params.case_id],
@@ -145,7 +145,7 @@ module.exports = {
       !req.body ||
       !req.token ||
       !req.params ||
-      typeof Number(req.params.case_id) !== 'number' ||
+      isNaN(Number(req.params.case_id)) ||
       typeof req.body.title !== 'string' ||
       typeof req.body.description !== 'string' ||
       typeof Number(req.body.lat) !== 'number' ||
@@ -160,27 +160,17 @@ module.exports = {
     let decoded_token = verifyToken(req.token);
     let token_user_id = Number(decoded_token.user_id);
     let token_access_level = Number(decoded_token.accesslevel);
-    let param_case_id = Number(req.params.case_id);
-    let b = req.body;
-    let update_body = {
-      title: b.title,
-      description: b.description,
-      lat: b.lat,
-      lon: b.lon,
-      region_id: b.region_id,
-      category_id: b.category_id
-    };
-    if (Number(token_access_level === 1)) update_body['status_id'] = req.body.status_id;
+    if (Number(token_access_level) !== 1) delete req.body.status_id;
 
-    return Case.findOne({ where: { case_id: param_case_id } })
+    return Case.findOne({ where: { case_id: Number(req.params.case_id) } })
       .then(cases => {
         if (!cases) throw new TypeError('Case not found.');
         if (cases.user_id !== token_user_id && token_access_level > 2) {
-          return res.status(401).send({ msg: 'User not allowed to update case.' });
+          return res.status(401).send({ message: 'User not allowed to update case.' });
         }
-        Case.update(update_body, { where: { case_id: param_case_id } })
+        Case.update(req.body, { where: { case_id: Number(req.params.case_id) } })
           .then(newCase => {
-            return res.sendStatus(200);
+            return res.send(newCase);
           })
           .catch(error => {
             return res.status(500).send(error.message);
@@ -197,7 +187,7 @@ module.exports = {
       !req.token ||
       !req.params ||
       !req.params.case_id ||
-      typeof Number(req.params.case_id) != 'number' ||
+      isNaN(Number(req.params.case_id)) ||
       typeof req.token != 'string'
     )
       return res.sendStatus(400);
@@ -208,8 +198,11 @@ module.exports = {
     let params_case_id = Number(req.params.case_id);
 
     if (token_access_level > 2) {
-      Case.findOne({ where: { case_id: params_case_id } }).then(async cases => {
-        if (!cases) return res.status(404).send({ msg: 'Case not found.' });
+      return Case.findOne({ where: { case_id: params_case_id } }).then(async cases => {
+        if (!cases) {
+          console.log(cases);
+          return res.status(404).send({ msg: 'Case not found.' });
+        }
         if (Number(cases.user_id) !== token_user_id) return res.status(401).send({ msg: 'User is unauthorized.' });
 
         let pictures = await Picture.findAll({ where: { case_id: params_case_id } });
@@ -237,7 +230,9 @@ module.exports = {
 
     Case.destroy({ where: { case_id: params_case_id } })
       .then(async result => {
-        console.log(result);
+        if (result === 0) {
+          return res.sendStatus(404);
+        }
         await path_array.forEach(p => {
           unlinkAsync(public_path + p);
         });
@@ -248,9 +243,16 @@ module.exports = {
       });
   },
 
-  getAllCasesInRegionByName: async function(req: Request, res: Response) {
-    if (!req.params || typeof req.params.county_name != 'string' || typeof req.params.region_name != 'string')
+  getAllCasesInRegionByName: function(req: Request, res: Response) {
+    if (
+      !req.params ||
+      !req.params.county_name ||
+      !req.params.region_name ||
+      typeof req.params.county_name != 'string' ||
+      typeof req.params.region_name != 'string'
+    )
       return res.sendStatus(400);
+
     let county_check = { 'Sør-Trøndelag': 'Trøndelag', 'Nord-Trøndelag': 'Trøndelag' };
     let county_name = req.params.county_name;
     if (req.params.county_name in county_check) county_name = county_check[req.params.county_name];
@@ -270,6 +272,7 @@ module.exports = {
         type: sequelize.QueryTypes.SELECT
       })
       .then(async cases => {
+        console.log(cases);
         const out = cases.map(async c => {
           let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
           c.img = pictures.map(img => img.path);
@@ -282,7 +285,7 @@ module.exports = {
       });
   },
   getAllCasesInRegionById: async function(req: Request, res: Response) {
-    if (!req.params || typeof Number(req.params.region_id) != 'number') return res.sendStatus(400);
+    if (!req.params || isNaN(Number(req.params.region_id))) return res.sendStatus(400);
 
     sequelize
       .query(rawQueryCases + ' WHERE c.region_id = ? ' + casesOrder, {
@@ -305,7 +308,7 @@ module.exports = {
     if (
       !req.token ||
       !req.params.user_id ||
-      typeof Number(req.params.user_id) !== 'number' ||
+      isNaN(Number(req.params.user_id)) ||
       typeof req.token !== 'string'
     )
       return res.sendStatus(400);
@@ -314,7 +317,7 @@ module.exports = {
     let user_id_token = decoded_token.user_id;
     let user_id_param = Number(req.params.user_id);
 
-    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(401);
 
     sequelize
       .query(rawQueryCases + ' WHERE c.user_id = ? ' + casesOrder, {

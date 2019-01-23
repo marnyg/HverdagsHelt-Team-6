@@ -24,45 +24,45 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
   subscribed = true;
 
   render() {
-      let overflowstyle = {
-          'overflow': 'scroll',
-          '-webkit-overflow-scrolling': 'touch'
-      };
-      return (
-          <div className={'container'}>
-              <div className={'row'}>
-                  <div className={'col col-md'}>
-                      <div className={'card'}>
-                          <div className={'card-header'}> Dine kommuner</div>
-                          <table className={'table'}>
-                              <thead>
-                                  <tr>
-                                      <th itemScope={'col'}>#</th>
-                                      <th itemScope={'col'}>Kommune</th>
-                                      <th itemScope={'col'}>Få epost varsler</th>
-                                      <th itemScope={'col'}>Slett fra varsler</th>
-                                  </tr>
-                              </thead>
-                              <tbody>{this.getYourRegionListEllement(this.followedRegions)}</tbody>
-                          </table>
-                      </div>
-                  </div>
-              </div>
-              <div className={'row'}>
-                  <div className={'col-md'}>
-                      <div className={'card my-3'} style={{maxHeight: '500px'}}>
-                          <div className={'card-header'}>Velg fylke:</div>
-                          {this.getCountyListEllement(this.county)}
-                      </div>
-                  </div>
-                  <div className={'col-md'}>
-                      <div className={'card my-3'}>
-                          <div className={'card-header'}>Velg kommune:</div>
-                          <div style={{overflow: 'scroll'}}>{this.getRegionListEllement()}</div>
-                      </div>
-                  </div>
-              </div>
+    let overflowstyle = {
+      'overflow': 'scroll',
+      '-webkit-overflow-scrolling': 'touch'
+    };
+    return (
+      <div className={'container'}>
+        <div className={'row'}>
+          <div className={'col col-md'}>
+            <div className={'card'}>
+              <div className={'card-header'}> Dine kommuner</div>
+              <table className={'table'}>
+                <thead>
+                  <tr>
+                    <th itemScope={'col'}>#</th>
+                    <th itemScope={'col'}>Kommune</th>
+                    <th itemScope={'col'}>Få epost varsler</th>
+                    <th itemScope={'col'}>Slett fra varsler</th>
+                  </tr>
+                </thead>
+                <tbody>{this.getYourRegionListEllement(this.followedRegions)}</tbody>
+              </table>
+            </div>
           </div>
+        </div>
+        <div className={'row'}>
+          <div className={'col-md'}>
+            <div className={'card my-3'} style={{ maxHeight: '500px' }}>
+              <div className={'card-header'}>Velg fylke:</div>
+              {this.getCountyListEllement(this.county)}
+            </div>
+          </div>
+          <div className={'col-md'}>
+            <div className={'card my-3'}>
+              <div className={'card-header'}>Velg kommune:</div>
+              <div style={{ overflow: 'scroll' }}>{this.getRegionListEllement()}</div>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -83,15 +83,15 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
                 />
               </button>
             ) : (
-              <button className="btn btn-primary" onClick={event => this.subscribe(event, e)}>
-                <FontAwesomeIcon
-                  id={'subscribe'}
-                  icon={faEnvelope}
-                  alt="Klikk her for å få varsler på epost om denne saker fra denne kommunen"
-                  className="float-right"
-                />
-              </button>
-            )}
+                <button className="btn btn-primary" onClick={event => this.subscribe(event, e)}>
+                  <FontAwesomeIcon
+                    id={'subscribe'}
+                    icon={faEnvelope}
+                    alt="Klikk her for å få varsler på epost om denne saker fra denne kommunen"
+                    className="float-right"
+                  />
+                </button>
+              )}
           </td>
           <td className={'text-center'}>
             <button onClick={(event) => this.handleDelete(event, e)} className={'btn btn-danger'}>
@@ -109,15 +109,15 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
   }
   getCountyListEllement(listItems: Array<County>) {
     return (
-        <ul className={'list-group list-group-flush'} style={{overflow: 'scroll'}}>
-          {listItems.map(e => {
-            return (
-              <li key={e.county_id} className={'list-group-item'} id={e.county_id} onClick={this.filterRegions}>
-                {e.name}
-              </li>
-            );
-          })}
-        </ul>
+      <ul className={'list-group list-group-flush'} style={{ overflow: 'scroll' }}>
+        {listItems.map(e => {
+          return (
+            <li key={e.county_id} className={'list-group-item'} id={e.county_id} onClick={this.filterRegions}>
+              {e.name}
+            </li>
+          );
+        })}
+      </ul>
     );
   }
   getRegionListEllement() {
@@ -140,13 +140,23 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
   }
 
   filterRegions(e) {
-      console.log('filtering regions');
+    console.log('filtering regions');
     let id = Number.parseInt(e.target.id);
     console.log('finltering on region with id ' + id);
     this.regionService
       .getAllRegionGivenCounty(id)
       .then((regions: Region[]) => {
-          this.region = regions;
+
+        let asd = regions.filter(e => {
+
+          let l = this.followedRegions.filter(el => {
+            if (el.region_id == e.region_id) {
+              return true
+            }
+          })
+          return l.length == 0
+        })
+        this.region = asd;
       })
       .catch((error: Error) => console.error(error));
   }
@@ -154,16 +164,16 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
   handleDelete(event, e) {
     console.log('delete ', e);
     this.regSubService.deleteRegionSubscription(e.region_id, this.user.user_id)
-        .then(() => {
-            this.userServise.getRegionSubscriptionsGivenUserId(this.user.user_id)
-                .then(res => (this.followedRegions = res.regions))
-                .catch((error: Error) => console.error(error));
-        })
-        .catch((error: Error) => console.error(error));
+      .then(() => {
+        this.userServise.getRegionSubscriptionsGivenUserId(this.user.user_id)
+          .then(res => (this.followedRegions = res.regions))
+          .catch((error: Error) => console.error(error));
+      })
+      .catch((error: Error) => console.error(error));
   }
 
   handleAdd(event, e) {
-    this.region.splice( this.region.indexOf(e), 1 );
+    this.region.splice(this.region.indexOf(e), 1);
     let regionSub = new RegionSubscription(this.user.user_id, e.region_id, true);
     console.log('add sub for user ' + this.user.user_id + ' to region ' + e.region_id);
     this.regSubService.createRegionSubscription(regionSub, regionSub.region_id).then(() => {
@@ -185,7 +195,7 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
     this.userServise
       .getRegionSubscriptionsGivenUserId(this.user.user_id)
       .then(res => {
-          this.followedRegions = res.regions;
+        this.followedRegions = res.regions;
       })
       .then(console.log(this.followedRegions));
   }

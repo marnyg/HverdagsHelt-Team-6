@@ -87,7 +87,7 @@ module.exports = {
         let region_id_user = the_user.region_id;
         let region_id_case = the_case.region_id;
 
-        if (decoded_token.accesslevel !== 1 && region_id_user !== region_id_case) return res.sendStatus(403);
+        if (decoded_token.accesslevel !== 1 && region_id_user !== region_id_case) return res.sendStatus(401);
       })
       .then(() => {
         create_body = {
@@ -153,7 +153,7 @@ module.exports = {
       .then(sc => {
         status_comment = sc.toJSON();
         case_status = status_comment.status_id;
-        if (decoded_token.accesslevel !== 1 && user_id_token !== status_comment.user_id) return res.sendStatus(403);
+        if (decoded_token.accesslevel !== 1 && user_id_token !== status_comment.user_id) return res.sendStatus(401);
       })
       .then(() => {
         update_body = {
@@ -185,10 +185,10 @@ module.exports = {
     let user_id_token = decoded_token.user_id;
     let user_id_param = req.body.user_id;
 
-    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(401);
 
     return Status_comment.destroy({
       where: { status_comment_id: Number(req.params.status_comment_id) }
-    }).then(subscr => (subscr ? res.send() : res.sendStatus(404)));
+    }).then(subscr => {return (subscr ? res.send() : res.sendStatus(404))});
   }
 };

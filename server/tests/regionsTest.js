@@ -63,17 +63,27 @@ describe('Create one region', () => {
   test('400 status code for POST /api/regions without body', done => {
     request(application)
       .post('/api/regions')
+      .set('Authorization', `Bearer ${admin_token}`)
       .send()
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();
       });
   });
-  test('403 status code for POST /api/regions without valid token', done => {
+  test('401 status code for POST /api/regions without valid token', done => {
     request(application)
       .post('/api/regions')
       .send({ name: 'Ny region' })
       .set('Authorization', `Bearer ${12345}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for POST /api/regions without token', done => {
+    request(application)
+      .post('/api/regions')
+      .send({ name: 'Ny region' })
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();
@@ -101,6 +111,7 @@ describe('Update one region', () => {
   test('400 status code for PUT /api/regions/{region_id} without body', done => {
     return request(application)
       .put(`/api/regions/${ny_region_id}`)
+      .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();
@@ -109,16 +120,26 @@ describe('Update one region', () => {
   test('400 status code for PUT /api/regions/{region_id} with invalid region_id', done => {
     return request(application)
       .put(`/api/regions/NaN`)
+      .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();
       });
   });
-  test('403 status code for PUT /api/regions/{region_id} without valid token', done => {
+  test('401 status code for PUT /api/regions/{region_id} without valid token', done => {
     return request(application)
       .put(`/api/regions/${ny_region_id}`)
       .send({ name: 'Nyeste region' })
       .set('Authorization', `Bearer ${12345}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for PUT /api/regions/{region_id} without token', done => {
+    return request(application)
+      .put(`/api/regions/${ny_region_id}`)
+      .send({ name: 'Nyeste region' })
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();
@@ -145,6 +166,7 @@ describe('Delete one region', () => {
   test('400 status code for DELETE /api/regions/:region_id with invalid id', done => {
     request(application)
       .delete(`/api/regions/NaN`)
+      .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();

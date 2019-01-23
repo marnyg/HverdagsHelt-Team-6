@@ -31,7 +31,9 @@ type Response = express$Response;
 
 const public_path = path.join(__dirname, '/../../client/public');
 
-let app = express();
+let expressws = require('express-ws');
+expressws = expressws(express());
+let app = expressws.app;
 
 app.use(express.static(public_path));
 app.use(express.json()); // For parsing application/json
@@ -51,7 +53,20 @@ const storage = multer.diskStorage({
 
 let upload = multer({ storage: storage });
 
+app.get('/', (req: Request, res: Response) => res.sendFile(public_path + '/index.html'));
+
+// ***************************** Log in and Log out *****************************
+
+let aWss = expressws.getWss('/');
+
+app.ws('/api/login', function(ws, req) {
+  console.log('')
+});
+
 app.post('/api/login', (req: Request, res: Response) => {
+  aWss.clients.forEach(function (client) {
+    client.send(JSON.stringify({ "message": "Socket connected." } ));
+  });
   return login(req, res);
 });
 
@@ -59,27 +74,22 @@ app.post('/api/logout', (req: Request, res: Response) => {
   return logout(req, res);
 });
 
-app.post('/api/uploads', upload.single('avatar'), (req, res) => {
-  if (!req.file) {
-    console.log('No file received');
-    return res.send({
-      success: false
-    });
-  } else {
-    console.log('file received');
-    console.log(req.files);
-    console.log(req.body.alt);
-    return res.send({
-      success: true
-    });
-  }
-});
-
 app.post('/api/verify', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, (req, res) => {
     console.log('------Token Verified!-------');
     return res.sendStatus(200);
   });
+});
+
+app.ws('/', function(ws, req) {
+  console.log('Socket Connected');
+
+  ws.onmessage = function(msg) {
+    console.log(msg.data);
+    aWss.clients.forEach(function (client) {
+      client.send(msg.data);
+    });
+  };
 });
 
 app.get('/', (req: Request, res: Response) => res.sendFile(public_path + '/index.html'));
@@ -141,6 +151,10 @@ app.get('/api/cases/region_cases/:county_name/:region_name', async (req: Request
 
 app.get('/api/cases/region_cases/:region_id', async (req: Request, res: Response) => {
   return Cases.getAllCasesInRegionById(req, res);
+});
+
+app.get('/api/search/:searchtext', (req: Request, res: Response) => {
+  Cases.search(req, res);
 });
 
 // ***************************** Categories *****************************
@@ -238,6 +252,10 @@ app.get('/api/counties/:county_id/regions', (req: Request, res: Response) => {
   Region.getAllRegionsInCounty(req, res);
 });
 
+app.get('/api/regions/:region_id/staff', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Region.getRegionStaff);
+});
+
 // ***************************** Roles *****************************
 
 app.get('/api/roles', (req: Request, res: Response) => {
@@ -254,6 +272,32 @@ app.put('/api/roles/:role_id', (req: Request, res: Response) => {
 
 app.delete('/api/roles/:role_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, Role.delRole);
+});
+
+// ***************************** Stats *****************************
+
+app.get('/api/stats/closed/:year', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Stats.getNationalStatsClosed);
+});
+
+app.get('/api/stats/opened/:year', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Stats.getNationalStatsOpened);
+});
+
+app.get('/api/stats/categories/:year', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Stats.getNationalStatsCategories);
+});
+
+app.get('/api/stats/closed/:year/:region_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Stats.getNationalStatsClosedByRegion);
+});
+
+app.get('/api/stats/opened/:year/:region_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Stats.getNationalStatsOpenedByRegion);
+});
+
+app.get('/api/stats/categories/:year/:region_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Stats.getStatsCategoriesByRegion);
 });
 
 // ***************************** Statuses *****************************
@@ -276,16 +320,17 @@ app.delete('/api/statuses/:status_id', (req: Request, res: Response) => {
 
 // ***************************** Status_comments *****************************
 
-app.post('/api/users/new_password', (req: Request, res: Response) => {
-  return Users.set_new_password(req, res);
-});
-
 app.get('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
   Status_comment.getAllStatus_comment(req, res);
 });
 
 app.post('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 3, Status_comment.addStatus_comment);
+  if(res.statusCode == 200){
+    aWss.clients.forEach(client => {
+      client.send(JSON.stringify({"case_id": req.params.case_id }))
+    })
+  }
 });
 
 app.put('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
@@ -319,52 +364,20 @@ app.delete('/api/users/:user_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Users.deleteOneUser);
 });
 
-
-
-
-
 app.put('/api/users/:user_id/password', async (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Users.changePassword);
+});
+
+app.post('/api/users/new_password', (req: Request, res: Response) => {
+  return Users.set_new_password(req, res);
 });
 
 app.get('/api/users/:user_id/region_subscriptions', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Users.getRegionSubscriptionsForUser);
 });
 
-app.get('/api/regions/:region_id/staff', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, Region.getRegionStaff);
-});
-
 app.get('/api/email_available', (req: Request, res: Response) => {
   return User.findAll().then(users => res.send(!users.some(user => user.email === req.body.email)));
-});
-
-app.get('/api/search/:searchtext', (req: Request, res: Response) => {
-  Cases.search(req, res);
-});
-
-app.get('/api/stats/closed/:year', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 2, Stats.getNationalStatsClosed);
-});
-
-app.get('/api/stats/opened/:year', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 2, Stats.getNationalStatsOpened);
-});
-
-app.get('/api/stats/categories/:year', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 2, Stats.getNationalStatsCategories);
-});
-
-app.get('/api/stats/closed/:year/:region_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 2, Stats.getNationalStatsClosedByRegion);
-});
-
-app.get('/api/stats/opened/:year/:region_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 2, Stats.getNationalStatsOpenedByRegion);
-});
-
-app.get('/api/stats/categories/:year/:region_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 2, Stats.getStatsCategoriesByRegion);
 });
 
 app.get('/*', (req, res) => {
@@ -387,6 +400,3 @@ export let listen = new Promise<void>((resolve, reject) => {
     resolve();
   });
 });
-
-
-

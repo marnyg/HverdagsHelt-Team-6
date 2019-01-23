@@ -43,10 +43,18 @@ describe('Find all case_subscriptions for a private user', () => {
         done();
       });
   });
-  test('403 status code for GET /api/cases/subscriptions/:user_id without token', done => {
+  test('401 status code for GET /api/cases/subscriptions/:user_id without valid token', done => {
     return request(application)
       .get(`/api/cases/subscriptions/${user_id}`)
       .set('Authorization', `Bearer ${10000}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for GET /api/cases/subscriptions/:user_id without token', done => {
+    return request(application)
+      .get(`/api/cases/subscriptions/${user_id}`)
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();
@@ -73,10 +81,18 @@ describe('Find all cases a private user has subscriptions to', () => {
         done();
       });
   });
-  test('403 status code for GET /api/cases/subscriptions/:user_id/cases without token', done => {
+  test('401 status code for GET /api/cases/subscriptions/:user_id/cases without valid token', done => {
     return request(application)
       .get(`/api/cases/subscriptions/${user_id}/cases`)
       .set('Authorization', `Bearer ${10000}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for GET /api/cases/subscriptions/:user_id/cases without token', done => {
+    return request(application)
+      .get(`/api/cases/subscriptions/${user_id}/cases`)
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();
@@ -119,7 +135,7 @@ describe('Create a subscription to a case', () => {
         done();
       });
   });
-  test('403 status code for POST /api/cases/:case_id/subscribe without valid token', done => {
+  test('401 status code for POST /api/cases/:case_id/subscribe without valid token', done => {
     request(application)
       .post(`/api/cases/${case_id}/subscribe`)
       .send({
@@ -128,6 +144,19 @@ describe('Create a subscription to a case', () => {
         is_up_to_date: 0
       })
       .set('Authorization', `Bearer ${10000}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for POST /api/cases/:case_id/subscribe without token', done => {
+    request(application)
+      .post(`/api/cases/${case_id}/subscribe`)
+      .send({
+        user_id: user_id,
+        notify_by_email: 1,
+        is_up_to_date: 0
+      })
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();
@@ -176,15 +205,16 @@ describe('Update a case_subscriptions', () => {
         done();
       });
   });
-  test('400 status code for PUT /api/cases/:case_id/subscribe without body and token', done => {
+  test('400 status code for PUT /api/cases/:case_id/subscribe without body', done => {
     return request(application)
       .put(`/api/cases/${case_id}/subscribe`)
+      .set('Authorization', `Bearer ${user_token}`)
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();
       });
   });
-  test('403 status code for PUT /api/cases/:case_id/subscribe without valid token', done => {
+  test('401 status code for PUT /api/cases/:case_id/subscribe without valid token', done => {
     return request(application)
       .put(`/api/cases/${case_id}/subscribe`)
       .send({
@@ -193,6 +223,19 @@ describe('Update a case_subscriptions', () => {
         is_up_to_date: false
       })
       .set('Authorization', `Bearer ${12345}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for PUT /api/cases/:case_id/subscribe without token', done => {
+    return request(application)
+      .put(`/api/cases/${case_id}/subscribe`)
+      .send({
+        user_id: user_id,
+        notify_by_email: false,
+        is_up_to_date: false
+      })
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();
@@ -218,15 +261,24 @@ describe('Delete a case_subscriptions', () => {
   test('400 status code for DELETE /api/cases/:case_id/subscribe/:user_id with invalid id', done => {
     request(application)
       .delete(`/api/cases/case_id/subscribe/user_id`)
+      .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();
       });
   });
-  test('403 status code for DELETE /api/cases/:case_id/subscribe/:user_id without valid token', done => {
+  test('401 status code for DELETE /api/cases/:case_id/subscribe/:user_id without valid token', done => {
     request(application)
       .delete(`/api/cases/${case_id}/subscribe/${user_id}`)
       .set('Authorization', `Bearer ${0}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for DELETE /api/cases/:case_id/subscribe/:user_id without token', done => {
+    request(application)
+      .delete(`/api/cases/${case_id}/subscribe/${user_id}`)
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();
@@ -253,10 +305,18 @@ describe('Find all cases where a user is not up to date', () => {
         done();
       });
   });
-  test('403 status code for GET /api/cases/subscriptions/:user_id/cases/is_up_to_date without token', done => {
+  test('401 status code for GET /api/cases/subscriptions/:user_id/cases/is_up_to_date without valid token', done => {
     return request(application)
       .get(`/api/cases/subscriptions/${user_id}/cases/is_up_to_date`)
       .set('Authorization', `Bearer ${10000}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for GET /api/cases/subscriptions/:user_id/cases/is_up_to_date without token', done => {
+    return request(application)
+      .get(`/api/cases/subscriptions/${user_id}/cases/is_up_to_date`)
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();

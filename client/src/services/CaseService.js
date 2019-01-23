@@ -286,5 +286,9 @@ class CaseService {
         .catch((error: Error) => reject(error));
     });
   }
+
+  getCasePageByRegion(limit: number, page: number, region_id: number) {
+    return axios.get('/api/cases/region_cases/' + region_id + '?page=' + page +'&limit=' + limit);
+  }
 }
 export default CaseService;

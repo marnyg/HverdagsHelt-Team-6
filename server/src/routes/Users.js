@@ -14,9 +14,18 @@ const email_subject = 'Bruker opprettet - Hverdagshelt';
 module.exports = {
   getAllUsers: function(req: Request, res: Response) {
     if (!req.token) return res.sendStatus(400);
-    return User.findAll({ attributes: ['user_id', 'firstname', 'lastname', 'email', 'tlf', 'region_id'] }).then(users =>
-      res.send(users)
-    );
+    let sql_query = "Select u.user_id, u.firstname, u.lastname, " +
+      "u.email, u.tlf, u.region_id, u.role_id, r.name, r.access_level " +
+      "from Users u JOIN Roles r ON u.role_id = r.role_id";
+
+    return sequelize.query(
+      sql_query,
+      {
+        type: sequelize.QueryTypes.SELECT
+      }
+    )
+      .then(users => { return res.send(users) })
+      .catch(error => { return res.status(500).json(error)});
   },
 
   createUser: async function(req: Request, res: Response) {
@@ -90,7 +99,7 @@ module.exports = {
     let user_id_token = decoded_token.user_id;
     let user_id_param = Number(req.params.user_id);
 
-    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(401);
 
     return User.findOne({
       where: { user_id: user_id_param },
@@ -123,7 +132,7 @@ module.exports = {
     let user_id_token = decoded_token.user_id;
     let user_id_param = Number(req.params.user_id);
 
-    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(401);
 
     let user_update_obj = {
       firstname: req.body.firstname,
@@ -159,7 +168,7 @@ module.exports = {
     let user_id_token = decoded_token.user_id;
     let user_id_param = Number(req.params.user_id);
 
-    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(401);
 
     return User.destroy({ where: { user_id: Number(req.params.user_id) } })
       .then(user => (user ? res.send() : res.status(400).send()))
@@ -198,7 +207,7 @@ module.exports = {
     let user_id_token = decoded_token.user_id;
     let user_id_param = Number(req.params.user_id);
 
-    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(401);
 
     let user = await User.findOne({
       where: { user_id: Number(req.params.user_id) }
@@ -223,7 +232,7 @@ module.exports = {
         { where: { user_id: Number(req.params.user_id) } }
       ).then(count => (count ? res.send(count) : res.sendStatus(404)));
     } else {
-      return res.sendStatus(403);
+      return res.sendStatus(401);
     }
   },
   getRegionSubscriptionsForUser: function(req: Request, res: Response) {
@@ -235,18 +244,12 @@ module.exports = {
     let user_id_token = decoded_token.user_id;
     let user_id_param = Number(req.params.user_id);
 
-    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(401);
 
     let page = 1;
     let limit = 20;
 
-    if(
-      req.query &&
-      req.query.page &&
-      req.query.limit &&
-      Number(req.query.page) > 0 &&
-      Number(req.query.limit) > 0
-    ) {
+    if (req.query && req.query.page && req.query.limit && Number(req.query.page) > 0 && Number(req.query.limit) > 0) {
       page = Number(req.query.page);
       limit = Number(req.query.limit);
     }
@@ -271,15 +274,14 @@ module.exports = {
   },
 
   set_new_password: function(req: Request, res: Response) {
-    if(
-      !req.body ||
-      typeof req.body.email != 'string'
-    ) return res.status(400).send();
+    if (!req.body || typeof req.body.email != 'string') return res.status(400).send();
 
-    User.findOne( { where: { email: req.body.email } })
+    User.findOne({ where: { email: req.body.email } })
       .then(users => {
-        if(!users) return res.status(404).send({ msg: "Bruker ikke funnet." });
-        const generated_pwd = Math.random().toString(36).slice(-8);
+        if (!users) return res.status(404).send({ msg: 'Bruker ikke funnet.' });
+        const generated_pwd = Math.random()
+          .toString(36)
+          .slice(-8);
         const pwd_obj = hashPassword(generated_pwd);
         const hashed_password = pwd_obj.passwordHash;
         const salt = pwd_obj.salt;
@@ -287,21 +289,21 @@ module.exports = {
         User.update(
           {
             hashed_password: hashed_password,
-            salt: salt,
+            salt: salt
           },
           { where: { email: req.body.email } }
         )
           .then(user => {
-            if(!user) return res.status(404).send();
-            Epost.send_email(req.body.email, "Nytt passord", `Nytt passord: ${generated_pwd}`);
-            return res.status(200).send({ msg: "Nytt passord satt, og epost sendt."});
+            if (!user) return res.status(404).send();
+            Epost.send_email(req.body.email, 'Nytt passord', `Nytt passord: ${generated_pwd}`);
+            return res.status(200).send({ msg: 'Nytt passord satt, og epost sendt.' });
           })
-          .catch(error =>{
+          .catch(error => {
             return res.status(500).json(error);
-          })
+          });
       })
       .catch(error => {
         return res.status(500).json(error);
-      })
+      });
   }
 };

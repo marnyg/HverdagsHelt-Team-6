@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Component } from 'react-simplified';
 import RegionForm from './RegionForm';
 import CountyForm from "./CountyForm";
-import CountyService from "../../services/CountyService";
+import CountyService from "../../../services/CountyService";
 
 class RegionRegistration extends Component {
     counties = [];
