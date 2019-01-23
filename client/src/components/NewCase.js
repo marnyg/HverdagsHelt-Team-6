@@ -171,7 +171,7 @@ class NewCase extends Component {
                     onChange={this.countyListener}
                     hidden
                   >
-                    <option value={'.null'} disabled>
+                    <option value={''} >
                       Velg fylke
                     </option>
                     {this.counties.map(e => (
@@ -196,7 +196,7 @@ class NewCase extends Component {
                     }}
                     hidden
                   >
-                    <option value={'.null'} disabled>
+                    <option value={""} >
                       Velg kommune
                     </option>
                     {this.municipalities.map(e => (
@@ -415,6 +415,8 @@ class NewCase extends Component {
   radio1() {
     // Automatic location discovery
     if (this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
+      this.list1.required = false;
+      this.list2.required = false;
       this.list1.hidden = true;
       this.list2.hidden = true;
       this.lastResortAddress.hidden = true;
@@ -478,6 +480,8 @@ class NewCase extends Component {
   radio2() {
     // Map marker location discovery
     if (this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
+      this.list1.required = false;
+      this.list2.required = false;
       this.list1.hidden = true;
       this.list2.hidden = true;
       this.lastResortAddress.hidden = true;
@@ -489,6 +493,8 @@ class NewCase extends Component {
   radio3() {
     // Last resort list location selection
     if (this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
+      this.list1.required = true;
+      this.list2.required = true;
       this.isMapClickable = false;
       console.log(JSON.stringify(this.pos));
       if (this.list1.selectedIndex === 0) {
@@ -759,6 +765,9 @@ class NewCase extends Component {
     if (this.pos.region === "Sør-Trøndelag") {
       this.pos.region = "Trøndelag";
     }
+    // if (this.pos.region === "Oslo") {
+    // this.pos.region = "Oslo kommune";
+    // }
     let cs = new CountyService();
     return await new Promise((resolve, reject) => {
       cs.getAllCounties()
