@@ -112,7 +112,7 @@ class EditProfile extends Component<{}, { isEditing: boolean }> {
               </div>
             </div>
             <div className={'row list-group-item d-flex'}>
-              <div className={'col-sm'}>HEIME KOMUNE!!!!!!</div>
+              <div className={'col-sm'}>Hjemme Kommune:</div>
               <div className={'col-lg'}>
                 <RegionSelect
                   className={"region-select"}
