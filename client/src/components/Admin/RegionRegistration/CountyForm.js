@@ -1,9 +1,9 @@
 //@flow
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import CountyService from "../../services/CountyService";
-import LocationService from "../../services/LocationService";
-import RegionService from "../../services/RegionService";
+import CountyService from "../../../services/CountyService";
+import LocationService from "../../../services/LocationService";
+import RegionService from "../../../services/RegionService";
 
 class CountyForm extends Component{
     county = {};

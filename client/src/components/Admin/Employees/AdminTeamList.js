@@ -3,9 +3,9 @@ import * as React from 'react';
 import { Component } from 'react-simplified';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
-import UserService from "../../services/UserService";
-import ToolService from "../../services/ToolService";
-import VerificationModal from "../VerificationModal";
+import UserService from "../../../services/UserService";
+import ToolService from "../../../services/ToolService";
+import VerificationModal from "../../VerificationModal";
 import EditUserForm from "./EditUserForm";
 
 class AdminTeamList extends Component{
@@ -40,6 +40,8 @@ class AdminTeamList extends Component{
                             return(
                                 <div key={employee.user_id} className={'list-group-item'}>
                                     {employee.firstname} {employee.lastname}
+                                    <br/>
+                                    <small className={'text-muted'}>Epost: {employee.email}</small>
                                     <button
                                         onClick={(event) => this.setDeleteModalContent(event, employee)}
                                         type="button" data-toggle="modal"
