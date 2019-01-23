@@ -14,7 +14,7 @@ class SelectedUser extends Component{
         if(!this.props.user){
             return(
                 <div className={'card px-3 py-3 mb-2'}>
-                    <h1>Velg en bruker fra listen</h1>
+                    <div>Velg en bruker fra listen</div>
                 </div>
             );
         }

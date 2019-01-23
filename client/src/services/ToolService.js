@@ -8,6 +8,7 @@ const dateMonths = ['jan', 'feb', 'mar', 'apr', 'mai', 'juni', 'jul', 'aug', 'se
 // Frequently used static methods are put here to reduce overall duplicate code
 
 class ToolService {
+  static admin_role_id = 1;
   static employee_role_id = 2;
   static private_user_role_id = 4;
 
@@ -44,8 +45,6 @@ class ToolService {
     if (userString) {
       return JSON.parse(userString);
     } else {
-      console.log('User is not logged in!');
-      Notify.danger('Du må logge inn for å bruke denne tjenesten!');
       return null;
     }
   }
