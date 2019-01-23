@@ -162,8 +162,6 @@ class NewUserForm extends Component{
         let county_selector = document.querySelector('#admin-user-form-county-selector');
         let county_id = county_selector[county_selector.selectedIndex].value;
 
-        console.log('');
-
         let regionService = new RegionService();
         regionService.getAllRegionGivenCounty(county_id)
             .then((regions: Region[]) => {

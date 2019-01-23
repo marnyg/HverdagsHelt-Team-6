@@ -10,7 +10,7 @@ class AdminUserView extends Component{
             <div>
                 <h1>Registrer ny bruker</h1>
                 <NewUserForm/>
-                <SelectedUser user={this.props.user}/>
+                <SelectedUser user={this.props.user} onUserUpdated={() => this.props.onUserUpdated()}/>
             </div>
         );
     }
