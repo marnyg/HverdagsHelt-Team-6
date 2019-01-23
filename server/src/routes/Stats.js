@@ -61,7 +61,7 @@ module.exports = {
       where: { user_id: user_id_token }
     }).then(user => {
       if (decoded_token.accesslevel !== 1 && Number(req.params.region_id) !== user.region_id) {
-        return res.status(401).send();
+        return res.sendStatus(401);
       } else {
         sequelize
           .query(
@@ -99,7 +99,7 @@ module.exports = {
       where: { user_id: user_id_token }
     }).then(user => {
       if (decoded_token.accesslevel !== 1 && Number(req.params.region_id) !== user.region_id) {
-        return res.status(401).send();
+        return res.sendStatus(401);
       } else {
         sequelize
           .query(
