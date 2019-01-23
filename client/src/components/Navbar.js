@@ -12,8 +12,6 @@ import ToolService from '../services/ToolService';
 import hverdagsheltLogo from '../../public/hverdagsheltLogo2Trans.png';
 import LoginService from "../services/LoginService";
 
-const region_employee_id = 4; // Change to 2 upon delivery
-const admin_id = 4; // Change to 1 upon delivery
 const SERVER_IP: string = '10.22.152.121'; //'localhost';
 const SERVER_PORT: number = 3000;
 
@@ -102,14 +100,14 @@ class Navbar extends Component<{ logged_in: boolean }> {
                                 </NavLink>
                             ) : null}
                         </li>
-                        {user && user.role_id <= region_employee_id ? (
+                        {user && user.role_id === ToolService.employee_role_id ? (
                             <li className="nav-item">
                                 <NavLink exact to="/employee/inbox" className="nav-link">
                                     Behandle saker
                                 </NavLink>
                             </li>
                         ) : null}
-                        {user && user.role_id <= admin_id ? (
+                        {user && user.role_id === ToolService.admin_role_id ? (
                             <li className="nav-item">
                                 <NavLink exact to="/admin/regions" className="nav-link">
                                     Admin
