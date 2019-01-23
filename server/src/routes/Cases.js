@@ -1,11 +1,13 @@
 // @flow
 
-import { Case, sequelize } from '../models.js';
+import { Case, User, sequelize } from '../models.js';
 import { reqAccessLevel, verifyToken } from '../auth';
 import { Case_subscriptions, Picture } from '../models';
 import { promisify } from 'util';
 import path from 'path';
 import { regexNames } from '../utils/Regex';
+import { duplicateCheck } from '../utils/DuplicateChecker';
+import Epost from '../utils/Epost';
 const fs = require('fs');
 const unlinkAsync = promisify(fs.unlink);
 
@@ -47,82 +49,78 @@ module.exports = {
       });
   },
 
-  createNewCase: function(req: Request, res: Response) {
+  createNewCase: async function(req: Request, res: Response) {
     reqAccessLevel(req, res, 4, () => true);
-    if (req.body) {
-      console.log(req.body);
-      console.log(req.body.images);
+    if (
+      !req.body ||
+      !req.token ||
+      !req.files ||
+      typeof req.body.title !== 'string' ||
+      typeof req.body.description !== 'string' ||
+      typeof Number(req.body.lat) !== 'number' ||
+      typeof Number(req.body.lon) !== 'number' ||
+      typeof Number(req.body.region_id) !== 'number' ||
+      typeof Number(req.body.category_id) !== 'number' ||
+      !regexNames.test(req.body.title)
+    ) {
+      // console.log(req.body);
+      return res.status(400).send();
     }
-    if (!req.files) {
-      console.log('No file received');
-      return res.send({
-        success: false
-      });
-    } else {
-      console.log('files received');
-      let filenames = req.files.map(file => {
-        return file.filename;
-      });
-      console.log(filenames);
 
-      if (
-        !req.body ||
-        !req.token ||
-        typeof req.body.title !== 'string' ||
-        typeof req.body.description !== 'string' ||
-        typeof Number(req.body.lat) !== 'number' ||
-        typeof Number(req.body.lon) !== 'number' ||
-        typeof Number(req.body.region_id) !== 'number' ||
-        typeof Number(req.body.category_id) !== 'number' ||
-        !regexNames.test(req.body.title)
-      ) {
-        console.log(req.body);
-        return res.sendStatus(400);
-      }
+    let duplicate = await duplicateCheck(req.body.lat, req.body.lon, req.body.category_id, req.body.region_id);
+    //console.log('Duplicate check: ', duplicate);
+    if (duplicate) return res.status(409).send('En lignende sak i nærheten eksisterer allerede');
 
-      let decoded = verifyToken(req.token);
-      let user_id = decoded.user_id;
+    let decoded = verifyToken(req.token);
+    let user_id = decoded.user_id;
 
-      Case.create({
-        title: req.body.title,
-        description: req.body.description,
-        lat: req.body.lat,
-        lon: req.body.lon,
-        region_id: req.body.region_id,
-        user_id: user_id,
-        category_id: req.body.category_id,
-        status_id: 1
-      })
-        .then(newCase => {
-          Case_subscriptions.create({
-            user_id: user_id,
-            case_id: newCase.dataValues.case_id,
-            notify_by_email: 1,
-            is_up_to_date: 1
-          });
-          console.log(newCase.dataValues);
-          if (req.files.length !== 0) {
-            Picture.bulkCreate(
-              filenames.map(filename => {
-                return {
-                  path: '/uploads/' + filename,
-                  alt: 'alternerende text',
-                  case_id: newCase.dataValues.case_id
-                };
-              })
-            )
-              .then(res.send(newCase))
-              .catch(error => {
-                return res.status(400).send(error);
-              });
-          } else {
-            return res.send(newCase);
-          }
-        })
-        .catch(error => {
-          return res.status(500).send(error);
+    let filenames = req.files.map(file => {
+      return file.filename;
+    });
+
+    Case.create({
+      title: req.body.title,
+      description: req.body.description,
+      lat: req.body.lat,
+      lon: req.body.lon,
+      region_id: req.body.region_id,
+      user_id: user_id,
+      category_id: req.body.category_id,
+      status_id: 1
+    })
+      .then(newCase => {
+        Case_subscriptions.create({
+          user_id: user_id,
+          case_id: newCase.dataValues.case_id,
+          notify_by_email: 1,
+          is_up_to_date: 1
         });
-    }
+        console.log(newCase.dataValues);
+        if (req.files.length !== 0) {
+          Picture.bulkCreate(
+            filenames.map(filename => {
+              return {
+                path: '/uploads/' + filename,
+                alt: 'alternerende text',
+                case_id: newCase.dataValues.case_id
+              };
+            })
+          )
+            .then(res.send(newCase))
+            .catch(error => {
+              return res.status(400).send(error);
+            });
+        } else {
+          return res.send(newCase);
+        }
+      })
+      .then(async () => {
+        let user = await User.findOne({ where: { user_id: user_id }, attributes: ['email']});
+        Epost.send_email(user.email, 'Ny sak opprettet', `Saken din "${req.body.title}" ble opprettet. Du kan følge med på saken din på nettsida. \n\nMvh. Hverdagshelt Team 6`);
+      })
+      .catch(error => {
+        return res.status(500).send(error);
+      });
   },
 
   getOneCase: async function(req: Request, res: Response) {
@@ -253,25 +251,19 @@ module.exports = {
   getAllCasesInRegionByName: async function(req: Request, res: Response) {
     if (!req.params || typeof req.params.county_name != 'string' || typeof req.params.region_name != 'string')
       return res.sendStatus(400);
-    let county_check = {'Sør-Trøndelag': 'Trøndelag', 'Nord-Trøndelag': 'Trøndelag'};
+    let county_check = { 'Sør-Trøndelag': 'Trøndelag', 'Nord-Trøndelag': 'Trøndelag' };
     let county_name = req.params.county_name;
     if (req.params.county_name in county_check) county_name = county_check[req.params.county_name];
 
     let page = 1;
     let limit = 20;
 
-    if(
-      req.query &&
-      req.query.page &&
-      req.query.limit &&
-      Number(req.query.page) > 0 &&
-      Number(req.query.limit) > 0
-    ) {
+    if (req.query && req.query.page && req.query.limit && Number(req.query.page) > 0 && Number(req.query.limit) > 0) {
       page = Number(req.query.page);
       limit = Number(req.query.limit);
     }
     let start_limit = (page - 1) * limit;
-    
+
     return sequelize
       .query(rawQueryCases + ' WHERE r.name = ? AND co.name = ? ' + casesOrder + ' Limit ?,?', {
         replacements: [req.params.region_name, county_name, start_limit, limit],
@@ -347,13 +339,7 @@ module.exports = {
     let page = 1;
     let limit = 20;
 
-    if(
-      req.query &&
-      req.query.page &&
-      req.query.limit &&
-      Number(req.query.page) > 0 &&
-      Number(req.query.limit) > 0
-    ) {
+    if (req.query && req.query.page && req.query.limit && Number(req.query.page) > 0 && Number(req.query.limit) > 0) {
       page = Number(req.query.page);
       limit = Number(req.query.limit);
     }
@@ -369,7 +355,10 @@ module.exports = {
           'OR cg.name LIKE ? ' +
           casesOrder +
           ' LIMIT ?,?;',
-        { replacements: [search, search, search, search, search, start_limit, limit], type: sequelize.QueryTypes.SELECT }
+        {
+          replacements: [search, search, search, search, search, start_limit, limit],
+          type: sequelize.QueryTypes.SELECT
+        }
       )
       .then(async cases => {
         const out = cases.map(async c => {

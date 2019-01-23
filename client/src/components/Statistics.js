@@ -200,6 +200,7 @@ class Statistics extends Component {
       const pdf = new jsPDF(1, "mm", "a4")
       pdf.addImage(imgData, 'PNG', 1, 0);
       pdf.save('download.pdf');
+
     });
   }
 }
