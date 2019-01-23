@@ -162,27 +162,17 @@ module.exports = {
     let decoded_token = verifyToken(req.token);
     let token_user_id = Number(decoded_token.user_id);
     let token_access_level = Number(decoded_token.accesslevel);
-    let param_case_id = Number(req.params.case_id);
-    let b = req.body;
-    let update_body = {
-      title: b.title,
-      description: b.description,
-      lat: b.lat,
-      lon: b.lon,
-      region_id: b.region_id,
-      category_id: b.category_id
-    };
-    if (Number(token_access_level === 1)) update_body['status_id'] = req.body.status_id;
+    if (Number(token_access_level) !== 1) delete req.body.status_id;
 
-    return Case.findOne({ where: { case_id: param_case_id } })
+    return Case.findOne({ where: { case_id: Number(req.params.case_id) } })
       .then(cases => {
         if (!cases) throw new TypeError('Case not found.');
         if (cases.user_id !== token_user_id && token_access_level > 2) {
-          return res.status(401).send({ msg: 'User not allowed to update case.' });
+          return res.status(401).send({ message: 'User not allowed to update case.' });
         }
-        Case.update(update_body, { where: { case_id: param_case_id } })
+        Case.update(req.body, { where: { case_id: Number(req.params.case_id) } })
           .then(newCase => {
-            return res.sendStatus(200);
+            return res.send(newCase);
           })
           .catch(error => {
             return res.status(500).send(error.message);
@@ -210,8 +200,8 @@ module.exports = {
     let params_case_id = Number(req.params.case_id);
 
     if (token_access_level > 2) {
-      Case.findOne({ where: { case_id: params_case_id } }).then(async cases => {
-        if (!cases) return res.status(404).send({ msg: 'Case not found.' });
+     return Case.findOne({ where: { case_id: params_case_id } }).then(async cases => {
+        if (!cases){console.log(cases); return res.status(404).send({ msg: 'Case not found.' });}
         if (Number(cases.user_id) !== token_user_id) return res.status(401).send({ msg: 'User is unauthorized.' });
 
         let pictures = await Picture.findAll({ where: { case_id: params_case_id } });
@@ -322,7 +312,7 @@ module.exports = {
     let user_id_token = decoded_token.user_id;
     let user_id_param = Number(req.params.user_id);
 
-    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
+    if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(401);
 
     sequelize
       .query(rawQueryCases + ' WHERE c.user_id = ? ' + casesOrder, {
