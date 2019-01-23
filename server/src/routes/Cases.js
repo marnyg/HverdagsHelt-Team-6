@@ -194,7 +194,7 @@ module.exports = {
       });
   },
 
-  deleteCase: function(req: Request, res: Response) {
+  deleteCase: async function(req: Request, res: Response) {
     if (
       !req.token ||
       !req.params ||
@@ -232,6 +232,22 @@ module.exports = {
           });
       });
     }
+    let pictures = await Picture.findAll({ where: { case_id: params_case_id } });
+    let path_array = await pictures.map(p => {
+      return p.path;
+    });
+
+    Case.destroy({ where: { case_id: params_case_id } })
+      .then(async result => {
+        console.log(result);
+        await path_array.forEach(p => {
+          unlinkAsync(public_path + p);
+        });
+        return res.status(200).send({ msg: 'Case deleted.' });
+      })
+      .catch(error => {
+        return res.status(500).send(error);
+      });
   },
 
   getAllCasesInRegionByName: async function(req: Request, res: Response) {
@@ -241,9 +257,24 @@ module.exports = {
     let county_name = req.params.county_name;
     if (req.params.county_name in county_check) county_name = county_check[req.params.county_name];
 
+    let page = 1;
+    let limit = 20;
+
+    if(
+      req.query &&
+      req.query.page &&
+      req.query.limit &&
+      Number(req.query.page) > 0 &&
+      Number(req.query.limit) > 0
+    ) {
+      page = Number(req.query.page);
+      limit = Number(req.query.limit);
+    }
+    let start_limit = (page - 1) * limit;
+
     return sequelize
-      .query(rawQueryCases + ' WHERE r.name = ? AND co.name = ? ' + casesOrder, {
-        replacements: [req.params.region_name, county_name],
+      .query(rawQueryCases + ' WHERE r.name = ? AND co.name = ? ' + casesOrder + ' Limit ?,?', {
+        replacements: [req.params.region_name, county_name, start_limit, limit],
         type: sequelize.QueryTypes.SELECT
       })
       .then(async cases => {
@@ -312,6 +343,22 @@ module.exports = {
   },
   search: function(req: Request, res: Response) {
     let search = '%' + req.params.searchtext + '%';
+
+    let page = 1;
+    let limit = 20;
+
+    if(
+      req.query &&
+      req.query.page &&
+      req.query.limit &&
+      Number(req.query.page) > 0 &&
+      Number(req.query.limit) > 0
+    ) {
+      page = Number(req.query.page);
+      limit = Number(req.query.limit);
+    }
+    let start_limit = (page - 1) * limit;
+
     sequelize
       .query(
         rawQueryCases +
@@ -321,8 +368,8 @@ module.exports = {
           'OR r.name LIKE ? ' +
           'OR cg.name LIKE ? ' +
           casesOrder +
-          ' LIMIT 20',
-        { replacements: [search, search, search, search, search], type: sequelize.QueryTypes.SELECT }
+          ' LIMIT ?,?;',
+        { replacements: [search, search, search, search, search, start_limit, limit], type: sequelize.QueryTypes.SELECT }
       )
       .then(async cases => {
         const out = cases.map(async c => {

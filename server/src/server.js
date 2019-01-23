@@ -84,6 +84,32 @@ app.post('/api/verify', (req: Request, res: Response) => {
 
 app.get('/', (req: Request, res: Response) => res.sendFile(public_path + '/index.html'));
 
+// ***************************** Case_subscriptions *****************************
+
+app.get('/api/cases/subscriptions/:user_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptions);
+});
+
+app.get('/api/cases/subscriptions/:user_id/cases', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptionCases);
+});
+
+app.post('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Case_subscription.addCase_subscriptions);
+});
+
+app.put('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Case_subscription.updateCase_subscriptions);
+});
+
+app.delete('/api/cases/:case_id/subscribe/:user_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Case_subscription.delCase_subscriptions);
+});
+
+app.get('/api/cases/subscriptions/:user_id/cases/is_up_to_date', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptionCasesIs_up_to_date);
+});
+
 // ***************************** Cases *****************************
 
 app.get('/api/cases', (req: Request, res: Response) => Cases.getAllCases(req, res));
@@ -157,6 +183,35 @@ app.get('/api/counties/:county_name', (req: Request, res: Response) => {
   County.getOneCountyByName(req, res);
 });
 
+// ***************************** Pictures *****************************
+
+app.post('/api/pictures/:case_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Pictures.uploadPicture);
+});
+
+app.delete('/api/pictures/:case_id/:image_name', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Pictures.delPicture);
+});
+
+// ***************************** Region_subscriptions *****************************
+
+app.get('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Region_subscriptions.getAllRegion_subscriptions);
+});
+
+app.post('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
+  console.log(req.body);
+  reqAccessLevel(req, res, 4, Region_subscriptions.addRegion_subscriptions);
+});
+
+app.put('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Region_subscriptions.updateRegion_subscriptions);
+});
+
+app.delete('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Region_subscriptions.delRegion_subscriptions);
+});
+
 // ***************************** Regions *****************************
 
 app.get('/api/regions', (req: Request, res: Response) => {
@@ -219,6 +274,28 @@ app.delete('/api/statuses/:status_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, Status.delStatus);
 });
 
+// ***************************** Status_comments *****************************
+
+app.post('/api/users/new_password', (req: Request, res: Response) => {
+  return Users.set_new_password(req, res);
+});
+
+app.get('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
+  Status_comment.getAllStatus_comment(req, res);
+});
+
+app.post('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Status_comment.addStatus_comment);
+});
+
+app.put('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Status_comment.updateStatus_comment);
+});
+
+app.delete('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 2, Status_comment.delStatus_comment);
+});
+
 // ***************************** Users *****************************
 
 app.get('/api/users', (req: Request, res: Response) => {
@@ -242,54 +319,6 @@ app.delete('/api/users/:user_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Users.deleteOneUser);
 });
 
-app.get('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
-  Status_comment.getAllStatus_comment(req, res);
-});
-
-app.post('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 2, Status_comment.addStatus_comment);
-});
-
-app.put('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 2, Status_comment.updateStatus_comment);
-});
-
-app.delete('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 2, Status_comment.delStatus_comment);
-});
-
-app.post('/api/pictures/:case_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Pictures.uploadPicture);
-});
-
-app.delete('/api/pictures/:case_id/:image_name', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Pictures.delPicture);
-});
-
-app.get('/api/cases/subscriptions/:user_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptions);
-});
-
-app.get('/api/cases/subscriptions/:user_id/cases', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptionCases);
-});
-
-app.get('/api/cases/subscriptions/:user_id/cases/is_up_to_date', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Case_subscription.getAllCase_subscriptionCasesIs_up_to_date);
-});
-
-app.post('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Case_subscription.addCase_subscriptions);
-});
-
-app.put('/api/cases/:case_id/subscribe', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Case_subscription.updateCase_subscriptions);
-});
-
-app.delete('/api/cases/:case_id/subscribe/:user_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Case_subscription.delCase_subscriptions);
-});
-
 app.put('/api/users/:user_id/password', async (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Users.changePassword);
 });
@@ -300,23 +329,6 @@ app.get('/api/users/:user_id/region_subscriptions', (req: Request, res: Response
 
 app.get('/api/regions/:region_id/staff', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, Region.getRegionStaff);
-});
-
-app.get('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, Region_subscriptions.getAllRegion_subscriptions);
-});
-
-app.post('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
-  console.log(req.body);
-  reqAccessLevel(req, res, 4, Region_subscriptions.addRegion_subscriptions);
-});
-
-app.put('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Region_subscriptions.updateRegion_subscriptions);
-});
-
-app.delete('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Region_subscriptions.delRegion_subscriptions);
 });
 
 app.get('/api/email_available', (req: Request, res: Response) => {
