@@ -33,7 +33,7 @@ import VerificationModal from "./VerificationModal";
 axios.interceptors.response.use(response => response.data);
 
 class App extends Component {
-    logged_in = false;
+    logged_in: boolean = false;
     render() {
         let visited = JSON.parse(localStorage.getItem('visited'));
         if(!visited){
@@ -77,7 +77,7 @@ class App extends Component {
     mounted() {
         let loginService = new LoginService();
         loginService.isLoggedIn()
-            .then((logged_in: Boolean) => {
+            .then((logged_in: boolean) => {
                 this.logged_in = logged_in;
             })
             .catch((error: Error) => console.error(error))
