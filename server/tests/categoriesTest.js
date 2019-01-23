@@ -34,19 +34,31 @@ describe('Create new category', () => {
   test('400 status code for POST /api/categories without body', done => {
     request(application)
       .post('/api/categories')
+      .set('Authorization', `Bearer ${admin_token}`)
       .send()
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();
       });
   });
-  test('403 status code for POST /api/categories without valid token', done => {
+  test('401 status code for POST /api/categories without valid token', done => {
+    request(application)
+      .post('/api/categories')
+      .set('Authorization', `Bearer ${100}`)
+      .send({
+        name: 'CategoryTest'
+      })
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for POST /api/categories without token', done => {
     request(application)
       .post('/api/categories')
       .send({
         name: 'CategoryTest'
       })
-      .set('Authorization', `Bearer ${100}`)
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();
@@ -83,6 +95,7 @@ describe('Update one in categories', () => {
   test('400 status code for PUT /api/categories/:category_id without body', done => {
     return request(application)
       .put(`/api/categories/${category_id}`)
+      .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();
@@ -91,16 +104,26 @@ describe('Update one in categories', () => {
   test('400 status code for PUT /api/categories/:category_id without valid id', done => {
     return request(application)
       .put(`/api/categories/${'cat'}`)
+      .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();
       });
   });
-  test('403 status code for PUT /api/categories/:category_id without valid token', done => {
+  test('401 status code for PUT /api/categories/:category_id without valid token', done => {
     return request(application)
       .put(`/api/categories/${category_id}`)
       .send({ name: 'updatedCategoryTest' })
       .set('Authorization', `Bearer ${12345}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for PUT /api/categories/:category_id without token', done => {
+    return request(application)
+      .put(`/api/categories/${category_id}`)
+      .send({ name: 'updatedCategoryTest' })
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();
@@ -143,15 +166,24 @@ describe('Delete one in categories', () => {
   test('400 status code for DELETE /api/categories/:category_id with invalid id', done => {
     request(application)
       .delete(`/api/categories/${'Not a number'}`)
+      .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(400);
         done();
       });
   });
-  test('403 status code for DELETE /api/categories/:category_id without valid token', done => {
+  test('401 status code for DELETE /api/categories/:category_id without valid token', done => {
     request(application)
       .delete(`/api/categories/${category_id}`)
       .set('Authorization', `Bearer ${0}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for DELETE /api/categories/:category_id without token', done => {
+    request(application)
+      .delete(`/api/categories/${category_id}`)
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();

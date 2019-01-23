@@ -1,6 +1,6 @@
 import { application } from '../src/server';
 import request from 'supertest';
-
+/*
 // Template for test-cases
 
 // Replace all modules with module-name (in plural)
@@ -169,3 +169,5 @@ describe('Delete one in modules', () => {
       });
   });
 });
+
+*/

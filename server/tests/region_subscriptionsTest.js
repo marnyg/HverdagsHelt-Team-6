@@ -56,7 +56,7 @@ describe('Create new region_subscriptions', () => {
         done();
       });
   });
-  test('403 status code for POST /api/regions/:region_id/subscribe without valid token', done => {
+  test('401 status code for POST /api/regions/:region_id/subscribe without valid token', done => {
     request(application)
       .post('/api/regions/44/subscribe')
       .send({
@@ -66,25 +66,23 @@ describe('Create new region_subscriptions', () => {
       })
       .set('Authorization', `Bearer ${100}`)
       .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for POST /api/regions/:region_id/subscribe without token', done => {
+    request(application)
+      .post('/api/regions/44/subscribe')
+      .send({
+        user_id: 1,
+        region_id: 44,
+        notify: true
+      })
+      .then(response => {
         expect(response.statusCode).toBe(403);
         done();
       });
   });
-  // Test doesn't work, received 409 instead of 404
-  // test('404 status code for POST /api/regions/:region_id/subscribe id does not exist', done => {
-  //   request(application)
-  //     .post('/api/regions/44/subscribe')
-  //     .send({
-  //       user_id: 9999,
-  //       region_id: 44,
-  //       notify: true
-  //     })
-  //     .set('Authorization', `Bearer ${admin_token}`)
-  //     .then(response => {
-  //       expect(response.statusCode).toBe(404);
-  //       done();
-  //     });
-  // });
   test('200 status code for POST /api/regions/:region_id/subscribe', done => {
     request(application)
       .post('/api/regions/44/subscribe')
@@ -140,7 +138,7 @@ describe('Update one in region_subscriptions', () => {
         done();
       });
   });
-  test('403 status code for PUT /api/regions/:region_id/subscribe without valid token', done => {
+  test('401 status code for PUT /api/regions/:region_id/subscribe without valid token', done => {
     return request(application)
       .put(`/api/regions/44/subscribe`)
       .send({
@@ -149,6 +147,19 @@ describe('Update one in region_subscriptions', () => {
         notify: false
       })
       .set('Authorization', `Bearer ${12345}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for PUT /api/regions/:region_id/subscribe without token', done => {
+    return request(application)
+      .put(`/api/regions/44/subscribe`)
+      .send({
+        user_id: 6,
+        region_id: 44,
+        notify: false
+      })
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();
@@ -195,13 +206,24 @@ describe('Delete one in region_subscriptions', () => {
         done();
       });
   });
-  test('403 status code for DELETE /api/regions/:region_id/subscribe without valid token', done => {
+  test('401 status code for DELETE /api/regions/:region_id/subscribe without valid token', done => {
     request(application)
       .delete(`/api/regions/44/subscribe`)
       .send({
         user_id: 6
       })
       .set('Authorization', `Bearer ${12345}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for DELETE /api/regions/:region_id/subscribe without token', done => {
+    request(application)
+      .delete(`/api/regions/44/subscribe`)
+      .send({
+        user_id: 6
+      })
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();
