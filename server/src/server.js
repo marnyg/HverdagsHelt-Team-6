@@ -31,8 +31,9 @@ type Response = express$Response;
 
 const public_path = path.join(__dirname, '/../../client/public');
 
-let app = express();
-const expressws = require('express-ws')(app);
+let expressws = require('express-ws');
+expressws = expressws(express());
+let app = expressws.app;
 
 app.use(express.static(public_path));
 app.use(express.json()); // For parsing application/json
@@ -52,19 +53,16 @@ const storage = multer.diskStorage({
 
 let upload = multer({ storage: storage });
 
-app.get('/api/websocket', function(req, res, next){
-  console.log('get route', req.testing);
-  res.end();
-});
+let aWss = expressws.getWss('/');
 
-app.ws('/api/websocket', function(ws, req) {
-  ws.on('message', function(msg) {
-    console.log(msg);
-  });
-  console.log('socket', req.testing);
+app.ws('/api/login', function(ws, req) {
+  console.log('')
 });
 
 app.post('/api/login', (req: Request, res: Response) => {
+  aWss.clients.forEach(function (client) {
+    client.send(JSON.stringify({ "message": "Socket connected." } ));
+  });
   return login(req, res);
 });
 
@@ -77,6 +75,17 @@ app.post('/api/verify', (req: Request, res: Response) => {
     console.log('------Token Verified!-------');
     return res.sendStatus(200);
   });
+});
+
+app.ws('/', function(ws, req) {
+  console.log('Socket Connected');
+
+  ws.onmessage = function(msg) {
+    console.log(msg.data);
+    aWss.clients.forEach(function (client) {
+      client.send(msg.data);
+    });
+  };
 });
 
 app.get('/', (req: Request, res: Response) => res.sendFile(public_path + '/index.html'));
@@ -283,6 +292,11 @@ app.get('/api/cases/:case_id/status_comments', (req: Request, res: Response) => 
 
 app.post('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 2, Status_comment.addStatus_comment);
+  if(res.statusCode == 200){
+    aWss.clients.forEach(client => {
+      client.send(JSON.stringify({"case_id": req.params.case_id }))
+    })
+  }
 });
 
 app.put('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
