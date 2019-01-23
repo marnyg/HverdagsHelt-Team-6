@@ -60,16 +60,12 @@ class LoginModal extends Component {
                       type='danger'
                       text='Brukernavn og/eller passord er feil'
                     />
-
-
                 });
         } else {
             this.error = <Alert
               type='danger'
               text='Du må fylle inn begge feltene for å sende skjemaet'
             />
-            
-
         }
     }
 
