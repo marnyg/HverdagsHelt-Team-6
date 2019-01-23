@@ -137,21 +137,29 @@ module.exports = {
     let decoded_token = verifyToken(req.token);
     let user_id_token = decoded_token.user_id;
 
+    let update_body;
+    let case_status;
+
     let status_comment = Status_comment.findOne({
       where: { status_comment_id: Number(req.params.status_comment_id) }
     })
       .then(sc => {
         status_comment = sc.toJSON();
+        case_status = status_comment.status_id;
         if (decoded_token.accesslevel !== 1 && user_id_token !== status_comment.user_id) return res.sendStatus(403);
       })
       .then(() => {
+          update_body = {
+              comment: req.body.comment,
+              case_id: Number(req.params.case_id),
+              user_id: decoded_token.user_id
+          };
+          console.log(req.body.status_id, case_status);
+          if (decoded_token.accesslevel <= 2) update_body['status_id'] = req.body.status_id;
+          else update_body['status_id'] = case_status;
+
         return Status_comment.update(
-          {
-            comment: req.body.comment,
-            case_id: Number(req.params.case_id),
-            status_id: req.body.status_id,
-            user_id: user_id_token
-          },
+          update_body,
           {
             where: { status_comment_id: Number(req.params.status_comment_id) }
           }
