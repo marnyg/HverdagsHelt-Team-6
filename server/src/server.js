@@ -53,22 +53,6 @@ let upload = multer({ storage: storage });
 
 app.get('/', (req: Request, res: Response) => res.sendFile(public_path + '/index.html'));
 
-app.post('/api/uploads', upload.single('avatar'), (req, res) => {
-  if (!req.file) {
-    console.log('No file received');
-    return res.send({
-      success: false
-    });
-  } else {
-    console.log('file received');
-    console.log(req.files);
-    console.log(req.body.alt);
-    return res.send({
-      success: true
-    });
-  }
-});
-
 // ***************************** Log in and Log out *****************************
 
 app.post('/api/login', (req: Request, res: Response) => {
