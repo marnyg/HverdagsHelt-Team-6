@@ -10,7 +10,7 @@ module.exports = {
         Region.findOne({ where: { region_id: region_id } }).then(async region => {
           if (region.lat == lat && region.lon == lon) resolve(false);
           else {
-            let cases = await Case.findAll({ where: { region_id: region_id }, attributes: ['lat', 'lon'] });
+            let cases = await Case.findAll({ where: { region_id: region_id, category_id: category_id }, attributes: ['lat', 'lon'] });
 
             resolve(
               cases.some(the_case => {
