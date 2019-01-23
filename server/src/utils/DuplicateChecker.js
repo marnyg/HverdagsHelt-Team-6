@@ -8,7 +8,7 @@ module.exports = {
     return new Promise(resolve => {
       setTimeout(() => {
         Region.findOne({ where: { region_id: region_id } }).then(async region => {
-          if (region.lat === lat && region.lon === lon) resolve(false);
+          if (region.lat == lat && region.lon == lon) resolve(false);
           else {
             let cases = await Case.findAll({ where: { region_id: region_id }, attributes: ['lat', 'lon'] });
 
