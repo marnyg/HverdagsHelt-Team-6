@@ -39,6 +39,7 @@ const ADMIN: number = 1;
 
 const EMPLOYEE_ACCESS_LEVEL: number = 2;
 const ADMIN_ACCESS_LEVEL: number = 1;
+
 const MAX_DESCRIPTION_LENGTH: number = 255;
 const STATUS_OPEN: number = 1;
 const STATUS_CLOSED: number = 3;
