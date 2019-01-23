@@ -86,7 +86,17 @@ module.exports = {
       }
     })
       .then(users => {
-        return res.send(users);
+        let my_users;
+        if(users) {
+          my_users = [...users];
+          my_users.forEach(user => {
+            console.log(user);
+              delete user.dataValues['hashed_password'];
+              delete user.dataValues['salt'];
+          });
+          return res.send(my_users);
+        }
+
       })
       .catch(error => {
         console.log(error);

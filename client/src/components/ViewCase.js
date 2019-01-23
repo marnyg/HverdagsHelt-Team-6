@@ -24,8 +24,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Picture from '../classes/Picture';
 import ToolService from '../services/ToolService';
 import CaseSubscription from '../classes/CaseSubscription';
+import Alert from './Alert.js';
 
 const MAX_NUMBER_IMG: number = 3; // Maximum number of images allowed in a single case.
+const subscriptionButtonStyles = ['btn btn-info', 'btn btn-outline-info'];
 
 // Privilege levels
 const NOT_USER: number = 6;
@@ -37,6 +39,7 @@ const ADMIN: number = 1;
 
 const EMPLOYEE_ACCESS_LEVEL: number = 2;
 const ADMIN_ACCESS_LEVEL: number = 1;
+
 const MAX_DESCRIPTION_LENGTH: number = 255;
 const STATUS_OPEN: number = 1;
 const STATUS_CLOSED: number = 3;
@@ -45,15 +48,18 @@ const COMMENTS_PER_QUERY = 5;
 class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   case: Case = null;
   statusComment: StatusComment = new StatusComment();
+  subscription: CaseSubscription = null;
   pos: Location = null;
   offset: number = 0;
-  deletedImages: string[] = [];
   statuses: Status[] = [];
   categories: Category[] = [];
   statusMessages: StatusComment[] = [];
   form: HTMLFormElement = null;
   fetchButton: HTMLButtonElement = null;
   fileTypes: string[] = ['image/jpeg', 'image/jpg', 'image/png'];
+  imgSync: boolean = false;
+  error=null;
+  loggedIn: boolean = false;
 
   render() {
     if (!this.case || !this.statusComment) {
@@ -65,6 +71,12 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     return (
       <div className={'modal-body row'}>
         <div className={'col-md-6'}>
+          {this.loggedIn ? (
+            <button className={this.getSubscriptionButtonStyles(this.case)} onClick={this.onClickSubscribeButton}>
+              Abonner
+            </button>
+          ) : null}
+          {this.error}
           <form
             ref={e => {
               this.form = e;
@@ -103,8 +115,8 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             </table>
             <h3>Beskrivelse</h3>
             {this.case.description ? <p>{this.case.description}</p> : <p>INGEN BESKRIVELSE GITT</p>}
-            {privilege <= OWNER_EMPLOYEE ||
-            (this.case.status_id === STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE) ? (
+            {(privilege <= OWNER_EMPLOYEE && this.loggedIn) ||
+            (this.case.status_id === STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE && this.loggedIn) ? (
               <section>
                 <h2>Oppdater sak</h2>
                 <div className={'form-group'}>
@@ -200,7 +212,6 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                       type={'file'}
                       accept={'.png, .jpg, .jpeg'}
                       onChange={this.fileInputListener}
-                      multiple
                     />
                   </div>
                 ) : null}
@@ -214,31 +225,30 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                 ) : null}
               </section>
             ) : null}
-
-            <div className="container my-5">
-              <div className="row">
-                {this.case.img.map(e => (
-                  <div key={e.src} className="col-md-3">
-                    <div className="card">
-                      <img src={e.src} alt={e.src} className="card-img-top" />
-                      {(privilege <= OWNER_EMPLOYEE && this.case.status_id !== STATUS_CLOSED) ||
-                      (privilege === OWNER_NOT_EMPLOYEE && this.case.status_id === STATUS_OPEN) ||
-                      privilege === ADMIN ? (
-                        <div className="card-img-overlay">
-                          <button
-                            className={'btn btn-danger img-overlay float-right align-text-bottom'}
-                            onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
-                          >
-                            <FontAwesomeIcon icon={faTrashAlt} />
-                          </button>
-                        </div>
-                      ) : null}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </form>
+          <div className="container my-5">
+            <div className="row">
+              {this.case.img.map(e => (
+                <div key={e.src} className="col-md-3">
+                  <div className="card">
+                    <img src={e.src} alt={e.src} className="card-img-top" />
+                    {(privilege <= OWNER_EMPLOYEE && this.case.status_id !== STATUS_CLOSED) ||
+                    (privilege === OWNER_NOT_EMPLOYEE && this.case.status_id === STATUS_OPEN) ||
+                    privilege === ADMIN ? (
+                      <div className="card-img-overlay">
+                        <button
+                          className={'btn btn-danger img-overlay float-right align-text-bottom'}
+                          onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
+                        >
+                          <FontAwesomeIcon icon={faTrashAlt} />
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
           <div className={'col-md-6 embed-responsive'}>
             {/*<GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.case.lat, lng: this.case.lon }} /> */}
           </div>
@@ -281,6 +291,13 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     let stat = new StatusService();
     let cat = new CategoryService();
     let cassub = new CaseSubscriptionService();
+    let login = new LoginService();
+    login
+      .isLoggedIn()
+      .then(e => (this.loggedIn = e))
+      .catch((err: Error) => {
+        console.log('User is not logged in. this.loggedIn remains false.');
+      });
     cas
       .getCase(this.props.match.params.case_id)
       .then((c: Case) => {
@@ -322,10 +339,81 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           this.pos = new Location(a.lat, a.lon, a.region_name, a.county_name, 'Norway');
         } else {
           console.log('Case object was not returned encapsulated in an array. Using this.case = Case[0].');
-          Notify.danger('Saken ble hentet i et ukjent format.');
+          this.error=<Alert
+            type='danger'
+            text='Saken ble hentet i et ukjent format.'
+          />
+          /*Notify.danger('Saken ble hentet i et ukjent format.');*/
         }
       })
       .then(() => this.fetchStatusComments())
+      .then(() => {
+        if (this.loggedIn) {
+          let sub = new CaseSubscriptionService();
+          sub
+            .getAllCaseSubscriptions(ToolService.getUserId())
+            .then(e => {
+              this.subscription = e.find(e => e.case_id === this.case.case_id);
+              if (this.subscription) {
+                if (!this.subscription.is_up_to_date) {
+                  let sub: CaseSubscription = new CaseSubscription(
+                    ToolService.getUserId(),
+                    this.case.case_id,
+                    null,
+                    true
+                  );
+                  cassub
+                    .updateCaseSubscription(sub)
+                    .then(() => {
+                      console.log('Case with id ' + this.case.case_id + ' has been set up to date.');
+                    })
+                    .catch((err: Error) => {
+                      console.log('Could not set CaseSubscription is_up_to_date.');
+                    });
+                } else {
+                  let userObj: User = ToolService.getUser();
+                  if (userObj) {
+                    console.log(
+                      'Case with id ' +
+                        this.case.case_id +
+                        ' is already up to date for user ' +
+                        userObj.firstname +
+                        ' ' +
+                        userObj.lastname +
+                        ' (id = ' +
+                        userObj.user_id +
+                        ').'
+                    );
+                  }
+                }
+              } else {
+                let userObj: User = ToolService.getUser();
+                if (userObj) {
+                  console.log(
+                    'Case with id ' +
+                      this.case.case_id +
+                      ' is not subscribed to user ' +
+                      userObj.firstname +
+                      ' ' +
+                      userObj.lastname +
+                      ' (id = ' +
+                      userObj.user_id +
+                      ').'
+                  );
+                } else {
+                  console.log('Could not load user object from local storage.');
+                }
+              }
+            })
+            .catch((err: Error) => {
+              console.log('Could not load categories.');
+              Notify.danger(
+                'Klarte ikke å hente abbonnementene dine, vi får derfor ikke til å vise om du allerede er abonnement på denne saken eller ikke. Du kan likevel trykke på abonnerknappen for å enten legge til eller slette abonnement. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+                  err.message
+              );
+            });
+        }
+      })
       .then(() => {
         if (this.grantAccess() <= OWNER_EMPLOYEE) {
           stat
@@ -339,11 +427,17 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             })
             .catch((err: Error) => {
               console.log('Could not load statuses.');
-              Notify.danger(
+              this.error=<Alert
+                type='danger'
+                text={'Klarte ikke å hente statuser. ' +
+                  'Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+                  err.message}
+              />
+              /*Notify.danger(
                 'Klarte ikke å hente statuser. ' +
                   'Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
                   err.message
-              );
+              );*/
             });
         }
         cat
@@ -357,42 +451,32 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           })
           .catch((err: Error) => {
             console.log('Could not load categories.');
-            Notify.danger(
+            this.error=<Alert
+              type='danger'
+              text={'Klarte ikke å hente statuser. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+                err.message}
+            />
+            /*Notify.danger(
               'Klarte ikke å hente statuser. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
                 err.message
-            );
-          });
-      })
-      .then(() => {
-        let login = new LoginService();
-        login
-          .isLoggedIn()
-          .then(e => {
-            if (e) {
-              // TODO Sjekk om vi kan sende notify by email som null/undefined slik at vi slipper å spørre om tilstanden til ett subscriptionobjekt
-              let sub: CaseSubscription = new CaseSubscription(ToolService.getUserId(), this.case.case_id, false, true);
-              cassub
-                .updateCaseSubscription(sub)
-                .then(() => {
-                  console.log('Case with id ' + this.case.case_id + ' has been set up to date.');
-                })
-                .catch((err: Error) => {
-                  console.log('Could not set CaseSubscription is_up_to_date.');
-                });
-            }
-          })
-          .catch((err: Error) => {
-            console.log('User is not logged in. No need to set subscription state.');
+            );*/
           });
       })
       .catch((err: Error) => {
         console.log('Could not load case with id ' + this.props.match.params.case_id);
-        Notify.danger(
+        this.error=<Alert
+          type='danger'
+          text={'Klarte ikke å hente sak med id ' +
+            this.props.match.params.case_id +
+            '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+            err.message}
+        />
+        /*Notify.danger(
           'Klarte ikke å hente sak med id ' +
             this.props.match.params.case_id +
             '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
             err.message
-        );
+        );*/
       });
   }
 
@@ -430,10 +514,65 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     return ToolService.getUserId() === c.user_id;
   }
 
-  updatePos(newPos: Object) {
-    this.case.lat = newPos.lat;
-    this.case.lon = newPos.lon;
-    console.log('got pos from map: ', { lat: this.case.lat, lon: this.case.lon });
+  isSubscribed(c: Case) {
+    if (this.subscription) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  isLoggedIn() {
+    let token = localStorage.getItem('token');
+    if (token) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  getSubscriptionButtonStyles(c: Case) {
+    if (this.isSubscribed(c)) {
+      return subscriptionButtonStyles[1];
+    } else {
+      return subscriptionButtonStyles[0];
+    }
+  }
+
+  onClickSubscribeButton(event: SyntheticInputEvent<HTMLButtonElement>) {
+    console.log('Clicked subscribe button!');
+    let sub = new CaseSubscriptionService();
+    if (this.isSubscribed(this.case)) {
+      // Unsubscribe the user from this case
+      console.log('USER IS SUBSCRIBED');
+      sub
+        .deleteCaseSubscription(this.case.case_id, ToolService.getUserId())
+        .then(() => {
+          this.subscription = null;
+        })
+        .catch((err: Error) => {
+          console.log('Could not unsubscribe user from case with id ' + this.case.case_id);
+          Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
+        });
+    } else {
+      // Subscribe this case to user
+      let s;
+      if (this.subscription) {
+        s = new CaseSubscription(ToolService.getUserId(), this.case.case_id, this.subscription.notify_by_email, true);
+      } else {
+        s = new CaseSubscription(ToolService.getUserId(), this.case.case_id, false, true);
+      }
+      sub
+        .createCaseSubscription(s)
+        .then(e => {
+          console.log('Subscribed, returned: ', e);
+          this.subscription = e;
+        })
+        .catch((err: Error) => {
+          console.log('Could not subscribe user from case with id ' + this.case.case_id);
+          Notify.warning('Det oppstod en feil ved oppretting av abonnement på saken. \n\nFeilmelding: ' + err.message);
+        });
+    }
   }
 
   textareaListener(event: SyntheticInputEvent<HTMLInputElement>) {
@@ -463,54 +602,96 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   }
 
   fileInputListener(event: SyntheticInputEvent<HTMLInputElement>) {
-    let files = Array.from(event.target.files);
-    console.log(files);
+    if (!this.imgSync) {
+      let files = Array.from(event.target.files);
+      console.log(files);
 
-    if (files.length === 0) {
-      // No files were selected. No changes committed.
-      console.log('No files were selected.');
-    } else {
-      // Files selected. Processing changes.
-      console.log('Files were selected.');
-      // Redundant file type check.
-      if ((files = files.filter(e => this.fileTypes.includes(e.type)))) {
-        // File type is accepted.
-        if (files.length + this.case.img.length <= MAX_NUMBER_IMG) {
-          files.map(e => {
-            this.case.img.push({
-              value: e,
-              alt: 'Bildenavn: ' + e.name,
-              src: URL.createObjectURL(e)
-            });
-          });
-        } else {
-          console.log(
-            'Max number of pictures (' +
-              MAX_NUMBER_IMG +
-              ') reached. \nCurrent embedded images: ' +
-              this.case.img.length +
-              '\nTried to add: ' +
-              files.length +
-              ' new files.'
-          );
-          Notify.warning(
-            'Du kan maksimalt feste ' + MAX_NUMBER_IMG + ' til en sak. Noen bilder må slettes før du kan legge til nye.'
-          );
-        }
+      if (files.length === 0) {
+        // No files were selected. No changes committed.
+        console.log('No files were selected.');
       } else {
-        // File type not accepted.
-        console.warn('File type not accepted.');
-        Notify.warning('Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png.');
+        // Files selected. Processing changes.
+        console.log('Files were selected.');
+        // Redundant file type check.
+        if ((files = files.filter(e => this.fileTypes.includes(e.type)))) {
+          // File type is accepted.
+          if (files.length + this.case.img.length <= MAX_NUMBER_IMG) {
+            this.imgSync = true;
+            let cas = new CaseService();
+            cas
+              .uploadPicture(this.case.case_id, files[0])
+              .then(() => (this.imgSync = false))
+              .then(() => {
+                console.log('Image upload successful!');
+                this.case.img.push({
+                  value: files[0],
+                  alt: 'Bildenavn: ' + files[0].name,
+                  src: URL.createObjectURL(files[0])
+                });
+              })
+              .catch((err: Error) => {
+                this.imgSync = false;
+                console.log('Upload image failed. ', err);
+                Notify.danger(
+                  'Kunne ikke laste opp bildet. Hvis problemet vedvarer kontakt oss. \n\nFeilmelding: ' + err.message
+                );
+              });
+          } else {
+            console.log(
+              'Max number of pictures (' +
+                MAX_NUMBER_IMG +
+                ') reached. \nCurrent embedded images: ' +
+                this.case.img.length +
+                '\nTried to add: ' +
+                files.length +
+                ' new files.'
+            );
+            Notify.warning(
+              'Du kan maksimalt feste ' +
+                MAX_NUMBER_IMG +
+                ' til en sak. Noen bilder må slettes før du kan legge til nye.'
+            );
+          }
+        } else {
+          // File type not accepted.
+          console.warn('File type not accepted.');
+          Notify.warning('Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png.');
+        }
       }
+    } else {
+      Notify.warning('Synkronisering av bilder pågår. Vennligst vent 2-3 sekunder og prøv igjen.');
     }
   }
 
   fileInputDeleteImage(event: SyntheticInputEvent<HTMLInputElement>, src: string) {
-    this.deletedImages.push(this.case.img.find(e => e.src === src));
-    this.case.img = this.case.img.filter(e => e.src !== src);
-    console.log('Deleting image file with src = ' + src);
-    console.log('this.deletedImages: ' + JSON.stringify(this.deletedImages));
-    console.log('this.case.img: ' + JSON.stringify(this.case.img));
+    if (!this.imgSync) {
+      this.imgSync = true;
+      let url = this.formatImageURL(src);
+      let cas = new CaseService();
+      cas
+        .deletePicture(this.case.case_id, url)
+        .then(() => {
+          this.case.img = this.case.img.filter(e => e.src !== src);
+          console.log('Deleting image file with src = ' + src);
+          console.log('this.case.img: ' + JSON.stringify(this.case.img));
+          this.imgSync = false;
+        })
+        .catch((err: Error) => {
+          console.log('Delete image failed. ', err);
+          Notify.danger(
+            'Kunne ikke slette bildet. Hvis problemet vedvarer kontakt oss. \n\nFeilmelding: ' + err.message
+          );
+          this.imgSync = false;
+        });
+    } else {
+      Notify.warning('Synkronisering av bilder pågår. Vennligst vent 2-3 sekunder og prøv igjen.');
+    }
+  }
+
+  formatImageURL(src: string) {
+    let a = src.split('/')[2];
+    console.log(a);
+    return a;
   }
 
   delete(event: SyntheticEvent<HTMLButtonElement>) {
@@ -521,16 +702,29 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       cas
         .deleteCase(this.case.case_id)
         .then(() => {
-          Notify.success('Din sak med id ' + this.case.case_id + ' ble slettet.');
+          this.error=<Alert
+            type='success'
+            text={'Din sak med id ' + this.case.case_id + ' ble slettet.'}
+          />
+          /*Notify.success('Din sak med id ' + this.case.case_id + ' ble slettet.');*/
           this.props.history.goBack();
         })
         .catch((err: Error) => {
           console.log('Could not delete case with id: ' + this.case.case_id, err);
-          Notify.danger('Kunne ikke slette sak med id: ' + this.case.case_id + '. \n\nFeilmelding: ' + err.message);
+          this.error=<Alert
+            type='danger'
+            text={'Kunne ikke slette sak med id: ' + this.case.case_id + '. \n\nFeilmelding: ' + err.message}
+          />
+          /*Notify.danger('Kunne ikke slette sak med id: ' + this.case.case_id + '. \n\nFeilmelding: ' + err.message);*/
         });
-    }else{
+    } else {
       console.log("You're not the owner of this case, nor admin! You cannot delete it.");
-      Notify.warning("Du eier ikke denne saken, og kan derfor ikke slette den.");
+      //Notify.warning('Du eier ikke denne saken, og kan derfor ikke slette den.');
+      this.error=<Alert
+        type='warning'
+        text="Du eier ikke denne saken, og kan derfor ikke slette den."
+      />
+      /*Notify.warning("Du eier ikke denne saken, og kan derfor ikke slette den.");*/
     }
   }
 
@@ -553,12 +747,19 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       })
       .catch((err: Error) => {
         console.log('Could not load case comments for case with id ' + this.props.match.params.case_id);
-        Notify.danger(
+        this.error=<Alert
+          type='danger'
+          text={'Klarte ikke å hente kommentarer til sak med id ' +
+            this.props.match.params.case_id +
+            '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+            err.message}
+        />
+        /*Notify.danger(
           'Klarte ikke å hente kommentarer til sak med id ' +
             this.props.match.params.case_id +
             '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
             err.message
-        );
+        );*/
       });
   }
 
@@ -570,7 +771,11 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
         return true;
       } else {
         console.log('Failed basic HTML form validation.');
-        Notify.warning('Vennligst fyll inn de påkrevde feltene.');
+        this.error=<Alert
+          type='warning'
+          text='Vennligst fyll inn de påkrevde feltene.'
+        />
+        /*Notify.warning('Vennligst fyll inn de påkrevde feltene.');*/
         return false;
       }
     } else {
@@ -590,7 +795,11 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
         .updateCase(this.case.case_id, this.case)
         .then(() => {
           console.log('Case ' + this.case.case_id + ' was updated.');
-          Notify.success('Sak med id ' + this.case.case_id + ' ble oppdatert.');
+          this.error=<Alert
+            type='success'
+            text={'Sak med id ' + this.case.case_id + ' ble oppdatert.'}
+          />
+          //Notify.success('Sak med id ' + this.case.case_id + ' ble oppdatert.');
           if (this.case.img.length > 0) {
             // Pictures are present
             // TODO Fortsett her
@@ -611,19 +820,29 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               })
               .catch((err: Error) => {
                 console.log('Uploading status comment failed for case ' + this.case.case_id + '. Error: ', err);
-                Notify.danger(
+                this.error=<Alert
+                  type='danger'
+                  text={'1Feil ved opplasting av statuskommentar. Saken har blitt oppdatert, men kommentaren din har ikke blitt lagret. \n\nFeilmelding: ' +
+                    err.message}
+                />
+                /*Notify.danger(
                   'Feil ved opplasting av statuskommentar. Saken har blitt oppdatert, men kommentaren din har ikke blitt lagret. \n\nFeilmelding: ' +
                     err.message
-                );
+                );*/
               });
           }
         })
         .catch((err: Error) => {
           console.log('Updating case ' + this.case.case_id + ' failed. Error: ', err);
-          Notify.danger(
+          this.error=<Alert
+            type='danger'
+            text={'Feil ved opplasting av oppdatert informasjon. Din sak har ikke blitt oppdatert. \n\nFeilmelding: ' +
+              err.message}
+          />
+          /*Notify.danger(
             'Feil ved opplasting av oppdatert informasjon. Din sak har ikke blitt oppdatert. \n\nFeilmelding: ' +
               err.message
-          );
+          );*/
         });
     }
   }

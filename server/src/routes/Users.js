@@ -14,9 +14,18 @@ const email_subject = 'Bruker opprettet - Hverdagshelt';
 module.exports = {
   getAllUsers: function(req: Request, res: Response) {
     if (!req.token) return res.sendStatus(400);
-    return User.findAll({ attributes: ['user_id', 'firstname', 'lastname', 'email', 'tlf', 'region_id'] }).then(users =>
-      res.send(users)
-    );
+    let sql_query = "Select u.user_id, u.firstname, u.lastname, " +
+      "u.email, u.tlf, u.region_id, u.role_id, r.name, r.access_level " +
+      "from Users u JOIN Roles r ON u.role_id = r.role_id";
+
+    return sequelize.query(
+      sql_query,
+      {
+        type: sequelize.QueryTypes.SELECT
+      }
+    )
+      .then(users => { return res.send(users) })
+      .catch(error => { return res.status(500).json(error)});
   },
 
   createUser: async function(req: Request, res: Response) {
@@ -237,14 +246,29 @@ module.exports = {
 
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
 
+    let page = 1;
+    let limit = 20;
+
+    if(
+      req.query &&
+      req.query.page &&
+      req.query.limit &&
+      Number(req.query.page) > 0 &&
+      Number(req.query.limit) > 0
+    ) {
+      page = Number(req.query.page);
+      limit = Number(req.query.limit);
+    }
+    let start_limit = (page - 1) * limit;
+
     const subscr = { user_id: Number(req.params.user_id) };
     sequelize
       .query(
         'Select sub.region_id, r.name as region_name, sub.notify ' +
           'FROM Region_subscriptions sub JOIN Regions r ON sub.region_id = r.region_id ' +
-          'WHERE sub.user_id = ?;',
+          'WHERE sub.user_id = ? LIMIT ?,?;',
         {
-          replacements: [Number(req.params.user_id)],
+          replacements: [Number(req.params.user_id), start_limit, limit],
           type: sequelize.QueryTypes.SELECT
         }
       )

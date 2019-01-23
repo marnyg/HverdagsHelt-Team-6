@@ -88,16 +88,14 @@ export async function loginOk(email, password) {
 }
 
 export function reqAccessLevel(req, res, accessLevel = 4, wrappedFunction) {
-  if (!req.token) return res.sendStatus(400);
+  if (!req.token) return res.status(403).send({ msg: "User not logged in." });
   let token = req.token;
   let decoded = verifyToken(token);
-  console.log(token in tokens);
-  console.log(tokens);
   if (decoded && decoded.accesslevel <= accessLevel && token in tokens) {
     console.log(token);
     return wrappedFunction(req, res);
   } else {
-    return res.sendStatus(403);
+    return res.status(401).send();
   }
 }
 

@@ -10,6 +10,7 @@ import Case from '../classes/Case';
 import CaseService from '../services/CaseService';
 import CaseSubscription from '../classes/CaseSubscription';
 import CaseSubscriptionService from '../services/CaseSubscriptionService';
+import Alert from './Alert.js';
 
 // Constants used for colouring status fields in table
 
@@ -23,6 +24,7 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
   subscriptions: CaseSubscription[] = [];
   offset: number = 0;
   fetchButton = null;
+  error=null;
 
   render() {
     if (!this.cases) {
@@ -31,6 +33,7 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
 
     return (
       <div className={'card my-3 mx-3'}>
+      {this.error}
         <table className="table table-hover table-striped">
           <thead>
             <tr>
@@ -102,10 +105,15 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
           }
         })
         .catch((err: Error) => {
-          Notify.danger(
+          this.error=<Alert
+            type='danger'
+            text={'Det oppstod en feil under henting av dine saker. Hvis feilen vedvarer kontakt oss. \n\nFeilmelding: ' +
+              err.message}
+          />
+          /*Notify.danger(
             'Det oppstod en feil under henting av dine saker. Hvis feilen vedvarer kontakt oss. \n\nFeilmelding: ' +
               err.message
-          );
+          );*/
           console.log(
             'Error when fetching cases for user with id ' +
               this.props.user_id.toString() +
@@ -125,10 +133,15 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
           }
         })
         .catch((err: Error) => {
-          Notify.danger(
+          this.error=<Alert
+            type='danger'
+            text={'Det oppstod en feil under henting av kommunens saker. Hvis feilen vedvarer kontakt oss. \n\nFeilmelding: ' +
+              err.message}
+          />
+          /*Notify.danger(
             'Det oppstod en feil under henting av kommunens saker. Hvis feilen vedvarer kontakt oss. \n\nFeilmelding: ' +
               err.message
-          );
+          );*/
           console.log(
             'Error when fetching cases for region with id ' +
               this.props.region_id.toString() +
@@ -138,9 +151,13 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
         });
     } else {
       console.warn("Didn't find user_id or region_id");
-      Notify.danger(
+      this.error=<Alert
+        type='danger'
+        text='Kunne ikke finne bruker eller kommunedata for å hente saker fra server. Vennligst gå tilbake til hovedsida.'
+      />
+      /*Notify.danger(
         'Kunne ikke finne bruker eller kommunedata for å hente saker fra server. Vennligst gå tilbake til hovedsida.'
-      );
+      );*/
     }
   }
 
@@ -155,9 +172,13 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
       .then(() => console.log('this.subscriptions: ', this.subscriptions))
       .catch((err: Error) => {
         console.log('Could not fetch subscriptions for user with id: ' + user_id);
-        Notify.danger(
+        this.error=<Alert
+          type='danger'
+          text={'Kunne ikke hente abonnement. Hvis problemet vedvarer kontakt oss. \n\nFeilmelding: ' + err.message}
+        />
+        /*Notify.danger(
           'Kunne ikke hente abonnement. Hvis problemet vedvarer kontakt oss. \n\nFeilmelding: ' + err.message
-        );
+        );*/
       });
   }
 
@@ -196,7 +217,11 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
       console.log(case_id);
       this.props.history.push('/case/' + case_id);
     } else {
-      Notify.danger('Kunne ikke videresende deg til sak.');
+      this.error=<Alert
+        type='danger'
+        text='Kunne ikke videresende deg til sak.'
+      />
+      //Notify.danger('Kunne ikke videresende deg til sak.');
     }
   }
 
@@ -211,12 +236,20 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
         .deleteCase(case_id)
         .then(() => {
           console.log('Delete successful!');
-          Notify.success('Din sak med id ' + case_id + ' ble slettet.');
+          this.error=<Alert
+            type='success'
+            text={'Din sak med id ' + case_id + ' ble slettet.'}
+          />
+          //Notify.success('Din sak med id ' + case_id + ' ble slettet.');
           this.cases = this.cases.filter(e => e.case_id !== case_id);
         })
         .catch((err: Error) => {
           console.log('Could not delete case with id ' + case_id + ': ', err);
-          Notify.danger('Kunne ikke slette sak. \n\nFeilmelding: ' + err.message);
+          this.error=<Alert
+            type='danger'
+            text={'Kunne ikke slette sak. \n\nFeilmelding: ' + err.message}
+          />
+          //Notify.danger('Kunne ikke slette sak. \n\nFeilmelding: ' + err.message);
         });
     } else {
       console.log('Did not find case_id to delete.');
@@ -239,7 +272,11 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
           })
           .catch((err: Error) => {
             console.log('Could not unsubscribe user from case with id ' + c.case_id);
-            Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
+            this.error=<Alert
+              type='warning'
+              text={'Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message}
+            />
+            //Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
           });
       } else {
         console.log('Did not find case_id to delete.');
@@ -263,7 +300,11 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
           })
           .catch((err: Error) => {
             console.log('Could not unsubscribe user from case with id ' + c.case_id);
-            Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
+            this.error=<Alert
+              type='warning'
+              text={'Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message}
+            />
+            //Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
           });
       } else {
         // Subscribe this case to user
@@ -276,7 +317,11 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
           })
           .catch((err: Error) => {
             console.log('Could not unsubscribe user from case with id ' + c.case_id);
-            Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
+            this.error=<Alert
+              type='warning'
+              text={'Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message}
+            />
+            //Notify.warning('Det oppstod en feil ved sletting av abonnement på saken. \n\nFeilmelding: ' + err.message);
           });
       }
     } else {
