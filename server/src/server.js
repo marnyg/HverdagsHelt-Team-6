@@ -32,6 +32,7 @@ type Response = express$Response;
 const public_path = path.join(__dirname, '/../../client/public');
 
 let app = express();
+const expressws = require('express-ws')(app);
 
 app.use(express.static(public_path));
 app.use(express.json()); // For parsing application/json
@@ -51,28 +52,24 @@ const storage = multer.diskStorage({
 
 let upload = multer({ storage: storage });
 
+app.get('/api/websocket', function(req, res, next){
+  console.log('get route', req.testing);
+  res.end();
+});
+
+app.ws('/api/websocket', function(ws, req) {
+  ws.on('message', function(msg) {
+    console.log(msg);
+  });
+  console.log('socket', req.testing);
+});
+
 app.post('/api/login', (req: Request, res: Response) => {
   return login(req, res);
 });
 
 app.post('/api/logout', (req: Request, res: Response) => {
   return logout(req, res);
-});
-
-app.post('/api/uploads', upload.single('avatar'), (req, res) => {
-  if (!req.file) {
-    console.log('No file received');
-    return res.send({
-      success: false
-    });
-  } else {
-    console.log('file received');
-    console.log(req.files);
-    console.log(req.body.alt);
-    return res.send({
-      success: true
-    });
-  }
 });
 
 app.post('/api/verify', (req: Request, res: Response) => {
@@ -318,10 +315,6 @@ app.put('/api/users/:user_id', (req: Request, res: Response) => {
 app.delete('/api/users/:user_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Users.deleteOneUser);
 });
-
-
-
-
 
 app.put('/api/users/:user_id/password', async (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Users.changePassword);
