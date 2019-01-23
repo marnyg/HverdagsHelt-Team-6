@@ -19,18 +19,18 @@ beforeAll(done => {
 
 // ***************** Roles *****************
 describe('Find all roles', () => {
-  test('400 status code for GET /api/roles without token', done => {
-    return request(application)
-      .get(`/api/roles`)
-      .then(response => {
-        expect(response.statusCode).toBe(400);
-        done();
-      });
-  });
-  test('403 status code for GET /api/roles without valid token', done => {
+  test('401 status code for GET /api/roles without valid token', done => {
     return request(application)
       .get(`/api/roles`)
       .set('Authorization', `Bearer ${12345}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for GET /api/roles without token', done => {
+    return request(application)
+      .get(`/api/roles`)
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();
@@ -59,7 +59,7 @@ describe('Create new role', () => {
         done();
       });
   });
-  test('403 status code for POST /api/roles without valid token', done => {
+  test('401 status code for POST /api/roles without valid token', done => {
     request(application)
       .post('/api/roles')
       .send({
@@ -67,6 +67,18 @@ describe('Create new role', () => {
         access_level: 10
       })
       .set('Authorization', `Bearer ${100}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for POST /api/roles without token', done => {
+    request(application)
+      .post('/api/roles')
+      .send({
+        name: 'Role name',
+        access_level: 10
+      })
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();
@@ -114,6 +126,7 @@ describe('Update one in roles', () => {
   test('400 status code for PUT /api/roles/:role_id without valid role_id', done => {
     return request(application)
       .put(`/api/roles/NaN`)
+      .set('Authorization', `Bearer ${admin_token}`)
       .send({
         name: 'New role',
         access_level: 10
@@ -123,7 +136,7 @@ describe('Update one in roles', () => {
         done();
       });
   });
-  test('403 status code for PUT /api/roles/:role_id without valid token', done => {
+  test('401 status code for PUT /api/roles/:role_id without valid token', done => {
     return request(application)
       .put(`/api/roles/${role_id}`)
       .send({
@@ -131,6 +144,18 @@ describe('Update one in roles', () => {
         access_level: 10
       })
       .set('Authorization', `Bearer ${12345}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for PUT /api/roles/:role_id without token', done => {
+    return request(application)
+      .put(`/api/roles/${role_id}`)
+      .send({
+        name: 'New role',
+        access_level: 10
+      })
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();
@@ -161,10 +186,18 @@ describe('Delete one in roles', () => {
         done();
       });
   });
-  test('403 status code for DELETE /api/roles/:role_id without valid token', done => {
+  test('401 status code for DELETE /api/roles/:role_id without valid token', done => {
     request(application)
       .delete(`/api/roles/${role_id}`)
       .set('Authorization', `Bearer ${0}`)
+      .then(response => {
+        expect(response.statusCode).toBe(401);
+        done();
+      });
+  });
+  test('403 status code for DELETE /api/roles/:role_id without token', done => {
+    request(application)
+      .delete(`/api/roles/${role_id}`)
       .then(response => {
         expect(response.statusCode).toBe(403);
         done();
