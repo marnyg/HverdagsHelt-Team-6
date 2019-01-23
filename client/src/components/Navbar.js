@@ -243,7 +243,6 @@ class Navbar extends Component<{ logged_in: boolean }> {
                 let id: number = Number(json.case_id);
                 if (this.notifications.some(e => e.case_id === id)) {
                     this.notification_count++;
-                    console.log('Notify++');
                 }
             }
         } else {
