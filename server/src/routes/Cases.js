@@ -126,7 +126,7 @@ module.exports = {
   },
 
   getOneCase: async function(req: Request, res: Response) {
-    if (!req.params || typeof Number(req.params.case_id) !== 'number') return res.sendStatus(400);
+    if (!req.params || isNaN(Number(req.params.case_id))) return res.sendStatus(400);
     sequelize
       .query(rawQueryCases + ' WHERE c.case_id = ?;', {
         replacements: [req.params.case_id],
@@ -147,7 +147,7 @@ module.exports = {
       !req.body ||
       !req.token ||
       !req.params ||
-      typeof Number(req.params.case_id) !== 'number' ||
+      isNaN(Number(req.params.case_id)) ||
       typeof req.body.title !== 'string' ||
       typeof req.body.description !== 'string' ||
       typeof Number(req.body.lat) !== 'number' ||
@@ -199,7 +199,7 @@ module.exports = {
       !req.token ||
       !req.params ||
       !req.params.case_id ||
-      typeof Number(req.params.case_id) != 'number' ||
+      isNaN(Number(req.params.case_id)) ||
       typeof req.token != 'string'
     )
       return res.sendStatus(400);
@@ -237,10 +237,10 @@ module.exports = {
   getAllCasesInRegionByName: async function(req: Request, res: Response) {
     if (!req.params || typeof req.params.county_name != 'string' || typeof req.params.region_name != 'string')
       return res.sendStatus(400);
-    let county_check = {'Sør-Trøndelag': 'Trøndelag', 'Nord-Trøndelag': 'Trøndelag'};
+    let county_check = { 'Sør-Trøndelag': 'Trøndelag', 'Nord-Trøndelag': 'Trøndelag' };
     let county_name = req.params.county_name;
     if (req.params.county_name in county_check) county_name = county_check[req.params.county_name];
-    
+
     return sequelize
       .query(rawQueryCases + ' WHERE r.name = ? AND co.name = ? ' + casesOrder, {
         replacements: [req.params.region_name, county_name],
