@@ -40,7 +40,7 @@ class NewCase extends Component {
   markerPos = this.lastResortPos;
   fileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
   isMapClickable: boolean = false;
-  error=null;
+  error = null;
 
 
   constructor() {
@@ -334,12 +334,12 @@ class NewCase extends Component {
       .then(e => console.log('Received ' + e.length + ' categories from server.'))
       .catch((err: Error) => {
         console.warn('FEIL!' + err.toString());
-        this.error=<Alert
+        this.error = <Alert
           type='danger'
-          text= {'Det oppstod en feil under lasting av kategorier. ' +
-          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-          '\n\nFeilmelding: ' +
-          err.toString()}
+          text={'Det oppstod en feil under lasting av kategorier. ' +
+            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+            '\n\nFeilmelding: ' +
+            err.toString()}
         />
         /*Notify.danger(
           'Det oppstod en feil under lasting av kategorier. ' +
@@ -355,12 +355,12 @@ class NewCase extends Component {
       .then(e => console.log('Received ' + e.length + ' counties from server.'))
       .catch((err: Error) => {
         console.warn('FEIL!' + err.toString());
-        this.error=<Alert
+        this.error = <Alert
           type='danger'
           text={'Det oppstod en feil under lasting av fylker. ' +
-          'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-          '\n\nFeilmelding: ' +
-          err.toString()}
+            'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+            '\n\nFeilmelding: ' +
+            err.toString()}
         />
         /*Notify.danger(
           'Det oppstod en feil under lasting av fylker. ' +
@@ -426,7 +426,6 @@ class NewCase extends Component {
       .getLocation()
       .then(e => {
         if (this.pos) {
-          console.log(e);
 
           this.case.lat = e.lat;
           this.case.lon = e.lon;
@@ -441,6 +440,7 @@ class NewCase extends Component {
           .getAllRegions()
           .then(e => {
             let region = e.find(e => e.name === this.pos.city);
+
             if (region) {
               // Region detected by Google Location was found in database
               this.case.region_id = region.region_id;
@@ -449,7 +449,7 @@ class NewCase extends Component {
               // Region detected by Google Location was not found in database
               // Proceeding to set this.case_region_id = undefined. This'll enable the validate() method to tell the user that automatic positioning failed
               this.case.region_id = undefined;
-              this.error=<Alert
+              this.error = <Alert
                 type='warning'
                 text='Vi klarte ikke å plassere din posisjon i en kommune registrert hos oss. Vennligst benytt en annen metode for å sette din posisjon, ellers blir posisjonen satt til din angitte hjemkommune.'
               />
@@ -466,7 +466,7 @@ class NewCase extends Component {
           });
       })
       .catch((err: Error) => {
-        this.error=<Alert
+        this.error = <Alert
           type='danger'
           text={'Det oppstod en feil ved henting av automatisk posisjon. \n\nFeilmelding: ' + err.message}
         />
@@ -566,14 +566,14 @@ class NewCase extends Component {
         .catch((err: Error) => {
           console.warn(err.toString());
           if (this.list1 instanceof HTMLSelectElement) {
-            this.error=<Alert
+            this.error = <Alert
               type='danger'
               text={'Det oppstod en feil under lasting av kommuner fra fylke ' +
-              this.list1.options[this.list1.selectedIndex].text +
-              '. ' +
-              'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
-              '\n\nFeilmelding: ' +
-              err.toString()}
+                this.list1.options[this.list1.selectedIndex].text +
+                '. ' +
+                'Vennligst prøv igjen. Hvis problemet vedvarer vennligst kontakt nettsideansvarlig.' +
+                '\n\nFeilmelding: ' +
+                err.toString()}
             />
             /*Notify.danger(
               'Det oppstod en feil under lasting av kommuner fra fylke ' +
@@ -617,7 +617,7 @@ class NewCase extends Component {
       } else {
         // File type not accepted.
         console.warn('File type not accepted.');
-        this.error=<Alert
+        this.error = <Alert
           type='warning'
           text='Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png.'
         />
@@ -640,7 +640,7 @@ class NewCase extends Component {
         if (region) {
           return region.region_id;
         } else {
-          this.error=<Alert
+          this.error = <Alert
             type='danger'
             text='Ingen kommuner passer ditt valg.'
           />
@@ -650,7 +650,7 @@ class NewCase extends Component {
       })
       .catch((err: Error) => {
         console.log('Could not get regions.');
-        this.error=<Alert
+        this.error = <Alert
           type='danger'
           text={'Kunne ikke hente kommunedata fra server for å sammenlikne med din valgte kommune. \n\nFeilmelding: ' + err.message}
         />
@@ -662,10 +662,10 @@ class NewCase extends Component {
       });
   }
 
-  validate(index: number) {
+  async validate(index: number): Promise<boolean> {
     if (!this.form.checkValidity()) {
       console.log('Basic HTML Form validation failed!');
-      this.error=<Alert
+      this.error = <Alert
         type='warning'
         text='Vennligst fyll in de påkrevde feltene og prøv igjen.'
       />
@@ -674,118 +674,64 @@ class NewCase extends Component {
     }
 
     console.log('Basic HTML Form validation passed!');
+    console.log(this.pos, this.case, this.list1, this.list2);
 
     if (this.list1 && this.list2 && this.pos) {
+      console.log(index);
       switch (index) {
+
         case 0:
           // Validate automatic position
-          if (this.pos && this.case.region_id) {
-            return true;
-          } else {
-            this.error=<Alert
-              type='warning'
-              text={'Din automatisk detekterte posisjon (lat: ' +
-              this.pos.lat +
-              ', lon: ' +
-              this.pos.lon +
-              ') finner sted i ' +
-              this.pos.country +
-              ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'}
-            />;
-            /*Notify.warning(
-              'Din automatisk detekterte posisjon (lat: ' +
-              this.pos.lat +
-              ', lon: ' +
-              this.pos.lon +
-              ') finner sted i ' +
-              this.pos.country +
-              ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'
-            );*/
-            console.log('Automatic position is not valid. this.pos: ', this.pos);
-            return false;
-          }
-        case 1:
-          // Validate map marker position
+          console.log(this.pos, this.case);
 
-          if (!this.case.region_id && this.pos.region) {
-            let reg = new RegionService();
-            let cs = new CountyService();
-            cs.getAllCounties()
-              .then(e => {
-                let county = e.find(f => f.county_name === this.pos.region);
-                if (county) {
-                  reg
-                    .getAllRegionGivenCounty(county.county_id)
-                    .then(e => {
-                      let region = e.find(f => f.region_name === this.pos.city);
-                      if (region) {
-                        this.case.region_id = region.region_id;
-                        return true;
-                      } else {
-                        console.log(
-                          'Region ' + this.pos.city + ' was not found in county' + this.pos.region + ' in database.'
-                        );
-                        return false;
-                      }
-                    })
-                    .catch((err: Error) => {
-                      this.error=<Alert
-                        type='danger'
-                        text={'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente kommunedata. Vennligst prøv igjen. \n\nFeilmelding: ' +
-                        err.message}
-                      />
-                      /*Notify.danger(
-                        'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente kommunedata. Vennligst prøv igjen. \n\nFeilmelding: ' +
-                        err.message
-                      );*/
-                      return false;
-                    });
-                } else {
-                  this.error=<Alert
-                    type='danger'
-                    text={'Fylket du trykket på finnes ikke i vår database. Dette kan komme som et resultat av kommunesammenslåing eller at geolokaliseringstjenesten vi benytter ikke bruker samme fylkesdata som oss.'}
-                  />
-                  /*Notify.danger(
-                    'Fylket du trykket på finnes ikke i vår database. Dette kan komme som et resultat av kommunesammenslåing eller at geolokaliseringstjenesten vi benytter ikke bruker samme fylkesdata som oss.'
-                  );*/
-                  return false;
-                }
-              })
-              .catch((err: Error) => {
-                this.error=<Alert
-                  type='danger'
-                  text={'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente fylkesdata. Vennligst prøv igjen. \n\nFeilmelding: ' +
-                  err.message}
-                />
-                /*Notify.danger(
-                  'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente fylkesdata. Vennligst prøv igjen. \n\nFeilmelding: ' +
-                  err.message
-                );*/
-                return false;
-              });
+
+          if (this.pos.region) {
+            let county = await this.doCheck1();
+            let regionOk = await this.doCheck2(county)
+
+            console.log("in Validate", county);
+            console.log("in Validate OK", regionOk);
+            return await new Promise((resolve, reject) => {
+              if (regionOk) {
+                resolve(true)
+              } else {
+                resolve(false)
+              }
+            })
+
           } else {
-            this.error=<Alert
-              type='warning'
-              text={'Din posisjon (lat: ' +
-              this.pos.lat +
-              ', lon: ' +
-              this.pos.lon +
-              ') finner sted i ' +
-              this.pos.country +
-              ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'}
-            />
-            /*Notify.warning(
-              'Din posisjon (lat: ' +
-              this.pos.lat +
-              ', lon: ' +
-              this.pos.lon +
-              ') finner sted i ' +
-              this.pos.country +
-              ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'
-            );*/
+            this.error = <Alert type='warning' text={'Din posisjon (lat: ' + this.pos.lat + ', lon: ' + this.pos.lon + ') finner sted i ' + this.pos.country + ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'} />
             console.log('Automatic position is not valid.');
             return false;
           }
+
+        case 1:
+          // Validate map marker position
+          console.log("asdds", this.case.region_id, this.pos.region);
+
+          if (this.case.region_id && this.pos.region) {
+            let county = await this.doCheck1();
+            let regionOk = await this.doCheck2(county)
+
+            console.log("in Validate", county);
+            console.log("in Validate OK", regionOk);
+            return await new Promise((resolve, reject) => {
+              if (regionOk) {
+                resolve(true)
+              } else {
+                resolve(false)
+              }
+            })
+
+
+          } else {
+            this.error = <Alert type='warning' text={'Din posisjon (lat: ' + this.pos.lat + ', lon: ' + this.pos.lon + ') finner sted i ' + this.pos.country + ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'} />
+            console.log('Automatic position is not valid.');
+            return false;
+          }
+
+
+
         case 2:
           // Validate last resort list selection
 
@@ -797,11 +743,10 @@ class NewCase extends Component {
             console.log('Last-resort-list validation is valid.');
             return true;
           } else {
-            this.error=<Alert
+            this.error = <Alert
               type='danger'
               text='Vennligst velg et fylke og en kommune hvor saken finner sted og prøv igjen.'
             />
-            /*Notify.danger('Vennligst velg et fylke og en kommune hvor saken finner sted og prøv igjen.');*/
             console.warn('County or municipality has not been set.');
             return false;
           }
@@ -809,10 +754,72 @@ class NewCase extends Component {
     }
   }
 
-  send() {
+  async doCheck1() {
+    if (this.pos.region === "Sør-Trøndelag") {
+      this.pos.region = "Trøndelag";
+    }
+    let cs = new CountyService();
+    return await new Promise((resolve, reject) => {
+      cs.getAllCounties()
+        .then(e => {
+          let county = e.find(f => f.name === this.pos.region);
+          console.log(county)
+          resolve(county)
+        })
+    })
+      .catch((err: Error) => {
+        this.error = <Alert type='danger' text={'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente fylkesdata. Vennligst prøv igjen. \n\nFeilmelding: ' +
+          err.message} />;
+        return false;
+      });
+  }
+
+  async doCheck2(county) {
+    let reg = new RegionService();
+    console.log("got to chech2");
+    console.log(county);
+    return await new Promise((resolve, reject) => {
+      reg
+        .getAllRegionGivenCounty(county.county_id)
+        .then(e => {
+          let region = e.find(f => f.name === this.pos.city);
+          console.log(this.pos.city);
+
+          console.log(region);
+          console.log(e);
+          console.log("khall");
+
+          if (region) {
+            this.case.region_id = region.region_id;
+            resolve(true);
+          }
+          else {
+            console.log('Region ' + this.pos.city + ' was not found in county' + this.pos.region + ' in database.');
+            resolve(false);
+          }
+        })
+        .catch((err: Error) => {
+          this.error = <Alert type='danger' text={'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente kommunedata. Vennligst prøv igjen. \n\nFeilmelding: ' +
+            err.message} />;
+          resolve(false)
+        });
+    })
+  }
+
+  async send() {
     if (this.case && this.form) {
       let index: number = this.radioSelector();
-      if (this.validate(index)) {
+      console.log(index);
+
+      let bool = false
+      try {
+        bool = await this.validate(index)
+      } catch{
+        bool = false
+      }
+      console.log("send if got:", bool);
+
+      if (bool) {
         console.log('Sending form data to server.');
         console.log('Case is ', this.case);
         let cas = new CaseService();
@@ -820,7 +827,7 @@ class NewCase extends Component {
           .createCase(this.case, this.case.img)
           .then(e => {
             if (e) {
-              this.error=<Alert
+              this.error = <Alert
                 type='success'
                 text={'Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id}
               />
@@ -828,7 +835,7 @@ class NewCase extends Component {
               console.log('Form data transmission success! Case ID: ' + e.case_id);
               this.props.history.push('/case/' + e.case_id);
             } else {
-              this.error=<Alert
+              this.error = <Alert
                 type='danger'
                 text={'Det skjedde en feil ved prosessering av din nye sak. Du kan prøve å finne saken din på Min side > Mine Saker'}
               />
@@ -839,11 +846,11 @@ class NewCase extends Component {
             }
           })
           .catch((err: Error) => {
-            this.error=<Alert
+            this.error = <Alert
               type='danger'
               text={'Det oppstod en feil ved sending av saken til oss. Sørg for at alle felter er fyllt ut korrekt. ' +
-              'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
-              err.message}
+                'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
+                err.message}
             />
             /*Notify.danger(
               'Det oppstod en feil ved sending av saken til oss. Sørg for at alle felter er fyllt ut korrekt. ' +
@@ -855,8 +862,9 @@ class NewCase extends Component {
       } else {
         console.log('Form is not valid.');
       }
+
     } else {
-      this.error=<Alert
+      this.error = <Alert
         type='warning'
         text={'En kritisk feil har oppstått. Vennligst last sida på nytt.'}
       />
@@ -866,6 +874,7 @@ class NewCase extends Component {
 
   updatePos(newPos) {
     console.log(this.pos);
+    console.log("new pos", newPos);
 
     this.pos.lon = newPos.lon;
     this.pos.lat = newPos.lat;
@@ -874,15 +883,20 @@ class NewCase extends Component {
     this.case.region_id = undefined;
     console.log('got pos from map:', this.pos);
     let locator = new LocationService();
+    console.log("after pos set", this.pos);
 
-    locator.geocodeLatLng(this.pos.lat, this.pos.lon)
+
+    locator.geocodeLatLng(newPos.lat, newPos.lon)
       .then(e => {
+        console.log(e)
+
         console.log(e.results[0]);
-        let city = e.results[0].address_components.find(e => e.types[0] === "administrative_area_level_2").long_name;
+        let city = e.results[0].address_components.find(e => e.types[0] === "administrative_area_level_2" || e.types[0] === "locality").long_name;
         let region = e.results[0].address_components.find(e => e.types[0] === "administrative_area_level_1").long_name;
         let country = e.results[0].address_components.find(e => e.types[0] === "country").long_name;
         let loc = new Location(this.pos.lat, this.pos.lon, city, region, country)
         this.pos = loc
+        console.log("du er i", city, region, country);
       })
       .then(() => {
         console.log("nu e DU hæær");
@@ -891,6 +905,8 @@ class NewCase extends Component {
         reg
           .getAllRegions()
           .then(e => {
+            console.log(e);
+
             let region = e.find(e => e.name === this.pos.city);
             if (region) {
               // Region detected by Google Location was found in database
@@ -900,7 +916,7 @@ class NewCase extends Component {
               // Region detected by Google Location was not found in database
               // Proceeding to set this.case_region_id = undefined. This'll enable the validate() method to tell the user that automatic positioning failed
               this.case.region_id = undefined;
-              this.error=<Alert
+              this.error = <Alert
                 type='warning'
                 text='Vi klarte ikke å plassere din posisjon i en kommune registrert hos oss. Vennligst benytt en annen metode for å sette din posisjon, ellers blir posisjonen satt til din angitte hjemkommune.'
               />
@@ -916,43 +932,6 @@ class NewCase extends Component {
             );
           });
       })
-    // locator
-    //   .geocodeLatLng(this.pos.lat, this.pos.lon)
-    //   .then(e => {
-    //     if (this.pos) {
-    //       this.pos = e;
-    //     }
-    //   })
-    //   .then(() => {
-    //     let reg = new RegionService();
-    //     reg
-    //       .getAllRegions()
-    //       .then(e => {
-    //         let region = e.find(e => e.name === this.pos.city);
-    //         if (region) {
-    //           // Region detected by Google Location was found in database
-    //           this.case.region_id = region.region_id;
-    //           console.log('This.case.region_id: ' + this.case.region_id + '\nCity/region_name: ' + this.pos.city);
-    //         } else {
-    //           // Region detected by Google Location was not found in databse
-    //           // Proceeding to set this.pos = users home region's GPS position from localStorage object
-    //           this.case.region_id = JSON.stringify(localStorage.getItem('user')).region_id;
-    //           console.log('this.case.region_id set to: ' + this.case.region_id);
-    //         }
-    //       })
-    //       .catch((err: Error) => {
-    //         console.log('Could not load regions from server. Error: ' + err.message);
-    //         throw new Error(
-    //           'Klarte ikke å sammenlikne automatisk posisjon med en kommune. \n\nFeilmelding: ' + err.message
-    //         );
-    //       });
-    //   })
-    //   .catch((err: Error) => {
-    //     Notify.danger(
-    //       'Det oppstod en feil ved sammenlikning av valgt posisjon og kommuner i databasen vår. \n\nFeilmelding: ' +
-    //       err.message
-    //     );
-    //   });
   }
 }
 
