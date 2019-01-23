@@ -40,6 +40,7 @@ class App extends Component {
             localStorage.setItem('visited', JSON.stringify({visited: true}));
         }
 
+        
         return (
             <BrowserRouter>
                 <div className={'h-100 w-100'}>
