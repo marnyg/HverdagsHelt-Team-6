@@ -51,25 +51,10 @@ module.exports = {
 
   createNewCase: async function(req: Request, res: Response) {
     reqAccessLevel(req, res, 4, () => true);
-    if (req.body) {
-      console.log(req.body);
-      console.log(req.body.images);
-    }
-    /*if (!req.files) {
-      console.log('No file received');
-      return res.send({
-        success: false
-      });
-    } else {
-      console.log('files received');
-      let filenames = req.files.map(file => {
-        return file.filename;
-      });
-      console.log(filenames);*/
-
     if (
       !req.body ||
       !req.token ||
+      !req.files ||
       typeof req.body.title !== 'string' ||
       typeof req.body.description !== 'string' ||
       typeof Number(req.body.lat) !== 'number' ||
@@ -84,10 +69,14 @@ module.exports = {
 
     let duplicate = await duplicateCheck(req.body.lat, req.body.lon, req.body.category_id, req.body.region_id);
     //console.log('Duplicate check: ', duplicate);
-    if (duplicate) return res.status(418).send('En lignende sak i nærheten eksisterer allerede');
+    if (duplicate) return res.status(409).send('En lignende sak i nærheten eksisterer allerede');
 
     let decoded = verifyToken(req.token);
     let user_id = decoded.user_id;
+
+    let filenames = req.files.map(file => {
+      return file.filename;
+    });
 
     Case.create({
       title: req.body.title,

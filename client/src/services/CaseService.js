@@ -226,63 +226,65 @@ class CaseService {
     return axios.get('/api/search/' + query, {}, {});
   }
 
-    //Get all cases in region, given region_id, limit and offset
-    getCasesByRegionWithLimitOffset(region_id: number, limit: number, offset: number){
-    }
+  //Get all cases in region, given region_id, limit and offset
+  getCasesByRegionWithLimitOffset(region_id: number, limit: number, offset: number) {}
 
-    uploadPicture(case_id: number, picture): Promise<any>{
-      return new Promise((resolve, reject) => {
-          let loginService = new LoginService();
-          loginService
-              .isLoggedIn()
-              .then((logged_in: Boolean) => {
-                  if (logged_in === true) {
-                      let token = localStorage.getItem('token');
-                      axios
-                          .post(
-                              '/api/pictures/' + case_id, picture,
-                              {
-                                  headers: {
-                                      Authorization: 'Bearer ' + token
-                                  }
-                              }
-                          )
-                          .then((response) => resolve(response))
-                          .catch((error: Error) => reject(error));
-                  } else {
-                      reject('User is not logged in');
+  uploadPicture(case_id: number, picture: File): Promise<any> {
+    return new Promise((resolve, reject) => {
+      let loginService = new LoginService();
+      loginService
+        .isLoggedIn()
+        .then((logged_in: Boolean) => {
+          if (logged_in === true) {
+            let token = localStorage.getItem('token');
+            if(token){
+              let formData = new FormData();
+              formData.append('image', picture);
+              axios
+                .post('/api/pictures/' + case_id, formData, {
+                  headers: {
+                    Authorization: 'Bearer ' + token,
+                    'Content-Type': 'multipart/form-data'
                   }
-              })
-              .catch((error: Error) => reject(error));
-      });
-    }
+                })
+                .then(response => resolve(response))
+                .catch((error: Error) => reject(error));
+            }else{
+              reject(
+                'Fant ikke brukerens token. Det kan hende brukeren ikke er logget inn, eller annen feil har oppstått. Prøv å logge ut og inn igjen, og prøv på nytt.'
+              );
+            }
+            
+          } else {
+            reject('User is not logged in');
+          }
+        })
+        .catch((error: Error) => reject(error));
+    });
+  }
 
-    deletePicture(case_id: number, image_name: string): Promise<any>{
-      return new Promise((resolve, reject) => {
-          let loginService = new LoginService();
-          loginService
-              .isLoggedIn()
-              .then((logged_in: Boolean) => {
-                  if (logged_in === true) {
-                      let token = localStorage.getItem('token');
-                      axios
-                          .delete(
-                              '/api/pictures/' + case_id + '/' + image_name,
-                              {
-                                  headers: {
-                                      Authorization: 'Bearer ' + token
-                                  }
-                              }
-                          )
-                          .then((response) => resolve(response))
-                          .catch((error: Error) => reject(error));
-                  } else {
-                      reject('User is not logged in');
-                  }
+  deletePicture(case_id: number, src: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      let loginService = new LoginService();
+      loginService
+        .isLoggedIn()
+        .then((logged_in: Boolean) => {
+          if (logged_in === true) {
+            let token = localStorage.getItem('token');
+            axios
+              .delete('/api/pictures/' + case_id + '/' + src, {
+                headers: {
+                  Authorization: 'Bearer ' + token
+                }
               })
+              .then(response => resolve(response))
               .catch((error: Error) => reject(error));
-      });
-    }
-
+          } else {
+            reject('User is not logged in');
+          }
+        })
+        .catch((error: Error) => reject(error));
+    });
+  }
 }
 export default CaseService;
