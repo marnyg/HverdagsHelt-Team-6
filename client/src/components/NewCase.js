@@ -426,7 +426,6 @@ class NewCase extends Component {
       .getLocation()
       .then(e => {
         if (this.pos) {
-          console.log(e);
 
           this.case.lat = e.lat;
           this.case.lon = e.lon;
@@ -441,6 +440,7 @@ class NewCase extends Component {
           .getAllRegions()
           .then(e => {
             let region = e.find(e => e.name === this.pos.city);
+
             if (region) {
               // Region detected by Google Location was found in database
               this.case.region_id = region.region_id;
@@ -674,25 +674,34 @@ class NewCase extends Component {
     }
 
     console.log('Basic HTML Form validation passed!');
+    console.log(this.pos, this.case, this.list1, this.list2);
 
     if (this.list1 && this.list2 && this.pos) {
+      console.log(index);
       switch (index) {
+
         case 0:
           // Validate automatic position
-          if (this.pos && this.case.region_id) {
-            return true;
+          console.log(this.pos, this.case);
+
+
+          if (this.pos.region) {
+            let county = await this.doCheck1();
+            let regionOk = await this.doCheck2(county)
+
+            console.log("in Validate", county);
+            console.log("in Validate OK", regionOk);
+            return await new Promise((resolve, reject) => {
+              if (regionOk) {
+                resolve(true)
+              } else {
+                resolve(false)
+              }
+            })
+
           } else {
-            this.error = <Alert
-              type='warning'
-              text={'Din automatisk detekterte posisjon (lat: ' +
-                this.pos.lat +
-                ', lon: ' +
-                this.pos.lon +
-                ') finner sted i ' +
-                this.pos.country +
-                ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'}
-            />;
-            console.log('Automatic position is not valid. this.pos: ', this.pos);
+            this.error = <Alert type='warning' text={'Din posisjon (lat: ' + this.pos.lat + ', lon: ' + this.pos.lon + ') finner sted i ' + this.pos.country + ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'} />
+            console.log('Automatic position is not valid.');
             return false;
           }
 
@@ -774,6 +783,8 @@ class NewCase extends Component {
         .getAllRegionGivenCounty(county.county_id)
         .then(e => {
           let region = e.find(f => f.name === this.pos.city);
+          console.log(this.pos.city);
+
           console.log(region);
           console.log(e);
           console.log("khall");
@@ -798,6 +809,8 @@ class NewCase extends Component {
   async send() {
     if (this.case && this.form) {
       let index: number = this.radioSelector();
+      console.log(index);
+
       let bool = false
       try {
         bool = await this.validate(index)
@@ -861,6 +874,7 @@ class NewCase extends Component {
 
   updatePos(newPos) {
     console.log(this.pos);
+    console.log("new pos", newPos);
 
     this.pos.lon = newPos.lon;
     this.pos.lat = newPos.lat;
@@ -869,15 +883,20 @@ class NewCase extends Component {
     this.case.region_id = undefined;
     console.log('got pos from map:', this.pos);
     let locator = new LocationService();
+    console.log("after pos set", this.pos);
 
-    locator.geocodeLatLng(this.pos.lat, this.pos.lon)
+
+    locator.geocodeLatLng(newPos.lat, newPos.lon)
       .then(e => {
+        console.log(e)
+
         console.log(e.results[0]);
-        let city = e.results[0].address_components.find(e => e.types[0] === "administrative_area_level_2").long_name;
+        let city = e.results[0].address_components.find(e => e.types[0] === "administrative_area_level_2" || e.types[0] === "locality").long_name;
         let region = e.results[0].address_components.find(e => e.types[0] === "administrative_area_level_1").long_name;
         let country = e.results[0].address_components.find(e => e.types[0] === "country").long_name;
         let loc = new Location(this.pos.lat, this.pos.lon, city, region, country)
         this.pos = loc
+        console.log("du er i", city, region, country);
       })
       .then(() => {
         console.log("nu e DU hæær");
@@ -886,6 +905,8 @@ class NewCase extends Component {
         reg
           .getAllRegions()
           .then(e => {
+            console.log(e);
+
             let region = e.find(e => e.name === this.pos.city);
             if (region) {
               // Region detected by Google Location was found in database
@@ -911,43 +932,6 @@ class NewCase extends Component {
             );
           });
       })
-    // locator
-    //   .geocodeLatLng(this.pos.lat, this.pos.lon)
-    //   .then(e => {
-    //     if (this.pos) {
-    //       this.pos = e;
-    //     }
-    //   })
-    //   .then(() => {
-    //     let reg = new RegionService();
-    //     reg
-    //       .getAllRegions()
-    //       .then(e => {
-    //         let region = e.find(e => e.name === this.pos.city);
-    //         if (region) {
-    //           // Region detected by Google Location was found in database
-    //           this.case.region_id = region.region_id;
-    //           console.log('This.case.region_id: ' + this.case.region_id + '\nCity/region_name: ' + this.pos.city);
-    //         } else {
-    //           // Region detected by Google Location was not found in databse
-    //           // Proceeding to set this.pos = users home region's GPS position from localStorage object
-    //           this.case.region_id = JSON.stringify(localStorage.getItem('user')).region_id;
-    //           console.log('this.case.region_id set to: ' + this.case.region_id);
-    //         }
-    //       })
-    //       .catch((err: Error) => {
-    //         console.log('Could not load regions from server. Error: ' + err.message);
-    //         throw new Error(
-    //           'Klarte ikke å sammenlikne automatisk posisjon med en kommune. \n\nFeilmelding: ' + err.message
-    //         );
-    //       });
-    //   })
-    //   .catch((err: Error) => {
-    //     Notify.danger(
-    //       'Det oppstod en feil ved sammenlikning av valgt posisjon og kommuner i databasen vår. \n\nFeilmelding: ' +
-    //       err.message
-    //     );
-    //   });
   }
 }
 
