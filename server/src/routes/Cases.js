@@ -193,8 +193,11 @@ module.exports = {
     let params_case_id = Number(req.params.case_id);
 
     if (token_access_level > 2) {
-     return Case.findOne({ where: { case_id: params_case_id } }).then(async cases => {
-        if (!cases){console.log(cases); return res.status(404).send({ msg: 'Case not found.' });}
+      return Case.findOne({ where: { case_id: params_case_id } }).then(async cases => {
+        if (!cases) {
+          console.log(cases);
+          return res.status(404).send({ msg: 'Case not found.' });
+        }
         if (Number(cases.user_id) !== token_user_id) return res.status(401).send({ msg: 'User is unauthorized.' });
 
         let pictures = await Picture.findAll({ where: { case_id: params_case_id } });
@@ -222,7 +225,9 @@ module.exports = {
 
     Case.destroy({ where: { case_id: params_case_id } })
       .then(async result => {
-        console.log(result);
+        if (result === 0) {
+          return res.sendStatus(404);
+        }
         await path_array.forEach(p => {
           unlinkAsync(public_path + p);
         });
@@ -233,24 +238,24 @@ module.exports = {
       });
   },
 
-  getAllCasesInRegionByName: async function(req: Request, res: Response) {
-    if (!req.params || typeof req.params.county_name != 'string' || typeof req.params.region_name != 'string')
+  getAllCasesInRegionByName: function(req: Request, res: Response) {
+    if (
+      !req.params ||
+      !req.params.county_name ||
+      !req.params.region_name ||
+      typeof req.params.county_name != 'string' ||
+      typeof req.params.region_name != 'string'
+    )
       return res.sendStatus(400);
+
     let county_check = { 'Sør-Trøndelag': 'Trøndelag', 'Nord-Trøndelag': 'Trøndelag' };
     let county_name = req.params.county_name;
     if (req.params.county_name in county_check) county_name = county_check[req.params.county_name];
 
-
     let page = 1;
     let limit = 20;
 
-    if(
-      req.query &&
-      req.query.page &&
-      req.query.limit &&
-      Number(req.query.page) > 0 &&
-      Number(req.query.limit) > 0
-    ) {
+    if (req.query && req.query.page && req.query.limit && Number(req.query.page) > 0 && Number(req.query.limit) > 0) {
       page = Number(req.query.page);
       limit = Number(req.query.limit);
     }
@@ -262,6 +267,7 @@ module.exports = {
         type: sequelize.QueryTypes.SELECT
       })
       .then(async cases => {
+        console.log(cases);
         const out = cases.map(async c => {
           let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
           c.img = pictures.map(img => img.path);
@@ -274,7 +280,7 @@ module.exports = {
       });
   },
   getAllCasesInRegionById: async function(req: Request, res: Response) {
-    if (!req.params || typeof Number(req.params.region_id) != 'number') return res.sendStatus(400);
+    if (!req.params || isNaN(Number(req.params.region_id))) return res.sendStatus(400);
 
     sequelize
       .query(rawQueryCases + ' WHERE c.region_id = ? ' + casesOrder, {
@@ -297,7 +303,7 @@ module.exports = {
     if (
       !req.token ||
       !req.params.user_id ||
-      typeof Number(req.params.user_id) !== 'number' ||
+      isNaN(Number(req.params.user_id)) ||
       typeof req.token !== 'string'
     )
       return res.sendStatus(400);
@@ -331,13 +337,7 @@ module.exports = {
     let page = 1;
     let limit = 20;
 
-    if(
-      req.query &&
-      req.query.page &&
-      req.query.limit &&
-      Number(req.query.page) > 0 &&
-      Number(req.query.limit) > 0
-    ) {
+    if (req.query && req.query.page && req.query.limit && Number(req.query.page) > 0 && Number(req.query.limit) > 0) {
       page = Number(req.query.page);
       limit = Number(req.query.limit);
     }
@@ -353,7 +353,10 @@ module.exports = {
           'OR cg.name LIKE ? ' +
           casesOrder +
           ' LIMIT ?,?;',
-        { replacements: [search, search, search, search, search, start_limit, limit], type: sequelize.QueryTypes.SELECT }
+        {
+          replacements: [search, search, search, search, search, start_limit, limit],
+          type: sequelize.QueryTypes.SELECT
+        }
       )
       .then(async cases => {
         const out = cases.map(async c => {
