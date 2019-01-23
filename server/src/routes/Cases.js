@@ -1,12 +1,13 @@
 // @flow
 
-import { Case, sequelize } from '../models.js';
+import { Case, User, sequelize } from '../models.js';
 import { reqAccessLevel, verifyToken } from '../auth';
 import { Case_subscriptions, Picture } from '../models';
 import { promisify } from 'util';
 import path from 'path';
 import { regexNames } from '../utils/Regex';
 import { duplicateCheck } from '../utils/DuplicateChecker';
+import Epost from '../utils/Epost';
 const fs = require('fs');
 const unlinkAsync = promisify(fs.unlink);
 
@@ -112,6 +113,10 @@ module.exports = {
         } else {
           return res.send(newCase);
         }
+      })
+      .then(async () => {
+        let user = await User.findOne({ where: { user_id: user_id }, attributes: ['email']});
+        Epost.send_email(user.email, 'Ny sak opprettet', `Saken din "${req.body.title}" ble opprettet. Du kan følge med på saken din på nettsida. \n\nMvh. Hverdagshelt Team 6`);
       })
       .catch(error => {
         return res.status(500).send(error);
