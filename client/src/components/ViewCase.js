@@ -56,6 +56,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   fetchButton: HTMLButtonElement = null;
   fileTypes: string[] = ['image/jpeg', 'image/jpg', 'image/png'];
   imgSync: boolean = false;
+  loggedIn: boolean = false;
 
   render() {
     if (!this.case || !this.statusComment) {
@@ -67,9 +68,11 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     return (
       <div className={'modal-body row'}>
         <div className={'col-md-6'}>
-          <button className={this.getSubscriptionButtonStyles(this.case)} onClick={this.onClickSubscribeButton}>
-            Abonner
-          </button>
+          {this.loggedIn ? (
+            <button className={this.getSubscriptionButtonStyles(this.case)} onClick={this.onClickSubscribeButton}>
+              Abonner
+            </button>
+          ) : null}
           <form
             ref={e => {
               this.form = e;
@@ -108,8 +111,8 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             </table>
             <h3>Beskrivelse</h3>
             {this.case.description ? <p>{this.case.description}</p> : <p>INGEN BESKRIVELSE GITT</p>}
-            {privilege <= OWNER_EMPLOYEE ||
-            (this.case.status_id === STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE) ? (
+            {(privilege <= OWNER_EMPLOYEE && this.loggedIn) ||
+            (this.case.status_id === STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE && this.loggedIn) ? (
               <section>
                 <h2>Oppdater sak</h2>
                 <div className={'form-group'}>
@@ -284,6 +287,13 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     let stat = new StatusService();
     let cat = new CategoryService();
     let cassub = new CaseSubscriptionService();
+    let login = new LoginService();
+    login
+      .isLoggedIn()
+      .then(e => (this.loggedIn = e))
+      .catch((err: Error) => {
+        console.log('User is not logged in. this.loggedIn remains false.');
+      });
     cas
       .getCase(this.props.match.params.case_id)
       .then((c: Case) => {
@@ -330,19 +340,71 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       })
       .then(() => this.fetchStatusComments())
       .then(() => {
-        let sub = new CaseSubscriptionService();
-        sub
-          .getAllCaseSubscriptions(this.case.user_id)
-          .then(e => {
-            this.subscription = e.find(e => e.case_id === this.case.case_id);
-          })
-          .catch((err: Error) => {
-            console.log('Could not load categories.');
-            Notify.danger(
-              'Klarte ikke å hente abbonnementene dine, vi får derfor ikke til å vise om du allerede er abonnement på denne saken eller ikke. Du kan likevel trykke på abonnerknappen for å enten legge til eller slette abonnement. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
-                err.message
-            );
-          });
+        if (this.loggedIn) {
+          let sub = new CaseSubscriptionService();
+          sub
+            .getAllCaseSubscriptions(ToolService.getUserId())
+            .then(e => {
+              this.subscription = e.find(e => e.case_id === this.case.case_id);
+              if (this.subscription) {
+                if (!this.subscription.is_up_to_date) {
+                  let sub: CaseSubscription = new CaseSubscription(
+                    ToolService.getUserId(),
+                    this.case.case_id,
+                    null,
+                    true
+                  );
+                  cassub
+                    .updateCaseSubscription(sub)
+                    .then(() => {
+                      console.log('Case with id ' + this.case.case_id + ' has been set up to date.');
+                    })
+                    .catch((err: Error) => {
+                      console.log('Could not set CaseSubscription is_up_to_date.');
+                    });
+                } else {
+                  let userObj: User = ToolService.getUser();
+                  if (userObj) {
+                    console.log(
+                      'Case with id ' +
+                        this.case.case_id +
+                        ' is already up to date for user ' +
+                        userObj.firstname +
+                        ' ' +
+                        userObj.lastname +
+                        ' (id = ' +
+                        userObj.user_id +
+                        ').'
+                    );
+                  }
+                }
+              } else {
+                let userObj: User = ToolService.getUser();
+                if (userObj) {
+                  console.log(
+                    'Case with id ' +
+                      this.case.case_id +
+                      ' is not subscribed to user ' +
+                      userObj.firstname +
+                      ' ' +
+                      userObj.lastname +
+                      ' (id = ' +
+                      userObj.user_id +
+                      ').'
+                  );
+                } else {
+                  console.log('Could not load user object from local storage.');
+                }
+              }
+            })
+            .catch((err: Error) => {
+              console.log('Could not load categories.');
+              Notify.danger(
+                'Klarte ikke å hente abbonnementene dine, vi får derfor ikke til å vise om du allerede er abonnement på denne saken eller ikke. Du kan likevel trykke på abonnerknappen for å enten legge til eller slette abonnement. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+                  err.message
+              );
+            });
+        }
       })
       .then(() => {
         if (this.grantAccess() <= OWNER_EMPLOYEE) {
@@ -379,28 +441,6 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               'Klarte ikke å hente statuser. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
                 err.message
             );
-          });
-      })
-      .then(() => {
-        let login = new LoginService();
-        login
-          .isLoggedIn()
-          .then(e => {
-            if (e) {
-              // TODO Sjekk om vi kan sende notify by email som null/undefined slik at vi slipper å spørre om tilstanden til ett subscriptionobjekt
-              let sub: CaseSubscription = new CaseSubscription(ToolService.getUserId(), this.case.case_id, null, true);
-              cassub
-                .updateCaseSubscription(sub)
-                .then(() => {
-                  console.log('Case with id ' + this.case.case_id + ' has been set up to date.');
-                })
-                .catch((err: Error) => {
-                  console.log('Could not set CaseSubscription is_up_to_date.');
-                });
-            }
-          })
-          .catch((err: Error) => {
-            console.log('User is not logged in. No need to set subscription state.');
           });
       })
       .catch((err: Error) => {
@@ -450,6 +490,15 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
 
   isSubscribed(c: Case) {
     if (this.subscription) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  isLoggedIn() {
+    let token = localStorage.getItem('token');
+    if (token) {
       return true;
     } else {
       return false;

@@ -729,6 +729,7 @@ class NewCase extends Component {
                       }
                     })
                     .catch((err: Error) => {
+                      console.log("Failed region matching.");
                       this.error=<Alert
                         type='danger'
                         text={'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente kommunedata. Vennligst prøv igjen. \n\nFeilmelding: ' +
@@ -741,6 +742,7 @@ class NewCase extends Component {
                       return false;
                     });
                 } else {
+                  console.log("Failed region matching.");
                   this.error=<Alert
                     type='danger'
                     text={'Fylket du trykket på finnes ikke i vår database. Dette kan komme som et resultat av kommunesammenslåing eller at geolokaliseringstjenesten vi benytter ikke bruker samme fylkesdata som oss.'}
