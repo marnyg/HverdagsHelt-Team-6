@@ -22,17 +22,17 @@ class Subscriptions extends Component<{ props: { region_id: number }  }> {
     regions = [];
     regionCases = [];
     user = JSON.parse(localStorage.getItem('user'));
+    frase = null;
 
     render() {
       if (this.subscriptions.length === 0 && this.subRegionCases().length === 0) {
           return <div className = 'mt-4 ml-4'>
             <h1>Du har foreløpig ingen saks-abonnementer.</h1>
             <p>For å opprette et abonnement på en sak, trykk på den blå klokken,
-            nederst i høyre hjørne av en sak</p>
+            nederst i høyre hjørne av en sak. Saken vil da dukke opp under denne menyen</p>
           </div>
-      } else {
-        
       }
+
 
         return(
             <div className={'mycarousel-wrapper'}>
@@ -57,6 +57,14 @@ class Subscriptions extends Component<{ props: { region_id: number }  }> {
                 </div>
                 <h1 className={'ml-5'}>Saker fra abonnerende kommuner:</h1>
                 <div className={'mycarousel'}>
+                {this.subRegionCases().length === 0 ?
+                  <div className = 'mt-4 ml-4'>
+                    <h3>Du har foreløpig ingen kommune-abonnementer.</h3>
+                    <p>For å opprette et abonnement på en kommune, gå til Min side etterfulgt av Mine kommuner.
+                    Du vil her kunne velge hvilke kommuner du ønsker å følge. Sakene for de respektive kommunene vil
+                    da dukke opp under denne menyen</p>
+                  </div>
+                  : null}
                     {this.subRegionCases().map(e => {
                         return (
                             <div className='mycarousel-row'>

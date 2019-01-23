@@ -1,3 +1,5 @@
+//@flow
+
 import * as React from 'react';
 import { Component } from 'react-simplified';
 import { withRouter } from 'react-router-dom';
@@ -21,12 +23,7 @@ class LoginModal extends Component {
                 <div className="modal-dialog">
                     <div className="loginmodal-container modal-content">
                         <h1>Logg inn</h1><br/>
-                        {this.error ?
-                            <Alert
-                              type='danger'
-                              text='Brukernavn eller passord er feil'
-                            />
-                            :null}
+                        {this.error}
                         <input type="text" name="user" placeholder="Epost" onKeyPress={this.keyCheck} onChange={this.emailChange}></input>
                         <input type="password" name="pass" placeholder="Passord" onKeyPress={this.keyCheck} onChange={this.pwChange}></input>
                         <input name="login" className="btn btn-primary" value="Login" onChange={this.submit} onClick={this.submit}></input>
@@ -59,14 +56,20 @@ class LoginModal extends Component {
                     this.props.onLogin();
                 })
                 .catch((error: Error) => {
-                    this.error = {
-                        message: 'Brukernavn og/eller passord er feil'
-                    };
+                    this.error = <Alert
+                      type='danger'
+                      text='Brukernavn og/eller passord er feil'
+                    />
+
+
                 });
         } else {
-            this.error = {
-              message: 'Du må fylle inn begge feltene for å sende skjemaet'
-            };
+            this.error = <Alert
+              type='danger'
+              text='Du må fylle inn begge feltene for å sende skjemaet'
+            />
+            
+
         }
     }
 
