@@ -15,7 +15,6 @@ import CaseService from '../services/CaseService.js';
 import Notify from './Notify.js';
 import CaseItem from './CaseItem';
 
-
 class Subscriptions extends Component<{ props: { region_id: number }  }> {
     sub_temp = [];
     subscriptions = [];
