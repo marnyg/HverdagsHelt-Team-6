@@ -1,12 +1,13 @@
 // @flow
 
-import { Case, sequelize } from '../models.js';
+import { Case, User, sequelize } from '../models.js';
 import { reqAccessLevel, verifyToken } from '../auth';
 import { Case_subscriptions, Picture } from '../models';
 import { promisify } from 'util';
 import path from 'path';
 import { regexNames } from '../utils/Regex';
 import { duplicateCheck } from '../utils/DuplicateChecker';
+import Epost from '../utils/Epost';
 const fs = require('fs');
 const unlinkAsync = promisify(fs.unlink);
 
@@ -123,6 +124,10 @@ module.exports = {
         } else {
           return res.send(newCase);
         }
+      })
+      .then(async () => {
+        let user = await User.findOne({ where: { user_id: user_id }, attributes: ['email']});
+        Epost.send_email(user.email, 'Ny sak opprettet', `Saken din "${req.body.title}" ble opprettet. Du kan følge med på saken din på nettsida. \n\nMvh. Hverdagshelt Team 6`);
       })
       .catch(error => {
         return res.status(500).send(error);
@@ -261,17 +266,10 @@ module.exports = {
     let county_name = req.params.county_name;
     if (req.params.county_name in county_check) county_name = county_check[req.params.county_name];
 
-
     let page = 1;
     let limit = 20;
 
-    if(
-      req.query &&
-      req.query.page &&
-      req.query.limit &&
-      Number(req.query.page) > 0 &&
-      Number(req.query.limit) > 0
-    ) {
+    if (req.query && req.query.page && req.query.limit && Number(req.query.page) > 0 && Number(req.query.limit) > 0) {
       page = Number(req.query.page);
       limit = Number(req.query.limit);
     }
@@ -352,13 +350,7 @@ module.exports = {
     let page = 1;
     let limit = 20;
 
-    if(
-      req.query &&
-      req.query.page &&
-      req.query.limit &&
-      Number(req.query.page) > 0 &&
-      Number(req.query.limit) > 0
-    ) {
+    if (req.query && req.query.page && req.query.limit && Number(req.query.page) > 0 && Number(req.query.limit) > 0) {
       page = Number(req.query.page);
       limit = Number(req.query.limit);
     }
@@ -374,7 +366,10 @@ module.exports = {
           'OR cg.name LIKE ? ' +
           casesOrder +
           ' LIMIT ?,?;',
-        { replacements: [search, search, search, search, search, start_limit, limit], type: sequelize.QueryTypes.SELECT }
+        {
+          replacements: [search, search, search, search, search, start_limit, limit],
+          type: sequelize.QueryTypes.SELECT
+        }
       )
       .then(async cases => {
         const out = cases.map(async c => {
