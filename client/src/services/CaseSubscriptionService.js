@@ -12,7 +12,7 @@ class CaseSubscriptionService {
       let loginService = new LoginService();
       loginService
         .isLoggedIn()
-        .then((logged_in: Boolean) => {
+        .then((logged_in: boolean) => {
           if (logged_in === true) {
             let token = localStorage.getItem('token');
             if (token) {
@@ -43,7 +43,7 @@ class CaseSubscriptionService {
       let loginService = new LoginService();
       loginService
         .isLoggedIn()
-        .then((logged_in: Boolean) => {
+        .then((logged_in: boolean) => {
           if (logged_in === true) {
             let token = localStorage.getItem('token');
             if (token) {
@@ -73,7 +73,7 @@ class CaseSubscriptionService {
       let loginService = new LoginService();
       loginService
         .isLoggedIn()
-        .then((logged_in: Boolean) => {
+        .then((logged_in: boolean) => {
           if (logged_in === true) {
             let token = localStorage.getItem('token');
             if (token) {
@@ -105,7 +105,7 @@ class CaseSubscriptionService {
       let loginService = new LoginService();
       loginService
         .isLoggedIn()
-        .then((logged_in: Boolean) => {
+        .then((logged_in: boolean) => {
           if (logged_in === true) {
             let token = localStorage.getItem('token');
             if (token) {
@@ -135,7 +135,7 @@ class CaseSubscriptionService {
       let loginService = new LoginService();
       loginService
         .isLoggedIn()
-        .then((logged_in: Boolean) => {
+        .then((logged_in: boolean) => {
           if (logged_in === true) {
             let token = localStorage.getItem('token');
             if (token) {
@@ -163,7 +163,7 @@ class CaseSubscriptionService {
       let loginService = new LoginService();
       loginService
         .isLoggedIn()
-        .then((logged_in: Boolean) => {
+        .then((logged_in: boolean) => {
           if (logged_in === true) {
             let token = localStorage.getItem('token');
             if (token) {
