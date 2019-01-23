@@ -75,7 +75,7 @@ class NewCase extends Component {
                     }
                     required
                   >
-                    <option value={'.null'} disabled>
+                    <option value={''} >
                       Kategori
                     </option>
                     {this.categories.map(e => (
@@ -664,6 +664,7 @@ class NewCase extends Component {
 
   async validate(index: number): Promise<boolean> {
     if (!this.form.checkValidity()) {
+      this.form.reportValidity()
       console.log('Basic HTML Form validation failed!');
       this.error = <Alert
         type='warning'
