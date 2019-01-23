@@ -28,7 +28,7 @@ module.exports = {
       typeof req.body.email !== 'string' ||
       typeof req.body.password !== 'string' ||
       typeof req.body.region_id !== 'number' ||
-      typeof req.body.region_id !== 'number' ||
+      typeof req.body.role_id !== 'number' ||
       !regexNames.test(req.body.firstname) ||
       !regexNames.test(req.body.lastname) ||
       !regexNumber.test(req.body.tlf) ||
@@ -237,14 +237,29 @@ module.exports = {
 
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(403);
 
+    let page = 1;
+    let limit = 20;
+
+    if(
+      req.query &&
+      req.query.page &&
+      req.query.limit &&
+      Number(req.query.page) > 0 &&
+      Number(req.query.limit) > 0
+    ) {
+      page = Number(req.query.page);
+      limit = Number(req.query.limit);
+    }
+    let start_limit = (page - 1) * limit;
+
     const subscr = { user_id: Number(req.params.user_id) };
     sequelize
       .query(
         'Select sub.region_id, r.name as region_name, sub.notify ' +
           'FROM Region_subscriptions sub JOIN Regions r ON sub.region_id = r.region_id ' +
-          'WHERE sub.user_id = ?;',
+          'WHERE sub.user_id = ? LIMIT ?,?;',
         {
-          replacements: [Number(req.params.user_id)],
+          replacements: [Number(req.params.user_id), start_limit, limit],
           type: sequelize.QueryTypes.SELECT
         }
       )
@@ -253,5 +268,40 @@ module.exports = {
         return res.send(subscr);
       })
       .catch(err => res.status(500).send(err));
+  },
+
+  set_new_password: function(req: Request, res: Response) {
+    if(
+      !req.body ||
+      typeof req.body.email != 'string'
+    ) return res.status(400).send();
+
+    User.findOne( { where: { email: req.body.email } })
+      .then(users => {
+        if(!users) return res.status(404).send({ msg: "Bruker ikke funnet." });
+        const generated_pwd = Math.random().toString(36).slice(-8);
+        const pwd_obj = hashPassword(generated_pwd);
+        const hashed_password = pwd_obj.passwordHash;
+        const salt = pwd_obj.salt;
+
+        User.update(
+          {
+            hashed_password: hashed_password,
+            salt: salt,
+          },
+          { where: { email: req.body.email } }
+        )
+          .then(user => {
+            if(!user) return res.status(404).send();
+            Epost.send_email(req.body.email, "Nytt passord", `Nytt passord: ${generated_pwd}`);
+            return res.status(200).send({ msg: "Nytt passord satt, og epost sendt."});
+          })
+          .catch(error =>{
+            return res.status(500).json(error);
+          })
+      })
+      .catch(error => {
+        return res.status(500).json(error);
+      })
   }
 };

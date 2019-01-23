@@ -2,6 +2,7 @@
 import axios from 'axios';
 import User from '../classes/User.js';
 import LoginService from './LoginService.js';
+import ToolService from "./ToolService";
 
 class UserService {
     getAllUsers(): Promise<User[]> {
@@ -76,7 +77,7 @@ class UserService {
         });
     }
 
-    updateUser(user_id: number, u: User): Promise<any> {
+    updateUser(u: User): Promise<any> {
         if(!u.role_id) {
             u.role_id = -1; // Standard, needed to make user-updates by admin work
         }
@@ -88,7 +89,7 @@ class UserService {
                     if (logged_in === true) {
                         let token = localStorage.getItem('token');
                         axios
-                            .put('/api/users/' + user_id, u, {
+                            .put('/api/users/' + u.user_id, u, {
                                 headers: {
                                     Authorization: 'Bearer ' + token
                                 }
@@ -130,9 +131,35 @@ class UserService {
     //Create user(RIKTIGE PARAMETERE?)
     createUser(u: User): Promise<User> {
         console.log(u);
+        if(!u.role_id){
+            u.role_id = -1;
+        }
         return axios.post('/api/users', u, {
             headers: { 'Content-Type': 'application/json' }
         });
+    }
+
+    createEmployee(u: User): Promise<User> {
+        if(!u.role_id) u.role_id = ToolService.employeeRole();
+        return new Promise(((resolve, reject) => {
+            let loginService = new LoginService();
+            loginService.isLoggedIn()
+                .then((logged_in: Boolean) => {
+                    if(logged_in === true){
+                        let token = localStorage.getItem('token');
+                        axios.post('/api/users', u, {
+                            headers: {
+                                Authorization: 'Bearer ' + token
+                            }
+                        })
+                            .then(response => resolve(response))
+                            .catch((error: Error) => reject(error));
+                    } else {
+                        reject('User is not registered and/or not logged in.');
+                    }
+                })
+                .catch((error: Error) => reject(error));
+        }));
     }
 
     updatePassword(user_id: number, old_password: string, new_password: string): Promise<void> {

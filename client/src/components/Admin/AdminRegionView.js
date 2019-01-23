@@ -10,7 +10,37 @@ import { faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 class AdminRegionView extends Component {
     cases = [];
     render() {
-        if(!this.props.region) return null;
+        if(!this.props.region) {
+            return(
+                <div style={{'maxHeight': '700px'}}>
+                    <div className={'card'}>
+                        <div className={'card-body'}>
+                            <div className={'card-title'}>
+                                <strong>ID: </strong>
+                                <strong className={'ml-3'}>Kommune: </strong>
+                            </div>
+                            <div className={'card-text'}>
+                                <strong>Fylke: </strong>
+                                <div className={'text-muted mt-1'}>
+                                    <strong>Lokasjon:</strong>
+                                    <div className={'ml-3'}>
+                                        Breddegrad:
+                                        <br/>
+                                        Lengdegrad:
+                                    </div>
+                                </div>
+                                <div>
+                                    Antall saker:
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <AdminCaseList cases={this.cases} onCaseSelected={(c) => console.log('case selected')}/>
+                    </div>
+                </div>
+            );
+        }
         this.fetchCases();
         return(
             <div style={{'maxHeight': '700px'}}>

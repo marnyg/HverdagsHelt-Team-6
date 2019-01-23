@@ -16,7 +16,7 @@ class AdminRegions extends Component {
                             <AdminRegionsList onRegionSelected={(region) => this.onRegionSelected(region)}/>
                         </div>
                         <div className={'col-lg'}>
-                            <h2>Diverse</h2>
+                            <h2>Informasjon om kommunen</h2>
                             <AdminRegionView region={this.viewing_region}/>
                         </div>
                     </div>
