@@ -24,6 +24,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Picture from '../classes/Picture';
 import ToolService from '../services/ToolService';
 import CaseSubscription from '../classes/CaseSubscription';
+import Alert from './Alert.js';
 
 const MAX_NUMBER_IMG: number = 3; // Maximum number of images allowed in a single case.
 
@@ -54,6 +55,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   form: HTMLFormElement = null;
   fetchButton: HTMLButtonElement = null;
   fileTypes: string[] = ['image/jpeg', 'image/jpg', 'image/png'];
+  error=null;
 
   render() {
     if (!this.case || !this.statusComment) {
@@ -65,6 +67,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     return (
       <div className={'modal-body row'}>
         <div className={'col-md-6'}>
+        {this.error}
           <form
             ref={e => {
               this.form = e;
@@ -322,7 +325,11 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           this.pos = new Location(a.lat, a.lon, a.region_name, a.county_name, 'Norway');
         } else {
           console.log('Case object was not returned encapsulated in an array. Using this.case = Case[0].');
-          Notify.danger('Saken ble hentet i et ukjent format.');
+          this.error=<Alert
+            type='danger'
+            text='Saken ble hentet i et ukjent format.'
+          />
+          /*Notify.danger('Saken ble hentet i et ukjent format.');*/
         }
       })
       .then(() => this.fetchStatusComments())
@@ -339,11 +346,17 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             })
             .catch((err: Error) => {
               console.log('Could not load statuses.');
-              Notify.danger(
+              this.error=<Alert
+                type='danger'
+                text={'Klarte ikke å hente statuser. ' +
+                  'Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+                  err.message}
+              />
+              /*Notify.danger(
                 'Klarte ikke å hente statuser. ' +
                   'Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
                   err.message
-              );
+              );*/
             });
         }
         cat
@@ -357,10 +370,15 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           })
           .catch((err: Error) => {
             console.log('Could not load categories.');
-            Notify.danger(
+            this.error=<Alert
+              type='danger'
+              text={'Klarte ikke å hente statuser. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+                err.message}
+            />
+            /*Notify.danger(
               'Klarte ikke å hente statuser. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
                 err.message
-            );
+            );*/
           });
       })
       .then(() => {
@@ -387,12 +405,19 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       })
       .catch((err: Error) => {
         console.log('Could not load case with id ' + this.props.match.params.case_id);
-        Notify.danger(
+        this.error=<Alert
+          type='danger'
+          text={'Klarte ikke å hente sak med id ' +
+            this.props.match.params.case_id +
+            '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+            err.message}
+        />
+        /*Notify.danger(
           'Klarte ikke å hente sak med id ' +
             this.props.match.params.case_id +
             '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
             err.message
-        );
+        );*/
       });
   }
 
@@ -493,14 +518,22 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               files.length +
               ' new files.'
           );
-          Notify.warning(
+          this.error=<Alert
+            type='warning'
+            text={'Du kan maksimalt feste ' + MAX_NUMBER_IMG + ' til en sak. Noen bilder må slettes før du kan legge til nye.'}
+          />
+          /*Notify.warning(
             'Du kan maksimalt feste ' + MAX_NUMBER_IMG + ' til en sak. Noen bilder må slettes før du kan legge til nye.'
-          );
+          );*/
         }
       } else {
         // File type not accepted.
         console.warn('File type not accepted.');
-        Notify.warning('Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png.');
+        this.error=<Alert
+          type='warning'
+          text='Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png.'
+        />
+        /*Notify.warning('Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png.');*/
       }
     }
   }
@@ -521,16 +554,28 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       cas
         .deleteCase(this.case.case_id)
         .then(() => {
-          Notify.success('Din sak med id ' + this.case.case_id + ' ble slettet.');
+          this.error=<Alert
+            type='success'
+            text={'Din sak med id ' + this.case.case_id + ' ble slettet.'}
+          />
+          /*Notify.success('Din sak med id ' + this.case.case_id + ' ble slettet.');*/
           this.props.history.goBack();
         })
         .catch((err: Error) => {
           console.log('Could not delete case with id: ' + this.case.case_id, err);
-          Notify.danger('Kunne ikke slette sak med id: ' + this.case.case_id + '. \n\nFeilmelding: ' + err.message);
+          this.error=<Alert
+            type='danger'
+            text={'Kunne ikke slette sak med id: ' + this.case.case_id + '. \n\nFeilmelding: ' + err.message}
+          />
+          /*Notify.danger('Kunne ikke slette sak med id: ' + this.case.case_id + '. \n\nFeilmelding: ' + err.message);*/
         });
     }else{
       console.log("You're not the owner of this case, nor admin! You cannot delete it.");
-      Notify.warning("Du eier ikke denne saken, og kan derfor ikke slette den.");
+      this.error=<Alert
+        type='warning'
+        text="Du eier ikke denne saken, og kan derfor ikke slette den."
+      />
+      /*Notify.warning("Du eier ikke denne saken, og kan derfor ikke slette den.");*/
     }
   }
 
@@ -553,12 +598,19 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       })
       .catch((err: Error) => {
         console.log('Could not load case comments for case with id ' + this.props.match.params.case_id);
-        Notify.danger(
+        this.error=<Alert
+          type='danger'
+          text={'Klarte ikke å hente kommentarer til sak med id ' +
+            this.props.match.params.case_id +
+            '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+            err.message}
+        />
+        /*Notify.danger(
           'Klarte ikke å hente kommentarer til sak med id ' +
             this.props.match.params.case_id +
             '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
             err.message
-        );
+        );*/
       });
   }
 
@@ -570,7 +622,11 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
         return true;
       } else {
         console.log('Failed basic HTML form validation.');
-        Notify.warning('Vennligst fyll inn de påkrevde feltene.');
+        this.error=<Alert
+          type='warning'
+          text='Vennligst fyll inn de påkrevde feltene.'
+        />
+        /*Notify.warning('Vennligst fyll inn de påkrevde feltene.');*/
         return false;
       }
     } else {
@@ -590,7 +646,11 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
         .updateCase(this.case.case_id, this.case)
         .then(() => {
           console.log('Case ' + this.case.case_id + ' was updated.');
-          Notify.success('Sak med id ' + this.case.case_id + ' ble oppdatert.');
+          this.error=<Alert
+            type='success'
+            text={'Sak med id ' + this.case.case_id + ' ble oppdatert.'}
+          />
+          //Notify.success('Sak med id ' + this.case.case_id + ' ble oppdatert.');
           if (this.case.img.length > 0) {
             // Pictures are present
             // TODO Fortsett her
@@ -611,19 +671,29 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               })
               .catch((err: Error) => {
                 console.log('Uploading status comment failed for case ' + this.case.case_id + '. Error: ', err);
-                Notify.danger(
+                this.error=<Alert
+                  type='danger'
+                  text={'1Feil ved opplasting av statuskommentar. Saken har blitt oppdatert, men kommentaren din har ikke blitt lagret. \n\nFeilmelding: ' +
+                    err.message}
+                />
+                /*Notify.danger(
                   'Feil ved opplasting av statuskommentar. Saken har blitt oppdatert, men kommentaren din har ikke blitt lagret. \n\nFeilmelding: ' +
                     err.message
-                );
+                );*/
               });
           }
         })
         .catch((err: Error) => {
           console.log('Updating case ' + this.case.case_id + ' failed. Error: ', err);
-          Notify.danger(
+          this.error=<Alert
+            type='danger'
+            text={'Feil ved opplasting av oppdatert informasjon. Din sak har ikke blitt oppdatert. \n\nFeilmelding: ' +
+              err.message}
+          />
+          /*Notify.danger(
             'Feil ved opplasting av oppdatert informasjon. Din sak har ikke blitt oppdatert. \n\nFeilmelding: ' +
               err.message
-          );
+          );*/
         });
     }
   }

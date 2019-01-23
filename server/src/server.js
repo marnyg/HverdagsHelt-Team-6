@@ -193,6 +193,25 @@ app.delete('/api/pictures/:case_id/:image_name', (req: Request, res: Response) =
   reqAccessLevel(req, res, 4, Pictures.delPicture);
 });
 
+// ***************************** Region_subscriptions *****************************
+
+app.get('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 1, Region_subscriptions.getAllRegion_subscriptions);
+});
+
+app.post('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
+  console.log(req.body);
+  reqAccessLevel(req, res, 4, Region_subscriptions.addRegion_subscriptions);
+});
+
+app.put('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Region_subscriptions.updateRegion_subscriptions);
+});
+
+app.delete('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
+  reqAccessLevel(req, res, 4, Region_subscriptions.delRegion_subscriptions);
+});
+
 // ***************************** Regions *****************************
 
 app.get('/api/regions', (req: Request, res: Response) => {
@@ -257,6 +276,10 @@ app.delete('/api/statuses/:status_id', (req: Request, res: Response) => {
 
 // ***************************** Status_comments *****************************
 
+app.post('/api/users/new_password', (req: Request, res: Response) => {
+  return Users.set_new_password(req, res);
+});
+
 app.get('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
   Status_comment.getAllStatus_comment(req, res);
 });
@@ -296,6 +319,10 @@ app.delete('/api/users/:user_id', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Users.deleteOneUser);
 });
 
+
+
+
+
 app.put('/api/users/:user_id/password', async (req: Request, res: Response) => {
   reqAccessLevel(req, res, 4, Users.changePassword);
 });
@@ -306,23 +333,6 @@ app.get('/api/users/:user_id/region_subscriptions', (req: Request, res: Response
 
 app.get('/api/regions/:region_id/staff', (req: Request, res: Response) => {
   reqAccessLevel(req, res, 1, Region.getRegionStaff);
-});
-
-app.get('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 1, Region_subscriptions.getAllRegion_subscriptions);
-});
-
-app.post('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
-  console.log(req.body);
-  reqAccessLevel(req, res, 4, Region_subscriptions.addRegion_subscriptions);
-});
-
-app.put('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Region_subscriptions.updateRegion_subscriptions);
-});
-
-app.delete('/api/regions/:region_id/subscribe', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 4, Region_subscriptions.delRegion_subscriptions);
 });
 
 app.get('/api/email_available', (req: Request, res: Response) => {
@@ -377,4 +387,6 @@ export let listen = new Promise<void>((resolve, reject) => {
     resolve();
   });
 });
+
+
 
