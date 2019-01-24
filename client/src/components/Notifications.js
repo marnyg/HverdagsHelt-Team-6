@@ -28,7 +28,7 @@ class Notifications extends Component {
                 <p>Alle våre ansatte gjør sitt yttertste for å løse dine saker.
                     Så fort det oppstår endringer i din sak, eller saker du har abonnert på, vil disse dukke opp på denne siden.
                     Vennligst kom tilbake senere.</p>
-                <p><strong>Vi i Hverdagshelter ønsker deg fin dag videre!</strong></p>
+                <p><strong>Vi i Hverdagshelter ønsker deg en fin dag videre!</strong></p>
             </div>
         }
 

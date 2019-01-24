@@ -13,19 +13,30 @@ class ToolService {
   static private_user_role_id = 4;
 
   static getStatusColour(status_id: number) {
-    return statusStyles[status_id + 1];
+    return statusStyles[status_id - 1];
   }
 
   static dateFormat(date: string) {
+    // Format: 1970-01-01T00:00:01.000Z
     if (date) {
-      let a = date.split('.')[0].replace('T', ' ');
-      return a.substr(0, a.length - 3);
+      let d = new Date(date);
+      return (
+        d.getDay() +
+        '. ' +
+        dateMonths[d.getMonth()] +
+        ' ' +
+        d.getFullYear() +
+        ' kl. ' +
+        d.getHours() +
+        ':' +
+        d.getMinutes()
+      );
     } else {
       return 'Fant ikke dato.';
     }
   }
 
-  static employeeRole(){
+  static employeeRole() {
     return 2;
   }
 
@@ -39,8 +50,8 @@ class ToolService {
       return -1;
     }
   }
-  
-  static getUser(): ?User{
+
+  static getUser(): ?User {
     let userString = localStorage.getItem('user');
     if (userString) {
       return JSON.parse(userString);
@@ -50,15 +61,16 @@ class ToolService {
   }
 
   static cleanQueryString(query: string) {
-      let check = {
-          'Nord-Trøndelag': 'Trøndelag',
-          'Sør-Trøndelag': 'Trøndelag',
-          'Øst-Trøndelag': 'Trøndelag',
-          'Vest-Trøndelag': 'Trøndelag'};
-      if(query in check) return check[query];
-      return query;
+    let check = {
+      'Nord-Trøndelag': 'Trøndelag',
+      'Sør-Trøndelag': 'Trøndelag',
+      'Øst-Trøndelag': 'Trøndelag',
+      'Vest-Trøndelag': 'Trøndelag'
+    };
+    if (query in check) return check[query];
+    return query;
 
-      /*
+    /*
       let help = query;
       if(help.split('-').length > 1){
           let part = help.split('-');

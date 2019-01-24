@@ -50,7 +50,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   statusComment: StatusComment = new StatusComment();
   subscription: CaseSubscription = null;
   pos: Location = null;
-  offset: number = 0;
+  pagenumber: number = 1;
   statuses: Status[] = [];
   categories: Category[] = [];
   statusMessages: StatusComment[] = [];
@@ -731,10 +731,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   fetchStatusComments() {
     let cascom = new StatusCommentService();
     cascom
-      .getAllStatusComments(this.props.match.params.case_id)
+      .getAllStatusComments(this.props.match.params.case_id, this.pagenumber, COMMENTS_PER_QUERY)
       .then(e => {
         this.statusMessages.push.apply(this.statusMessages, e);
-        this.offset += e.length;
+        this.pagenumber++;
         if (this.fetchButton && e.length < COMMENTS_PER_QUERY) {
           this.fetchButton.hidden = true;
         }

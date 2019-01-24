@@ -162,6 +162,40 @@ class CaseService {
     });
   }
 
+  //Get all cases given user with offset
+  getAllCasesGivenUser(user_id: number, page: number, items_per_query: number): Promise<Case[]> {
+    return new Promise((resolve, reject) => {
+      let loginService = new LoginService();
+      loginService
+        .isLoggedIn()
+        .then((logged_in: Boolean) => {
+          if (logged_in === true) {
+            let token = localStorage.getItem('token');
+            if (token) {
+              console.log(
+                'Fertching cases for user ' + user_id + ', page ' + page + ' number of cases: ' + items_per_query
+              );
+              axios
+                .get('/api/cases/user_cases/' + user_id + '?page=' + page + '&limit=' + items_per_query, {
+                  headers: {
+                    Authorization: 'Bearer ' + token
+                  }
+                })
+                .then((cases: Case[]) => resolve(cases))
+                .catch((error: Error) => reject(error));
+            } else {
+              reject(
+                'Fant ikke brukerens token. Det kan hende brukeren ikke er logget inn, eller annen feil har oppstått. Prøv å logge ut og inn igjen, og prøv på nytt.'
+              );
+            }
+          } else {
+            reject('User is not logged in');
+          }
+        })
+        .catch((error: Error) => reject(error));
+    });
+  }
+
   //Get cases given region
   getAllCasesGivenRegionId(region_id: number): Promise<Case[]> {
     return new Promise((resolve, reject) => {
@@ -237,7 +271,7 @@ class CaseService {
         .then((logged_in: Boolean) => {
           if (logged_in === true) {
             let token = localStorage.getItem('token');
-            if(token){
+            if (token) {
               let formData = new FormData();
               formData.append('image', picture);
               axios
@@ -249,12 +283,11 @@ class CaseService {
                 })
                 .then(response => resolve(response))
                 .catch((error: Error) => reject(error));
-            }else{
+            } else {
               reject(
                 'Fant ikke brukerens token. Det kan hende brukeren ikke er logget inn, eller annen feil har oppstått. Prøv å logge ut og inn igjen, og prøv på nytt.'
               );
             }
-            
           } else {
             reject('User is not logged in');
           }
