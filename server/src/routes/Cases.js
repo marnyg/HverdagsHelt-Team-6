@@ -287,9 +287,18 @@ module.exports = {
   getAllCasesInRegionById: async function(req: Request, res: Response) {
     if (!req.params || isNaN(Number(req.params.region_id))) return res.sendStatus(400);
 
+    let page = 1;
+    let limit = 20;
+
+    if (req.query && req.query.page && req.query.limit && Number(req.query.page) > 0 && Number(req.query.limit) > 0) {
+      page = Number(req.query.page);
+      limit = Number(req.query.limit);
+    }
+    let offset = (page - 1) * limit;
+
     sequelize
-      .query(rawQueryCases + ' WHERE c.region_id = ? ' + casesOrder, {
-        replacements: [Number(req.params.region_id)],
+      .query(rawQueryCases + ' WHERE c.region_id = ? ' + casesOrder + ' LIMIT ?,?', {
+        replacements: [Number(req.params.region_id), offset, limit],
         type: sequelize.QueryTypes.SELECT
       })
       .then(async cases => {
