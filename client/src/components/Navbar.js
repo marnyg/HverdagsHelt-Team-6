@@ -11,6 +11,7 @@ import User from '../classes/User';
 import ToolService from '../services/ToolService';
 import hverdagsheltLogo from '../../public/hverdagsheltLogo2Trans.png';
 import LoginService from "../services/LoginService";
+import Notify from "./Notify";
 
 const SERVER_IP: string = 'localhost';
 const SERVER_PORT: number = 3000;
@@ -136,17 +137,14 @@ class Navbar extends Component<{ logged_in: boolean }> {
 
     mounted() {
         // Check if user is logged in
-        console.log('Navbar mounted');
         this.logged_in = this.props.logged_in;
         this.setState({
             logged_in: this.props.logged_in
         });
-        this.initSocket();
         let loginService = new LoginService();
         loginService.isLoggedIn()
             .then((logged_in: boolean) => {
                 if(logged_in === true){
-                    console.log('Navbar user is logged in');
                     let user: User = ToolService.getUser();
                     this.fetch_notifications(user, this.countPushNotifications);
                 }
@@ -155,48 +153,22 @@ class Navbar extends Component<{ logged_in: boolean }> {
     }
 
     fetch_notifications(user: User, cb) {
-        console.log('Navbar fetching subscriptions');
         let subscriptionService = new CaseSubscriptionService();
         subscriptionService
             .getAllCaseSubscriptions(user.user_id)
             .then((cs: CaseSubscription[]) => {
-                //this.subscriptions = cs;
+                this.subscriptions = cs;
                 cb(cs);
             })
             .catch((error: Error) => console.error(error));
     }
 
     countPushNotifications(subscriptions: []) {
-        console.log('Before counting notifications:', this.notification_count);
         this.notification_count = 0;
-        let subService = new CaseSubscriptionService();
-        let user: User = ToolService.getUser();
-        subService.getAllOutdatedCaseSubscriptions(user.user_id)
-            .then((subs: CaseSubscription[]) => {
-                console.log('These are the outdated subscriptions:', subs);
-                this.subscriptions = subs;
-            })
-            .catch((error: Error) => console.error(error));
-        /*
-        for (let i = 0; i < subscriptions.length; i++) {
-            if (subscriptions[i].is_up_to_date === false) {
-                this.notification_count++;
-            }
-        }
-        */
-        /*
-        subscriptions.map(e => {
-            if(e.is_up_to_date === false) this.notification_count++;
-        });
-        */
-        console.log('After counting notifications:', this.notification_count);
+        subscriptions.map(e => e.is_up_to_date === false ? this.notification_count++:null);
     }
 
     componentWillReceiveProps(newProps) {
-        console.log('Navbar received props logged_in:', newProps.logged_in);
-        if(this.socket === undefined || this.socket === null) {
-            this.initSocket();
-        }
         if(newProps.logged_in !== this.props.logged_in) {
             this.logged_in = newProps.logged_in;
             this.setState({
@@ -205,6 +177,9 @@ class Navbar extends Component<{ logged_in: boolean }> {
         }
 
         if(this.logged_in === true) {
+            if(this.socket === undefined || this.socket === null) {
+                this.initSocket();
+            }
             let user: User = ToolService.getUser();
             if(user) {
                 this.fetch_notifications(user, this.countPushNotifications);
@@ -262,9 +237,6 @@ class Navbar extends Component<{ logged_in: boolean }> {
     }
 
     onLogin() {
-        if(this.socket === undefined || this.socket === null) {
-            this.initSocket();
-        }
         this.props.onLogin();
     }
 
@@ -283,15 +255,9 @@ class Navbar extends Component<{ logged_in: boolean }> {
         if (json) {
             if (this.subscriptions.length > 0) {
                 let id: number = Number(json.case_id);
+                this.notification_count = 0;
                 if (this.subscriptions.some(e => e.case_id === id)) {
                     this.notification_count++;
-                }
-
-                for (let i = 0; i < this.subscriptions.length; i++) {
-                    if(this.subscriptions[i].case_id === id) {
-                        this.subscriptions[i].is_up_to_date = false;
-                        break;
-                    }
                 }
             }
         } else {
@@ -300,14 +266,28 @@ class Navbar extends Component<{ logged_in: boolean }> {
     }
 
     initSocket() {
-        console.log('initiating socket');
         let socketArgument: string = 'ws://' + SERVER_IP + ':' + SERVER_PORT.toString();
         console.log(socketArgument);
         this.socket = new WebSocket(socketArgument);
         this.socket.onmessage = (msg: MessageEvent) => this.receiveBcast(msg);
         this.socket.onerror = (err: Event) => console.log('WebSocket error:', err);
         this.socket.onopen = (e: Event) => console.log('Connected to ', e);
-        console.log('socket initiated');
+    }
+
+    static onCaseOpened(c) {
+        setTimeout(() => {
+            for (let instance of Navbar.instances()) {
+                for(let sub of instance.subscriptions) {
+                    console.log(sub);
+                    if(sub.case_id === c.case_id) {
+                        instance.subscriptions.splice(instance.subscriptions.indexOf(sub), 1);
+                        instance.countPushNotifications(instance.subscriptions);
+                        break;
+                    }
+                }
+            }
+        });
+
     }
 }
 export default withRouter(Navbar);
