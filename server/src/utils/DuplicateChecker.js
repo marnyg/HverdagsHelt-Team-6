@@ -8,7 +8,6 @@ module.exports = {
   // returns true if it's a duplicate
   duplicateCheck: function(lat: number, lon: number, category_id: number, region_id: number) {
     return new Promise(resolve => {
-      setTimeout(() => {
         Region.findOne({ where: { region_id: region_id } }).then(async region => {
           if (region.lat == lat && region.lon == lon) resolve(false);
           else {
@@ -21,7 +20,6 @@ module.exports = {
             );
           }
         });
-      }, 1000);
     });
   }
 };
