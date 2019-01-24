@@ -21,6 +21,7 @@ import County from '../classes/County';
 import Category from '../classes/Category';
 import User from '../classes/User';
 import Alert from './Alert.js';
+import Loader from 'react-loader-spinner'; //https://www.npmjs.com/package/react-loader-spinner
 
 const MAX_DESCRIPTION_LENGTH: number = 255;
 
@@ -66,7 +67,8 @@ class NewCase extends Component {
               <div className={'form-group'}>
                 <label htmlFor="category">Kategori</label>
                 <select
-                  defaultValue={'.null'}
+                  required
+                  defaultValue={''}
                   className={'form-control'}
                   id={'category'}
                   onChange={(event: SyntheticInputEvent<HTMLSelectElement>) =>
@@ -74,7 +76,7 @@ class NewCase extends Component {
                   }
                   required
                 >
-                  <option value={'.null'} disabled>
+                  <option value={''} disabled>
                     Kategori
                                     </option>
                   {this.categories.map(e => (
@@ -162,16 +164,17 @@ class NewCase extends Component {
               </div>
               <div className={'form-group ml-3 my-3'}>
                 <select
+                  required
                   ref={e => {
                     this.list1 = e;
                   }}
-                  defaultValue={'.null'}
+                  defaultValue={''}
                   className={'form-control mb-3'}
                   id={'last-resort-county'}
                   onChange={this.countyListener}
                   hidden
                 >
-                  <option value={'.null'} disabled>
+                  <option value={''} disabled>
                     Velg fylke
                                     </option>
                   {this.counties.map(e => (
@@ -182,10 +185,11 @@ class NewCase extends Component {
                   ))}
                 </select>
                 <select
+                  required
                   ref={e => {
                     this.list2 = e;
                   }}
-                  defaultValue={'.null'}
+                  defaultValue={''}
                   className={'form-control mb-3'}
                   id={'last-resort-municipality'}
                   onChange={(event: SyntheticEvent<HTMLSelectElement>) => {
@@ -196,7 +200,7 @@ class NewCase extends Component {
                   }}
                   hidden
                 >
-                  <option value={'.null'} disabled>
+                  <option value={''} disabled>
                     Velg kommune
                                     </option>
                   {this.municipalities.map(e => (
@@ -242,7 +246,7 @@ class NewCase extends Component {
               ) : null}
             </form>
             <div>
-              <button className={'btn btn-primary mr-2'} onClick={this.send}>
+              <button ref="sendButton" className={'btn btn-primary mr-2'} onClick={this.send}>
                 Send sak
                             </button>
               <NavLink className={'btn btn-secondary'} exact to="/">
@@ -686,6 +690,7 @@ class NewCase extends Component {
     if (!this.form.checkValidity()) {
       this.form.reportValidity();
       console.log('Basic HTML Form validation failed!');
+      $("#spinner").hide();
       this.error = <Alert type="warning" text="Vennligst fyll in de påkrevde feltene og prøv igjen." />;
       //Notify.warning('Vennligst fyll in de påkrevde feltene og prøv igjen.');
       return false;
@@ -774,12 +779,13 @@ class NewCase extends Component {
 
           if (
             this.list1.selectedIndex !== 0 &&
-            this.list2.selectedIndex !== 0 &&
-            this.case.region_id === this.municipalities[this.list2.selectedIndex - 1].region_id
+            this.list2.selectedIndex !== 0
+            // && this.case.region_id === this.municipalities[this.list2.selectedIndex - 1].region_id
           ) {
             console.log('Last-resort-list validation is valid.');
             return true;
           } else {
+            $("#spinner").hide();
             this.error = (
               <Alert type="danger" text="Vennligst velg et fylke og en kommune hvor saken finner sted og prøv igjen." />
             );
@@ -857,6 +863,7 @@ class NewCase extends Component {
   }
 
   async send() {
+    $("#spinner").show();
     if (this.case && this.form) {
       let index: number = this.radioSelector();
       console.log(index);
@@ -877,6 +884,7 @@ class NewCase extends Component {
           .createCase(this.case, this.case.img)
           .then(e => {
             if (e) {
+              $("#spinner").hide();
               this.error = (
                 <Alert
                   type="success"
@@ -885,8 +893,13 @@ class NewCase extends Component {
               );
               //Notify.success('Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id);
               console.log('Form data transmission success! Case ID: ' + e.case_id);
+
+              $("#spinner").hide();
               this.props.history.push('/case/' + e.case_id);
             } else {
+              $("#spinner").hide();
+
+
               this.error = (
                 <Alert
                   type="danger"
@@ -903,6 +916,7 @@ class NewCase extends Component {
           })
           .catch((err: Error) => {
             if (err.message === 'Request failed with status code 409') {
+              $("#spinner").hide();
               this.error = (
                 <Alert
                   type="warning"
@@ -912,6 +926,7 @@ class NewCase extends Component {
                 />
               );
             } else {
+              $("#spinner").hide();
               this.error = (
                 <Alert
                   type="danger"
@@ -934,7 +949,9 @@ class NewCase extends Component {
         console.log('Form is not valid.');
       }
     } else {
+      $("#spinner").hide();
       this.error = <Alert type="warning" text={'En kritisk feil har oppstått. Vennligst last sida på nytt.'} />;
+      $("#spinner").hide();
       /*Notify.warning('En kritisk feil har oppstått. Vennligst last sida på nytt.');*/
     }
   }
@@ -943,6 +960,9 @@ class NewCase extends Component {
     console.log(this.pos);
     console.log('new pos', newPos);
 
+    $("#spinner").show();
+    this.refs.sendButton.disabled = true
+    this.sen
     this.pos.lon = newPos.lon;
     this.pos.lat = newPos.lat;
     this.case.lat = newPos.lat;
@@ -975,16 +995,23 @@ class NewCase extends Component {
           .getAllRegions()
           .then(e => {
             console.log(e);
+            $("#spinner").hide();
+            console.log(this.refs.sendButton);
+            this.refs.sendButton.disabled = false
+            console.log(this.refs.sendButton);
 
             let region = e.find(e => e.name === this.pos.city);
             if (region) {
               // Region detected by Google Location was found in database
               this.case.region_id = region.region_id;
+
               console.log('This.case.region_id: ' + this.case.region_id + '\nCity/region_name: ' + this.pos.city);
             } else {
               // Region detected by Google Location was not found in database
               // Proceeding to set this.case_region_id = undefined. This'll enable the validate() method to tell the user that automatic positioning failed
               this.case.region_id = undefined;
+              $("#spinner").hide();
+              this.refs.sendButton.disabled = false
               this.error = (
                 <Alert
                   type="warning"
@@ -997,6 +1024,8 @@ class NewCase extends Component {
             }
           })
           .catch((err: Error) => {
+            this.refs.sendButton.disabled = false
+            $("#spinner").hide();
             console.log('Could not load regions from server. Error: ' + err.message);
             throw new Error(
               'Klarte ikke å sammenlikne automatisk posisjon med en kommune. \n\nFeilmelding: ' + err.message
