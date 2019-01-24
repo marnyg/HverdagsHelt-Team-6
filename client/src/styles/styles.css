@@ -1,3 +1,14 @@
+#spinner {
+    display: none;
+    justify-items: center;
+    align-items: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
 .btn:focus,.btn:active{
     outline: none !important;
     -webkit-box-shadow: none;
