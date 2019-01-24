@@ -78,6 +78,18 @@ describe('Create new status', () => {
         done();
       });
   });
+    test('409 status code for POST /api/statuses if status exists', done => {
+        request(application)
+            .post('/api/statuses')
+            .send({
+                name: 'Ny status'
+            })
+            .set('Authorization', `Bearer ${admin_token}`)
+            .then(response => {
+                expect(response.statusCode).toBe(409);
+                done();
+            });
+    });
 });
 
 describe('Update one in statuses', () => {
