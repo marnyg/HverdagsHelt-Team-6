@@ -220,6 +220,7 @@ class NewCase extends Component {
                     hidden
                   />
                 </div>
+                <div>Fixbranch</div>
             </div>
             <div className="col-md-6 embed-responsive">
               <GoogleApiWrapper
