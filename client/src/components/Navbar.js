@@ -17,9 +17,10 @@ const SERVER_PORT: number = 3000;
 
 class Navbar extends Component<{ logged_in: boolean }> {
     notification_count: number = 0;
-    notifications: CaseSubscription[] = [];
+    subscriptions: CaseSubscription[] = [];
     search: string = '';
     socket: WebSocket = null;
+    logged_in: boolean = false;
 
     constructor() {
         super();
@@ -35,7 +36,7 @@ class Navbar extends Component<{ logged_in: boolean }> {
                     Registrer sak
                 </div>
             );
-        } else if (this.props.logged_in === false) {
+        } else if (this.logged_in === false) {
             loginlink = (
                 <div className="nav-link" style={{ cursor: 'pointer' }} data-toggle="modal" data-target="#login-modal">
                     Registrer sak
@@ -50,7 +51,7 @@ class Navbar extends Component<{ logged_in: boolean }> {
         }
         return (
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
-                {this.props.logged_in ? (
+                {this.logged_in ? (
                     <NavLink to={'/'} className="navbar-left">
                         <img src={hverdagsheltLogo} height={29.7} width={185} />
                         <sup className="badge badge-primary mobile-notification">
@@ -84,14 +85,14 @@ class Navbar extends Component<{ logged_in: boolean }> {
 
                         <li className="nav-item">{loginlink}</li>
                         <li className="nav-item">
-                            {this.props.logged_in ? (
+                            {this.logged_in ? (
                                 <NavLink to="/subscriptions" className="nav-link">
                                     Abonnement
                                 </NavLink>
                             ) : null}
                         </li>
                         <li className="nav-item">
-                            {this.props.logged_in ? (
+                            {this.logged_in ? (
                                 <NavLink to="/notifications" className="nav-link">
                                     Varsler{' '}
                                     <sup className="badge badge-primary">
@@ -135,41 +136,80 @@ class Navbar extends Component<{ logged_in: boolean }> {
 
     mounted() {
         // Check if user is logged in
+        console.log('Navbar mounted');
+        this.logged_in = this.props.logged_in;
+        this.setState({
+            logged_in: this.props.logged_in
+        });
+        this.initSocket();
         let loginService = new LoginService();
         loginService.isLoggedIn()
             .then((logged_in: boolean) => {
                 if(logged_in === true){
-                    let subscriptionService = new CaseSubscriptionService();
+                    console.log('Navbar user is logged in');
                     let user: User = ToolService.getUser();
-                    subscriptionService
-                        .getAllCaseSubscriptions(user.user_id)
-                        .then((cs: CaseSubscription[]) => {
-                            for (let i = 0; i < cs.length; i++) {
-                                if (cs[i].is_up_to_date === false) {
-                                    this.notification_count++;
-                                }
-                            }
-                            this.notifications = cs;
-                            this.initSocket();
-                        })
-                        .catch((error: Error) => console.error(error));
+                    this.fetch_notifications(user, this.countPushNotifications);
                 }
             })
             .catch((error: Error) => console.error(error));
-        if (this.props.logged_in) {
-            // get notifications
-        } /*
-    if(this.notifications.length > 0){
-      let socketArgument: string = 'ws://' + SERVER_IP + ':' + SERVER_PORT.toString();
-      console.log(socketArgument);
-      this.socket = new WebSocket(socketArgument);
-      this.socket.onmessage = (msg: MessageEvent) => this.receiveBcast(msg);
-      this.socket.onerror = (err: Event) => console.log('WebSocket error:', err);
-      this.socket.onopen = (e: Event) => console.log('Connected to ', e);
-      // Ref: https://github.com/facebook/flow/blob/v0.87.0/lib/bom.js#L484
-    }*/
+    }
 
-        // Ref: https://github.com/facebook/flow/blob/v0.87.0/lib/bom.js#L484
+    fetch_notifications(user: User, cb) {
+        console.log('Navbar fetching subscriptions');
+        let subscriptionService = new CaseSubscriptionService();
+        subscriptionService
+            .getAllCaseSubscriptions(user.user_id)
+            .then((cs: CaseSubscription[]) => {
+                //this.subscriptions = cs;
+                cb(cs);
+            })
+            .catch((error: Error) => console.error(error));
+    }
+
+    countPushNotifications(subscriptions: []) {
+        console.log('Before counting notifications:', this.notification_count);
+        this.notification_count = 0;
+        let subService = new CaseSubscriptionService();
+        let user: User = ToolService.getUser();
+        subService.getAllOutdatedCaseSubscriptions(user.user_id)
+            .then((subs: CaseSubscription[]) => {
+                console.log('These are the outdated subscriptions:', subs);
+                this.subscriptions = subs;
+            })
+            .catch((error: Error) => console.error(error));
+        /*
+        for (let i = 0; i < subscriptions.length; i++) {
+            if (subscriptions[i].is_up_to_date === false) {
+                this.notification_count++;
+            }
+        }
+        */
+        /*
+        subscriptions.map(e => {
+            if(e.is_up_to_date === false) this.notification_count++;
+        });
+        */
+        console.log('After counting notifications:', this.notification_count);
+    }
+
+    componentWillReceiveProps(newProps) {
+        console.log('Navbar received props logged_in:', newProps.logged_in);
+        if(this.socket === undefined || this.socket === null) {
+            this.initSocket();
+        }
+        if(newProps.logged_in !== this.props.logged_in) {
+            this.logged_in = newProps.logged_in;
+            this.setState({
+                logged_in: newProps.logged_in
+            });
+        }
+
+        if(this.logged_in === true) {
+            let user: User = ToolService.getUser();
+            if(user) {
+                this.fetch_notifications(user, this.countPushNotifications);
+            }
+        }
     }
 
     submitSearch(event) {
@@ -180,7 +220,7 @@ class Navbar extends Component<{ logged_in: boolean }> {
     }
 
     logincheck() {
-        if (this.props.logged_in) {
+        if (this.logged_in) {
             return (
                 <ul className="navbar-nav">
                     <li className="nav-item">
@@ -229,20 +269,29 @@ class Navbar extends Component<{ logged_in: boolean }> {
     }
 
     logout(event) {
-        this.socket.onclose = function() {
-            console.log('socket closing');
-        };
-        this.socket.close();
+        if(this.socket !== undefined && this.socket !== null) {
+            this.socket.onclose = function() {
+                console.log('socket closing');
+            };
+            this.socket.close();
+        }
         this.props.logout(event);
     }
 
     receiveBcast(message: MessageEvent) {
         let json = JSON.parse(message.data);
         if (json) {
-            if (this.notifications.length > 0) {
+            if (this.subscriptions.length > 0) {
                 let id: number = Number(json.case_id);
-                if (this.notifications.some(e => e.case_id === id)) {
+                if (this.subscriptions.some(e => e.case_id === id)) {
                     this.notification_count++;
+                }
+
+                for (let i = 0; i < this.subscriptions.length; i++) {
+                    if(this.subscriptions[i].case_id === id) {
+                        this.subscriptions[i].is_up_to_date = false;
+                        break;
+                    }
                 }
             }
         } else {

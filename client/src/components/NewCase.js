@@ -220,28 +220,6 @@ class NewCase extends Component {
                     hidden
                   />
                 </div>
-                {this.case.img.length < 3 ? (
-                  <div className={'form-group'}>
-                    <label htmlFor={'image-input'}>Legg ved bilder</label>
-                    <input
-                      className={'form-control-file'}
-                      id={'image-inpu'}
-                      type={'file'}
-                      accept={'.png, .jpg, .jpeg'}
-                      onChange={this.fileInputListener}
-                      multiple
-                    />
-                  </div>
-                ) : null}
-              </form>
-              <div>
-                <button className={'btn btn-primary mr-2'} onClick={this.send}>
-                  Send sak
-                </button>
-                <NavLink className={'btn btn-secondary'} exact to="/">
-                  Avbryt
-                </NavLink>
-              </div>
             </div>
             <div className="col-md-6 embed-responsive">
               <GoogleApiWrapper
@@ -411,9 +389,6 @@ class NewCase extends Component {
             // Last resort list
             return 2;
         }
-      } else {
-        return -1;
-      }
     }
   }
 
@@ -438,19 +413,18 @@ class NewCase extends Component {
           this.pos = e;
           this.markerPos = e;
         }
-      })
-      // TODO Tar ikke hensyn til to Bø kommuner!!!
-      .then(() => {
-        let reg = new RegionService();
-        reg
-          .getAllRegions()
-          .then(e => {
-            let region = e.find(e => e.name === this.pos.city);
+    }
 
-            if (region) {
-              // Region detected by Google Location was found in database
-              this.case.region_id = region.region_id;
-              console.log('This.case.region_id: ' + this.case.region_id + '\nCity/region_name: ' + this.pos.city);
+    radio3() {
+        // Last resort list location selection
+        if (this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
+            this.isMapClickable = false;
+            console.log(JSON.stringify(this.pos));
+            if (this.list1.selectedIndex === 0) {
+                this.list1.hidden = false;
+            } else if (this.list2.selectedIndex === 0) {
+                this.list1.hidden = false;
+                this.list2.hidden = false;
             } else {
               // Region detected by Google Location was not found in database
               // Proceeding to set this.case_region_id = undefined. This'll enable the validate() method to tell the user that automatic positioning failed
@@ -604,7 +578,6 @@ class NewCase extends Component {
           }
         });
     }
-  }
 
   resetMunicipalityList() {
     if (this.list2 instanceof HTMLSelectElement) {
@@ -644,21 +617,14 @@ class NewCase extends Component {
         /*Notify.warning('Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png.');*/
       }
     }
-  }
 
-  fileInputDeleteImage(event: SyntheticInputEvent<HTMLInputElement>, src) {
-    this.case.img = this.case.img.filter(e => e.src !== src);
-    console.log('Deleting image file with src = ' + src);
-  }
+    fileInputListener(event: SyntheticInputEvent<HTMLInputElement>) {
+        let files = Array.from(event.target.files);
+        console.log('Files in file-input:', files);
 
-  getRegionId(name: string) {
-    let service = new RegionService();
-    service
-      .getAllRegions()
-      .then(e => {
-        let region = e.find(j => j.region_name === name);
-        if (region) {
-          return region.region_id;
+        if (files.length === 0) {
+            // No files were selected. No changes committed.
+            console.log('No files were selected.');
         } else {
           this.error = <Alert type="danger" text="Ingen kommuner passer ditt valg." />;
           /*Notify.danger('Ingen kommuner passer ditt valg.');*/
@@ -693,8 +659,10 @@ class NewCase extends Component {
       return false;
     }
 
-    console.log('Basic HTML Form validation passed!');
-    console.log(this.pos, this.case, this.list1, this.list2);
+    fileInputDeleteImage(event: SyntheticInputEvent<HTMLInputElement>, src) {
+        this.case.img = this.case.img.filter(e => e.src !== src);
+        console.log('Deleting image file with src = ' + src);
+    }
 
     if (this.list1 && this.list2 && this.pos) {
       console.log(index);

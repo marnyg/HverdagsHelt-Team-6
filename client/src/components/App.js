@@ -89,13 +89,13 @@ class App extends Component {
         userService.logout()
             .then(res => {
                 this.logged_in = false;
-                console.log('Loggin out');
+                console.log('App logging out');
             })
             .catch((error: Error) => console.error(error));
     }
 
     onLogin = () => {
-        console.log('Logged in');
+        console.log('App Logged in');
         this.logged_in = true;
     }
 }

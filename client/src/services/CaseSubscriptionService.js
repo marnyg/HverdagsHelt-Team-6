@@ -100,6 +100,7 @@ class CaseSubscriptionService {
   }
 
   updateCaseSubscription(subscription: CaseSubscription): Promise<any> {
+      console.log('UPDATING CASE SUBSCRIPTION');
     //axios.put('/api/cases/' + case_id + '/subscribe');
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
