@@ -33,12 +33,12 @@ let rawQueryCases =
 let casesOrder = 'ORDER BY c.updatedAt DESC';
 
 module.exports = {
-    /**
-     * Get all cases
-     * @param req Request
-     * @param res Response
-     * @returns {Promise<void>}
-     */
+  /**
+   * Get all cases
+   * @param req Request
+   * @param res Response
+   * @returns {Promise<void>}
+   */
   getAllCases: async function(req: Request, res: Response) {
     let page = 1;
     let limit = 20;
@@ -50,11 +50,10 @@ module.exports = {
     let offset = (page - 1) * limit;
 
     sequelize
-      .query(rawQueryCases + casesOrder + ' LIMIT ?,?',
-        {
-          replacements: [offset, limit],
-          type: sequelize.QueryTypes.SELECT
-        })
+      .query(rawQueryCases + casesOrder + ' LIMIT ?,?', {
+        replacements: [offset, limit],
+        type: sequelize.QueryTypes.SELECT
+      })
       .then(async cases => {
         const out = cases.map(async c => {
           let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
@@ -67,12 +66,12 @@ module.exports = {
         return res.status(500).send(err);
       });
   },
-    /**
-     * Creates a new case
-     * @param req Request
-     * @param res Response
-     * @returns {Promise<Case>}
-     */
+  /**
+   * Creates a new case
+   * @param req Request
+   * @param res Response
+   * @returns {Promise<Case>}
+   */
   createNewCase: async function(req: Request, res: Response) {
     reqAccessLevel(req, res, 4, () => true);
     if (
@@ -139,19 +138,25 @@ module.exports = {
         }
       })
       .then(async () => {
-        let user = await User.findOne({ where: { user_id: user_id }, attributes: ['email']});
-        Epost.send_email(user.email, 'Ny sak opprettet', `Saken din "${req.body.title}" ble opprettet. Du kan følge med på saken din på nettsida. \n\nMvh. Hverdagshelt Team 6`);
+        let user = await User.findOne({ where: { user_id: user_id }, attributes: ['email'] });
+        Epost.send_email(
+          user.email,
+          'Ny sak opprettet',
+          `Saken din "${
+            req.body.title
+          }" ble opprettet. Du kan følge med på saken din på nettsida. \n\nMvh. Hverdagshelt Team 6`
+        );
       })
       .catch(error => {
         return res.status(500).send(error);
       });
   },
-    /**
-     * Gets one case, for given case_id
-     * @param req Request
-     * @param res Response
-     * @returns {Promise<Response>}
-     */
+  /**
+   * Gets one case, for given case_id
+   * @param req Request
+   * @param res Response
+   * @returns {Promise<Response>}
+   */
   getOneCase: async function(req: Request, res: Response) {
     if (!req.params || isNaN(Number(req.params.case_id))) return res.sendStatus(400);
     sequelize
@@ -168,12 +173,12 @@ module.exports = {
         return res.status(500).send(err);
       });
   },
-    /**
-     * Updates one case
-     * @param req Request
-     * @param res Response
-     * @returns {Case}
-     */
+  /**
+   * Updates one case
+   * @param req Request
+   * @param res Response
+   * @returns {Case}
+   */
   updateCase: function(req: Request, res: Response) {
     if (
       !req.body ||
@@ -215,12 +220,12 @@ module.exports = {
         else return res.status(500).send(error.message);
       });
   },
-    /**
-     * Deletes one case
-     * @param req Request
-     * @param res Response
-     * @returns {Promise<*>}
-     */
+  /**
+   * Deletes one case
+   * @param req Request
+   * @param res Response
+   * @returns {Promise<*>}
+   */
   deleteCase: async function(req: Request, res: Response) {
     if (
       !req.token ||
@@ -281,12 +286,12 @@ module.exports = {
         return res.status(500).send(error);
       });
   },
-    /**
-     * Gets all cases with given region name
-     * @param req Request
-     * @param res Response
-     * @returns {Case}
-     */
+  /**
+   * Gets all cases with given region name
+   * @param req Request
+   * @param res Response
+   * @returns {Case}
+   */
   getAllCasesInRegionByName: function(req: Request, res: Response) {
     if (
       !req.params ||
@@ -328,12 +333,12 @@ module.exports = {
         return res.status(500).send(err);
       });
   },
-    /**
-     * Gets all cases with given region_id
-     * @param req Request
-     * @param res Response
-     * @returns {Promise<Response>}
-     */
+  /**
+   * Gets all cases with given region_id
+   * @param req Request
+   * @param res Response
+   * @returns {Promise<Response>}
+   */
   getAllCasesInRegionById: async function(req: Request, res: Response) {
     if (!req.params || isNaN(Number(req.params.region_id))) return res.sendStatus(400);
 
@@ -363,19 +368,14 @@ module.exports = {
         return res.status(500).send(err);
       });
   },
-    /**
-     * Gets all cases belonging to given user_id
-     * @param req Request
-     * @param res Response
-     * @returns {Promise<Response>}
-     */
+  /**
+   * Gets all cases belonging to given user_id
+   * @param req Request
+   * @param res Response
+   * @returns {Promise<Response>}
+   */
   getAllCasesForUser: async function(req: Request, res: Response) {
-    if (
-      !req.token ||
-      !req.params.user_id ||
-      isNaN(Number(req.params.user_id)) ||
-      typeof req.token !== 'string'
-    )
+    if (!req.token || !req.params.user_id || isNaN(Number(req.params.user_id)) || typeof req.token !== 'string')
       return res.sendStatus(400);
 
     let decoded_token = verifyToken(req.token);
@@ -410,12 +410,12 @@ module.exports = {
         return res.status(500).send(err);
       });
   },
-    /**
-     * Get all cases that matches searchstring on title, description, category, county or region
-     * @param req Request
-     * @param res Response
-     * @returns Case
-     */
+  /**
+   * Get all cases that matches searchstring on title, description, category, county or region
+   * @param req Request
+   * @param res Response
+   * @returns Case
+   */
   search: function(req: Request, res: Response) {
     let search = '%' + req.params.searchtext + '%';
 
