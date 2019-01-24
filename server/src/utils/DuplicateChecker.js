@@ -1,6 +1,8 @@
 // @flow
 
 import { Case, Region } from '../models.js';
+import Sequelize from 'sequelize';
+const Op = Sequelize.Op;
 
 module.exports = {
   // returns true if it's a duplicate
@@ -10,8 +12,8 @@ module.exports = {
         Region.findOne({ where: { region_id: region_id } }).then(async region => {
           if (region.lat == lat && region.lon == lon) resolve(false);
           else {
-            let cases = await Case.findAll({ where: { region_id: region_id, category_id: category_id }, attributes: ['lat', 'lon'] });
-
+            let cases = await Case.findAll({ where: { region_id: region_id, category_id: category_id, status_id: { [Op.ne]: 3 } }, attributes: ['lat', 'lon'] });
+            console.log(cases);
             resolve(
               cases.some(the_case => {
                 return isDuplicate(lat, lon, the_case.lat, the_case.lon);
@@ -19,7 +21,7 @@ module.exports = {
             );
           }
         });
-      }, 2000);
+      }, 1000);
     });
   }
 };
