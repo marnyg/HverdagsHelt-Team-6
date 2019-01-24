@@ -61,7 +61,7 @@ class App extends Component {
                                 <Route exact path="/" render={() => <ContentWrapper logged_in={this.logged_in} onLogin={() => this.onLogin()}/>} />
                                 :
                                 <Route exact path="/" render={() => <InfoPage/>}/>}
-                            <Route exact path="/case/:case_id" render={() => <ViewCase/>} />
+                            <Route exact path="/case/:case_id" render={() => <ViewCase onCaseOpened={(c) => Navbar.onCaseOpened(c)}/>} />
                             <Route exact path="/notifications" render={() => <Notifications/>} />
                             <Route exact path="/new-case" render={() => <NewCase />} />
                             <Route exact path="/search/:query" component={ContentWrapper} />

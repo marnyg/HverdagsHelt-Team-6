@@ -350,6 +350,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             a.lat,
             a.lon
           );
+            this.props.onCaseOpened(this.case);
           a.img.map(e => this.case.img.push({ src: e }));
           let userObj: User = ToolService.getUser();
           let statusCommentPoster: number;
