@@ -32,7 +32,7 @@ class ToolService {
   static dateFormat(date: string) {
     // Format: 1970-01-01T00:00:01.000Z
     if (date) {
-      return dateConverter(date, 'dd.mm.yyyy HH:MM');
+      return dateConverter(date, 'HH:MM dd.mm.yyyy');
     } else {
       return 'Fant ikke dato.';
     }

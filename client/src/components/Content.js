@@ -83,11 +83,11 @@ class Content extends Component {
                       {this.grid ? (
                           <div className="content">
                               {this.props.cases.map(e => (
-                                  <CaseItem case={e} key={e.case_id} grid={this.grid} user={this.props.user}/>
+                                  <CaseItem case={e} key={e.case_id} grid={this.grid} user={this.props.user} logged_in={this.props.logged_in}/>
                               ))}
                           </div>
                       ) : (
-                          this.props.cases.map(e => <CaseItem case={e} key={e.case_id} grid={this.grid} user={this.props.user}/>)
+                          this.props.cases.map(e => <CaseItem case={e} key={e.case_id} grid={this.grid} user={this.props.user} logged_in={this.props.logged_in}/>)
                       )}
                   </div>
               </div>
