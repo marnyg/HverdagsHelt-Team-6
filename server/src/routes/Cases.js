@@ -328,9 +328,18 @@ module.exports = {
 
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(401);
 
+    let page = 1;
+    let limit = 20;
+
+    if (req.query && req.query.page && req.query.limit && Number(req.query.page) > 0 && Number(req.query.limit) > 0) {
+      page = Number(req.query.page);
+      limit = Number(req.query.limit);
+    }
+    let offset = (page - 1) * limit;
+
     sequelize
-      .query(rawQueryCases + ' WHERE c.user_id = ? ' + casesOrder, {
-        replacements: [Number(req.params.user_id)],
+      .query(rawQueryCases + ' WHERE c.user_id = ? ' + casesOrder + ' LIMIT ?,?', {
+        replacements: [Number(req.params.user_id), offset, limit],
         type: sequelize.QueryTypes.SELECT
       })
       .then(async cases => {
