@@ -48,11 +48,12 @@ class RegisterModal extends Component {
                         <h1>Lag ny bruker</h1><br />
                         {this.error}
                         <form ref="form" className={'form-group'}>
+                            <small className="text-muted">Epost på formen bruker@adresse.no</small>
                             <input ref="email" className={"form-control my-2 py-3"}
                                 pattern="^[\wæøåÆØÅ]+([.]{1}[\wæøåÆØÅ]+)*@[\wæøåÆØÅ]+([.]{1}[\wæøåÆØÅ]+)+$"
                                 type="email" required name="emails" id={'inputPassword'} placeholder="Epost" />
 
-
+                            <small className="text-muted">Passord må inneholde store og må bokstaver pluss tall</small>
                             <input type="password" ref="pass1"
                                 pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$" required placeholder="Passord" />
 
@@ -90,6 +91,7 @@ class RegisterModal extends Component {
                                     </option>
                                 ))}
                             </select>
+                            <small className="text-muted">Tlf må inneholde 8 tall</small>
                             <input ref="tlf" className={"form-control my-2 py-3"} pattern="^[\d]{8}" type="tel" required placeholder="Telefonnummer" />
                             <input name="login" className="btn btn-primary" value="Register" onChange={this.submit} onClick={this.submit} />
                         </form>
