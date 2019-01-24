@@ -9,7 +9,7 @@ export let sequelize = new Sequelize(
   process.env.CI ? 'root' : process.env.DB_USER,
   process.env.CI ? '' : process.env.DB_PW,
   {
-    host: process.env.CI ? mysql : process.env.DB_HOST, // The host is 'mysql' when running in gitlab CI
+    host: process.env.CI ? 'mysql' : process.env.DB_HOST, // The host is 'mysql' when running in gitlab CI
     dialect: 'mysql',
 
     pool: {
