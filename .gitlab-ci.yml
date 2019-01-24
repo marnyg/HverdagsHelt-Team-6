@@ -6,8 +6,8 @@ variables:
 
 test:
   image: node:latest
-  services:
-    - mysql:5 # The JS mysql-library does not yet support the newest mysql protocol
+  #services:
+   # - mysql:5 # The JS mysql-library does not yet support the newest mysql protocol
   before_script:
     - echo "$PRIVATE_KEY" > ./server/src/private.key
     - echo "$PUBLIC_KEY" > ./server/src/public.key

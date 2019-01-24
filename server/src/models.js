@@ -5,11 +5,11 @@ import type { Model } from 'sequelize';
 require('dotenv').config();
 
 export let sequelize = new Sequelize(
-  process.env.CI ? 'School' : process.env.DB_USER,
-  process.env.CI ? 'root' : process.env.DB_USER,
-  process.env.CI ? '' : process.env.DB_PW,
+  process.env.CI ? process.env.CI_DB_USER : process.env.DB_USER,
+  process.env.CI ? process.env.CI_DB_DB : process.env.DB_USER,
+  process.env.CI ? process.env.CI_DB_PASS : process.env.DB_PW,
   {
-    host: process.env.CI ? 'mysql' : process.env.DB_HOST, // The host is 'mysql' when running in gitlab CI
+    host: process.env.CI ? process.env.CI_DB_HOST : process.env.DB_HOST, // The host is 'mysql' when running in gitlab CI
     dialect: 'mysql',
 
     pool: {
