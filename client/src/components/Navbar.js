@@ -252,10 +252,13 @@ class Navbar extends Component<{ logged_in: boolean }> {
 
     receiveBcast(message: MessageEvent) {
         let json = JSON.parse(message.data);
+        console.log(json);
+        console.log(this.subscriptions);
         if (json) {
             if (this.subscriptions.length > 0) {
                 let id: number = Number(json.case_id);
                 this.notification_count = 0;
+                this.subscriptions.map(e => e.is_up_to_date === false && e.case_id !== id ? this.notification_count++:null);
                 if (this.subscriptions.some(e => e.case_id === id)) {
                     this.notification_count++;
                 }
@@ -278,7 +281,6 @@ class Navbar extends Component<{ logged_in: boolean }> {
         setTimeout(() => {
             for (let instance of Navbar.instances()) {
                 for(let sub of instance.subscriptions) {
-                    console.log(sub);
                     if(sub.case_id === c.case_id) {
                         instance.subscriptions.splice(instance.subscriptions.indexOf(sub), 1);
                         instance.countPushNotifications(instance.subscriptions);
