@@ -5,10 +5,19 @@ import Status from '../classes/Status.js';
 import LoginService from './LoginService.js';
 
 class StatusService {
+  /**
+   * Get all statuses
+   * @returns {AxiosPromise<Status[]>}
+   */
   getAllStatuses(): Promise<Status[]> {
     return axios.get('/api/statuses');
   }
 
+  /**
+   * Create a status
+   * @param s Status
+   * @returns {Promise<any>}
+   */
   createStatus(s: Status): Promise<any> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
@@ -33,6 +42,12 @@ class StatusService {
     });
   }
 
+  /**
+   * Update a status
+   * @param status_id
+   * @param s Status
+   * @returns {Promise<any>}
+   */
   updateStatus(status_id: number, s: Status): Promise<any> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
@@ -57,6 +72,11 @@ class StatusService {
     });
   }
 
+  /**
+   * Delete a status
+   * @param status_id
+   * @returns {Promise<any>}
+   */
   deleteStatus(status_id: number): Promise<any> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();

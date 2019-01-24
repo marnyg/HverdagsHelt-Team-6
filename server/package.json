@@ -11,11 +11,14 @@
     "testURL": "http://localhost",
     "reporters": [
       "default",
-      ["./node_modules/jest-html-reporter", {
-        "pageTitle": "Test Report",
-        "outputPath": "./tests/testReport/report.html",
-        "sort": "titleAsc"
-      }]
+      [
+        "./node_modules/jest-html-reporter",
+        {
+          "pageTitle": "Test Report",
+          "outputPath": "./tests/testReport/report.html",
+          "sort": "titleAsc"
+        }
+      ]
     ]
   },
   "dependencies": {

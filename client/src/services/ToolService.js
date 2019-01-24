@@ -15,10 +15,20 @@ class ToolService {
   static employee_role_id = 2;
   static private_user_role_id = 4;
 
+    /**
+     * Get the defined color for given status_id
+     * @param status_id
+     * @returns {{color}|*}
+     */
   static getStatusColour(status_id: number) {
     return statusStyles[status_id - 1];
   }
 
+    /**
+     * Get the default date format
+     * @param date
+     * @returns {string}
+     */
   static dateFormat(date: string) {
     // Format: 1970-01-01T00:00:01.000Z
     if (date) {
@@ -28,10 +38,18 @@ class ToolService {
     }
   }
 
+    /**
+     * Get the role_id for employees
+     * @returns {number}
+     */
   static employeeRole() {
     return 2;
   }
 
+    /**
+     * Get user_id from localStorage
+     * @returns {number}
+     */
   static getUserId() {
     let userString = localStorage.getItem('user');
     if (userString) {
@@ -43,6 +61,10 @@ class ToolService {
     }
   }
 
+    /**
+     * Get user from localStorage
+     * @returns {User}
+     */
   static getUser(): ?User {
     let userString = localStorage.getItem('user');
     if (userString) {
@@ -52,6 +74,10 @@ class ToolService {
     }
   }
 
+    /**
+     * Method to fix conflicting region names after joined regions
+     * @param query
+     */
   static cleanQueryString(query: string) {
     let check = {
       'Nord-Trøndelag': 'Trøndelag',
@@ -72,6 +98,11 @@ class ToolService {
       */
   }
 
+    /**
+     * Error handler for user update
+     * @param error
+     * @returns {*}
+     */
   static getUserUpdateErrorAlert(error: Error) {
       if(error.response) {
           if(error.response.status === 409) {
