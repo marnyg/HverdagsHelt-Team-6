@@ -192,7 +192,6 @@ class NewUserForm extends Component{
                     $("#spinner").hide();
                 })
                 .catch((error: Error) => {
-                    console.log('THIS IS THE ERROR', error.response.status);
                     $("#spinner").hide();
                     if(error.response) {
                         if(error.response.status === 409) {
