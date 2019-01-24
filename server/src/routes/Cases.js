@@ -34,8 +34,21 @@ let casesOrder = 'ORDER BY c.updatedAt DESC';
 
 module.exports = {
   getAllCases: async function(req: Request, res: Response) {
+    let page = 1;
+    let limit = 20;
+
+    if (req.query && req.query.page && req.query.limit && Number(req.query.page) > 0 && Number(req.query.limit) > 0) {
+      page = Number(req.query.page);
+      limit = Number(req.query.limit);
+    }
+    let offset = (page - 1) * limit;
+
     sequelize
-      .query(rawQueryCases + casesOrder, { type: sequelize.QueryTypes.SELECT })
+      .query(rawQueryCases + casesOrder + ' LIMIT ?,?',
+        {
+          replacements: [offset, limit],
+          type: sequelize.QueryTypes.SELECT
+        })
       .then(async cases => {
         const out = cases.map(async c => {
           let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
@@ -287,9 +300,18 @@ module.exports = {
   getAllCasesInRegionById: async function(req: Request, res: Response) {
     if (!req.params || isNaN(Number(req.params.region_id))) return res.sendStatus(400);
 
+    let page = 1;
+    let limit = 20;
+
+    if (req.query && req.query.page && req.query.limit && Number(req.query.page) > 0 && Number(req.query.limit) > 0) {
+      page = Number(req.query.page);
+      limit = Number(req.query.limit);
+    }
+    let offset = (page - 1) * limit;
+
     sequelize
-      .query(rawQueryCases + ' WHERE c.region_id = ? ' + casesOrder, {
-        replacements: [Number(req.params.region_id)],
+      .query(rawQueryCases + ' WHERE c.region_id = ? ' + casesOrder + ' LIMIT ?,?', {
+        replacements: [Number(req.params.region_id), offset, limit],
         type: sequelize.QueryTypes.SELECT
       })
       .then(async cases => {
@@ -319,9 +341,18 @@ module.exports = {
 
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(401);
 
+    let page = 1;
+    let limit = 20;
+
+    if (req.query && req.query.page && req.query.limit && Number(req.query.page) > 0 && Number(req.query.limit) > 0) {
+      page = Number(req.query.page);
+      limit = Number(req.query.limit);
+    }
+    let offset = (page - 1) * limit;
+
     sequelize
-      .query(rawQueryCases + ' WHERE c.user_id = ? ' + casesOrder, {
-        replacements: [Number(req.params.user_id)],
+      .query(rawQueryCases + ' WHERE c.user_id = ? ' + casesOrder + ' LIMIT ?,?', {
+        replacements: [Number(req.params.user_id), offset, limit],
         type: sequelize.QueryTypes.SELECT
       })
       .then(async cases => {

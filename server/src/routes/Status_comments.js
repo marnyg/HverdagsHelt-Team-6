@@ -71,9 +71,16 @@ module.exports = {
 
     let decoded_token = verifyToken(req.token);
 
+    let case_status;
     let the_user;
-    let the_case = Case.findOne({ where: { case_id: Number(req.params.case_id) } })
-      .then(() => {
+    let create_body;
+    let the_case = Case.findOne({
+      where: { case_id: Number(req.params.case_id) },
+      attributes: ['region_id', 'status_id']
+    })
+      .then(result => {
+        console.log(result);
+        case_status = result.dataValues.status_id;
         the_user = User.findOne({ where: { user_id: decoded_token.user_id } });
       })
       .then(() => {
@@ -83,16 +90,23 @@ module.exports = {
         if (decoded_token.accesslevel !== 1 && region_id_user !== region_id_case) return res.sendStatus(401);
       })
       .then(() => {
-        return Status_comment.create({
+        create_body = {
           comment: req.body.comment,
           case_id: Number(req.params.case_id),
-          status_id: req.body.status_id,
           user_id: decoded_token.user_id
-        });
+        };
+        console.log(req.body.status_id, case_status);
+        if (decoded_token.accesslevel <= 2) create_body['status_id'] = req.body.status_id;
+        else create_body['status_id'] = case_status;
+
+        console.log(create_body);
+
+        return Status_comment.create(create_body);
       })
       .then(comment => {
         if (comment) {
-          Case.update({ status_id: req.body.status_id }, { where: { case_id: Number(req.params.case_id) } });
+          if (decoded_token.accesslevel <= 2)
+            Case.update({ status_id: req.body.status_id }, { where: { case_id: Number(req.params.case_id) } });
           Case_subscriptions.findAll({ where: { case_id: Number(req.params.case_id), notify_by_email: 1 } }).then(
             async subs => {
               let all_ids = await subs.map(s => {
@@ -105,6 +119,10 @@ module.exports = {
             }
           );
         }
+      })
+      .then(() => {
+        console.log("Kommer hit");
+        Case_subscriptions.update({ is_up_to_date: false }, { where: { case_id: Number(req.params.case_id) } });
       })
       .catch(error => {
         return res.status(500).json(error);
@@ -126,25 +144,30 @@ module.exports = {
     let decoded_token = verifyToken(req.token);
     let user_id_token = decoded_token.user_id;
 
+    let update_body;
+    let case_status;
+
     let status_comment = Status_comment.findOne({
       where: { status_comment_id: Number(req.params.status_comment_id) }
     })
       .then(sc => {
         status_comment = sc.toJSON();
+        case_status = status_comment.status_id;
         if (decoded_token.accesslevel !== 1 && user_id_token !== status_comment.user_id) return res.sendStatus(401);
       })
       .then(() => {
-        return Status_comment.update(
-          {
-            comment: req.body.comment,
-            case_id: Number(req.params.case_id),
-            status_id: req.body.status_id,
-            user_id: user_id_token
-          },
-          {
-            where: { status_comment_id: Number(req.params.status_comment_id) }
-          }
-        ).then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)));
+        update_body = {
+          comment: req.body.comment,
+          case_id: Number(req.params.case_id),
+          user_id: decoded_token.user_id
+        };
+        console.log(req.body.status_id, case_status);
+        if (decoded_token.accesslevel <= 2) update_body['status_id'] = req.body.status_id;
+        else update_body['status_id'] = case_status;
+
+        return Status_comment.update(update_body, {
+          where: { status_comment_id: Number(req.params.status_comment_id) }
+        }).then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)));
       });
   },
   // Kun den som skrev kommentaren og admin kan slette
