@@ -72,7 +72,8 @@ class Content extends Component {
                               classNameChild={'form-inline'}
                               elementsMargin={'mr-2'}
                               selector_id={'desktop'}
-                              onSubmit={(region_id) => this.props.onSubmit(region_id)}/>
+                              onSubmit={(region_id) => this.props.onSubmit(region_id)}
+                          />
                       </div>
                   </div>
                   {this.props.location ?
