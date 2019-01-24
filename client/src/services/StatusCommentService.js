@@ -8,6 +8,12 @@ class StatusCommentService {
   getAllStatusComments(case_id: number): Promise<StatusComment[]> {
       return axios.get('/api/cases/' + case_id + '/status_comments');
   }
+  
+  //Get all status comments, given case with offset
+  getAllStatusComments(case_id: number, page: number, items_per_query: number): Promise<StatusComment[]> {
+    console.log("Page = " + page + "\nLimit = " + items_per_query);
+    return axios.get('/api/cases/' + case_id + '/status_comments?page=' + page + '&limit=' + items_per_query);
+  }
 
   //Update one specific category
   updateStatusComment(sc: StatusComment): Promise<void> {
