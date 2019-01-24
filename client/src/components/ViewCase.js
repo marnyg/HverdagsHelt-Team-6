@@ -28,6 +28,7 @@ import Alert from './Alert.js';
 
 const MAX_NUMBER_IMG: number = 3; // Maximum number of images allowed in a single case.
 const subscriptionButtonStyles = ['btn btn-info', 'btn btn-outline-info'];
+const editButtonStyles = ['btn btn-secondary', 'btn btn-outline-secondary'];
 
 // Privilege levels
 const NOT_USER: number = 6;
@@ -58,8 +59,9 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   fetchButton: HTMLButtonElement = null;
   fileTypes: string[] = ['image/jpeg', 'image/jpg', 'image/png'];
   imgSync: boolean = false;
-  error=null;
+  error = null;
   loggedIn: boolean = false;
+  edit: boolean = false;
 
   render() {
     if (!this.case || !this.statusComment) {
@@ -72,9 +74,15 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       <div className={'modal-body row'}>
         <div className={'col-md-6'}>
           {this.loggedIn ? (
-            <button className={this.getSubscriptionButtonStyles(this.case)} onClick={this.onClickSubscribeButton}>
-              Abonner
-            </button>
+            this.isSubscribed(this.case) ? (
+              <button className={this.getSubscriptionButtonStyles(this.case)} onClick={this.onClickSubscribeButton}>
+                Slutt å følg
+              </button>
+            ) : (
+              <button className={this.getSubscriptionButtonStyles(this.case)} onClick={this.onClickSubscribeButton}>
+                Følg sak
+              </button>
+            )
           ) : null}
           {this.error}
           <form
@@ -118,110 +126,131 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             {(privilege <= OWNER_EMPLOYEE && this.loggedIn) ||
             (this.case.status_id === STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE && this.loggedIn) ? (
               <section>
-                <h2>Oppdater sak</h2>
-                <div className={'form-group'}>
-                  <label htmlFor="category">Kategori</label>
-                  <select
-                    defaultValue={this.case.category_id}
-                    onChange={this.categoryListener}
-                    className={'form-control'}
-                    id={'category'}
-                    required
+                {privilege <= NOT_OWNER_EMPLOYEE ? (
+                  <button
+                    className={this.edit === false ? editButtonStyles[0] : editButtonStyles[1]}
+                    type={'button'}
+                    onClick={this.onClickToggleForm}
                   >
-                    {this.categories.map(e => (
-                      <option key={e.category_id} value={e.category_id}>
-                        {' '}
-                        {e.name}{' '}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {(this.case.status_id === STATUS_OPEN && this.isOwner(this.case)) || privilege === ADMIN ? (
-                  <div className={'form-group'}>
-                    <label htmlFor="title">Tittel</label>
-                    <input
-                      className={'form-control'}
-                      type="text"
-                      pattern="^.{2,255}$"
-                      autoComplete="off"
-                      value={this.case.title}
-                      onChange={(event: SyntheticInputEvent<HTMLInputElement>) => {
-                        this.case.title = event.target.value;
-                      }}
-                      placeholder={'Gi saken din en beskrivende tittel'}
-                      required
-                    />
-                  </div>
-                ) : null}
-                {privilege <= OWNER_EMPLOYEE ? (
-                  <div className={'form-group'}>
-                    <label htmlFor="status">Saksstatus</label>
-                    <select
-                      defaultValue={this.case.status_id}
-                      onChange={this.statusListener}
-                      className={'form-control'}
-                      id={'status'}
-                      required
-                    >
-                      {this.statuses.map(e => (
-                        <option key={e.status_id} value={e.status_id}>
-                          {' '}
-                          {e.name}{' '}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                ) : null}
-                {this.case.status_id === STATUS_OPEN || privilege === ADMIN ? (
-                  <div className={'form-group'}>
-                    <label htmlFor="description">Beskrivelse</label>
-                    <textarea
-                      className={'form-control'}
-                      id={'description'}
-                      maxLength={MAX_DESCRIPTION_LENGTH}
-                      placeholder="Gi din sak en beskrivende beskrivelse, så blir det enklere for oss å hjelpe deg."
-                      value={this.case.description}
-                      onChange={this.textareaListener}
-                    />
-                    {this.case.description
-                      ? this.case.description.length + ' av ' + MAX_DESCRIPTION_LENGTH + ' tegn brukt.'
-                      : null}
-                  </div>
-                ) : null}
-                {privilege <= OWNER_EMPLOYEE ? (
-                  <div className={'form-group'}>
-                    <label htmlFor="description">Melding</label>
-                    <textarea
-                      className={'form-control'}
-                      id={'message'}
-                      maxLength={255}
-                      minLength={2}
-                      placeholder="Melding om sak"
-                      value={this.statusComment.comment}
-                      onChange={this.textareaListener}
-                      required
-                    />
-                  </div>
-                ) : null}
-                {this.case.img.length < MAX_NUMBER_IMG ? (
-                  <div className={'form-group'}>
-                    <label htmlFor={'image-input'}>Legg ved bilder</label>
-                    <input
-                      className={'form-control-file'}
-                      id={'image-inpu'}
-                      type={'file'}
-                      accept={'.png, .jpg, .jpeg'}
-                      onChange={this.fileInputListener}
-                    />
-                  </div>
-                ) : null}
-                <button className={'btn btn-primary mr-2'} onClick={this.submit}>
-                  Oppdater
-                </button>
-                {(this.case.status_id === STATUS_OPEN && this.isOwner(this.case)) || privilege === ADMIN ? (
-                  <button className={'btn btn-danger mr-2'} onClick={this.delete}>
-                    Slett
+                    Svar sak
                   </button>
+                ) : (
+                  <button
+                    className={this.edit === false ? editButtonStyles[0] : editButtonStyles[1]}
+                    type={'button'}
+                    onClick={this.onClickToggleForm}
+                  >
+                    Rediger sak
+                  </button>
+                )}
+                {this.edit === true ? (
+                  <section>
+                    <h2>Oppdater sak</h2>
+                    <div className={'form-group'}>
+                      <label htmlFor="category">Kategori</label>
+                      <select
+                        defaultValue={this.case.category_id}
+                        onChange={this.categoryListener}
+                        className={'form-control'}
+                        id={'category'}
+                        required
+                      >
+                        {this.categories.map(e => (
+                          <option key={e.category_id} value={e.category_id}>
+                            {' '}
+                            {e.name}{' '}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    {(this.case.status_id === STATUS_OPEN && this.isOwner(this.case)) || privilege === ADMIN ? (
+                      <div className={'form-group'}>
+                        <label htmlFor="title">Tittel</label>
+                        <input
+                          className={'form-control'}
+                          type="text"
+                          pattern="^.{2,255}$"
+                          autoComplete="off"
+                          value={this.case.title}
+                          onChange={(event: SyntheticInputEvent<HTMLInputElement>) => {
+                            this.case.title = event.target.value;
+                          }}
+                          placeholder={'Gi saken din en beskrivende tittel'}
+                          required
+                        />
+                      </div>
+                    ) : null}
+                    {privilege <= OWNER_EMPLOYEE ? (
+                      <div className={'form-group'}>
+                        <label htmlFor="status">Saksstatus</label>
+                        <select
+                          defaultValue={this.case.status_id}
+                          onChange={this.statusListener}
+                          className={'form-control'}
+                          id={'status'}
+                          required
+                        >
+                          {this.statuses.map(e => (
+                            <option key={e.status_id} value={e.status_id}>
+                              {' '}
+                              {e.name}{' '}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    ) : null}
+                    {this.case.status_id === STATUS_OPEN || privilege === ADMIN ? (
+                      <div className={'form-group'}>
+                        <label htmlFor="description">Beskrivelse</label>
+                        <textarea
+                          className={'form-control'}
+                          id={'description'}
+                          maxLength={MAX_DESCRIPTION_LENGTH}
+                          placeholder="Gi din sak en beskrivende beskrivelse, så blir det enklere for oss å hjelpe deg."
+                          value={this.case.description}
+                          onChange={this.textareaListener}
+                        />
+                        {this.case.description
+                          ? this.case.description.length + ' av ' + MAX_DESCRIPTION_LENGTH + ' tegn brukt.'
+                          : null}
+                      </div>
+                    ) : null}
+                    {privilege <= OWNER_EMPLOYEE ? (
+                      <div className={'form-group'}>
+                        <label htmlFor="description">Melding</label>
+                        <textarea
+                          className={'form-control'}
+                          id={'message'}
+                          maxLength={255}
+                          minLength={2}
+                          placeholder="Melding om sak"
+                          value={this.statusComment.comment}
+                          onChange={this.textareaListener}
+                          required
+                        />
+                      </div>
+                    ) : null}
+                    {this.case.img.length < MAX_NUMBER_IMG ? (
+                      <div className={'form-group'}>
+                        <label htmlFor={'image-input'}>Legg ved bilder</label>
+                        <input
+                          className={'form-control-file'}
+                          id={'image-inpu'}
+                          type={'file'}
+                          accept={'.png, .jpg, .jpeg'}
+                          onChange={this.fileInputListener}
+                        />
+                      </div>
+                    ) : null}
+                    <button className={'btn btn-primary mr-2'} onClick={this.submit}>
+                      Oppdater
+                    </button>
+                    {(this.case.status_id === STATUS_OPEN && this.isOwner(this.case)) || privilege === ADMIN ? (
+                      <button className={'btn btn-danger mr-2'} onClick={this.delete}>
+                        Slett
+                      </button>
+                    ) : null}
+                  </section>
                 ) : null}
               </section>
             ) : null}
@@ -321,6 +350,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             a.lat,
             a.lon
           );
+            this.props.onCaseOpened(this.case);
           a.img.map(e => this.case.img.push({ src: e }));
           let userObj: User = ToolService.getUser();
           let statusCommentPoster: number;
@@ -339,10 +369,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           this.pos = new Location(a.lat, a.lon, a.region_name, a.county_name, 'Norway');
         } else {
           console.log('Case object was not returned encapsulated in an array. Using this.case = Case[0].');
-          this.error=<Alert
-            type='danger'
-            text='Saken ble hentet i et ukjent format.'
-          />
+          this.error = <Alert type="danger" text="Saken ble hentet i et ukjent format." />;
           /*Notify.danger('Saken ble hentet i et ukjent format.');*/
         }
       })
@@ -427,12 +454,16 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             })
             .catch((err: Error) => {
               console.log('Could not load statuses.');
-              this.error=<Alert
-                type='danger'
-                text={'Klarte ikke å hente statuser. ' +
-                  'Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
-                  err.message}
-              />
+              this.error = (
+                <Alert
+                  type="danger"
+                  text={
+                    'Klarte ikke å hente statuser. ' +
+                    'Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+                    err.message
+                  }
+                />
+              );
               /*Notify.danger(
                 'Klarte ikke å hente statuser. ' +
                   'Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
@@ -451,11 +482,15 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           })
           .catch((err: Error) => {
             console.log('Could not load categories.');
-            this.error=<Alert
-              type='danger'
-              text={'Klarte ikke å hente statuser. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
-                err.message}
-            />
+            this.error = (
+              <Alert
+                type="danger"
+                text={
+                  'Klarte ikke å hente statuser. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+                  err.message
+                }
+              />
+            );
             /*Notify.danger(
               'Klarte ikke å hente statuser. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
                 err.message
@@ -464,13 +499,17 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       })
       .catch((err: Error) => {
         console.log('Could not load case with id ' + this.props.match.params.case_id);
-        this.error=<Alert
-          type='danger'
-          text={'Klarte ikke å hente sak med id ' +
-            this.props.match.params.case_id +
-            '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
-            err.message}
-        />
+        this.error = (
+          <Alert
+            type="danger"
+            text={
+              'Klarte ikke å hente sak med id ' +
+              this.props.match.params.case_id +
+              '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+              err.message
+            }
+          />
+        );
         /*Notify.danger(
           'Klarte ikke å hente sak med id ' +
             this.props.match.params.case_id +
@@ -572,6 +611,16 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           console.log('Could not subscribe user from case with id ' + this.case.case_id);
           Notify.warning('Det oppstod en feil ved oppretting av abonnement på saken. \n\nFeilmelding: ' + err.message);
         });
+    }
+  }
+
+  onClickToggleForm(event: SyntheticInputEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    console.log('Toggling form edit.');
+    if (this.edit === true) {
+      this.edit = false;
+    } else {
+      this.edit = true;
     }
   }
 
@@ -702,28 +751,24 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       cas
         .deleteCase(this.case.case_id)
         .then(() => {
-          this.error=<Alert
-            type='success'
-            text={'Din sak med id ' + this.case.case_id + ' ble slettet.'}
-          />
+          this.error = <Alert type="success" text={'Din sak med id ' + this.case.case_id + ' ble slettet.'} />;
           /*Notify.success('Din sak med id ' + this.case.case_id + ' ble slettet.');*/
           this.props.history.goBack();
         })
         .catch((err: Error) => {
           console.log('Could not delete case with id: ' + this.case.case_id, err);
-          this.error=<Alert
-            type='danger'
-            text={'Kunne ikke slette sak med id: ' + this.case.case_id + '. \n\nFeilmelding: ' + err.message}
-          />
+          this.error = (
+            <Alert
+              type="danger"
+              text={'Kunne ikke slette sak med id: ' + this.case.case_id + '. \n\nFeilmelding: ' + err.message}
+            />
+          );
           /*Notify.danger('Kunne ikke slette sak med id: ' + this.case.case_id + '. \n\nFeilmelding: ' + err.message);*/
         });
     } else {
       console.log("You're not the owner of this case, nor admin! You cannot delete it.");
       //Notify.warning('Du eier ikke denne saken, og kan derfor ikke slette den.');
-      this.error=<Alert
-        type='warning'
-        text="Du eier ikke denne saken, og kan derfor ikke slette den."
-      />
+      this.error = <Alert type="warning" text="Du eier ikke denne saken, og kan derfor ikke slette den." />;
       /*Notify.warning("Du eier ikke denne saken, og kan derfor ikke slette den.");*/
     }
   }
@@ -747,13 +792,17 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       })
       .catch((err: Error) => {
         console.log('Could not load case comments for case with id ' + this.props.match.params.case_id);
-        this.error=<Alert
-          type='danger'
-          text={'Klarte ikke å hente kommentarer til sak med id ' +
-            this.props.match.params.case_id +
-            '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
-            err.message}
-        />
+        this.error = (
+          <Alert
+            type="danger"
+            text={
+              'Klarte ikke å hente kommentarer til sak med id ' +
+              this.props.match.params.case_id +
+              '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+              err.message
+            }
+          />
+        );
         /*Notify.danger(
           'Klarte ikke å hente kommentarer til sak med id ' +
             this.props.match.params.case_id +
@@ -771,10 +820,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
         return true;
       } else {
         console.log('Failed basic HTML form validation.');
-        this.error=<Alert
-          type='warning'
-          text='Vennligst fyll inn de påkrevde feltene.'
-        />
+        this.error = <Alert type="warning" text="Vennligst fyll inn de påkrevde feltene." />;
         /*Notify.warning('Vennligst fyll inn de påkrevde feltene.');*/
         return false;
       }
@@ -795,16 +841,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
         .updateCase(this.case.case_id, this.case)
         .then(() => {
           console.log('Case ' + this.case.case_id + ' was updated.');
-          this.error=<Alert
-            type='success'
-            text={'Sak med id ' + this.case.case_id + ' ble oppdatert.'}
-          />
-          //Notify.success('Sak med id ' + this.case.case_id + ' ble oppdatert.');
-          if (this.case.img.length > 0) {
-            // Pictures are present
-            // TODO Fortsett her
-            console.log('Images are present. Proceeding to update images.');
-          }
+          this.error = <Alert type="success" text={'Sak med id ' + this.case.case_id + ' ble oppdatert.'} />;
         })
         .then(() => {
           if (privilege <= NOT_OWNER_EMPLOYEE) {
@@ -820,11 +857,15 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               })
               .catch((err: Error) => {
                 console.log('Uploading status comment failed for case ' + this.case.case_id + '. Error: ', err);
-                this.error=<Alert
-                  type='danger'
-                  text={'1Feil ved opplasting av statuskommentar. Saken har blitt oppdatert, men kommentaren din har ikke blitt lagret. \n\nFeilmelding: ' +
-                    err.message}
-                />
+                this.error = (
+                  <Alert
+                    type="danger"
+                    text={
+                      '1Feil ved opplasting av statuskommentar. Saken har blitt oppdatert, men kommentaren din har ikke blitt lagret. \n\nFeilmelding: ' +
+                      err.message
+                    }
+                  />
+                );
                 /*Notify.danger(
                   'Feil ved opplasting av statuskommentar. Saken har blitt oppdatert, men kommentaren din har ikke blitt lagret. \n\nFeilmelding: ' +
                     err.message
@@ -832,13 +873,20 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               });
           }
         })
+        .then(() => {
+          this.edit = false;
+        })
         .catch((err: Error) => {
           console.log('Updating case ' + this.case.case_id + ' failed. Error: ', err);
-          this.error=<Alert
-            type='danger'
-            text={'Feil ved opplasting av oppdatert informasjon. Din sak har ikke blitt oppdatert. \n\nFeilmelding: ' +
-              err.message}
-          />
+          this.error = (
+            <Alert
+              type="danger"
+              text={
+                'Feil ved opplasting av oppdatert informasjon. Din sak har ikke blitt oppdatert. \n\nFeilmelding: ' +
+                err.message
+              }
+            />
+          );
           /*Notify.danger(
             'Feil ved opplasting av oppdatert informasjon. Din sak har ikke blitt oppdatert. \n\nFeilmelding: ' +
               err.message

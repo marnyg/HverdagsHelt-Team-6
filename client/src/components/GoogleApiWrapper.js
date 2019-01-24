@@ -56,8 +56,8 @@ export class GoogleMapsContainer extends Component {
     );
   }
   mounted() {
-    this.gmap = this.refs.Gmap.map
-    this.marker = this.refs.marker.marker
+    this.gmap = this.refs.Gmap.map;
+    this.marker = this.refs.marker.marker;
 
   }
 }

@@ -11,15 +11,17 @@ import User from '../classes/User';
 import ToolService from '../services/ToolService';
 import hverdagsheltLogo from '../../public/hverdagsheltLogo2Trans.png';
 import LoginService from "../services/LoginService";
+import Notify from "./Notify";
 
 const SERVER_IP: string = 'localhost';
 const SERVER_PORT: number = 3000;
 
 class Navbar extends Component<{ logged_in: boolean }> {
     notification_count: number = 0;
-    notifications: CaseSubscription[] = [];
+    subscriptions: CaseSubscription[] = [];
     search: string = '';
     socket: WebSocket = null;
+    logged_in: boolean = false;
 
     constructor() {
         super();
@@ -35,7 +37,7 @@ class Navbar extends Component<{ logged_in: boolean }> {
                     Registrer sak
                 </div>
             );
-        } else if (this.props.logged_in === false) {
+        } else if (this.logged_in === false) {
             loginlink = (
                 <div className="nav-link" style={{ cursor: 'pointer' }} data-toggle="modal" data-target="#login-modal">
                     Registrer sak
@@ -50,7 +52,7 @@ class Navbar extends Component<{ logged_in: boolean }> {
         }
         return (
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
-                {this.props.logged_in ? (
+                {this.logged_in ? (
                     <NavLink to={'/'} className="navbar-left">
                         <img src={hverdagsheltLogo} height={29.7} width={185} />
                         <sup className="badge badge-primary mobile-notification">
@@ -84,14 +86,14 @@ class Navbar extends Component<{ logged_in: boolean }> {
 
                         <li className="nav-item">{loginlink}</li>
                         <li className="nav-item">
-                            {this.props.logged_in ? (
+                            {this.logged_in ? (
                                 <NavLink to="/subscriptions" className="nav-link">
                                     Abonnement
                                 </NavLink>
                             ) : null}
                         </li>
                         <li className="nav-item">
-                            {this.props.logged_in ? (
+                            {this.logged_in ? (
                                 <NavLink to="/notifications" className="nav-link">
                                     Varsler{' '}
                                     <sup className="badge badge-primary">
@@ -135,41 +137,54 @@ class Navbar extends Component<{ logged_in: boolean }> {
 
     mounted() {
         // Check if user is logged in
+        this.logged_in = this.props.logged_in;
+        this.setState({
+            logged_in: this.props.logged_in
+        });
         let loginService = new LoginService();
         loginService.isLoggedIn()
             .then((logged_in: boolean) => {
                 if(logged_in === true){
-                    let subscriptionService = new CaseSubscriptionService();
                     let user: User = ToolService.getUser();
-                    subscriptionService
-                        .getAllCaseSubscriptions(user.user_id)
-                        .then((cs: CaseSubscription[]) => {
-                            for (let i = 0; i < cs.length; i++) {
-                                if (cs[i].is_up_to_date === false) {
-                                    this.notification_count++;
-                                }
-                            }
-                            this.notifications = cs;
-                            this.initSocket();
-                        })
-                        .catch((error: Error) => console.error(error));
+                    this.fetch_notifications(user, this.countPushNotifications);
                 }
             })
             .catch((error: Error) => console.error(error));
-        if (this.props.logged_in) {
-            // get notifications
-        } /*
-    if(this.notifications.length > 0){
-      let socketArgument: string = 'ws://' + SERVER_IP + ':' + SERVER_PORT.toString();
-      console.log(socketArgument);
-      this.socket = new WebSocket(socketArgument);
-      this.socket.onmessage = (msg: MessageEvent) => this.receiveBcast(msg);
-      this.socket.onerror = (err: Event) => console.log('WebSocket error:', err);
-      this.socket.onopen = (e: Event) => console.log('Connected to ', e);
-      // Ref: https://github.com/facebook/flow/blob/v0.87.0/lib/bom.js#L484
-    }*/
+    }
 
-        // Ref: https://github.com/facebook/flow/blob/v0.87.0/lib/bom.js#L484
+    fetch_notifications(user: User, cb) {
+        let subscriptionService = new CaseSubscriptionService();
+        subscriptionService
+            .getAllCaseSubscriptions(user.user_id)
+            .then((cs: CaseSubscription[]) => {
+                this.subscriptions = cs;
+                cb(cs);
+            })
+            .catch((error: Error) => console.error(error));
+    }
+
+    countPushNotifications(subscriptions: []) {
+        this.notification_count = 0;
+        subscriptions.map(e => e.is_up_to_date === false ? this.notification_count++:null);
+    }
+
+    componentWillReceiveProps(newProps) {
+        if(newProps.logged_in !== this.props.logged_in) {
+            this.logged_in = newProps.logged_in;
+            this.setState({
+                logged_in: newProps.logged_in
+            });
+        }
+
+        if(this.logged_in === true) {
+            if(this.socket === undefined || this.socket === null) {
+                this.initSocket();
+            }
+            let user: User = ToolService.getUser();
+            if(user) {
+                this.fetch_notifications(user, this.countPushNotifications);
+            }
+        }
     }
 
     submitSearch(event) {
@@ -180,7 +195,7 @@ class Navbar extends Component<{ logged_in: boolean }> {
     }
 
     logincheck() {
-        if (this.props.logged_in) {
+        if (this.logged_in) {
             return (
                 <ul className="navbar-nav">
                     <li className="nav-item">
@@ -222,26 +237,26 @@ class Navbar extends Component<{ logged_in: boolean }> {
     }
 
     onLogin() {
-        if(this.socket === undefined || this.socket === null) {
-            this.initSocket();
-        }
         this.props.onLogin();
     }
 
     logout(event) {
-        this.socket.onclose = function() {
-            console.log('socket closing');
-        };
-        this.socket.close();
+        if(this.socket !== undefined && this.socket !== null) {
+            this.socket.onclose = function() {
+                console.log('socket closing');
+            };
+            this.socket.close();
+        }
         this.props.logout(event);
     }
 
     receiveBcast(message: MessageEvent) {
         let json = JSON.parse(message.data);
         if (json) {
-            if (this.notifications.length > 0) {
+            if (this.subscriptions.length > 0) {
                 let id: number = Number(json.case_id);
-                if (this.notifications.some(e => e.case_id === id)) {
+                this.notification_count = 0;
+                if (this.subscriptions.some(e => e.case_id === id)) {
                     this.notification_count++;
                 }
             }
@@ -251,14 +266,28 @@ class Navbar extends Component<{ logged_in: boolean }> {
     }
 
     initSocket() {
-        console.log('initiating socket');
         let socketArgument: string = 'ws://' + SERVER_IP + ':' + SERVER_PORT.toString();
         console.log(socketArgument);
         this.socket = new WebSocket(socketArgument);
         this.socket.onmessage = (msg: MessageEvent) => this.receiveBcast(msg);
         this.socket.onerror = (err: Event) => console.log('WebSocket error:', err);
         this.socket.onopen = (e: Event) => console.log('Connected to ', e);
-        console.log('socket initiated');
+    }
+
+    static onCaseOpened(c) {
+        setTimeout(() => {
+            for (let instance of Navbar.instances()) {
+                for(let sub of instance.subscriptions) {
+                    console.log(sub);
+                    if(sub.case_id === c.case_id) {
+                        instance.subscriptions.splice(instance.subscriptions.indexOf(sub), 1);
+                        instance.countPushNotifications(instance.subscriptions);
+                        break;
+                    }
+                }
+            }
+        });
+
     }
 }
 export default withRouter(Navbar);
