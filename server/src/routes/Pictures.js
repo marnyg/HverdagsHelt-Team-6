@@ -28,6 +28,12 @@ type Request = express$Request;
 type Response = express$Response;
 
 module.exports = {
+    /**
+     * Uploads a picture to an existing case
+     * @param req Request
+     * @param res Response
+     * @returns {*}
+     */
   uploadPicture: function(req: Request, res: Response) {
     if (!req.params || typeof Number(req.params.case_id) != 'number')
       return res.status(400).send({ err: 'Invalid or missing CaseID in URL-parameter.' });
@@ -67,7 +73,12 @@ module.exports = {
         return res.status(500).send(error.message);
       });
   },
-
+    /**
+     * Deletes a picture from a case
+     * @param req Request
+     * @param res Response
+     * @returns {*}
+     */
   delPicture: function(req: Request, res: Response) {
     if (
       !req.params ||
