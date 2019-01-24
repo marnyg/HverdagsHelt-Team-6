@@ -164,7 +164,6 @@ class NewCase extends Component {
               </div>
               <div className={'form-group ml-3 my-3'}>
                 <select
-                  required
                   ref={e => {
                     this.list1 = e;
                   }}
@@ -185,7 +184,6 @@ class NewCase extends Component {
                   ))}
                 </select>
                 <select
-                  required
                   ref={e => {
                     this.list2 = e;
                   }}
@@ -343,6 +341,7 @@ class NewCase extends Component {
               '\n\nFeilmelding: ' +
               err.toString()
             }
+            onClose={() => this.error = null}
           />
         );
         /*Notify.danger(
@@ -368,6 +367,7 @@ class NewCase extends Component {
               '\n\nFeilmelding: ' +
               err.toString()
             }
+            onClose={() => this.error = null}
           />
         );
         /*Notify.danger(
@@ -461,6 +461,7 @@ class NewCase extends Component {
                 <Alert
                   type="warning"
                   text="Vi klarte ikke å plassere din posisjon i en kommune registrert hos oss. Vennligst benytt en annen metode for å sette din posisjon, ellers blir posisjonen satt til din angitte hjemkommune."
+                  onClose={() => this.error = null}
                 />
               );
               /*Notify.warning(
@@ -480,6 +481,7 @@ class NewCase extends Component {
           <Alert
             type="danger"
             text={'Det oppstod en feil ved henting av automatisk posisjon. \n\nFeilmelding: ' + err.message}
+            onClose={() => this.error = null}
           />
         );
         /*Notify.danger('Det oppstod en feil ved henting av automatisk posisjon. \n\nFeilmelding: ' + err.message);*/
@@ -593,6 +595,7 @@ class NewCase extends Component {
                   '\n\nFeilmelding: ' +
                   err.toString()
                 }
+                onClose={() => this.error = null}
               />
             );
             /*Notify.danger(
@@ -641,6 +644,7 @@ class NewCase extends Component {
           <Alert
             type="warning"
             text="Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png."
+            onClose={() => this.error = null}
           />
         );
         /*Notify.warning('Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png.');*/
@@ -658,11 +662,17 @@ class NewCase extends Component {
     service
       .getAllRegions()
       .then(e => {
+        console.log(e);
+
         let region = e.find(j => j.region_name === name);
+        console.log(region);
+
         if (region) {
           return region.region_id;
         } else {
-          this.error = <Alert type="danger" text="Ingen kommuner passer ditt valg." />;
+          this.error = <Alert type="danger" text="Ingen kommuner passer ditt valg."
+            onClose={() => this.error = null}
+          />;
           /*Notify.danger('Ingen kommuner passer ditt valg.');*/
           return null;
         }
@@ -676,6 +686,7 @@ class NewCase extends Component {
               'Kunne ikke hente kommunedata fra server for å sammenlikne med din valgte kommune. \n\nFeilmelding: ' +
               err.message
             }
+            onClose={() => this.error = null}
           />
         );
         /*Notify.danger(
@@ -691,7 +702,8 @@ class NewCase extends Component {
       this.form.reportValidity();
       console.log('Basic HTML Form validation failed!');
       $("#spinner").hide();
-      this.error = <Alert type="warning" text="Vennligst fyll in de påkrevde feltene og prøv igjen." />;
+      this.error = <Alert type="warning" text="Vennligst fyll in de påkrevde feltene og prøv igjen."
+        onClose={() => this.error = null} />;
       //Notify.warning('Vennligst fyll in de påkrevde feltene og prøv igjen.');
       return false;
     }
@@ -720,18 +732,14 @@ class NewCase extends Component {
               }
             });
           } else {
+            $("#spinner").hide();
             this.error = (
               <Alert
                 type="warning"
                 text={
-                  'Din posisjon (lat: ' +
-                  this.pos.lat +
-                  ', lon: ' +
-                  this.pos.lon +
-                  ') finner sted i ' +
-                  this.pos.country +
-                  ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'
+                  'Din valgte posisjon er ikke i vår database, dette er enten fordi kommunen ikke er medlem av vårt system, eller ikke i norge'
                 }
+                onClose={() => this.error = null}
               />
             );
             console.log('Automatic position is not valid.');
@@ -760,16 +768,12 @@ class NewCase extends Component {
               <Alert
                 type="warning"
                 text={
-                  'Din posisjon (lat: ' +
-                  this.pos.lat +
-                  ', lon: ' +
-                  this.pos.lon +
-                  ') finner sted i ' +
-                  this.pos.country +
-                  ' og kan derfor ikke brukes som posisjon. Vennligst benytt en annen metode for å velge posisjon.'
+                  'Din valgte posisjon er ikke i vår database, dette er enten fordi kommunen ikke er medlem av vårt system, eller ikke i norge'
                 }
+                onClose={() => this.error = null}
               />
             );
+            $("#spinner").hide();
             console.log('Automatic position is not valid.');
             return false;
           }
@@ -787,7 +791,10 @@ class NewCase extends Component {
           } else {
             $("#spinner").hide();
             this.error = (
-              <Alert type="danger" text="Vennligst velg et fylke og en kommune hvor saken finner sted og prøv igjen." />
+              <Alert type="danger" text="Vennligst velg et fylke og en kommune hvor saken finner sted og prøv igjen."
+                onClose={() => this.error = null}
+
+              />
             );
             console.warn('County or municipality has not been set.');
             return false;
@@ -815,11 +822,12 @@ class NewCase extends Component {
         <Alert
           type="danger"
           text={
-            'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente fylkesdata. Vennligst prøv igjen. \n\nFeilmelding: ' +
-            err.message
+            'Din valgte posisjon er ikke i vår database, dette er enten fordi kommunen ikke er medlem av vårt system, eller ikke i norge'
           }
+          onClose={() => this.error = null}
         />
       );
+      $("#spinner").hide();
       return false;
     });
   }
@@ -843,6 +851,19 @@ class NewCase extends Component {
             this.case.region_id = region.region_id;
             resolve(true);
           } else {
+            this.error = (
+              <Alert
+                type="danger"
+                text={
+                  'Komunen ' + this.pos.city + ' er ikke registrert i vårt system.'
+                  +
+                  err.message
+                }
+                onClose={() => this.error = null}
+              />)
+            $("#spinner").hide();
+
+
             console.log('Region ' + this.pos.city + ' was not found in county' + this.pos.region + ' in database.');
             resolve(false);
           }
@@ -855,8 +876,11 @@ class NewCase extends Component {
                 'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente kommunedata. Vennligst prøv igjen. \n\nFeilmelding: ' +
                 err.message
               }
+              onClose={() => this.error = null}
             />
           );
+          $("#spinner").hide();
+
           resolve(false);
         });
     });
@@ -864,6 +888,9 @@ class NewCase extends Component {
 
   async send() {
     $("#spinner").show();
+
+    console.log(this.case && this.form);
+
     if (this.case && this.form) {
       let index: number = this.radioSelector();
       console.log(index);
@@ -889,6 +916,7 @@ class NewCase extends Component {
                 <Alert
                   type="success"
                   text={'Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id}
+                  onClose={() => this.error = null}
                 />
               );
               //Notify.success('Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id);
@@ -906,6 +934,7 @@ class NewCase extends Component {
                   text={
                     'Det skjedde en feil ved prosessering av din nye sak. Du kan prøve å finne saken din på Min side > Mine Saker'
                   }
+                  onClose={() => this.error = null}
                 />
               );
               /*Notify.danger(
@@ -923,6 +952,7 @@ class NewCase extends Component {
                   text={
                     'Duplikatsjekk feilet. Dette kommer av at det allerede ligger inn liknende saker i vårt system som enda ikke er under behandling. For å stoppe overflod av henvendelser blir derfor din innsending avslått.'
                   }
+                  onClose={() => this.error = null}
                 />
               );
             } else {
@@ -935,6 +965,7 @@ class NewCase extends Component {
                     'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
                     err.message
                   }
+                  onClose={() => this.error = null}
                 />
               );
             }
@@ -950,7 +981,10 @@ class NewCase extends Component {
       }
     } else {
       $("#spinner").hide();
-      this.error = <Alert type="warning" text={'En kritisk feil har oppstått. Vennligst last sida på nytt.'} />;
+      this.error = <Alert type="warning" text={'En kritisk feil har oppstått. Vennligst last sida på nytt.'}
+        onClose={() => this.error = null}
+
+      />;
       $("#spinner").hide();
       /*Notify.warning('En kritisk feil har oppstått. Vennligst last sida på nytt.');*/
     }
@@ -1016,6 +1050,7 @@ class NewCase extends Component {
                 <Alert
                   type="warning"
                   text="Vi klarte ikke å plassere din posisjon i en kommune registrert hos oss. Vennligst benytt en annen metode for å sette din posisjon, ellers blir posisjonen satt til din angitte hjemkommune."
+                  onClose={() => this.error = null}
                 />
               );
               /*Notify.warning(
