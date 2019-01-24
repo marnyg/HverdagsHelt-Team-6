@@ -7,10 +7,22 @@ type Request = express$Request;
 type Response = express$Response;
 
 module.exports = {
+  /**
+   * Get all roles
+   * @param req Request
+   * @param res Response
+   * @returns {Role}
+   */
   getAllRoles: function(req: Request, res: Response) {
     if (!req.token) return res.sendStatus(400);
     return Role.findAll().then(roles => res.send(roles));
   },
+  /**
+   * Add a new role
+   * @param req Request
+   * @param res Response
+   * @returns {Role}
+   */
   addRole: function(req: Request, res: Response) {
     if (
       !req.token ||
@@ -32,6 +44,12 @@ module.exports = {
         console.log(err.parent.sqlMessage);
       });
   },
+  /**
+   * Update a role
+   * @param req Request
+   * @param res Response
+   * @returns {Role}
+   */
   updateRole: function(req: Request, res: Response) {
     if (
       !req.params ||
@@ -57,6 +75,12 @@ module.exports = {
         console.log(err.parent.sqlMessage);
       });
   },
+  /**
+   * Delete a role
+   * @param req Request
+   * @param res Response
+   * @returns {*}
+   */
   delRole: function(req: Request, res: Response) {
     if (!req.params || isNaN(Number(req.params.role_id))) return res.sendStatus(400);
 
