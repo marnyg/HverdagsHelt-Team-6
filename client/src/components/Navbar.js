@@ -267,17 +267,22 @@ class Navbar extends Component<{ logged_in: boolean }> {
         let json = JSON.parse(message.data);
         console.log(json);
         console.log(this.subscriptions);
-        if (json) {
-            if (this.subscriptions.length > 0) {
-                let id: number = Number(json.case_id);
-                this.notification_count = 0;
-                this.subscriptions.map(e => e.is_up_to_date === false && e.case_id !== id ? this.notification_count++:null);
-                if (this.subscriptions.some(e => e.case_id === id)) {
-                    this.notification_count++;
+        let user = JSON.parse(localStorage.getItem('user'));
+        if(user) {
+            this.fetch_notifications(user, (subs) => {
+                if (json) {
+                    if (this.subscriptions.length > 0) {
+                        let id: number = Number(json.case_id);
+                        this.notification_count = 0;
+                        this.subscriptions.map(e => e.is_up_to_date === false && e.case_id !== id ? this.notification_count++:null);
+                        if (this.subscriptions.some(e => e.case_id === id)) {
+                            this.notification_count++;
+                        }
+                    }
+                } else {
+                    console.log('Could not parse websocket data from server.');
                 }
-            }
-        } else {
-            console.log('Could not parse websocket data from server.');
+            })
         }
     }
 
