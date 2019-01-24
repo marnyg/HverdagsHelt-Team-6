@@ -6,6 +6,7 @@ import { faBell, faCheck } from '@fortawesome/free-solid-svg-icons/index';
 import CaseSubscriptionService from "../services/CaseSubscriptionService";
 import CaseSubscription from "../classes/CaseSubscription";
 import LoginService from "../services/LoginService";
+import ToolService from "../services/ToolService";
 
 class CaseItem extends Component {
   images = [];
@@ -23,10 +24,11 @@ class CaseItem extends Component {
             )}
             <div className="d-inline">
               <div className="card-body">
+                <h2 className="card-title">{this.props.case.title}</h2>
                 <div className="card-text text-muted">{this.props.case.region_name} {this.props.case.county_name}</div>
                 <h2 className="card-title">{this.props.case.category_name}</h2>
                 <div className=" d-inline">
-                  <small className="text-muted">{this.getTimeString(this.props.case.createdAt)}</small>
+                  <small className="text-muted">{ToolService.dateFormat(this.props.case.createdAt)}</small>
                 </div>
                 {this.props.user ?
                     <button onClick={this.subscribe.bind(this)} className={"btn btn-" + this.button_type + " float-right"}>
@@ -66,7 +68,7 @@ class CaseItem extends Component {
 
                     <p className="card-text text-justify">{this.props.case.description ? this.props.case.description:"Ingen beskrivelse"}</p>
                     <p className="card-text">
-                      <small className="text-muted">{this.getTimeString(this.props.case.createdAt)}</small>
+                      <small className="text-muted">{ToolService.dateFormat(this.props.case.createdAt)}</small>
                     </p>
                     <button className={"btn btn-" + this.button_type + " float-right"} onClick={this.subscribe.bind(this)}>
                         {this.props.case.subscribed ? "Du abonnerer på denne saken":"Abonner på denne saken"}

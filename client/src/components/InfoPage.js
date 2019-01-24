@@ -23,7 +23,7 @@ class InfoPage extends Component {
                 </p>
                 <p>
                     <strong>Hjem</strong> viser deg sakene vi finner registrert i kommunen du for øyeblikket befinner deg i.<br/>
-                    <strong>Registrer Sak</strong> gir viser deg et skjema for å registrere en ny sak. For å registrere en ny sak, må du være registrert og logget inn.<br/>
+                    <strong>Registrer Sak</strong> tilbyr innsendingsskjema for å registrere en ny sak. For å registrere en ny sak, må du være registrert og logget inn.<br/>
                     Når du har registrert deg, vil du automatisk bli logget inn.<br/>
                     Du vil da se noen flere navigasjons-lenker i menyen øverst:<br/>
                     <strong>Abonnementer</strong> viser deg sakene du har abonnert og saker som er publisert av kommunen(e) du har abonnert på.<br/>
