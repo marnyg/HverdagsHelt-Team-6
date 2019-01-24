@@ -13,7 +13,7 @@ class About extends Component {
           du vil snakke med Bergen kommune eller Alta kommune, det ser helt likt ut, og det fungere også helt likt.
         </p>
         <p>
-          Vi er en studentbedrift bestående av elever på NTNU i Trondheim. Systemet er laget som et sammarbeidsprosjekt
+          Vi er en studentbedrift bestående av studenter ved NTNU i Trondheim. Systemet er laget som et sammarbeidsprosjekt
           mellom IT-støttet bedriftsutvikling- og Dataingeniørstudenter.
         </p>
       </section>
