@@ -33,14 +33,6 @@ class VerificationModal extends Component{
         );
     }
 
-    mounted() {
-        console.log('modal mounted');
-    }
-
-    componentWillUnmount() {
-        console.log('Modal will unmount');
-    }
-
     static setcontent(title: string, body: React.Node, footer: React.Node){
         setTimeout(() => {
             for (let instance of VerificationModal.instances()){
