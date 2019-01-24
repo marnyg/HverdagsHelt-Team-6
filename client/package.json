@@ -28,6 +28,7 @@
     "jspdf": "^1.5.3",
     "npm": "^6.5.0",
     "react-chartjs-2": "^2.7.4",
+    "react-loader-spinner": "^2.3.0",
     "react-router-dom": "^4.3.1",
     "react-simplified": "^1.5.2"
   },
