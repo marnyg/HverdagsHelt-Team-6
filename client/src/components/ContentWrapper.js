@@ -11,6 +11,8 @@ import NoLocationPage from "./NoLocationPage";
 import RegionService from "../services/RegionService";
 import Content from './Content.js';
 import ToolService from "../services/ToolService";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCaretLeft, faCaretRight} from '@fortawesome/free-solid-svg-icons/index';
 
 class ContentWrapper extends Component {
     cases = [];
@@ -41,9 +43,7 @@ class ContentWrapper extends Component {
                             logged_in={this.logged_in}
                             onLogin={() => this.props.onLogin()}
                         />
-                        <button className={'btn btn-primary w-100 mt-5'} onClick={() => this.loadResults()}>
-                            Last inn flere saker
-                        </button>
+                        {this.pageButtons()}
                     </div>
                 );
             } else {
@@ -59,9 +59,7 @@ class ContentWrapper extends Component {
                                 logged_in={this.props.logged_in}
                                 onLogin={() => this.props.onLogin()}
                             />
-                            <button className={'btn btn-primary w-100 mt-5'} onClick={() => this.loadResults()}>
-                                Last inn flere saker
-                            </button>
+                            {this.pageButtons()}
                         </div>
                     );
                 } else {
@@ -81,9 +79,7 @@ class ContentWrapper extends Component {
                             logged_in={this.logged_in}
                             onLogin={() => this.props.onLogin()}
                         />
-                        <button className={'btn btn-primary w-100 mt-5'} onClick={() => this.loadResults()}>
-                            Last inn flere saker
-                        </button>
+                        {this.pageButtons()}
                     </div>
                 );
             } else {
@@ -243,7 +239,6 @@ class ContentWrapper extends Component {
     }
 
     loadResults(){
-        this.page = this.page + 1;
         console.log('Loading page: ', this.page);
         let caseService = new CaseService();
         caseService.getCasePageByRegion(this.limit, this.page, this.region)
@@ -252,6 +247,38 @@ class ContentWrapper extends Component {
                 console.log('Number of cases loaded:', this.cases.length);
             })
             .catch((error: Error) => console.error(error));
+    }
+
+    pageButtons() {
+        return(
+            <div className={'container mt-5'}>
+                <div className={'row'}>
+                    <div className={'col w-100 text-center'}>
+                        <button className={'btn btn-primary w-100'} onClick={() => {
+                            if(this.page !== 1) {
+                                this.page--;
+                                this.loadResults();
+                            }
+                        }}>
+                            <FontAwesomeIcon icon={faCaretLeft}/>
+                            &nbsp;Gå til forrige side
+                        </button>
+                    </div>
+                    <div className={'col w-100 text-center'}>
+                        <h2 className={'w-100'}>Side: {this.page}</h2>
+                    </div>
+                    <div className={'col w-100 text-center'}>
+                        <button className={'btn btn-primary w-100'} onClick={() => {
+                            this.page++;
+                            this.loadResults()
+                        }}>
+                            Gå til neste side&nbsp;
+                            <FontAwesomeIcon icon={faCaretRight}/>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
 }

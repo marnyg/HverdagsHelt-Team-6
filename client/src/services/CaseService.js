@@ -20,7 +20,22 @@ class CaseService {
    * @returns {AxiosPromise<any>}
    */
   getCase(case_id: number): Promise<Case> {
-    return axios.get('/api/cases/' + case_id);
+    return new Promise((resolve, reject) => {
+        let token = localStorage.getItem('token');
+        if(token) {
+            axios.get('/api/cases/' + case_id, {
+                headers: {
+                    Authorization: 'Bearer ' + token
+                }
+            })
+                .then((cases: Case) => resolve(cases))
+                .catch((error: Error) => reject(error));
+        } else {
+            axios.get('/api/cases/' + case_id)
+                .then((cases: Case) => resolve(cases))
+                .catch((error: Error) => reject(error));
+        }
+    });
   }
 
   /**
