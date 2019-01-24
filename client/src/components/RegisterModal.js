@@ -48,7 +48,7 @@ class RegisterModal extends Component {
                         <h1>Lag ny bruker</h1><br />
                         {this.error}
                         <form ref="form" className={'form-group'}>
-                            <input ref="email" className={"form-control"}
+                            <input ref="email" className={"form-control my-2 py-3"}
                                 pattern="^[\wæøåÆØÅ]+([.]{1}[\wæøåÆØÅ]+)*@[\wæøåÆØÅ]+([.]{1}[\wæøåÆØÅ]+)+$"
                                 type="email" required name="emails" id={'inputPassword'} placeholder="Epost" />
 
@@ -90,7 +90,7 @@ class RegisterModal extends Component {
                                     </option>
                                 ))}
                             </select>
-                            <input ref="tlf" pattern="^[\d]{8}" type="tel" required placeholder="Telefonnummer" />
+                            <input ref="tlf" className={"form-control my-2 py-3"} pattern="^[\d]{8}" type="tel" required placeholder="Telefonnummer" />
                             <input name="login" className="btn btn-primary" value="Register" onChange={this.submit} onClick={this.submit} />
                         </form>
                     </div>
