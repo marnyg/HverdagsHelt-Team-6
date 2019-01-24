@@ -60,8 +60,8 @@ class RegisterModal extends Component {
                             <input type="password" ref="pass2" required placeholder="Gjenta passord" />
                             <input type="text" ref="fn" required name="firstname" placeholder="Fornavn" />
                             <input type="text" ref="ln" required name="lastname" placeholder="Etternavn" />
-                            <input type="text" ref="addr" required name="adress" placeholder="Adresse" />
-                            <input type="text" ref="zip" required name="zip" placeholder="Postnummer" />
+                            {/* <input type="text" ref="addr" required name="adress" placeholder="Adresse" /> */}
+                            {/* <input type="text" ref="zip" required name="zip" placeholder="Postnummer" /> */}
                             <select defaultValue={''} required onChange={this.countyListener} className={'form-control mb-3'} id={'countySelector'}>
                                 <option value={''} >
                                     Velg fylke
