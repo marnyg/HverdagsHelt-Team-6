@@ -190,8 +190,10 @@ Case_subscriptions.belongsTo(User, { foreignKey: { name: 'user_id', allowNull: f
 Case_subscriptions.belongsTo(Case, { foreignKey: { name: 'case_id', allowNull: false }, onDelete: 'CASCADE' });
 
 // Drop tables and create test data when not in production environment
-let production = process.env.NODE_ENV === 'production';
+let production = process.env.NODE_ENV === 'production' ;
 production = true; // Gjør at databasen er statisk
+if(process.env.IN_CI_ENVIRONMENT) console.log('------------ IN CI! ------------');
+else console.log('------------ NOT IN CI ---------------');
 // The sync promise can be used to wait for the database to be ready (for instance in your tests)
 export let sync = sequelize.sync({ force: production ? false : true }).then(
   () => {
