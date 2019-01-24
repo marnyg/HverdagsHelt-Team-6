@@ -62,17 +62,29 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
                       <button className={'btn btn-danger'} onClick={this.onClickDeleteButton}>
                         Slett
                       </button>
-                      <button className={this.getSubscriptionButtonStyles(c)} onClick={this.onClickSubscribeButton}>
-                        Abonner
-                      </button>
+                      {this.isSubscribed(c) ? (
+                        <button className={this.getSubscriptionButtonStyles(c)} onClick={this.onClickSubscribeButton}>
+                          Slutt å følg
+                        </button>
+                      ) : (
+                        <button className={this.getSubscriptionButtonStyles(c)} onClick={this.onClickSubscribeButton}>
+                          Følg sak
+                        </button>
+                      )}
                     </div>
-                  ) : ( ToolService.getUser() !== null ?
+                  ) : ToolService.getUser() !== null ? (
                     <div>
-                      <button className={this.getSubscriptionButtonStyles(c)} onClick={this.onClickSubscribeButton}>
-                        Abonner
-                      </button>
+                      {this.isSubscribed(c) ? (
+                        <button className={this.getSubscriptionButtonStyles(c)} onClick={this.onClickSubscribeButton}>
+                          Slutt å følg
+                        </button>
+                      ) : (
+                        <button className={this.getSubscriptionButtonStyles(c)} onClick={this.onClickSubscribeButton}>
+                          Følg sak
+                        </button>
+                      )}
                     </div>
-                  : null )}
+                  ) : null}
                 </td>
               </tr>
             ))}
