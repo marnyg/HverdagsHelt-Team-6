@@ -400,3 +400,7 @@ export let listen = new Promise<void>((resolve, reject) => {
     resolve();
   });
 });
+
+export function close (){
+  return app.close()
+}
