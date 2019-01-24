@@ -3,8 +3,9 @@
 import Notify from '../components/Notify';
 import User from '../classes/User';
 
+const dateConverter = require('dateformat');
+
 const statusStyles = [{ color: '#CC0000' }, { color: '#0000FF' }, { color: '#007500' }]; // Constant used for colouring status fields in table.
-const dateMonths = ['jan', 'feb', 'mar', 'apr', 'mai', 'juni', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'];
 // Frequently used static methods are put here to reduce overall duplicate code
 
 class ToolService {
@@ -19,18 +20,7 @@ class ToolService {
   static dateFormat(date: string) {
     // Format: 1970-01-01T00:00:01.000Z
     if (date) {
-      let d = new Date(date);
-      return (
-        d.getDay() +
-        '. ' +
-        dateMonths[d.getMonth()] +
-        ' ' +
-        d.getFullYear() +
-        ' kl. ' +
-        d.getHours() +
-        ':' +
-        d.getMinutes()
-      );
+      return dateConverter(date, 'dd.mm.yyyy HH:MM');
     } else {
       return 'Fant ikke dato.';
     }
