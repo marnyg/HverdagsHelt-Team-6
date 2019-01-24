@@ -39,6 +39,7 @@ class RegionSelect extends Component {
                     <button className={'form-control btn btn-primary ' + this.props.elementsMargin} onClick={this.submit}>
                         Filtrer
                     </button>
+                    {this.props.clearButton}
                 </form>
             </div>
         );
