@@ -17,6 +17,10 @@ beforeAll(done => {
     });
 });
 
+afterAll(()=> {
+  application.close();
+});
+
 let case_id = 1;
 
 // ***************** status_comments *****************

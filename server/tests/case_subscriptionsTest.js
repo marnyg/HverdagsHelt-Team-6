@@ -32,6 +32,10 @@ beforeAll(done => {
     });
 });
 
+afterAll(()=> {
+  application.close();
+});
+
 // ***************** case_subscriptions *****************
 describe('Find all case_subscriptions for a private user', () => {
   test('400 status code for GET /api/cases/subscriptions/:user_id without valid id', done => {

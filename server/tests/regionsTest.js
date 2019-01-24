@@ -19,6 +19,10 @@ beforeAll(done => {
     });
 });
 
+afterAll(()=> {
+  application.close();
+});
+
 // ***************** Regions *****************
 describe('Find all regions', () => {
   test('200 status code for GET /api/regions', done => {

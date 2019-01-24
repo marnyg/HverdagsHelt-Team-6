@@ -19,6 +19,10 @@ beforeAll(done => {
     });
 });
 
+afterAll(()=> {
+  application.close();
+});
+
 // ***************** Counties *****************
 describe('Find all counties', () => {
   test('200 status code for GET /api/counties', done => {

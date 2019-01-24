@@ -17,6 +17,10 @@ beforeAll(done => {
     });
 });
 
+afterAll(()=> {
+  application.close();
+});
+
 // ***************** Region_subscriptions *****************
 describe('Find all region_subscriptions', () => {
   test('200 status code for GET /api/regions/:region_id/subscribe', done => {

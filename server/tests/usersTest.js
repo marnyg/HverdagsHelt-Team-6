@@ -17,6 +17,10 @@ beforeAll(done => {
     });
 });
 
+afterAll(()=> {
+  application.close();
+});
+
 // ***************************** USERS **************************************
 
 let token;

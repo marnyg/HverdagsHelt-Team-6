@@ -14,11 +14,15 @@ import {
   Region_subscriptions,
   sync
 } from '../src/models.js';
+import {application} from "../src/server";
 
 beforeAll(async () => {
   await sync;
 });
 
+afterAll(()=> {
+  application.close();
+});
 
 describe('Sequelize model findAll() tests', () => {
   it('County.findAll()  returns correct data', async () => {
