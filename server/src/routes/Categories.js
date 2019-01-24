@@ -7,9 +7,21 @@ type Request = express$Request;
 type Response = express$Response;
 
 module.exports = {
+    /**
+     * Gets all categories
+     * @param req Request
+     * @param res Response
+     * @returns {Category}
+     */
   getAllCategories: function(req: Request, res: Response) {
     return Category.findAll().then(category => res.send(category));
   },
+    /**
+     * Adds a new category
+     * @param req Request
+     * @param res Response
+     * @returns {Category}
+     */
   addCategory: function(req: Request, res: Response) {
     if (!req.body || typeof req.body.name !== 'string' || !regexNames.test(req.body.name)) return res.sendStatus(400);
     return Category.create({
@@ -22,6 +34,12 @@ module.exports = {
         console.log(err.parent.sqlMessage);
       });
   },
+    /**
+     * Updates an existing category
+     * @param req Request
+     * @param res Response
+     * @returns {Category}
+     */
   updateCategory: function(req: Request, res: Response) {
     if (
       !req.body ||
@@ -43,6 +61,12 @@ module.exports = {
         console.log(err.parent.sqlMessage);
       });
   },
+    /**
+     * Deletes a category
+     * @param req Request
+     * @param res Response
+     * @returns {*}
+     */
   delCategory: function(req: Request, res: Response) {
     if (!req.params || isNaN(Number(req.params.category_id))) return res.sendStatus(400);
     return Category.destroy({
