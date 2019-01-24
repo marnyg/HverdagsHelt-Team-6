@@ -705,6 +705,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       console.log('this.case.status_id: ' + this.case.status_id);
       if (this.statusComment) {
         this.statusComment.status_id = this.case.status_id;
+        this.statusComment.status_name = this.case.status_name;
         console.log('this.statusComment.status_id: ' + this.statusComment.status_id);
       }
     }
@@ -940,7 +941,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               .then(e => {
                 console.log('Received StatusComment Object: ', e);
                 this.statusComment.createdAt = e.createdAt;
-                this.statusMessages.push(this.statusComment);
+                this.statusMessages.unshift(this.statusComment);
                 let usr = ToolService.getUser()
                 this.statusComment = new StatusComment(null, this.case.case_id, this.case.status_id, usr.user_id, this.case.status_name, "", usr.firstname + " " + usr.lastname, null);
               })
