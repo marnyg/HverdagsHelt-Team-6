@@ -1,24 +1,27 @@
 //@flow
 import * as React from 'react';
 import { Component } from 'react-simplified';
+import UserService from "../../../services/UserService";
+import ToolService from "../../../services/ToolService";
 
 class EditUserForm extends Component{
     newuser = {
         name: ""
     };
+    error = null;
 
     render() {
-        console.log('Form user:', this.props.user);
-
         return(
             <div key={this.props.user.user_id}>
-                <div className={'form-group'}>
+                {this.error}
+                <form ref={'editUserForm'} className={'form-group'}>
                     <label htmlFor={'edit-user-form-firstname'}>Fornavn:</label>
                     <input id={'edit-user-form-firstname'}
                            className={'form-control'}
                            type={'text'}
                            name={'edit-user-form-firstname'}
                            defaultValue={this.props.user.firstname}
+                           required
                     />
 
                     <label htmlFor={'edit-user-form-lastname'}>Etternavn:</label>
@@ -27,6 +30,7 @@ class EditUserForm extends Component{
                            type={'text'}
                            name={'edit-user-form-lastname'}
                            defaultValue={this.props.user.lastname}
+                           required
                     />
 
                     <label htmlFor={'edit-user-form-email'}>Epost:</label>
@@ -35,6 +39,7 @@ class EditUserForm extends Component{
                            type={'text'}
                            name={'edit-user-form-email'}
                            defaultValue={this.props.user.email}
+                           required
                     />
 
                     <label htmlFor={'edit-user-form-phone'}>Telefon:</label>
@@ -43,13 +48,14 @@ class EditUserForm extends Component{
                            type={'number'}
                            name={'edit-user-form-phone'}
                            defaultValue={this.props.user.tlf}
+                           required
                     />
-                </div>
+                </form>
                 <button onClick={(event) => console.log('Avbryter')}
                         type="button"
                         className="btn btn-danger float-right"
                         data-dismiss="modal">Avbryt</button>
-                <button onClick={(event) => this.submit()}
+                <button onClick={(event) => this.submit(event)}
                         type="button"
                         className="btn btn-primary"
                         >Oppdater</button>
@@ -73,25 +79,36 @@ class EditUserForm extends Component{
         console.log('mounting');
     }
 
-    submit() {
-        let user_id = this.props.user.user_id;
-        let role_id = this.props.user.role_id;
-        let region_id = this.props.user.region_id;
-        let firstname = document.querySelector('#edit-user-form-firstname').value;
-        let lastname = document.querySelector('#edit-user-form-lastname').value;
-        let email = document.querySelector('#edit-user-form-email').value;
-        let tlf = Number(document.querySelector('#edit-user-form-phone').value);
+    submit(event) {
+        event.preventDefault();
+        let form = this.refs.editUserForm;
+        if(form.checkValidity()) {
+            $('#spinner').show();
+            let newuser = {
+                user_id: this.props.user.user_id,
+                firstname: document.querySelector('#edit-user-form-firstname').value,
+                lastname: document.querySelector('#edit-user-form-lastname').value,
+                email: document.querySelector('#edit-user-form-email').value,
+                tlf: Number(document.querySelector('#edit-user-form-phone').value),
+                region_id: this.props.user.region_id,
+                role_id: this.props.user.role_id
+            };
 
-        let newuser = {
-            user_id: user_id,
-            firstname: firstname,
-            lastname: lastname,
-            email: email,
-            tlf: tlf,
-            region_id: region_id,
-            role_id: role_id
-        };
-        this.props.editUser(newuser)
+            let userService = new UserService();
+            userService.updateUser(newuser)
+                .then(res => {
+                    $('#spinner').hide();
+                    console.log(res);
+                    this.props.editUser(newuser);
+                })
+                .catch((error: Error) => {
+                    $("#spinner").hide();
+                    this.error = ToolService.getUserUpdateErrorAlert(error);
+                    console.error(error);
+                });
+        } else {
+            form.reportValidity();
+        }
     }
 }
 export default EditUserForm;

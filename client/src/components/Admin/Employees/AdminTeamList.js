@@ -10,6 +10,7 @@ import EditUserForm from "./EditUserForm";
 
 class AdminTeamList extends Component{
     verification = false;
+    delete_error = null;
     render() {
         if(this.props.team === undefined || this.props.team === null){
             return(
@@ -70,6 +71,7 @@ class AdminTeamList extends Component{
         let modal_body = (
             <div>
                 <div className={'my-3 mx-3'}>
+                    {this.delete_error}
                     <div>Er du sikker på at du vil fjerne <strong>{employee.firstname} {employee.lastname}</strong> fra kommunens saksbehandlere?</div>
                     <div className={'text-muted'}>Epost: {employee.email}</div>
                 </div>
@@ -84,36 +86,36 @@ class AdminTeamList extends Component{
     setEditModalContent(event, employee) {
         let modal_header = "Rediger ansatt: " + employee.firstname + ' ' + employee.lastname;
         let modal_body = (
-            <EditUserForm editUser={(user) => this.editEmployee(user)} user={employee}/>
+            <EditUserForm editUser={(user) => this.editEmployee(user)}
+                          user={employee}
+                          error={this.edit_error}
+            />
         );
         let modal_footer = null;
         VerificationModal.setcontent(modal_header, modal_body, modal_footer);
     }
 
     editEmployee(employee: User) {
-        console.log('User updated', employee);
-
-        let userService = new UserService();
-        userService.updateUser(employee)
-            .then(res => {
-                $('#verify-modal').modal('hide');
-                this.props.onTeamChange(employee);
-                console.log(res);
-            })
-            .catch((error: Error) => console.error(error));
+        $('#verify-modal').modal('hide');
+        this.props.onTeamChange(employee);
     }
 
     removeEmployee(event, employee: User) {
-
+        $('#spinner').show();
         let userService = new UserService();
         if(!employee.role_id || employee.role_id !== ToolService.private_user_role_id) employee.role_id = ToolService.private_user_role_id;
         console.log(employee);
         userService.updateUser(employee)
             .then(res => {
                 console.log(res);
+                $('#spinner').hide();
                 this.props.onTeamChange(employee);
             })
-            .catch((error: Error) => console.error(error));
+            .catch((error: Error) => {
+                $('#spinner').hide();
+                this.delete_error = ToolService.getUserUpdateErrorAlert(error);
+                console.error(error);
+            });
     }
 }
 export default AdminTeamList;

@@ -1,6 +1,8 @@
 // @flow
-
+import * as React from 'react';
+import { Component } from 'react-simplified';
 import Notify from '../components/Notify';
+import Alert from '../components/Alert';
 import User from '../classes/User';
 
 const dateConverter = require('dateformat');
@@ -68,6 +70,64 @@ class ToolService {
       }
       return help;
       */
+  }
+
+  static getUserUpdateErrorAlert(error: Error) {
+      if(error.response) {
+          if(error.response.status === 409) {
+              // Epost finnes allerede
+              return(
+                  <Alert
+                      type={'danger'}
+                      text={'En bruker med denne epostadressen eksisterer allerede.'}
+                      onClose={() => this.error = null}
+                  />
+              );
+          } else if (error.response.status === 400) {
+              // bad request
+              return(
+                  <Alert
+                      type={'danger'}
+                      text={'Fyll inn alle feltene riktig før du registrerer.'}
+                      onClose={() => this.error = null}
+                  />
+              );
+          } else if (error.response.status === 403) {
+              // not logged in, token expired
+              return(
+                  <Alert
+                      type={'danger'}
+                      text={'Din økt har utgått, logg ut og inn og prøv igjen.'}
+                      onClose={() => this.error = null}
+                  />
+              );
+          } else if (error.response.status === 401) {
+              // unauthorized
+              return(
+                  <Alert
+                      type={'danger'}
+                      text={'Du har ikke rettigheter til å utføre denne handlingen.'}
+                      onClose={() => this.error = null}
+                  />
+              );
+          } else {
+              return(
+                  <Alert
+                      type={'danger'}
+                      text={error.message}
+                      onClose={() => this.error = null}
+                  />
+              );
+          }
+      } else {
+          return(
+              <Alert
+                  type={'danger'}
+                  text={error.message}
+                  onClose={() => this.error = null}
+              />
+          );
+      }
   }
 }
 
