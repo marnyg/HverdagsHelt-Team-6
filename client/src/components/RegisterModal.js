@@ -17,13 +17,9 @@ class RegisterModal extends Component {
     validpasswords = false;
     region_id = null;
 
-    emailPattern = "^[\wæøåÆØÅ]+([.]{1[\wæøåÆØÅ]+)*@[\wæøåÆØÅ]+([.]{1}[\wæøåÆØÅ])*"
-    regexPassword = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$"
-    regexNumber = "^[\d]{8}"
     constructor() {
         super();
         this.submit = this.submit.bind(this);
-        this.notBlank = this.notBlank.bind(this);
     }
     getEmailStatus() {
         if (this.email === undefined || this.email === null) {
@@ -52,14 +48,19 @@ class RegisterModal extends Component {
                         <h1>Lag ny bruker</h1><br />
                         {this.error}
                         <form ref="form" className={'form-group'}>
-                            <input className={"form-control"} pattern={this.emailPattern} type="email" required name="emails" id={'inputPassword'} placeholder="Epost" />
-                            <input type="password" ref="pass1" pattern={this.regexPassword} required placeholder="Passord" />
+                            <input ref="email" className={"form-control"}
+                                pattern="^[\wæøåÆØÅ]+([.]{1}[\wæøåÆØÅ]+)*@[\wæøåÆØÅ]+([.]{1}[\wæøåÆØÅ]+)+$"
+                                type="email" required name="emails" id={'inputPassword'} placeholder="Epost" />
+
+
+                            <input type="password" ref="pass1"
+                                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$" required placeholder="Passord" />
 
                             <input type="password" ref="pass2" required placeholder="Gjenta passord" />
-                            <input type="text" required name="firstname" placeholder="Fornavn" />
-                            <input type="text" required name="lastname" placeholder="Etternavn" />
-                            <input type="text" required name="adress" placeholder="Adresse" onChange={(event) => { this.address = event.target.value }} />
-                            <input type="text" required name="zip" placeholder="Postnummer" onChange={(event) => { this.zip = event.target.value }} />
+                            <input type="text" ref="fn" required name="firstname" placeholder="Fornavn" />
+                            <input type="text" ref="ln" required name="lastname" placeholder="Etternavn" />
+                            <input type="text" ref="addr" required name="adress" placeholder="Adresse" />
+                            <input type="text" ref="zip" required name="zip" placeholder="Postnummer" />
                             <select defaultValue={''} required onChange={this.countyListener} className={'form-control mb-3'} id={'countySelector'}>
                                 <option value={''} >
                                     Velg fylke
@@ -89,7 +90,7 @@ class RegisterModal extends Component {
                                     </option>
                                 ))}
                             </select>
-                            <input pattern={this.regexNumber} type="tel" required placeholder="Telefonnummer" />
+                            <input ref="tlf" pattern="^[\d]{8}" type="tel" required placeholder="Telefonnummer" />
                             <input name="login" className="btn btn-primary" value="Register" onChange={this.submit} onClick={this.submit} />
                         </form>
                     </div>
@@ -135,23 +136,45 @@ class RegisterModal extends Component {
     }
 
     submit(event) {
-        console.log('Is ' + this.email + ' a valid email?: ', this.validate_email(this.email));
+        console.log('Is ' + this.email + ' a valid email?: ');
         //user_id, role_id, region_id, firstname, lastname, tlf, email, hash_password, salt){
-        if (this.refs.form.checkValidity()) {
+        if (this.refs.form.checkValidity() && this.refs.pass1.value === this.refs.pass2.value) {
             console.log("true");
+            this.refs.pass2.setCustomValidity("")
+
+
+            let user = new User(null, null, Number(this.region_id),
+                this.refs.fn.value, this.refs.ln.value, Number(this.refs.tlf.value),
+                this.refs.email.value, this.refs.pass1.value);
+            console.log(user);
+
+
+            let userService = new UserService();
+
+            userService.createUser(user)
+                .then((user_out: User) => {
+                    //email: string, password: string
+                    console.log('Registered');
+                    userService.login(this.email, this.password1)
+                        .then(res => {
+                            $('#register-modal').modal('hide');
+                            this.props.onLogin();
+                        })
+                        .catch((error: Error) => console.error(error));
+                })
+                .catch((error: Error) => { console.error(error) });
+
 
         } else {
-
+            if (!(this.refs.pass1.value === this.refs.pass2.value)) {
+                this.refs.pass2.setCustomValidity("Passord må vere identisk")
+            } else {
+                this.refs.pass2.setCustomValidity("")
+            }
             this.refs.form.reportValidity()
-            this.refs.pass1.setCustomValidity("")
-            console.log("nottrue");
-            console.log(this.refs.pass1.value);
-            console.log(this.refs.pass1);
-            console.log(this.refs.pass1.inv);
 
         }
 
-        let user = new User(null, null, Number(this.region_id), this.fn, this.ln, Number(this.phone), this.email, this.password1);
 
         // if (this.notBlank(user)) {
         //     // All required fields have been filled
@@ -183,26 +206,5 @@ class RegisterModal extends Component {
         // }
     }
 
-    validate_passwords(pw1, pw2) {
-        if (pw1 !== pw2) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    validate_email(email) {
-        //console.log(re + '.test(' + email + ') === ' + re.test(email));
-        // return re.test(email);
-    }
-
-    notBlank(data) {
-        for (var prop in data) {
-            if (data[prop] === undefined || data[prop] === '') {
-                return false;
-            }
-        }
-        return true
-    }
 }
 export default RegisterModal;
