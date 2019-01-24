@@ -3,6 +3,10 @@ import Location from '../classes/Location.js';
 import ToolService from "./ToolService";
 const key = 'AIzaSyBfY2sQ7ZU-o-npnt8Ua5RSdV9-5ZCoriM';
 class LocationService {
+    /**
+     * Get a location, using geolocation
+     * @returns {Promise<Location>}
+     */
     getLocation(): Promise<Location> {
         return new Promise((resolve, reject) => {
             if (navigator.geolocation) {
@@ -76,10 +80,18 @@ class LocationService {
 
     }
 
+    /**
+     * Get a location, using IP address
+     * @returns {AxiosPromise<any>}
+     */
     getLocationByIP(): Promise<any> {
         return axios.get('http://ip-api.com/json');
     }
 
+    /**
+     * Get coordinates (latitude & longitude)
+     * @returns {Promise<any>}
+     */
     getLocationCoords() {
         return new Promise((resolve, reject) => {
             var location_timeout = setTimeout(() => { reject('GPS timed out') }, 10000);
@@ -102,15 +114,31 @@ class LocationService {
         });
     }
 
+    /**
+     * Get geocode, given latitude and longitude
+     * @param lat
+     * @param lng
+     * @returns {AxiosPromise<any>}
+     */
     geocodeLatLng(lat, lng): Promise<any> {
         //https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=YOUR_API_KEY
         return axios.get('https://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lng + '&key=' + key);
     }
 
+    /**
+     * Get geocode, given city and county
+     * @param city
+     * @param county
+     * @returns {AxiosPromise<any>}
+     */
     geocodeCityCounty(city, county): Promise<any> {
         return axios.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + city + ',region=' + county + '&key=' + key);
     }
 
+    /**
+     * Errorhandler for geolacation errors
+     * @returns {Error}
+     */
     geolocFail() {
         return new Error('Geolocation failed');
     }

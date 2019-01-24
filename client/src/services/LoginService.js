@@ -2,6 +2,10 @@
 import axios from 'axios';
 
 class LoginService {
+  /**
+   * Check if a user is logged in, using token
+   * @returns {Promise<boolean>}
+   */
   isLoggedIn(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       let token = localStorage.getItem('token');

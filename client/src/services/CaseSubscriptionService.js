@@ -5,7 +5,11 @@ import LoginService from './LoginService.js';
 import Case from '../classes/Case.js';
 
 class CaseSubscriptionService {
-  //Get all subscriotions, given user
+  /**
+   * Get all subscriptions, given user
+   * @param user_id
+   * @returns {Promise<CaseSubscription[]>}
+   */
   getAllCaseSubscriptions(user_id: number): Promise<CaseSubscription[]> {
     //return axios.get('/api/cases/subscription/' + user_id);
     return new Promise((resolve, reject) => {
@@ -37,7 +41,12 @@ class CaseSubscriptionService {
     });
   }
 
-  //Delete subscription, given case
+  /**
+   * Delete subscription, given case
+   * @param case_id
+   * @param user_id
+   * @returns {Promise<void>}
+   */
   deleteCaseSubscription(case_id: number, user_id: number): Promise<void> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
@@ -67,7 +76,11 @@ class CaseSubscriptionService {
     });
   }
 
-  //Create subscription, given case
+  /**
+   * Create subscription, given case
+   * @param subscription
+   * @returns {Promise<CaseSubscription>}
+   */
   createCaseSubscription(subscription: CaseSubscription): Promise<CaseSubscription> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
@@ -99,8 +112,13 @@ class CaseSubscriptionService {
     });
   }
 
+  /**
+   * Update a case subscription
+   * @param subscription
+   * @returns {Promise<any>}
+   */
   updateCaseSubscription(subscription: CaseSubscription): Promise<any> {
-      console.log('UPDATING CASE SUBSCRIPTION');
+    console.log('UPDATING CASE SUBSCRIPTION');
     //axios.put('/api/cases/' + case_id + '/subscribe');
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
@@ -130,6 +148,11 @@ class CaseSubscriptionService {
     });
   }
 
+  /**
+   * Get all subscribed cases for a user
+   * @param user_id
+   * @returns {Promise<Case[]>}
+   */
   getAllSubscribedCasesGivenUser(user_id: number): Promise<Case[]> {
     //return axios.get('/api/cases/subscription/' + user_id);
     return new Promise((resolve, reject) => {
@@ -159,6 +182,11 @@ class CaseSubscriptionService {
     });
   }
 
+  /**
+   * Get all outdated cases that user subscribed to
+   * @param user_id
+   * @returns {Promise<Case[]>}
+   */
   getAllOutdatedCaseSubscriptions(user_id: number): Promise<Case[]> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
