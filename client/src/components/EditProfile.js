@@ -84,18 +84,21 @@ class EditProfile extends Component<{}, { isEditing: boolean }> {
                 Email:
                 <input
                   type="email"
+                  pattern="^[\wæøåÆØÅ]+([.]{1}[\wæøåÆØÅ]+)*@[\wæøåÆØÅ]+([.]{1}[\wæøåÆØÅ]+)+$"
                   required
                   id="email"
                   defaultValue={this.user.email}
                   onChange={this.handleChange}
                   className="form-control mt-2"
                 />
+                <small className={"text-muted"}>Epost må vere på formen bruker@adresse.no  </small>
               </div>
             </div>
             <div className={'row list-group-item d-flex'}>
               <div className={'col-sm'}>Tlf:</div>
               <div className={'col-lg'}>
                 <input
+                  pattern="^[\d]{8}"
                   type="tel"
                   required
                   id="tlf"
@@ -103,10 +106,11 @@ class EditProfile extends Component<{}, { isEditing: boolean }> {
                   onChange={this.handleChange}
                   className="form-control"
                 />
+                <small className={"text-muted"}>Tlf må ha 8 siffer  </small>
               </div>
             </div>
             <div className={'row list-group-item d-flex'}>
-              <div className={'col-sm'}>Passord:</div>
+              <div className={'col-sm'}>Bekreft Passord:</div>
               <div className={'col-lg'}>
                 <input type="password" required id="password" onChange={this.handleChange} className="form-control" />
               </div>

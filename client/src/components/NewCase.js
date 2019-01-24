@@ -47,225 +47,223 @@ class NewCase extends Component {
     Notify.flush();
   }
 
+
   render() {
     if (!this.case) {
       return null;
     }
 
     return (
-      <div>
-        <div className="container">
-          {this.error}
-          <div className="row">
-            <div className="col-md-6">
-              <form
-                ref={e => {
-                  this.form = e;
-                }}
-              >
-                <div className={'form-group'}>
-                  <label htmlFor="category">Kategori</label>
-                  <select
-                    defaultValue={'.null'}
-                    className={'form-control'}
-                    id={'category'}
-                    onChange={(event: SyntheticInputEvent<HTMLSelectElement>) =>
-                      (this.case.category_id = event.target.value)
-                    }
-                    required
-                  >
-                    <option value={''}>Kategori</option>
-                    {this.categories.map(e => (
-                      <option key={e.category_id} value={e.category_id}>
-                        {' '}
-                        {e.name}{' '}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className={'form-group'}>
-                  <label htmlFor="title">Tittel</label>
-                  <input
-                    className={'form-control'}
-                    type="text"
-                    pattern="^.{2,255}$"
-                    autoComplete="off"
-                    value={this.case.title}
-                    onChange={(event: SyntheticInputEvent<HTMLInputElement>) => {
-                      this.case.title = event.target.value;
-                    }}
-                    placeholder={'Gi saken din en beskrivende tittel'}
-                    required
-                  />
-                </div>
-                <div className={'form-group'}>
-                  <label htmlFor="description">Beskrivelse</label>
-                  <textarea
-                    className={'form-control'}
-                    id={'description'}
-                    maxLength={MAX_DESCRIPTION_LENGTH}
-                    value={this.case.description}
-                    onChange={(event: SyntheticInputEvent<HTMLTextAreaElement>) =>
-                      (this.case.description = event.target.value)
-                    }
-                    placeholder="Skriv en kort beskrivelse her, så blir det enklere for oss å hjelpe deg."
-                  />
-                  {this.case.description
-                    ? this.case.description.length + ' av ' + MAX_DESCRIPTION_LENGTH + ' tegn brukt.'
-                    : null}
-                </div>
-                <div>
-                  Posisjon
-                  <div className={'form-check'}>
-                    <input
-                      id={'radio1'}
-                      className={'form-check-input'}
-                      type="radio"
-                      name="pos"
-                      value="auto"
-                      onClick={this.radioListener}
-                      defaultChecked
-                    />
-                    <label htmlFor={'radio1'} className={'form-check-label'}>
-                      Hent automatisk
-                    </label>
-                  </div>
-                  <div className={'form-check'}>
-                    <input
-                      id={'radio2'}
-                      className={'form-check-input'}
-                      type="radio"
-                      name="pos"
-                      value="mapmarker"
-                      onClick={this.radioListener}
-                    />
-                    <label htmlFor={'radio2'} className={'form-check-label'}>
-                      Marker på kart
-                    </label>
-                  </div>
-                  <div className={'form-check'}>
-                    <input
-                      id={'radio3'}
-                      className={'form-check-input'}
-                      type="radio"
-                      name="pos"
-                      value="last-resort-selection"
-                      onClick={this.radioListener}
-                    />
-                    <label htmlFor={'radio3'} className={'form-check-label'}>
-                      Velg fra liste
-                    </label>
-                  </div>
-                </div>
-                <div className={'form-group ml-3 my-3'}>
-                  <select
-                    ref={e => {
-                      this.list1 = e;
-                    }}
-                    defaultValue={'.null'}
-                    className={'form-control mb-3'}
-                    id={'last-resort-county'}
-                    onChange={this.countyListener}
-                    hidden
-                  >
-                    <option value={''}>Velg fylke</option>
-                    {this.counties.map(e => (
-                      <option key={e.county_id} value={e.county_id}>
-                        {' '}
-                        {e.name}{' '}
-                      </option>
-                    ))}
-                  </select>
-                  <select
-                    ref={e => {
-                      this.list2 = e;
-                    }}
-                    defaultValue={'.null'}
-                    className={'form-control mb-3'}
-                    id={'last-resort-municipality'}
-                    onChange={(event: SyntheticEvent<HTMLSelectElement>) => {
-                      this.case.region_id = this.municipalities[event.target.selectedIndex - 1].region_id;
-                      this.case.lat = this.municipalities[event.target.selectedIndex - 1].lat;
-                      this.case.lon = this.municipalities[event.target.selectedIndex - 1].lon;
-                      this.municipalityListener(event);
-                    }}
-                    hidden
-                  >
-                    <option value={''}>Velg kommune</option>
-                    {this.municipalities.map(e => (
-                      <option key={e.region_id} value={e.region_id}>
-                        {' '}
-                        {e.name}{' '}
-                      </option>
-                    ))}
-                  </select>
-                  <label
-                    ref={e => {
-                      this.lastResortAddressLabel = e;
-                    }}
-                    id={'last-resort-address-label'}
-                    htmlFor={'last-resort-address'}
-                    hidden
-                  >
-                    Adresse
-                  </label>
-                  <input
-                    ref={e => {
-                      this.lastResortAddress = e;
-                    }}
-                    className={'form-control mb-3'}
-                    id={'last-resort-address'}
-                    type="text"
-                    placeholder={'Skriv inn eventuell adresse'}
-                    hidden
-                  />
-                </div>
-                {this.case.img.length < 3 ? (
-                  <div className={'form-group'}>
-                    <label htmlFor={'image-input'}>Legg ved bilder</label>
-                    <input
-                      className={'form-control-file'}
-                      id={'image-inpu'}
-                      type={'file'}
-                      accept={'.png, .jpg, .jpeg'}
-                      onChange={this.fileInputListener}
-                      multiple
-                    />
-                  </div>
-                ) : null}
-              </form>
-              <div>
-                <button className={'btn btn-primary mr-2'} onClick={this.send}>
-                  Send sak
-                </button>
-                <NavLink className={'btn btn-secondary'} exact to="/">
-                  Avbryt
-                </NavLink>
+      <div className="container">
+        {this.error}
+        <div className="row">
+          <div className="col-lg">
+            <form
+              ref={e => {
+                this.form = e;
+              }}
+            >
+              <div className={'form-group'}>
+                <label htmlFor="category">Kategori</label>
+                <select
+                  defaultValue={'.null'}
+                  className={'form-control'}
+                  id={'category'}
+                  onChange={(event: SyntheticInputEvent<HTMLSelectElement>) =>
+                    (this.case.category_id = event.target.value)
+                  }
+                  required
+                >
+                  <option value={'.null'} disabled>
+                    Kategori
+                                    </option>
+                  {this.categories.map(e => (
+                    <option key={e.category_id} value={e.category_id}>
+                      {' '}
+                      {e.name}{' '}
+                    </option>
+                  ))}
+                </select>
               </div>
-            </div>
-            <div className="col-md-6 embed-responsive">
-              <GoogleApiWrapper
-                centerPos={
-                  this.case.lat !== undefined && this.case.lon !== undefined
-                    ? { lat: this.case.lat, lng: this.case.lon }
-                    : { lat: this.lastResortPos.lat, lng: this.lastResortPos.lon }
-                }
-                updatePos={this.updatePos}
-                markerPos={
-                  this.case.lat !== undefined && this.case.lon !== undefined
-                    ? { lat: this.case.lat, lng: this.case.lon }
-                    : { lat: this.lastResortPos.lat, lng: this.lastResortPos.lon }
-                }
-                isClickable={this.isMapClickable}
-                chosenMuni={this.list2 ? this.municipalities[this.list2.selectedIndex - 1] : null}
-              />
+              <div className={'form-group'}>
+                <label htmlFor="title">Tittel</label>
+                <input
+                  className={'form-control'}
+                  type="text"
+                  pattern="^.{2,255}$"
+                  autoComplete="off"
+                  value={this.case.title}
+                  onChange={(event: SyntheticInputEvent<HTMLInputElement>) => {
+                    this.case.title = event.target.value;
+                  }}
+                  placeholder={'Gi saken din en beskrivende tittel'}
+                  required
+                />
+              </div>
+              <div className={'form-group'}>
+                <label htmlFor="description">Beskrivelse</label>
+                <textarea
+                  className={'form-control'}
+                  id={'description'}
+                  maxLength={MAX_DESCRIPTION_LENGTH}
+                  value={this.case.description}
+                  onChange={(event: SyntheticInputEvent<HTMLTextAreaElement>) =>
+                    (this.case.description = event.target.value)
+                  }
+                  placeholder="Skriv en kort beskrivelse her, så blir det enklere for oss å hjelpe deg."
+                />
+                {this.case.description
+                  ? this.case.description.length + ' av ' + MAX_DESCRIPTION_LENGTH + ' tegn brukt.'
+                  : null}
+              </div>
+              <div>
+                Posisjon: {document.querySelector('#radio1') && document.querySelector('#radio1').checked ?
+                  <strong>{ToolService.cleanQueryString(this.pos.city)} {ToolService.cleanQueryString(this.pos.region)}</strong> : null}
+                <div className={'form-check'}>
+                  <input
+                    id={'radio1'}
+                    className={'form-check-input'}
+                    type="radio"
+                    name="pos"
+                    value="auto"
+                    onClick={this.radioListener}
+                    defaultChecked
+                  />
+                  <label htmlFor={'radio1'} className={'form-check-label'}>
+                    Hent automatisk
+                                    </label>
+                </div>
+                <div className={'form-check'}>
+                  <input
+                    id={'radio2'}
+                    className={'form-check-input'}
+                    type="radio"
+                    name="pos"
+                    value="mapmarker"
+                    onClick={this.radioListener}
+                  />
+                  <label htmlFor={'radio2'} className={'form-check-label'}>
+                    Marker på kart
+                                    </label>
+                </div>
+                <div className={'form-check'}>
+                  <input
+                    id={'radio3'}
+                    className={'form-check-input'}
+                    type="radio"
+                    name="pos"
+                    value="last-resort-selection"
+                    onClick={this.radioListener}
+                  />
+                  <label htmlFor={'radio3'} className={'form-check-label'}>
+                    Velg fra liste
+                                    </label>
+                </div>
+              </div>
+              <div className={'form-group ml-3 my-3'}>
+                <select
+                  ref={e => {
+                    this.list1 = e;
+                  }}
+                  defaultValue={'.null'}
+                  className={'form-control mb-3'}
+                  id={'last-resort-county'}
+                  onChange={this.countyListener}
+                  hidden
+                >
+                  <option value={'.null'} disabled>
+                    Velg fylke
+                                    </option>
+                  {this.counties.map(e => (
+                    <option key={e.county_id} value={e.county_id}>
+                      {' '}
+                      {e.name}{' '}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  ref={e => {
+                    this.list2 = e;
+                  }}
+                  defaultValue={'.null'}
+                  className={'form-control mb-3'}
+                  id={'last-resort-municipality'}
+                  onChange={(event: SyntheticEvent<HTMLSelectElement>) => {
+                    this.case.region_id = this.municipalities[event.target.selectedIndex - 1].region_id;
+                    this.case.lat = this.municipalities[event.target.selectedIndex - 1].lat;
+                    this.case.lon = this.municipalities[event.target.selectedIndex - 1].lon;
+                    this.municipalityListener(event);
+                  }}
+                  hidden
+                >
+                  <option value={'.null'} disabled>
+                    Velg kommune
+                                    </option>
+                  {this.municipalities.map(e => (
+                    <option key={e.region_id} value={e.region_id}>
+                      {' '}
+                      {e.name}{' '}
+                    </option>
+                  ))}
+                </select>
+                <label
+                  ref={e => {
+                    this.lastResortAddressLabel = e;
+                  }}
+                  id={'last-resort-address-label'}
+                  htmlFor={'last-resort-address'}
+                  hidden
+                >
+                  Adresse
+                                </label>
+                <input
+                  ref={e => {
+                    this.lastResortAddress = e;
+                  }}
+                  className={'form-control mb-3'}
+                  id={'last-resort-address'}
+                  type="text"
+                  placeholder={'Skriv inn eventuell adresse'}
+                  hidden
+                />
+              </div>
+              {this.case.img.length < 3 ? (
+                <div className={'form-group'}>
+                  <label htmlFor={'image-input'}>Legg ved bilder</label>
+                  <input
+                    className={'form-control-file'}
+                    id={'image-inpu'}
+                    type={'file'}
+                    accept={'.png, .jpg, .jpeg'}
+                    onChange={this.fileInputListener}
+                    multiple
+                  />
+                </div>
+              ) : null}
+            </form>
+            <div>
+              <button className={'btn btn-primary mr-2'} onClick={this.send}>
+                Send sak
+                            </button>
+              <NavLink className={'btn btn-secondary'} exact to="/">
+                Avbryt
+                            </NavLink>
             </div>
           </div>
+          <div className={"col-lg google-map " + (document.querySelector('#radio2') && !document.querySelector('#radio2').checked ? "mobile-map-hidden" : "")}>
+            <GoogleApiWrapper
+              centerPos={this.case.lat !== undefined && this.case.lon !== undefined ? { lat: this.case.lat, lng: this.case.lon } : { lat: this.lastResortPos.lat, lng: this.lastResortPos.lon }}
+              updatePos={this.updatePos}
+              markerPos={this.case.lat !== undefined && this.case.lon !== undefined ? { lat: this.case.lat, lng: this.case.lon } : { lat: this.lastResortPos.lat, lng: this.lastResortPos.lon }}
+              isClickable={this.isMapClickable}
+              chosenMuni={this.list2 ? this.municipalities[this.list2.selectedIndex - 1] : null}
+            />
+          </div>
         </div>
-        <div className="container my-5">
+        <div className={'container my-3'}>
           <div className="row">
             {this.case.img.map(e => (
-              <div key={e.src} className="col-md-3">
+              <div key={e.src} className="col-sm-2 my-2">
                 <div className="card">
                   <img src={e.src} alt={e.alt} className="card-img-top" />
                   <div className="card-img-overlay">
@@ -281,9 +279,9 @@ class NewCase extends Component {
             ))}
           </div>
         </div>
-      </div>
-    );
+      </div>)
   }
+
 
   mounted() {
     this.case.user_id = ToolService.getUserId();
@@ -527,10 +525,10 @@ class NewCase extends Component {
       let county = event.target;
       console.log(
         'Slected ' +
-          event.target.options[event.target.selectedIndex].text +
-          ' with id = ' +
-          event.target.value +
-          ' as county from drop-down list.'
+        event.target.options[event.target.selectedIndex].text +
+        ' with id = ' +
+        event.target.value +
+        ' as county from drop-down list.'
       );
       this.list2.hidden = false;
       this.fetchMunicipalities(county.value);
@@ -548,10 +546,10 @@ class NewCase extends Component {
         console.log(
           muni,
           'Slected ' +
-            muni.options[muni.selectedIndex].text +
-            ' with id = ' +
-            muni.value +
-            ' as municipality from drop-down list.'
+          muni.options[muni.selectedIndex].text +
+          ' with id = ' +
+          muni.value +
+          ' as municipality from drop-down list.'
         );
       }
       this.lastResortAddress.hidden = false;
@@ -566,10 +564,10 @@ class NewCase extends Component {
     if (this.list1 && this.list1 instanceof HTMLSelectElement) {
       console.log(
         'Fetching municipalities for county: ' +
-          this.list1.options[this.list1.selectedIndex].text +
-          ' (county_id = ' +
-          county_id +
-          ').'
+        this.list1.options[this.list1.selectedIndex].text +
+        ' (county_id = ' +
+        county_id +
+        ').'
       );
       // Fetching logic here
       let reg = new RegionService();
