@@ -27,10 +27,6 @@ module.exports = {
 function isDuplicate(lat1: number, lon1: number, lat2: number, lon2: number) {
   const duplicate_limit = 50;
 
-  /*Number.prototype.toRad = function() {
-    return (this * Math.PI) / 180;
-  };*/
-
   let R = 6371; // km
   let x1 = lat2 - lat1;
   let dLat = toRad(x1);
@@ -41,7 +37,6 @@ function isDuplicate(lat1: number, lon1: number, lat2: number, lon2: number) {
     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
   let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-  //console.log('Distance: ', R * c * 1000);
   return R * c * 1000 < duplicate_limit; // meter
 }
 
