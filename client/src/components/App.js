@@ -30,6 +30,7 @@ import EmployeePage from "./Employee/EmployeePage";
 import AdminPage from "./Admin/AdminPage";
 import VerificationModal from "./VerificationModal";
 
+import Loader from 'react-loader-spinner'; //https://www.npmjs.com/package/react-loader-spinner
 axios.interceptors.response.use(response => response.data);
 
 class App extends Component {
@@ -44,6 +45,14 @@ class App extends Component {
         return (
             <BrowserRouter>
                 <div className={'h-100 w-100'}>
+                    <div id={'spinner'}>
+                        <Loader
+                            type="TailSpin"
+                            color="#00BFFF"
+                            height="100"
+                            width="100"
+                        />
+                    </div>
                     <div className={'h-100 w-100'}>
                         <Navbar
                             logged_in={this.logged_in}

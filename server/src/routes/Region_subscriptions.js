@@ -6,9 +6,21 @@ type Request = express$Request;
 type Response = express$Response;
 
 module.exports = {
+  /**
+   * Get all region subscriptions
+   * @param req Request
+   * @param res Response
+   * @returns {Region_subscriptions}
+   */
   getAllRegion_subscriptions: function(req: Request, res: Response) {
     return Region_subscriptions.findAll().then(subs => res.send(subs));
   },
+  /**
+   * Add a new region subscription
+   * @param req Request
+   * @param res Response
+   * @returns {Region_subscriptions}
+   */
   addRegion_subscriptions: function(req: Request, res: Response) {
     if (
       !req.body ||
@@ -31,6 +43,12 @@ module.exports = {
         console.log(err.parent.sqlMessage);
       });
   },
+  /**
+   * Updates an existing region subscription
+   * @param req Request
+   * @param res Response
+   * @returns {Region_subscriptions}
+   */
   updateRegion_subscriptions: function(req: Request, res: Response) {
     if (
       !req.body ||
@@ -47,13 +65,14 @@ module.exports = {
       { where: { region_id: Number(req.params.region_id), user_id: req.body.user_id } }
     ).then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)));
   },
+  /**
+   * Deletes a region subscriptions
+   * @param req Request
+   * @param res Response
+   * @returns {*}
+   */
   delRegion_subscriptions: function(req: Request, res: Response) {
-    if (
-      !req.body ||
-      !req.params ||
-      isNaN(Number(req.params.region_id)) ||
-      typeof req.body.user_id !== 'number'
-    )
+    if (!req.body || !req.params || isNaN(Number(req.params.region_id)) || typeof req.body.user_id !== 'number')
       return res.sendStatus(400);
     return Region_subscriptions.destroy({
       where: { region_id: Number(req.params.region_id), user_id: req.body.user_id }
