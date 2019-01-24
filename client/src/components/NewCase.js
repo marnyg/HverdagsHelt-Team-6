@@ -279,6 +279,7 @@ class NewCase extends Component {
                         ))}
                     </div>
                 </div>
+                <div>Fixbranch</div>
             </div>
         );
     }
