@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import { BrowserRouter, Route, withRouter} from 'react-router-dom';
+import { HashRouter, Route, withRouter} from 'react-router-dom';
 import '../styles/styles.css';
 import '../styles/loginmodal.css';
 import '../styles/registermodal.css';
@@ -43,7 +43,7 @@ class App extends Component {
 
         
         return (
-            <BrowserRouter>
+            <HashRouter>
                 <div className={'h-100 w-100'}>
                     <div id={'spinner'}>
                         <Loader
@@ -80,7 +80,7 @@ class App extends Component {
                     </div>
                     <Footer/>
                 </div>
-            </BrowserRouter>
+            </HashRouter>
         );
     }
 
