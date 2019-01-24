@@ -116,10 +116,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   <td>Kategori</td>
                   <td>{this.case.category_name}</td>
                 </tr>
-                <tr>
-                  <td>Sak sendt av</td>
-                  <td>{this.case.createdBy}</td>
-                </tr>
+                {this.getCreatedBy()}
                 <tr>
                   <td>Sak opprettet</td>
                   <td>{ToolService.dateFormat(this.case.createdAt)}</td>
@@ -982,6 +979,23 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               err.message
           );*/
         });
+    }
+  }
+  getCreatedBy() {
+    let user = JSON.parse(localStorage.getItem('user'));
+    if(user) {
+      if(user.role_id === ToolService.admin_role_id || user.role_id === ToolService.employee_role_id) {
+          return(
+              <tr>
+                  <td>Sak sendt av</td>
+                  <td>{this.case.createdBy}</td>
+              </tr>
+          );
+      } else {
+          return null;
+      }
+    } else {
+      return null;
     }
   }
 }

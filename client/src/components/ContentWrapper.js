@@ -152,6 +152,7 @@ class ContentWrapper extends Component {
             caseService.search(this.props.match.params.query)
                 .then((cases: Case[]) => {
                     this.cases = cases;
+                    $('#spinner').hide();
                 })
                 .catch((error: Error) => console.error(error));
         } else {
