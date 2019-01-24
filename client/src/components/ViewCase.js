@@ -41,28 +41,37 @@ const ADMIN: number = 1;
 const EMPLOYEE_ACCESS_LEVEL: number = 2;
 const ADMIN_ACCESS_LEVEL: number = 1;
 
-const MAX_DESCRIPTION_LENGTH: number = 255;
+const MAX_DESCRIPTION_LENGTH: number = 255; // Maximum length of description attribute accepted in database.
 const STATUS_OPEN: number = 1;
 const STATUS_CLOSED: number = 3;
-const COMMENTS_PER_QUERY = 5;
+const COMMENTS_PER_QUERY = 5; // Number of status comments returned per fetch request.
+
+/**
+ * React Component. Provides user with a set display of a case, and logic and elements needed to alter/update said case.
+ * match: params: case_id: case_id which uniquely identifies the case to be displayed.
+ */
 
 class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
-  case: Case = null;
-  statusComment: StatusComment = new StatusComment();
-  subscription: CaseSubscription = null;
-  pos: Location = null;
-  pagenumber: number = 1;
-  statuses: Status[] = [];
-  categories: Category[] = [];
-  statusMessages: StatusComment[] = [];
-  form: HTMLFormElement = null;
-  fetchButton: HTMLButtonElement = null;
-  fileTypes: string[] = ['image/jpeg', 'image/jpg', 'image/png'];
-  imgSync: boolean = false;
-  error = null;
-  loggedIn: boolean = false;
-  edit: boolean = false;
+  case: Case = null; // Case object to be displayed
+  statusComment: StatusComment = new StatusComment(); // Status comment object to be sent if required
+  subscription: CaseSubscription = null; // Subscription object to represent the users current subscription state to this case
+  pos: Location = null; // Location object used for list-selection transitivity.
+  pagenumber: number = 1; // Current page to load status comments
+  statuses: Status[] = []; // List of available statuses
+  categories: Category[] = []; // List of available categories
+  statusMessages: StatusComment[] = []; // List of currently loaded status comments
+  form: HTMLFormElement = null; // Reply form element used for user input
+  fetchButton: HTMLButtonElement = null; // Button element used for status comment fetch requests
+  fileTypes: string[] = ['image/jpeg', 'image/jpg', 'image/png']; // List of accepted image file types. Could be constant.
+  imgSync: boolean = false; // Boolean state. If images are currently being uploaded/downloaded.
+  error = null; // Alert component
+  loggedIn: boolean = false; // Boolean state. If user is logged in or not.
+  edit: boolean = false; // Boolean state. Toggle whether or not to show the edit/reply form
 
+  /**
+   * Returns an HTML element containing sub-elements that presents a case and if the user's authorized; the needs to alter or update it.
+   * Utilizes object variables to alter the state of the HTML element.
+   */
   render() {
     if (!this.case || !this.statusComment) {
       return null;
@@ -313,6 +322,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     );
   }
 
+  /**
+   * Runs when component is mounted.
+   * Initiates data variables, fetching logic and state logic.
+   */
   mounted() {
     this.case = new Case();
     let cas = new CaseService();
@@ -518,6 +531,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       });
   }
 
+  /**
+   * Detects the users privilege level, if user is logged in.
+   * @returns {number} Number that uniquely identifies the user's privilege level.
+   */
   grantAccess() {
     let userObj = localStorage.getItem('user');
     if (this.case && userObj) {
@@ -548,10 +565,20 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Detects wheter or not the currently logged in user is the owner of the supplied case.
+   * @param c Case object to check for ownership.
+   * @returns {boolean} True if user's user_id matches c.user_id
+   */
   isOwner(c: Case) {
     return ToolService.getUserId() === c.user_id;
   }
 
+  /**
+   *
+   * @param c
+   * @returns {boolean}
+   */
   isSubscribed(c: Case) {
     if (this.subscription) {
       return true;
@@ -560,6 +587,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Detects whether or not user is logged in
+   * @returns {boolean} True if user is logged in. False if user is not logged in.
+   */
   isLoggedIn() {
     let token = localStorage.getItem('token');
     if (token) {
@@ -569,6 +600,11 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Fetches CSS style for Subscription Button
+   * @param c Case item of which status is to be styled.
+   * @returns {*} CSS-style component with predefined style property.
+   */
   getSubscriptionButtonStyles(c: Case) {
     if (this.isSubscribed(c)) {
       return subscriptionButtonStyles[1];
@@ -577,6 +613,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Subscribes the user to this case if user is not currently subscribed, or unsibscribes the user if the user is currently not subscribed.
+   * @param event Source event, created by a HTML Button Element, that called this method.
+   */
   onClickSubscribeButton(event: SyntheticInputEvent<HTMLButtonElement>) {
     console.log('Clicked subscribe button!');
     let sub = new CaseSubscriptionService();
@@ -613,6 +653,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Displays or hides the form with user input, if the user has sufficient privilege.
+   * @param event Source event, created by a HTML Button Element, that called this method.
+   */
   onClickToggleForm(event: SyntheticInputEvent<HTMLButtonElement>) {
     event.preventDefault();
     console.log('Toggling form edit.');
@@ -623,6 +667,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Listens for any changes on a bound HTML Textarea Element and alters the case's description with the changes made to the text field inpput.
+   * @param event Source event, created by a HTML Textarea Element, that called this method.
+   */
   textareaListener(event: SyntheticInputEvent<HTMLInputElement>) {
     if (event.target) {
       if (event.target.id === 'description') {
@@ -633,6 +681,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Listens for any changes to the category drop-down list and alters the case's category_id and category_name accordingly.
+   * @param event Source event, created by a HTML Select Element, that called this method.
+   */
   categoryListener(event: SyntheticEvent<HTMLSelectElement>) {
     if (event.target && event.target instanceof HTMLSelectElement && this.case) {
       this.case.category_id = this.categories[event.target.selectedIndex].category_id;
@@ -641,14 +693,26 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Listens for any changes to the status drop-down list and alters the case's status_id and status_name accordingly.
+   * @param event Source event, created by a HTML Select Element, that called this method.
+   */
   statusListener(event: SyntheticEvent<HTMLSelectElement>) {
     if (event.target && event.target instanceof HTMLSelectElement && this.case) {
       this.case.status_id = this.statuses[event.target.selectedIndex].status_id;
       this.case.status_name = this.statuses[event.target.selectedIndex].name;
       console.log('this.case.status_id: ' + this.case.status_id);
+      if (this.statusComment) {
+        this.statusComment.status_id = this.case.status_id;
+        console.log('this.statusComment.status_id: ' + this.statusComment.status_id);
+      }
     }
   }
 
+  /**
+   * Listen for changes to the HTML Input Element of type file. Filters associated files and adds files to the case when necessary.
+   * @param event Source event, created by a HTML Input Element, that called this method.
+   */
   fileInputListener(event: SyntheticInputEvent<HTMLInputElement>) {
     if (!this.imgSync) {
       let files = Array.from(event.target.files);
@@ -711,6 +775,11 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Deletes image associated with the given src parameter from the case object.
+   * @param event Source event, created by a HTML Button Element, that called this method.
+   * @param src Temporary URL of image to be deleted
+   */
   fileInputDeleteImage(event: SyntheticInputEvent<HTMLInputElement>, src: string) {
     if (!this.imgSync) {
       this.imgSync = true;
@@ -736,12 +805,20 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Removes header prefix from local URL resource
+   * @param src URL of image resource
+   * @returns {string} File name of the image, ready for upload.
+   */
   formatImageURL(src: string) {
     let a = src.split('/')[2];
-    console.log(a);
     return a;
   }
 
+  /**
+   * Deletes this case, if status is open.
+   * @param event Source event, created by a HTML Button Element, that called this method.
+   */
   delete(event: SyntheticEvent<HTMLButtonElement>) {
     event.preventDefault();
     console.log('Clicked delete button');
@@ -772,6 +849,9 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Fetches status comments from the server.
+   */
   fetchStatusComments() {
     let cascom = new StatusCommentService();
     cascom
@@ -811,6 +891,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       });
   }
 
+  /**
+   * Validates all inputfields in the HTML form element.
+   * @returns {boolean} Returns true if all fields are ok, or false if not ok.
+   */
   validate() {
     let privilege = this.grantAccess();
     if ((this.case.status_id === STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE) || privilege <= NOT_OWNER_EMPLOYEE) {
@@ -829,6 +913,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Checks form validity and then sends the case and, if applicable, status comment to server.
+   * @param event Source event, created by a HTML Button Element, that called this method.
+   */
   submit(event: SyntheticEvent<HTMLButtonElement>) {
     event.preventDefault();
     let privilege = this.grantAccess();

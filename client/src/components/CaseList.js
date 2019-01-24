@@ -14,7 +14,7 @@ import Alert from './Alert.js';
 
 // Constants used for colouring status fields in table
 
-const ITEMS_PER_QUERY = 3;
+const ITEMS_PER_QUERY = 10;
 const STATUS_CAN_DELETE = 1;
 const subscriptionButtonStyles = ['btn btn-info', 'btn btn-outline-info'];
 
