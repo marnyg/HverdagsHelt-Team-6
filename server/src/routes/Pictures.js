@@ -28,12 +28,12 @@ type Request = express$Request;
 type Response = express$Response;
 
 module.exports = {
-    /**
-     * Uploads a picture to an existing case
-     * @param req Request
-     * @param res Response
-     * @returns {*}
-     */
+  /**
+   * Uploads a picture to an existing case
+   * @param req Request
+   * @param res Response
+   * @returns {*}
+   */
   uploadPicture: function(req: Request, res: Response) {
     if (!req.params || typeof Number(req.params.case_id) != 'number')
       return res.status(400).send({ err: 'Invalid or missing CaseID in URL-parameter.' });
@@ -73,19 +73,20 @@ module.exports = {
         return res.status(500).send(error.message);
       });
   },
-    /**
-     * Deletes a picture from a case
-     * @param req Request
-     * @param res Response
-     * @returns {*}
-     */
+  /**
+   * Deletes a picture from a case
+   * @param req Request
+   * @param res Response
+   * @returns {*}
+   */
   delPicture: function(req: Request, res: Response) {
     if (
       !req.params ||
       !req.token ||
       typeof req.params.image_name != 'string' ||
       typeof Number(req.params.case_id) != 'number'
-    ) return res.sendStatus(400);
+    )
+      return res.sendStatus(400);
 
     let param_case_id = Number(req.params.case_id);
     let image_name = req.params.image_name;
@@ -94,63 +95,58 @@ module.exports = {
     let token_user_id = decoded_token.user_id;
     let token_access_level = decoded_token.accesslevel;
 
-    if(token_access_level > 2) {
-      return Case.findOne(
-        { where: {case_id: param_case_id } }
-      )
-        .then(cases => {
-          if(!cases) return res.status(404).send({ msg: "Case not found."});
-          if(cases.user_id !== token_user_id) return res.status(401).send({ msg: "User did not create this case, and is unauthorized."});
+    if (token_access_level > 2) {
+      return Case.findOne({ where: { case_id: param_case_id } }).then(cases => {
+        if (!cases) return res.status(404).send({ msg: 'Case not found.' });
+        if (cases.user_id !== token_user_id)
+          return res.status(401).send({ msg: 'User did not create this case, and is unauthorized.' });
 
-          Picture.destroy(
-            { where: {
-              case_id: param_case_id,
-              path: image_path
-              }
-            }
-          )
-            .then( async (result) => {
-              console.log('RESULT: ' + result);
-              if(result !== 1) return res.status(404).send({ msg: "Picture not found." });
-              try {
-                await unlinkAsync(path.join(public_path + image_path));
-                return res.status(200).send({msg: "Picture successfully deleted."});
-              } catch (err) {
-                console.log(err);
-                console.log("Picture not found on local machine");
-                return res.status(200).send({ error: "Removed from database, but file not found on filesystem."});
-              }
-
-            })
-            .catch(error => {
-              console.log(error);
-              return res.sendStatus(500);
-            })
-        })
-    } else {
-      return Picture.destroy(
-        { where: {
+        Picture.destroy({
+          where: {
             case_id: param_case_id,
             path: image_path
           }
+        })
+          .then(async result => {
+            console.log('RESULT: ' + result);
+            if (result !== 1) return res.status(404).send({ msg: 'Picture not found.' });
+            try {
+              await unlinkAsync(path.join(public_path + image_path));
+              return res.status(200).send({ msg: 'Picture successfully deleted.' });
+            } catch (err) {
+              console.log(err);
+              console.log('Picture not found on local machine');
+              return res.status(200).send({ error: 'Removed from database, but file not found on filesystem.' });
+            }
+          })
+          .catch(error => {
+            console.log(error);
+            return res.sendStatus(500);
+          });
+      });
+    } else {
+      return Picture.destroy({
+        where: {
+          case_id: param_case_id,
+          path: image_path
         }
-      )
-        .then( async (result) => {
+      })
+        .then(async result => {
           console.log('RESULT: ' + result);
-          if(result !== 1) return res.status(404).send({ msg: "Picture not found." });
+          if (result !== 1) return res.status(404).send({ msg: 'Picture not found.' });
           try {
             await unlinkAsync(path.join(public_path + image_path));
-            return res.status(200).send({msg: "Picture successfully deleted."});
+            return res.status(200).send({ msg: 'Picture successfully deleted.' });
           } catch (err) {
-            console.log("Picture not found on local machine");
+            console.log('Picture not found on local machine');
             console.log(err);
-            return res.status(200).send({ error: "Removed from database, but file not found on filesystem."});
+            return res.status(200).send({ error: 'Removed from database, but file not found on filesystem.' });
           }
         })
         .catch(error => {
           console.log(error);
           return res.sendStatus(500);
-        })
+        });
     }
   }
 };
