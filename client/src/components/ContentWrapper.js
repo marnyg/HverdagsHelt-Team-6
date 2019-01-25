@@ -100,7 +100,6 @@ class ContentWrapper extends Component {
   }
 
   componentWillReceiveProps(newProps) {
-    console.log('Contentwrapper received props, old:', this.props, ' new:', newProps);
     if (newProps.logged_in !== this.props.logged_in) {
       this.logged_in = newProps.logged_in;
       let user = JSON.parse(localStorage.getItem('user'));
@@ -124,7 +123,6 @@ class ContentWrapper extends Component {
       this.setState({
         logged_in: newProps.logged_in
       });
-      console.log('CONTENTWRAPPER is now logged_in:', this.logged_in);
     }
   }
 
@@ -261,13 +259,11 @@ class ContentWrapper extends Component {
   }
 
   loadResults() {
-    console.log('Loading page: ', this.page);
     let caseService = new CaseService();
     caseService
       .getCasePageByRegion(this.limit, this.page, this.region)
       .then((cases: Case[]) => {
         this.cases = cases;
-        console.log('Number of cases loaded:', this.cases.length);
         if (this.cases.length < this.limit) {
           this.nextPageButton.disabled = true;
         } else {

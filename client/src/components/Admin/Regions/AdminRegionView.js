@@ -93,6 +93,10 @@ class AdminRegionView extends Component {
         );
     }
 
+    mounted() {
+        $('#spinner').hide();
+    }
+
     componentWillReceiveProps(newProps) {
         console.log('Old: ', this.props.region, ' new:', newProps.region);
         console.log('Region view receves props');

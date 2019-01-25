@@ -75,6 +75,7 @@ class EmployeePage extends Component{
     }
 
     mounted() {
+        $('#spinner').hide();
         let user = JSON.parse(localStorage.getItem('user'));
         if(user){
             this.fetchCases(user.region_id);

@@ -44,5 +44,9 @@ class MyPage extends Component {
       </div>
     );
   }
+
+  mounted() {
+      $('#spinner').hide();
+  }
 }
 export default MyPage;
