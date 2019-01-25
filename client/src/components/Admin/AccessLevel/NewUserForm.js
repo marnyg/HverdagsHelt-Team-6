@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import Loader from 'react-loader-spinner'; //https://www.npmjs.com/package/react-loader-spinner
 import Alert from '../../Alert';
+import ToolService from "../../../services/ToolService";
 
 class NewUserForm extends Component{
     regions = [];
@@ -148,12 +149,16 @@ class NewUserForm extends Component{
                             defaultValue={''}
                             required>
                         <option value={''} disabled>Velg rolle</option>
-                        {this.roles.map(e => (
-                            <option key={e.role_id} value={e.role_id}>
-                                {' '}
-                                {e.name}{' '}
-                            </option>
-                        ))}
+                        {this.roles.map(e => {
+                            if(e.role_id !== ToolService.deleted_role_id) {
+                                return(
+                                    <option key={e.role_id} value={e.role_id}>
+                                        {' '}
+                                        {e.name}{' '}
+                                    </option>
+                                );
+                            }
+                        })}
                     </select>
                     <button className={'btn btn-primary w-100 mt-3'} onClick={(event) => this.submit(event)}>
                         Registrer bruker

@@ -17,21 +17,23 @@ import CaseItem from './CaseItem';
 
 class Subscriptions extends Component<{ props: { region_id: number }  }> {
     sub_temp = [];
-    subscriptions = [];
+    subscriptions: [] = null;
     regions = [];
     regionCases = [];
     user = JSON.parse(localStorage.getItem('user'));
     frase = null;
 
     render() {
-      if (this.subscriptions.length === 0 && this.subRegionCases().length === 0) {
-          return <div className = 'mt-4 ml-4'>
-            <h1>Du har foreløpig ingen saks-abonnementer.</h1>
-            <p>For å opprette et abonnement på en sak, trykk på den blå klokken,
-            nederst i høyre hjørne av en sak. Saken vil da dukke opp under denne menyen</p>
-          </div>
-      }
-
+        if(this.subscriptions === undefined || this.subscriptions === null) {
+            return null;
+        }
+        if (this.subscriptions.length === 0 && this.subRegionCases().length === 0) {
+            return <div className = 'mt-4 ml-4'>
+                <h1>Du har foreløpig ingen saks-abonnementer.</h1>
+                <p>For å opprette et abonnement på en sak, trykk på den blå klokken,
+                    nederst i høyre hjørne av en sak. Saken vil da dukke opp under denne menyen</p>
+            </div>
+        }
 
         return(
             <div className={'mycarousel-wrapper'}>
@@ -56,14 +58,14 @@ class Subscriptions extends Component<{ props: { region_id: number }  }> {
                 </div>
                 <h1 className={'ml-5'}>Saker fra abonnerende kommuner:</h1>
                 <div className={'mycarousel'}>
-                {this.subRegionCases().length === 0 ?
-                  <div className = 'mt-4 ml-4'>
-                    <h3>Du har foreløpig ingen kommune-abonnementer.</h3>
-                    <p>For å opprette et abonnement på en kommune, gå til Min side etterfulgt av Mine kommuner.
-                    Du vil her kunne velge hvilke kommuner du ønsker å følge. Sakene for de respektive kommunene vil
-                    da dukke opp under denne menyen</p>
-                  </div>
-                  : null}
+                    {this.subRegionCases().length === 0 ?
+                        <div className = 'mt-4 ml-4'>
+                            <h3>Du har foreløpig ingen kommune-abonnementer.</h3>
+                            <p>For å opprette et abonnement på en kommune, gå til Min side etterfulgt av Mine kommuner.
+                                Du vil her kunne velge hvilke kommuner du ønsker å følge. Sakene for de respektive kommunene vil
+                                da dukke opp under denne menyen</p>
+                        </div>
+                        : null}
                     {this.subRegionCases().map(e => {
                         return (
                             <div className='mycarousel-row'>
@@ -85,6 +87,7 @@ class Subscriptions extends Component<{ props: { region_id: number }  }> {
     }
 
     mounted() {
+        $('#spinner').show();
         let css = new CaseSubscriptionService();
         let rss = new RegionSubscriptionService();
         let cs = new CaseService();
@@ -94,13 +97,18 @@ class Subscriptions extends Component<{ props: { region_id: number }  }> {
             .then((subscriptions: Case[]) => {
                 this.subscriptions = subscriptions;
                 console.log('Subscriptions: ', subscriptions)
+                $('#spinner').hide();
             })
             .then(() => {
                 this.divideSubscriptionCasesByRegion().map(index => {
                     this.sub_temp.push(this.subscriptions.filter(sub => sub.region_id === index));
-                })
+                });
+                $('#spinner').hide();
             })
-            .catch((error: Error) => console.error(error));
+            .catch((error: Error) => {
+                console.error(error);
+                $('#spinner').hide();
+            });
 
         rss
             .getSubscribedRegionsForUser(this.user.user_id)
@@ -108,6 +116,7 @@ class Subscriptions extends Component<{ props: { region_id: number }  }> {
                 this.regions = regions.regions;
                 JSON.stringify(this.regions);
                 JSON.parse(JSON.stringify(this.regions));
+                $('#spinner').hide();
             })
             .then(() => {
                 this.regions.map(e => {
@@ -117,10 +126,15 @@ class Subscriptions extends Component<{ props: { region_id: number }  }> {
                             this.regionCases.push(regionCases);
                             JSON.stringify(this.regionCases);
                             JSON.parse(JSON.stringify(this.regionCases));
+                            $('#spinner').hide();
                         })
-                })
+                });
+                $('#spinner').hide();
             })
-            .catch((error: Error) => console.error(error));
+            .catch((error: Error) => {
+                $('#spinner').hide();
+                console.error(error);
+            });
     }
 
     divideSubscriptionCasesByRegion() {
