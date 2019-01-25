@@ -1,13 +1,11 @@
-Folder PATH listing for volume OS
-Volume serial number is E688-D685
 C:.
 |   .DS_Store
 |   .gitignore
 |   .gitlab-ci.yml
+|   folder-tree.txt
 |   LICENSE
 |   README.md
-|   tree.txt
-|   
+|            
 +---client
 |   |   .babelrc
 |   |   .flowconfig
@@ -17,6 +15,14 @@ C:.
 |   |   package.json
 |   |   webpack.config.js
 |   |   
+|   +---flow-typed
+|   |   \---npm
+|   |           axios_v0.18.x.js
+|   |           enzyme_v3.x.x.js
+|   |           history_v4.x.x.js
+|   |           jest_v23.x.x.js
+|   |           react-router-dom_v4.x.x.js
+|   |            
 |   +---public
 |   |   |   bootstrap.min.css
 |   |   |   bundle.js
@@ -29,165 +35,179 @@ C:.
 |   |   |   no-image.png
 |   |   |   
 |   |   \---uploads
+|   |           0ced320dc59cbee0689114e2adab405a.jpg
+|   |           2ac9842272757cdd855b40ff80af2925.jpg
+|   |           2b792eabe70b49cc01f5ffea2bb6f9ba.jpg
 |   |           
-|   \---src
-|       |   .DS_Store
-|       |   index.js
-|       |   services.js
+|   +---src
+|   |   |   .DS_Store
+|   |   |   index.js
+|   |   |   services.js
+|   |   |   
+|   |   +---classes
+|   |   |       Case.js
+|   |   |       CaseSubscription.js
+|   |   |       Category.js
+|   |   |       County.js
+|   |   |       Location.js
+|   |   |       Picture.js
+|   |   |       Region.js
+|   |   |       RegionSubscription.js
+|   |   |       Role.js
+|   |   |       Status.js
+|   |   |       StatusComment.js
+|   |   |       User.js
+|   |   |       
+|   |   +---components
+|   |   |   |   About.js
+|   |   |   |   Alert.js
+|   |   |   |   App.js
+|   |   |   |   CaseItem.js
+|   |   |   |   CaseList.js
+|   |   |   |   Content.js
+|   |   |   |   ContentWrapper.js
+|   |   |   |   DisplayProfile.js
+|   |   |   |   EditPassword.js
+|   |   |   |   EditProfile.js
+|   |   |   |   Footer.js
+|   |   |   |   ForgottenPWModal.js
+|   |   |   |   GoogleApiWrapper.js
+|   |   |   |   ImageModal.js
+|   |   |   |   InfoPage.js
+|   |   |   |   LoginModal.js
+|   |   |   |   MyCases.js
+|   |   |   |   MyPage.js
+|   |   |   |   MyProfile.js
+|   |   |   |   MyRegions.js
+|   |   |   |   Navbar.js
+|   |   |   |   Navigation.js
+|   |   |   |   NewCase.js
+|   |   |   |   NoLocationPage.js
+|   |   |   |   Notifications.js
+|   |   |   |   Notify.js
+|   |   |   |   RegionSelect.js
+|   |   |   |   RegisterModal.js
+|   |   |   |   SearchBox.js
+|   |   |   |   serviceWorker.js
+|   |   |   |   Statistics.js
+|   |   |   |   Subscriptions.js
+|   |   |   |   VerificationModal.js
+|   |   |   |   ViewCase.js
+|   |   |   |   
+|   |   |   +---Admin
+|   |   |   |   |   AdminPage.js
+|   |   |   |   |   
+|   |   |   |   +---AccessLevel
+|   |   |   |   |       AccessLevels.js
+|   |   |   |   |       AdminUserList.js
+|   |   |   |   |       AdminUserView.js
+|   |   |   |   |       NewUserForm.js
+|   |   |   |   |       SelectedUser.js
+|   |   |   |   |       
+|   |   |   |   +---Employees
+|   |   |   |   |       AdminTeamForm.js
+|   |   |   |   |       AdminTeamList.js
+|   |   |   |   |       AdminTeams.js
+|   |   |   |   |       AdminTeamView.js
+|   |   |   |   |       EditUserForm.js
+|   |   |   |   |       
+|   |   |   |   +---RegionRegistration
+|   |   |   |   |       CountyForm.js
+|   |   |   |   |       RegionForm.js
+|   |   |   |   |       RegionRegistration.js
+|   |   |   |   |       
+|   |   |   |   \---Regions
+|   |   |   |           AdminCaseList.js
+|   |   |   |           AdminRegions.js
+|   |   |   |           AdminRegionsList.js
+|   |   |   |           AdminRegionView.js
+|   |   |   |           EditRegionForm.js
+|   |   |   |           
+|   |   |   \---Employee
+|   |   |           EmployeePage.js
+|   |   |           Inbox.js
+|   |   |           TeamList.js
+|   |   |           
+|   |   +---services
+|   |   |       CaseService.js
+|   |   |       CaseSubscriptionService.js
+|   |   |       CategoryService.js
+|   |   |       CountyService.js
+|   |   |       EmployeeService.js
+|   |   |       LocationService.js
+|   |   |       LoginService.js
+|   |   |       RegionService.js
+|   |   |       RegionSubscriptionService.js
+|   |   |       RoleService.js
+|   |   |       StatsService.js
+|   |   |       StatusCommentService.js
+|   |   |       StatusService.js
+|   |   |       ToolService.js
+|   |   |       UserService.js
+|   |   |       
+|   |   \---styles
+|   |           carousel.css
+|   |           grid-list-toggle.css
+|   |           loginmodal.css
+|   |           registermodal.css
+|   |           simple-sidebar.css
+|   |           styles.css
+|   |           
+|   \---tests
+|           setup.js
+|           widgetsTest.js
+|           
++---server
+|   |   .babelrc
+|   |   .env
+|   |   .flowconfig
+|   |   .gitkeep
+|   |   .npmrc
+|   |   .prettierrc
+|   |   package.json
+|   |               
+|   +---src
+|   |   |   auth.js
+|   |   |   models.js
+|   |   |   private.key
+|   |   |   public.key
+|   |   |   server.js
+|   |   |   
+|   |   +---routes
+|   |   |       Cases.js
+|   |   |       Case_subscriptions.js
+|   |   |       Categories.js
+|   |   |       Counties.js
+|   |   |       Pictures.js
+|   |   |       Regions.js
+|   |   |       Region_subscriptions.js
+|   |   |       Roles.js
+|   |   |       Stats.js
+|   |   |       Statuses.js
+|   |   |       Status_comments.js
+|   |   |       Users.js
+|   |   |       
+|   |   \---utils
+|   |           DuplicateChecker.js
+|   |           Epost.js
+|   |           Regex.js
+|   |           
+|   \---tests
+|       |   casesTest.js
+|       |   case_subscriptionsTest.js
+|       |   categoriesTest.js
+|       |   countiesTest.js
+|       |   jest.setup.js
+|       |   modelsTest.js
+|       |   regionsTest.js
+|       |   region_subscriptionsTest.js
+|       |   rolesTest.js
+|       |   statusesTest.js
+|       |   status_commentsTest.js
+|       |   usersTest.js
 |       |   
-|       +---classes
-|       |       Case.js
-|       |       CaseSubscription.js
-|       |       Category.js
-|       |       County.js
-|       |       Location.js
-|       |       Picture.js
-|       |       Region.js
-|       |       RegionSubscription.js
-|       |       Role.js
-|       |       Status.js
-|       |       StatusComment.js
-|       |       User.js
-|       |       
-|       +---components
-|       |   |   About.js
-|       |   |   Alert.js
-|       |   |   App.js
-|       |   |   CaseItem.js
-|       |   |   CaseList.js
-|       |   |   Content.js
-|       |   |   ContentWrapper.js
-|       |   |   DisplayProfile.js
-|       |   |   EditPassword.js
-|       |   |   EditProfile.js
-|       |   |   Footer.js
-|       |   |   GoogleApiWrapper.js
-|       |   |   ImageModal.js
-|       |   |   InfoPage.js
-|       |   |   LoginModal.js
-|       |   |   MyCases.js
-|       |   |   MyPage.js
-|       |   |   MyProfile.js
-|       |   |   MyRegions.js
-|       |   |   Navbar.js
-|       |   |   Navigation.js
-|       |   |   NewCase.js
-|       |   |   NoLocationPage.js
-|       |   |   Notifications.js
-|       |   |   Notify.js
-|       |   |   RegionSelect.js
-|       |   |   RegisterModal.js
-|       |   |   SearchBox.js
-|       |   |   serviceWorker.js
-|       |   |   Statistics.js
-|       |   |   Subscriptions.js
-|       |   |   VerificationModal.js
-|       |   |   ViewCase.js
-|       |   |   
-|       |   +---Admin
-|       |   |   |   AdminPage.js
-|       |   |   |   
-|       |   |   +---AccessLevel
-|       |   |   |       AccessLevels.js
-|       |   |   |       AdminUserList.js
-|       |   |   |       AdminUserView.js
-|       |   |   |       NewUserForm.js
-|       |   |   |       SelectedUser.js
-|       |   |   |       
-|       |   |   +---Employees
-|       |   |   |       AdminTeamForm.js
-|       |   |   |       AdminTeamList.js
-|       |   |   |       AdminTeams.js
-|       |   |   |       AdminTeamView.js
-|       |   |   |       EditUserForm.js
-|       |   |   |       
-|       |   |   +---RegionRegistration
-|       |   |   |       CountyForm.js
-|       |   |   |       RegionForm.js
-|       |   |   |       RegionRegistration.js
-|       |   |   |       
-|       |   |   \---Regions
-|       |   |           AdminCaseList.js
-|       |   |           AdminRegions.js
-|       |   |           AdminRegionsList.js
-|       |   |           AdminRegionView.js
-|       |   |           EditRegionForm.js
-|       |   |           
-|       |   \---Employee
-|       |           EmployeePage.js
-|       |           Inbox.js
-|       |           
-|       +---services
-|       |       CaseService.js
-|       |       CaseSubscriptionService.js
-|       |       CategoryService.js
-|       |       CountyService.js
-|       |       EmployeeService.js
-|       |       LocationService.js
-|       |       LoginService.js
-|       |       RegionService.js
-|       |       RegionSubscriptionService.js
-|       |       RoleService.js
-|       |       SearchService.js
-|       |       StatsService.js
-|       |       StatusCommentService.js
-|       |       StatusService.js
-|       |       ToolService.js
-|       |       UserService.js
-|       |       
-|       \---styles
-|               carousel.css
-|               grid-list-toggle.css
-|               loginmodal.css
-|               registermodal.css
-|               simple-sidebar.css
-|               styles.css
+|       \---testReport
+|               report.html
 |               
-\---server
-    |   .babelrc
-    |   .env
-    |   .flowconfig
-    |   .gitkeep
-    |   .npmrc
-    |   .prettierrc
-    |   package.json
-    |                 
-    +---src
-    |   |   auth.js
-    |   |   models.js
-    |   |   private.key
-    |   |   public.key
-    |   |   server.js
-    |   |   
-    |   +---routes
-    |   |       Cases.js
-    |   |       Case_subscriptions.js
-    |   |       Categories.js
-    |   |       Counties.js
-    |   |       Pictures.js
-    |   |       Regions.js
-    |   |       Region_subscriptions.js
-    |   |       Roles.js
-    |   |       Stats.js
-    |   |       Statuses.js
-    |   |       Status_comments.js
-    |   |       Users.js
-    |   |       
-    |   \---utils
-    |           DuplicateChecker.js
-    |           Epost.js
-    |           Regex.js
-    |           
-    \---tests
-            casesTest.js
-            case_subscriptionsTest.js
-            categoriesTest.js
-            countiesTest.js
-            modelsTest.js
-            regionsTest.js
-            region_subscriptionsTest.js
-            rolesTest.js
-            statusesTest.js
-            status_commentsTest.js
-            template.js
-            usersTest.js
+\---Wiki files
+        folder-tree.txt

@@ -7,13 +7,20 @@ import UserService from "../../../services/UserService";
 import CountyService from "../../../services/CountyService";
 import RegionService from "../../../services/RegionService";
 
-const region_employee_id = 2; // Change to 2 upon delivery
+const region_employee_id = 2;
 
+/**
+ * Component for editing municipality employees.
+ */
 class AdminTeams extends Component {
     region = null;
     team = [];
     regions = [];
-
+  
+  /**
+   * Generates HTML code.
+   * @returns {*} HTML Element with sub-elements.
+   */
     render() {
         return(
             <div className={'container'}>
@@ -33,8 +40,11 @@ class AdminTeams extends Component {
             </div>
         );
     }
-
-    onUserCreated() {
+  
+  /**
+   * Fetches employees from current component region variable.
+   */
+  onUserCreated() {
         if(this.region){
             console.log('user created');
             let userService = new UserService();
@@ -47,7 +57,11 @@ class AdminTeams extends Component {
             console.error('Can\'t update user list, no region_id');
         }
     }
-
+  
+  /**
+   * Fetches employees from region provided.
+   * @param region Region object to fetch users.
+   */
     onRegionSelected(region) {
         $('#spinner').show();
         this.region = region;
@@ -62,7 +76,11 @@ class AdminTeams extends Component {
                 $('#spinner').hide();
             });
     }
-
+  
+  /**
+   * Fetches updates list of employees in region. Called by child component.
+   * @param user
+   */
     onTeamChange(user: User) {
         $('#spinner').show();
         console.log('Team changed');
@@ -76,8 +94,11 @@ class AdminTeams extends Component {
                 $('#spinner').hide();
             });
     }
-
-    mounted() {
+  
+  /**
+   * When component mounts: fetch regions and counties and set component region and county variable object state.
+   */
+  mounted() {
         $('#spinner').show();
         let regionService = new RegionService();
         regionService.getAllRegions()

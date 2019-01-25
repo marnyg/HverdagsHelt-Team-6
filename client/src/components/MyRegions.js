@@ -12,6 +12,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEnvelope, faCheck, faTrashAlt } from '@fortawesome/free-solid-svg-icons/index';
 import UserService from '../services/UserService';
 
+
+
 class MyRegions extends Component<{}, { isEditing: boolean }> {
     regionService = new RegionService();
     countyService = new CountyService();
@@ -23,6 +25,12 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
     followedRegions = []; //temp data
     subscribed = true;
 
+
+
+    /**
+    * Generates HTML code.
+    * return {*} HTML Element with sub-elements.
+    */
     render() {
         return (
             <div className={'container'}>
@@ -34,12 +42,12 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
                             <div className={'card-header'}> Dine kommuner</div>
                             <table className={'table'}>
                                 <thead>
-                                <tr>
-                                    <th itemScope={'col'}>#</th>
-                                    <th itemScope={'col'}>Kommune</th>
-                                    <th itemScope={'col'}>Få epost varsler</th>
-                                    <th itemScope={'col'}>Slett fra varsler</th>
-                                </tr>
+                                    <tr>
+                                        <th itemScope={'col'}>#</th>
+                                        <th itemScope={'col'}>Kommune</th>
+                                        <th itemScope={'col'}>Få epost varsler</th>
+                                        <th itemScope={'col'}>Slett fra varsler</th>
+                                    </tr>
                                 </thead>
                                 <tbody>{this.getYourRegionListEllement(this.followedRegions)}</tbody>
                             </table>
@@ -64,6 +72,11 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
         );
     }
 
+    /**
+    * Generates HTML code for list of Regions
+    * return {*} HTML Element with sub-elements.
+    */
+
     getYourRegionListEllement(listItems: RegionSubscription[]) {
         return listItems.map((e, index) => {
             return (
@@ -81,15 +94,15 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
                                 />
                             </button>
                         ) : (
-                            <button className="btn btn-primary" onClick={event => this.subscribe(event, e)}>
-                                <FontAwesomeIcon
-                                    id={'subscribe'}
-                                    icon={faEnvelope}
-                                    alt="Klikk her for å få varsler på epost om denne saker fra denne kommunen"
-                                    className="float-right"
-                                />
-                            </button>
-                        )}
+                                <button className="btn btn-primary" onClick={event => this.subscribe(event, e)}>
+                                    <FontAwesomeIcon
+                                        id={'subscribe'}
+                                        icon={faEnvelope}
+                                        alt="Klikk her for å få varsler på epost om denne saker fra denne kommunen"
+                                        className="float-right"
+                                    />
+                                </button>
+                            )}
                     </td>
                     <td className={'text-center'}>
                         <button onClick={(event) => this.handleDelete(event, e)} className={'btn btn-danger'}>
@@ -105,6 +118,12 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
             );
         });
     }
+
+
+    /**
+    * Generates HTML code for list of counties
+    * return {*} HTML Element with sub-elements.
+    */
     getCountyListEllement(listItems: Array<County>) {
         return (
             <ul className={'list-group list-group-flush'} style={{ overflow: 'scroll' }}>
@@ -118,6 +137,10 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
             </ul>
         );
     }
+    /**
+    * Generates HTML code for list of regions
+    * return {*} HTML Element with sub-elements.
+    */
     getRegionListEllement() {
         return (
             <div>
@@ -136,6 +159,10 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
             </div>
         );
     }
+
+    /**
+    * gets regions relevant to the chosen county
+    */
 
     filterRegions(e) {
         console.log('filtering regions');
@@ -159,6 +186,11 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
             .catch((error: Error) => console.error(error));
     }
 
+    /**
+     * handles click of delete buttons
+    */
+
+
     handleDelete(event, e) {
         console.log('delete ', e);
         this.regSubService.deleteRegionSubscription(e.region_id, this.user.user_id)
@@ -170,6 +202,9 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
             .catch((error: Error) => console.error(error));
     }
 
+    /**
+     * handles click of add buttons
+    */
     handleAdd(event, e) {
         this.region.splice(this.region.indexOf(e), 1);
         let regionSub = new RegionSubscription(this.user.user_id, e.region_id, true);
@@ -180,6 +215,10 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
                 .then(res => (this.followedRegions = res.regions));
         });
     }
+
+    /**
+     * handles click of delete buttons
+    */
     mounted() {
         this.countyService
             .getAllCounties()
@@ -198,12 +237,18 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
             .then(console.log(this.followedRegions));
     }
 
+    /**
+     * handles click of subscribe buttons
+    */
     subscribe(event, element) {
         event.preventDefault();
         console.log('Subscribe to region');
         element.subscribed = !element.subscribed;
     }
 
+    /**
+     * handles click of delete buttons
+    */
     delete(event, element) {
         event.preventDefault();
         console.log('Delete region sub');

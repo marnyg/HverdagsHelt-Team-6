@@ -16,6 +16,7 @@
       "json",
       "html"
     ],
+    "coverageDirectory": "./../coverage",
     "reporters": [
       "default",
       [
@@ -27,7 +28,6 @@
         }
       ]
     ]
-
   },
   "dependencies": {
     "express": "^4.16.4",

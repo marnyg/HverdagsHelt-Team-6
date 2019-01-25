@@ -6,15 +6,24 @@ import SearchBox from './SearchBox'
 
 export class GoogleMapsContainer extends Component {
 
+
+  /**
+   * handles click on map
+  */
   onClick(t, map, coord) {
     const latLng = { lat: coord.latLng.lat(), lon: coord.latLng.lng() };
     this.props.updatePos(latLng);
   }
 
+  /**
+    * handles what which actions to do when component is updated
+    */
   componentDidUpdate(prevProps) {
     try {
       this.gmap.panTo(this.props.markerPos);
     } catch{
+      console.log("catch");
+
     }
     if (!this.props.isClickable) {
       this.gmap.onClick = null;
@@ -32,11 +41,19 @@ export class GoogleMapsContainer extends Component {
     }
   }
 
+  /**
+  * gets result form google-maps search box
+  */
   getSearchPlaces(res) {
     let lok = res[0].geometry.location
     let respos = { lat: lok.lat(), lon: lok.lng() }
     this.props.updatePos(respos)
   }
+
+  /**
+     * Generates HTML code.
+     * return {*} HTML Element with sub-elements.
+     */
   render() {
     return (
       <div reg="a">
@@ -58,6 +75,10 @@ export class GoogleMapsContainer extends Component {
       </div>
     );
   }
+
+  /**
+* When component mounts: Initiate fetching logic and sets component variable states.
+*/
   mounted() {
     this.gmap = this.refs.Gmap.map;
     this.marker = this.refs.marker.marker;
@@ -65,6 +86,9 @@ export class GoogleMapsContainer extends Component {
   }
 }
 
+/**
+* sets the api key
+*/
 export default GoogleApiWrapper({
   apiKey: 'AIzaSyDhfEwBKYpfnkGiGMNV44wkKBtxI_oH_lo'
 })(GoogleMapsContainer);
