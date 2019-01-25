@@ -30,6 +30,19 @@ let rawQueryCases =
   'JOIN Statuses s ON c.status_id = s.status_id ' +
   'JOIN Categories cg ON c.category_id = cg.category_id ';
 
+let rawQueryCasesNoUserInfo =
+  'Select c.case_id, c.title, c.description, c.lat, c.lon, c.user_id, ' +
+  'co.county_id, co.name AS county_name, ' +
+  'c.region_id, r.name as region_name, ' +
+  'c.status_id, s.name as status_name, ' +
+  'c.category_id, cg.name as category_name, ' +
+  'c.createdAt, c.updatedAt ' +
+  'FROM Cases c JOIN Regions r ON c.region_id = r.region_id ' +
+  'Join Counties co ON r.county_id = co.county_id ' +
+  'JOIN Users u ON c.user_id = u.user_id ' +
+  'JOIN Statuses s ON c.status_id = s.status_id ' +
+  'JOIN Categories cg ON c.category_id = cg.category_id ';
+
 let casesOrder = 'ORDER BY c.updatedAt DESC';
 
 module.exports = {
@@ -40,6 +53,15 @@ module.exports = {
    * @returns {Promise<void>}
    */
   getAllCases: async function(req: Request, res: Response) {
+    let rawQuery = rawQueryCasesNoUserInfo;
+    if (req.token) {
+      let decoded_token = verifyToken(req.token);
+      let token_access_level = Number(decoded_token.accesslevel);
+      if (token_access_level < 3) {
+        rawQuery = rawQueryCases;
+      }
+    }
+
     let page = 1;
     let limit = 20;
 
@@ -48,9 +70,8 @@ module.exports = {
       limit = Number(req.query.limit);
     }
     let offset = (page - 1) * limit;
-
     sequelize
-      .query(rawQueryCases + casesOrder + ' LIMIT ?,?', {
+      .query(rawQuery + casesOrder + ' LIMIT ?,?', {
         replacements: [offset, limit],
         type: sequelize.QueryTypes.SELECT
       })
