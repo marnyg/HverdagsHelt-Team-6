@@ -13,11 +13,10 @@ export class GoogleMapsContainer extends Component {
 
   componentDidUpdate(prevProps) {
     try {
-      if (!this.props.isClickable) {
-      }catch{
-        console.log("kjladkjladkadsjkladkjladl");
-
-      }
+      this.gmap.panTo(this.props.markerPos);
+    } catch{
+    }
+    if (!this.props.isClickable) {
       this.gmap.onClick = null;
       this.gmap.draggable = false
       this.gmap.setOptions({ styles: [{ stylers: [{ saturation: -100 }] }] })
