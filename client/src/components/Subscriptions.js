@@ -15,6 +15,10 @@ import CaseService from '../services/CaseService.js';
 import Notify from './Notify.js';
 import CaseItem from './CaseItem';
 
+/**
+ * This component is used to present all cases that a user i subscribed to.
+ */
+
 class Subscriptions extends Component<{ props: { region_id: number }  }> {
     sub_temp = [];
     subscriptions: [] = null;
@@ -22,6 +26,12 @@ class Subscriptions extends Component<{ props: { region_id: number }  }> {
     regionCases = [];
     user = JSON.parse(localStorage.getItem('user'));
     frase = null;
+
+    /**
+     * Rendering a page with all cases a given that a user has subscribed to.
+     * @returns {*} HTML elements presenting the information based on the user's
+     *              subscriptions.
+     */
 
     render() {
         if(this.subscriptions === undefined || this.subscriptions === null) {
@@ -86,6 +96,10 @@ class Subscriptions extends Component<{ props: { region_id: number }  }> {
         )
     }
 
+    /**
+     * Function that gets subscriptions
+     */
+
     mounted() {
         $('#spinner').show();
         let css = new CaseSubscriptionService();
@@ -137,17 +151,33 @@ class Subscriptions extends Component<{ props: { region_id: number }  }> {
             });
     }
 
+    /**
+     * Function used to divide case subscriptions by Regions. Done to make it
+     * easier to separate data for the overview page.
+     * @returns {*[]}   Array of cases, separated by regions
+     */
+
     divideSubscriptionCasesByRegion() {
         let unique = [...new Set(this.subscriptions.map(item => item.region_id))];
         console.log('Unique subscription cases region_id: ', unique);
         return unique;
     }
 
+    /**
+     * Removes subscribed regions without any cases.
+     * @returns {*[]}   Array of cases.
+     */
     //For å fjerne abonnerenderegioner UTEN caser
     subRegionCases() {
         let res = this.regionCases.filter(e => e.length);
         return res;
     }
+
+    /**
+     * Function to make dateformat more readable.
+     * @param date  Dateformat from database.
+     * @returns {string}    Readable dateformat.
+     */
 
     dateFormat(date: string) {
         if (date) {
