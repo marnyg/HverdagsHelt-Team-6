@@ -8,9 +8,22 @@ import ToolService from "../../../services/ToolService";
 import VerificationModal from "../../VerificationModal";
 import EditUserForm from "./EditUserForm";
 
+/**
+ * This component is a table of regions with their respective employees. Admin
+ * have the opportunity to either edit or delete users from this list.
+ */
+
 class AdminTeamList extends Component{
     verification = false;
-    delete_error = null;
+    delete_error = null;    //Used to display error-messages caused by delete failures
+
+    /**
+     * Rendering the table containing the employees of an region. If a region has no employees,
+     * the user will be met with a message telling that the region has no employees.
+     * @returns {*} HTML elements displaying employees, with opportunity to delete or edit
+     *              user.
+     */
+
     render() {
         if(this.props.team === undefined || this.props.team === null){
             return(
@@ -66,6 +79,13 @@ class AdminTeamList extends Component{
         }
     }
 
+    /**
+     * Function displaying a delete confirmation box. Here you will be able to
+     * cancel or submit the action.
+     * @param event Triggered by a button click.
+     * @param employee  The specific employee that you would like to delete.
+     */
+
     setDeleteModalContent(event, employee) {
         let modal_header = "Er du sikker?";
         let modal_body = (
@@ -83,6 +103,12 @@ class AdminTeamList extends Component{
         VerificationModal.setcontent(modal_header, modal_body, modal_footer);
     }
 
+    /**
+     * Function displaying a edit modal, where you will be able to edit different user variables.
+     * @param event Triggered by a button-click.
+     * @param employee  The specific employee that you would like to edit.
+     */
+
     setEditModalContent(event, employee) {
         let modal_header = "Rediger ansatt: " + employee.firstname + ' ' + employee.lastname;
         let modal_body = (
@@ -95,10 +121,21 @@ class AdminTeamList extends Component{
         VerificationModal.setcontent(modal_header, modal_body, modal_footer);
     }
 
+    /**
+     * Function that handles and proceeds the edit.
+     * @param employee  The specific employee you would like to edit.
+     */
+
     editEmployee(employee: User) {
         $('#verify-modal').modal('hide');
         this.props.onTeamChange(employee);
     }
+
+    /**
+     * Function that handles and proceeds the edit.
+     * @param event Triggered by a double click.
+     * @param employee  The specific employee you would like to delete.
+     */
 
     removeEmployee(event, employee: User) {
         $('#spinner').show();

@@ -3,6 +3,10 @@ import { Component } from 'react-simplified';
 import Notify from './Notify';
 import Picture from '../classes/Picture';
 
+/**
+ * This component is rendering the images from a Picture object.
+ */
+
 class ImageModal extends Component<{ img: Picture }> {
   render() {
     console.log("IMAGEMODAL!");

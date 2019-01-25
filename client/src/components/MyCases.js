@@ -7,6 +7,10 @@ import { HashRouter, Route, NavLink, withRouter } from 'react-router-dom';
 import caseService from '../services/CaseService.js';
 import Notify from './Notify';
 
+/**
+ * This component is representing a table with all the user's cases.
+ */
+
 class MyCases extends Component<{ match: { params: { user_id: number } } }> {
   cases = [
     {
@@ -19,6 +23,11 @@ class MyCases extends Component<{ match: { params: { user_id: number } } }> {
     }
   ];
   user_id = null;
+
+    /**
+     * The render method is rendering a table of all the user's cases.
+     * @returns {*} HTML element containing table of cases.
+     */
 
   render() {
     if (!this.cases) {

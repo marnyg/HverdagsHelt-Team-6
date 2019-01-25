@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for src/routes/Status_comments.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="..\..\prettify.css" />
+    <link rel="stylesheet" href="..\..\base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(..\..\sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="..\..\index.html">All files</a> / <a href="index.html">src/routes</a> Status_comments.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">86.49% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>64/74</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">75.44% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>43/57</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">85% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>17/20</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">89.55% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>60/67</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// @flow
+&nbsp;
+import { Case, Status_comment, User, sequelize, Case_subscriptions } from '../models';
+import { verifyToken } from '../auth';
+import { send_subs_email } from '../utils/Epost.js';
+&nbsp;
+type Request = express$Request;
+type Response = express$Response;
+&nbsp;
+const email_subject = 'Oppdatering på sak!';
+const email_body = `Det har kommet en oppdatering på saken med tittel 'blah blah'`;
+&nbsp;
+let all_true = <span class="fstat-no" title="function not covered" >fu</span>nction(val) {
+<span class="cstat-no" title="statement not covered" >  return val === true;</span>
+};
+&nbsp;
+module.exports = {
+  /**
+   * Get all status comments
+   * @param req Request
+   * @param res Response
+   * @returns {Status_comment}
+   */
+  getAllStatus_comment: async function(req: Request, res: Response) {
+    if (!req.params || isNaN(Number(req.params.case_id))) return res.sendStatus(400);
+&nbsp;
+    let page = 1;
+    let limit = 5;
+    console.log(limit);
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (req.query &amp;&amp; req.query.page !== undefined &amp;&amp; <span class="branch-2 cbranch-no" title="branch not covered" >req.query.limit !== undefined)</span> {
+<span class="cstat-no" title="statement not covered" >      page = Number(req.query.page);</span>
+<span class="cstat-no" title="statement not covered" >      limit = Number(req.query.limit);</span>
+    }
+    let limit_start = (page - 1) * limit;
+&nbsp;
+    sequelize
+      .query(
+        'Select sc.status_comment_id, sc.comment, sc.createdAt, sc.updatedAt, sc.case_id, sc.status_id, sc.user_id, ' +
+          "CONCAT(u.firstname, ' ', u.lastname) as createdBy, " +
+          's.name AS status_name ' +
+          'FROM Status_comments sc ' +
+          'JOIN Users u ON sc.user_id = u.user_id ' +
+          'JOIN Statuses s ON sc.status_id = s.status_id ' +
+          'WHERE case_id = ? Order By sc.updatedAt DESC Limit ?,?;',
+        {
+          replacements: [Number(req.params.case_id), limit_start, limit],
+          type: sequelize.QueryTypes.SELECT
+        }
+      )
+      .then(async result =&gt; {
+        return res.send(result);
+      })
+      .catch(<span class="fstat-no" title="function not covered" >er</span>r =&gt; {
+<span class="cstat-no" title="statement not covered" >        return res.status(500).send(err);</span>
+      });
+  },
+  /**
+   * Add a status comment
+   * @param req Request
+   * @param res Response
+   * @returns {Status_comment}
+   */
+  addStatus_comment: function(req: Request, res: Response) {
+    if (
+      !req.body ||
+      !req.token ||
+      typeof req.body.comment !== 'string' ||
+      typeof req.body.status_id !== 'number' ||
+      typeof req.token !== 'string' ||
+      isNaN(Number(req.params.case_id))
+    )
+      return res.sendStatus(400);
+&nbsp;
+    let decoded_token = verifyToken(req.token);
+&nbsp;
+    let case_status;
+    let the_user;
+    let create_body;
+    let the_case = Case.findOne({
+      where: { case_id: Number(req.params.case_id) },
+      attributes: ['region_id', 'status_id']
+    })
+      .then(result =&gt; {
+        console.log(result);
+        case_status = result.dataValues.status_id;
+        the_user = User.findOne({ where: { user_id: decoded_token.user_id } });
+      })
+      .then(() =&gt; {
+        let region_id_user = the_user.region_id;
+        let region_id_case = the_case.region_id;
+&nbsp;
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (decoded_token.accesslevel !== 1 &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >region_id_user !== region_id_case)</span> <span class="cstat-no" title="statement not covered" >return res.sendStatus(401);</span>
+      })
+      .then(() =&gt; {
+        create_body = {
+          comment: req.body.comment,
+          case_id: Number(req.params.case_id),
+          user_id: decoded_token.user_id
+        };
+        console.log(req.body.status_id, case_status);
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (decoded_token.accesslevel &lt;= 2) create_body['status_id'] = req.body.status_id;
+        else <span class="cstat-no" title="statement not covered" >create_body['status_id'] = case_status;</span>
+&nbsp;
+        console.log(create_body);
+&nbsp;
+        return Status_comment.create(create_body);
+      })
+      .then(comment =&gt; {
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (comment) {
+          <span class="missing-if-branch" title="else path not taken" >E</span>if (decoded_token.accesslevel &lt;= 2)
+            Case.update({ status_id: req.body.status_id }, { where: { case_id: Number(req.params.case_id) } });
+          Case_subscriptions.findAll({ where: { case_id: Number(req.params.case_id), notify_by_email: 1 } }).then(
+            async subs =&gt; {
+              let all_ids = await subs.map(s =&gt; {
+                return s.user_id;
+              });
+              let all_users = await User.findAll({ where: { user_id: all_ids } });
+              let emails = all_users.map(u =&gt; u.email);
+              send_subs_email(emails, email_subject, email_body);
+              return res.send({ comment: comment });
+            }
+          );
+        }
+      })
+      .then(() =&gt; {
+        console.log('Kommer hit');
+        Case_subscriptions.update({ is_up_to_date: false }, { where: { case_id: Number(req.params.case_id) } });
+      })
+      .catch(<span class="fstat-no" title="function not covered" >er</span>ror =&gt; {
+<span class="cstat-no" title="statement not covered" >        return res.status(500).json(error);</span>
+      });
+  },
+  /**
+   * Update a status comment
+   * @param req Request
+   * @param res Response
+   * @returns {Status_comment}
+   */
+  updateStatus_comment: function(req: Request, res: Response) {
+    if (
+      !req.body ||
+      !req.token ||
+      typeof req.body.comment !== 'string' ||
+      typeof req.body.status_id !== 'number' ||
+      typeof req.token !== 'string' ||
+      isNaN(Number(req.params.status_comment_id)) ||
+      isNaN(Number(req.params.case_id))
+    )
+      return res.sendStatus(400);
+&nbsp;
+    let decoded_token = verifyToken(req.token);
+    let user_id_token = decoded_token.user_id;
+&nbsp;
+    let update_body;
+    let case_status;
+&nbsp;
+    let status_comment = Status_comment.findOne({
+      where: { status_comment_id: Number(req.params.status_comment_id) }
+    })
+      .then(sc =&gt; {
+        status_comment = sc.toJSON();
+        case_status = status_comment.status_id;
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (decoded_token.accesslevel !== 1 &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >user_id_token !== status_comment.user_id)</span> <span class="cstat-no" title="statement not covered" >return res.sendStatus(401);</span>
+      })
+      .then(() =&gt; {
+        update_body = {
+          comment: req.body.comment,
+          case_id: Number(req.params.case_id),
+          user_id: decoded_token.user_id
+        };
+        console.log(req.body.status_id, case_status);
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (decoded_token.accesslevel &lt;= 2) update_body['status_id'] = req.body.status_id;
+        else <span class="cstat-no" title="statement not covered" >update_body['status_id'] = case_status;</span>
+&nbsp;
+        return Status_comment.update(update_body, {
+          where: { status_comment_id: Number(req.params.status_comment_id) }
+        }).then(subscr =&gt; (subscr ? res.send(subscr) : <span class="branch-1 cbranch-no" title="branch not covered" >res.sendStatus(404))</span>);
+      });
+  },
+  /**
+   * Delete a status comment
+   * @param req Request
+   * @param res Response
+   * @returns {*}
+   */
+  delStatus_comment: function(req: Request, res: Response) {
+    if (
+      !req.token ||
+      typeof req.body.user_id !== 'number' ||
+      typeof req.token !== 'string' ||
+      isNaN(Number(req.params.status_comment_id)) ||
+      isNaN(Number(req.params.case_id))
+    )
+      return res.sendStatus(400);
+&nbsp;
+    let decoded_token = verifyToken(req.token);
+    let user_id_token = decoded_token.user_id;
+    let user_id_param = req.body.user_id;
+&nbsp;
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (decoded_token.accesslevel !== 1 &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >user_id_token !== user_id_param)</span> <span class="cstat-no" title="statement not covered" >return res.sendStatus(401);</span>
+&nbsp;
+    return Status_comment.destroy({
+      where: { status_comment_id: Number(req.params.status_comment_id) }
+    }).then(subscr =&gt; {
+      return subscr ? res.send() : <span class="branch-1 cbranch-no" title="branch not covered" >res.sendStatus(404);</span>
+    });
+  }
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Fri Jan 25 2019 14:07:59 GMT+0100 (Central European Standard Time)
+</div>
+</div>
+<script src="..\..\prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="..\..\sorter.js"></script>
+</body>
+</html>

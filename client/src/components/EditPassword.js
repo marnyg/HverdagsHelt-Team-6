@@ -8,6 +8,10 @@ import EditProfile from './EditProfile';
 import DisplayProfile from './DisplayProfile';
 import Alert from './Alert.js';
 
+/**
+ * This component is representing the area where to change you own password.
+ */
+
 class EditPassword extends Component {
     us = new UserService();
     user = JSON.parse(localStorage.getItem('user'));
@@ -16,6 +20,10 @@ class EditPassword extends Component {
     oldPass = '';
     error = null;
 
+    /**
+     * If user does not exist, render 404 page
+     * @returns {*} HTML element presenting 404 page, or the editform for password change.
+     */
 
     render() {
         if (this.user == null) {
@@ -23,6 +31,11 @@ class EditPassword extends Component {
         }
         return <div>{this.getEditFormVersion()}</div>;
     }
+
+    /**
+     * This function is used to set both old and new password from form.
+     * @param event To be triggered by change in input-fields.
+     */
 
     handleChange(event: React.ChangeEvent<HTMLInputElement>) {
         switch (event.target.id) {
@@ -34,6 +47,13 @@ class EditPassword extends Component {
                 break;
         }
     }
+
+    /**
+     * This function is the change password form.
+     * @returns {*} HTML element containing the edit password form.
+     */
+
+
     getEditFormVersion() {
         return (
             <form ref="form" className={'row list-group-item mx-5'}>
@@ -89,6 +109,12 @@ class EditPassword extends Component {
         );
 
     }
+
+    /**
+     * Function to validate if the change password action will be accepted or not.
+     * @param event To be triggered by button-click
+     */
+
     validateForm(event: Event) {
         event.preventDefault();
 
