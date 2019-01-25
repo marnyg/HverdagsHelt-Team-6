@@ -31,10 +31,15 @@ import AdminPage from "./Admin/AdminPage";
 import VerificationModal from "./VerificationModal";
 
 import Loader from 'react-loader-spinner'; //https://www.npmjs.com/package/react-loader-spinner
-axios.interceptors.response.use(response => response.data);
+axios.interceptors.response.use(response => response.data); //
+
+/**
+ *
+ */
 
 class App extends Component {
     logged_in: boolean = false;
+    
     render() {
         let visited = JSON.parse(localStorage.getItem('visited'));
         if(!visited){
