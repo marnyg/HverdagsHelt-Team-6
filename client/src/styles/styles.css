@@ -151,6 +151,9 @@
     .mobile-notification {
         display: none;
     }
+    .megabutton {
+        width: 50% !important;
+    }
     .mobile-region-select {
         display: none;
     }
