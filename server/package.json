@@ -28,7 +28,6 @@
         }
       ]
     ]
-
   },
   "dependencies": {
     "express": "^4.16.4",
