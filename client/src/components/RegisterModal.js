@@ -26,12 +26,10 @@ class RegisterModal extends Component {
         super();
         this.submit = this.submit.bind(this);   //Function to submit the the registration
     }
-
     /**
      * Function to check if exists.
      * @returns {boolean}   Returns true / false depending on the given email's status.
      */
-
     getEmailStatus() {
         if (this.email === undefined || this.email === null) {
             // email is good
@@ -49,14 +47,12 @@ class RegisterModal extends Component {
             }
         }
     }
-
     /**
      * Rendering the register new user form.
      * @returns {*} HTML element that represents the register new user form.
      */
-
     render() {
-        return (
+        t         return (
             <div className="modal fade" id="register-modal" tabIndex="-1" role="dialog"
                 aria-labelledby="myModalLabel" aria-hidden="true">
                 <div className="modal-dialog">
@@ -69,7 +65,7 @@ class RegisterModal extends Component {
                                 pattern="^[\wæøåÆØÅ]+([.]{1}[\wæøåÆØÅ]+)*@[\wæøåÆØÅ]+([.]{1}[\wæøåÆØÅ]+)+$"
                                 type="email" required name="emails" id={'inputPassword'} placeholder="Epost" />
 
-                            <small className="text-muted">Passord må inneholde store og må bokstaver pluss tall</small>
+                            <small className="text-muted">Passord må inneholde store og små bokstaver pluss tall, og ha minst 8 tegn </small>
                             <input type="password" ref="pass1"
                                 pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$" required placeholder="Passord" />
 
@@ -116,19 +112,15 @@ class RegisterModal extends Component {
             </div>
         );
     }
-
     /**
      * Function used to unmount component.
      */
-
     componentWillUnmount() {
         this._isMounted = false;
     }
-
     /**
      * Getting all counties registered in the database.
      */
-
     mounted() {
         this._isMounted = true;
         let countyService = new CountyService();
@@ -145,7 +137,6 @@ class RegisterModal extends Component {
      * Function used to get county from dropdown menu in register new user form.
      * @param event Triggered by selected value in dropdown menu.
      */
-
     countyListener(event) {
         let county = event.target.options[event.target.selectedIndex];
         console.log('County selected:', county.value);
@@ -203,8 +194,6 @@ class RegisterModal extends Component {
                         this.error = null
                     });
                 });
-
-
         } else {
             if (!(this.refs.pass1.value === this.refs.pass2.value)) {
                 this.refs.pass2.setCustomValidity("Passord må vere identisk")
@@ -212,39 +201,7 @@ class RegisterModal extends Component {
                 this.refs.pass2.setCustomValidity("")
             }
             this.refs.form.reportValidity()
-
         }
-
-
-        // if (this.notBlank(user)) {
-        //     // All required fields have been filled
-        //     if (this.validate_passwords(this.password1, this.password2)) {
-        //         if (this.validate_email(this.email)) {
-        //             let userService = new UserService();
-
-        //             userService.createUser(user)
-        //                 .then((user_out: User) => {
-        //                     //email: string, password: string
-        //                     console.log('Registered');
-        //                     userService.login(this.email, this.password1)
-        //                         .then(res => {
-        //                             $('#register-modal').modal('hide');
-        //                             this.props.onLogin();
-        //                         })
-        //                         .catch((error: Error) => console.error(error));
-        //                 })
-        //                 .catch((error: Error) => { console.error(error) });
-        //         } else {
-        //             alert('Epostadressen er ikke gyldig');
-        //         }
-        //     } else {
-        //         alert('Passordene er ikke like')
-        //     }
-        // } else {
-        //     // One or more required fields have not been filled
-        //     alert('Epostadressen er ikke gyldig');
-        // }
     }
-
 }
 export default RegisterModal;
