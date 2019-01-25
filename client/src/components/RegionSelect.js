@@ -22,7 +22,6 @@ class RegionSelect extends Component {
   render() {
     return (
       <div className={this.props.className}>
-        {this.error}
         <form className={this.props.classNameChild}>
           <select
             className={'form-control ' + this.props.elementsMargin}
@@ -122,6 +121,10 @@ class RegionSelect extends Component {
       this.props.onSubmit(this.region_id);
     } else {
       this.error = <Alert type="danger" text="Du må velge både fylke og kommune før du kan sende skjemaet." />;
+      console.log('Filter error');
+      if(this.props.onFilterError) {
+          this.props.onFilterError(this.error);
+      }
       /*Notify.danger('Du må velge både fylke og kommune før du kan sende skjemaet.');*/
     }
   }

@@ -24,6 +24,7 @@ import LoginModal from './LoginModal';
 
 class Content extends Component {
   grid = true;
+  filter_error = null;
 
   /**
    * Overrides default constructor. Flushes/removes any previous notifications from the Notify component.
@@ -43,7 +44,7 @@ class Content extends Component {
       let user = JSON.parse(localStorage.getItem('user'));
       if(user === null){
           registerButton = (
-              <div>
+              <div className={'text-center'}>
                   <div className="btn btn-primary btn-lg w-100 mb-3 megabutton" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#content-login">
                       Registrer sak
                   </div>
@@ -52,18 +53,23 @@ class Content extends Component {
           );
       } else {
           registerButton = (
-              <NavLink to={'/new-case'} className={'btn btn-primary btn-lg w-100 mb-3 megabutton'}>Registrer sak</NavLink>
+              <div className={'text-center'}>
+                    <NavLink to={'/new-case'} className={'btn btn-primary btn-lg w-100 mb-3 megabutton'}>Registrer sak</NavLink>
+              </div>
           );
       }
       return (
-          <div>
+          <div className={'container mx-5 px-5'}>
               {registerButton}
+              {this.filter_error}
               <RegionSelect
                   className={'mobile-region-select'}
                   classNameChild={'form-group'}
                   elementsMargin={'mb-3'}
                   selector_id={'mobile'}
-                  onSubmit={(region_id) => this.props.onSubmit(region_id)}/>
+                  onSubmit={(region_id) => this.props.onSubmit(region_id)}
+                  onFilterError={(error) => this.filter_error = error}
+              />
               <div>
                   <div className="grid-list-control mb-3">
                       <div className="btn-toolbar mx-2" role="toolbar">
@@ -85,6 +91,7 @@ class Content extends Component {
                               elementsMargin={'mr-2'}
                               selector_id={'desktop'}
                               onSubmit={(region_id) => this.props.onSubmit(region_id)}
+                              onFilterError={(error) => this.filter_error = error}
                           />
                       </div>
                   </div>
@@ -100,7 +107,9 @@ class Content extends Component {
                               ))}
                           </div>
                       ) : (
-                          this.props.cases.map(e => <CaseItem case={e} key={e.case_id} grid={this.grid} user={this.props.user} logged_in={this.props.logged_in}/>)
+                          <div className={''}>
+                              {this.props.cases.map(e => <CaseItem case={e} key={e.case_id} grid={this.grid} user={this.props.user} logged_in={this.props.logged_in}/>)}
+                          </div>
                       )}
                   </div>
               </div>

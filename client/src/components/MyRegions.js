@@ -49,7 +49,7 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
                                         <th itemScope={'col'}>Slett fra varsler</th>
                                     </tr>
                                 </thead>
-                                <tbody>{this.getYourRegionListEllement(this.followedRegions)}</tbody>
+                                <tbody>{this.getYourRegionListEllement()}</tbody>
                             </table>
                         </div>
                     </div>
@@ -77,14 +77,14 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
     * return {*} HTML Element with sub-elements.
     */
 
-    getYourRegionListEllement(listItems: RegionSubscription[]) {
-        return listItems.map((e, index) => {
+    getYourRegionListEllement() {
+        return this.followedRegions.map((e, index) => { //listItems = this.followedRegions
             return (
                 <tr id={e.region_id} key={e.region_id}>
                     <th itemScope={'row'}>{index + 1}</th>
                     <td>{e.region_name}</td>
                     <td className={'text-center'}>
-                        {e.subscribed === true ? (
+                        {e.notify !== 1 ? (
                             <button className="btn btn-success" onClick={event => this.subscribe(event, e)}>
                                 <FontAwesomeIcon
                                     id={'subscribe'}
@@ -225,14 +225,31 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
             .then(res => {
                 this.county = res.map(e => new County(e.county_id, e.name));
                 for (let i = 0; i < this.county.length; i++) {
-                    this.county[i].subscribed = true;
+                    this.county[i].subscribed = false;
                 }
             })
             .catch((error: Error) => console.error(error));
         this.userServise
             .getRegionSubscriptionsGivenUserId(this.user.user_id)
             .then(res => {
-                this.followedRegions = res.regions;
+                for (let i = 0; i < res.regions.length; i++) {
+                    res.regions.subscribed = false;
+                }
+                let regSubService = new RegionSubscriptionService();
+                regSubService.getSubscribedRegionsForUser(this.user.user_id)
+                    .then((regsub: RegionSubscription[]) => {
+                        for (let i = 0; i < res.regions.length; i++) {
+                            for (let j = 0; j < regsub.length; j++) {
+                                if(regsub[j].region_id === res.regions[i].region_id) {
+                                    res.regions[i].subscribed = true;
+                                }
+                            }
+                        }
+                        this.followedRegions = res.regions;
+                    })
+                    .catch((error: Error) => {
+                        console.error(error);
+                    });
             })
             .then(console.log(this.followedRegions));
     }
@@ -240,10 +257,23 @@ class MyRegions extends Component<{}, { isEditing: boolean }> {
     /**
      * handles click of subscribe buttons
     */
-    subscribe(event, element) {
+    subscribe(event, region) {
         event.preventDefault();
         console.log('Subscribe to region');
-        element.subscribed = !element.subscribed;
+        let regionSubService = new RegionSubscriptionService();
+        let sub = new RegionSubscription(this.user.user_id, region.region_id, (region.notify !== 1));
+        console.log(sub);
+        regionSubService.updateRegionSubscription(sub, region.region_id)
+            .then(res => {
+                if(region.notify === 1) {
+                    region.notify = 0;
+                } else {
+                    region.notify = 1;
+                }
+            })
+            .catch((error: Error) => {
+                console.error(error);
+            });
     }
 
     /**
