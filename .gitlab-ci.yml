@@ -21,7 +21,7 @@ run_tests:
     - npm test
   artifacts:
     paths:
-      - coverage/
+      - ./tests/testReport/report.html
 
 pages:
   stage: deploy
@@ -29,7 +29,7 @@ pages:
     - run_tests
   script:
     - mkdir .public
-    - cp -r coverage/* .public
+    - cp -r ./tests/testReport/* .public
     - mv .public public
   artifacts:
     paths:
