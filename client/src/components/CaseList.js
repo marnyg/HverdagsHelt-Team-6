@@ -72,21 +72,23 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
                     <button className={this.getSubscriptionButtonStyles(c)} onClick={this.onClickSubscribeButton}>
                       {this.isSubscribed(c) ? 'Slutt å følg' : 'Følg sak'}
                     </button>
-                    <button
-                      className={this.isNotifyByEmail(c) ? 'btn btn-success' : 'btn btn-primary'}
-                      disabled={!this.isSubscribed(c)}
-                      onClick={this.onClickNotifyByEmailButton}
-                    >
-                      <FontAwesomeIcon
-                        icon={this.isNotifyByEmail(c) ? faCheck : faEnvelope}
-                        alt={
-                          this.isNotifyByEmail(c)
-                            ? 'Klikk her for å få varsler på epost om denne saken'
-                            : 'Klikk her for å skru av varsler på epost om denne saken'
-                        }
-                        className="float-right"
-                      />
-                    </button>
+                    {this.isSubscribed(c) ? (
+                      <button
+                        className={this.isNotifyByEmail(c) ? 'btn btn-success' : 'btn btn-primary'}
+                        disabled={!this.isSubscribed(c)}
+                        onClick={this.onClickNotifyByEmailButton}
+                      >
+                        <FontAwesomeIcon
+                          icon={this.isNotifyByEmail(c) ? faCheck : faEnvelope}
+                          alt={
+                            this.isNotifyByEmail(c)
+                              ? 'Klikk her for å få varsler på epost om denne saken'
+                              : 'Klikk her for å skru av varsler på epost om denne saken'
+                          }
+                          className="float-right"
+                        />
+                      </button>
+                    ) : null}
                   </div>
                 </td>
               </tr>
@@ -326,8 +328,7 @@ class CaseList extends Component<{ user_id: ?number, region_id: ?number }> {
       console.log('Did not find case_id to delete.');
     }
   }
-  
-  
+
   /**
    * Subscribes or unsubscribes the user from the case belonging to the current table of which this button belongs.
    * @param event Source event, created by the HTML Button Element.
