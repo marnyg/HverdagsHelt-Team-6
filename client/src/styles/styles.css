@@ -9,11 +9,12 @@
     z-index: 2;
 }
 
-.btn:focus,.btn:active{
+.grid-list-swapper:focus,.grid-list-swapper:active{
     outline: none !important;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;
+    background-color: #556068;
 }
 
 .image-preview {

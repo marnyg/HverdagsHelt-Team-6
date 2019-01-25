@@ -58,12 +58,12 @@ class Content extends Component {
                           <div className="btn-group mr-2" role="group">
                               <button
                                   type="button"
-                                  className={'btn btn-secondary'}
+                                  className={'btn btn-secondary grid-list-swapper'}
                                   onClick={() => (this.grid = true)}
                               >
                                   <FontAwesomeIcon icon={faTh} /> Grid
                               </button>
-                              <button type="button" className="btn btn-secondary" onClick={() => (this.grid = false)}>
+                              <button type="button" className="btn btn-secondary grid-list-swapper" onClick={() => (this.grid = false)}>
                                   <FontAwesomeIcon icon={faListUl} /> List
                               </button>
                           </div>
