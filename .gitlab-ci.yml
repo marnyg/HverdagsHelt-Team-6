@@ -23,16 +23,17 @@ run_tests:
     paths:
       - ./../tests/testReport/report.html
 
-pages:
-  stage: deploy
-  dependencies:
-    - run_tests
-  script:
-    - mkdir .public
-    - cp -r ./tests/testReport/* .public
-    - mv .public public
-  artifacts:
-    paths:
-      - public
-  only:
-    - master
+#
+#pages:
+#  stage: deploy
+#  dependencies:
+#    - run_tests
+#  script:
+#    - mkdir .public
+#    - cp -r ./tests/testReport/* .public
+#    - mv .public public
+#  artifacts:
+#    paths:
+#      - public
+#  only:
+#    - master
