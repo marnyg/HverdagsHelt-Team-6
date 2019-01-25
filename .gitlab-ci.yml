@@ -20,7 +20,7 @@ run_tests:
       - npm test
     artifacts:
       paths:
-        - coverage/
+        - ./../coverage/
 
 pages:
   stage: deploy
