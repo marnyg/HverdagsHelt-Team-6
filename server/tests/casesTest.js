@@ -127,7 +127,6 @@ describe('Create new case', () => {
       .field('status_id', 1)
       .attach('images', null)
       .then(response => {
-        case_id = response.body.case_id;
         expect(response.statusCode).toBe(409);
         done();
       });
