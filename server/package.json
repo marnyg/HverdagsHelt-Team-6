@@ -16,6 +16,7 @@
       "json",
       "html"
     ],
+    "coverageDirectory": "./../coverage",
     "reporters": [
       "default",
       [

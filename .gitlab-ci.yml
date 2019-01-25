@@ -16,11 +16,12 @@ before_script:
 
 # Run JEST tests
 run_tests:
-    script:
-      - npm test
-    artifacts:
-      paths:
-        - ./../coverage/
+  stage: test
+  script:
+    - npm test
+  artifacts:
+    paths:
+      - ./../coverage/
 
 pages:
   stage: deploy
