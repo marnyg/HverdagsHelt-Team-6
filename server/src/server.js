@@ -38,6 +38,11 @@ let app = expressws.app;
 app.use(express.static(public_path));
 app.use(express.json()); // For parsing application/json
 app.use(bearerToken()); // For easy access to token sent in 'Authorization' header.
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 const storage = multer.diskStorage({
   destination: public_path + '/' + 'uploads',
