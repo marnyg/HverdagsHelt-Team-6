@@ -86,7 +86,10 @@ class Navbar extends Component<{ logged_in: boolean }> {
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav mr-auto">
                         <li className="nav-item">
-                            <NavLink exact to="/" className="nav-link" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
+                            <NavLink exact to="/" className="nav-link" onClick={(event) => {
+                                $('#navbarSupportedContent').collapse('hide');
+                                window.location.reload();
+                            }}>
                                 Hjem
                             </NavLink>
                         </li>
@@ -159,7 +162,9 @@ class Navbar extends Component<{ logged_in: boolean }> {
                     this.fetch_notifications(user, this.countPushNotifications);
                 }
             })
-            .catch((error: Error) => console.error(error));
+            .catch((error: Error) => {
+                // user is not logged in
+            });
     }
 
     fetch_notifications(user: User, cb) {

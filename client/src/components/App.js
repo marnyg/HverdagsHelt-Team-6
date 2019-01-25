@@ -95,7 +95,9 @@ class App extends Component {
             .then((logged_in: boolean) => {
                 this.logged_in = logged_in;
             })
-            .catch((error: Error) => console.error(error))
+            .catch((error: Error) => {
+                // user is not logged in
+            })
     }
 
     logout(event) {
@@ -103,13 +105,11 @@ class App extends Component {
         userService.logout()
             .then(res => {
                 this.logged_in = false;
-                console.log('App logging out');
             })
             .catch((error: Error) => console.error(error));
     }
 
     onLogin = () => {
-        console.log('App Logged in');
         this.logged_in = true;
     }
 }

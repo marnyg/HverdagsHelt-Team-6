@@ -32,6 +32,7 @@ class AccessLevels extends Component{
     }
 
     mounted() {
+        $('#spinner').hide();
         this.fetch_users();
     }
 

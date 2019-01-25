@@ -33,6 +33,7 @@ class RegionRegistration extends Component {
     }
 
     mounted() {
+        $('#spinner').hide();
         let countyService = new CountyService();
         countyService.getAllCounties()
             .then((counties: County[]) => {
