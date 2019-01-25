@@ -54,8 +54,8 @@ module.exports = {
       !req.body ||
       !req.params ||
       isNaN(Number(req.params.region_id)) ||
-      typeof req.body.user_id !== 'number' ||
-      typeof req.body.notify !== 'boolean'
+      typeof Number(req.body.user_id) != 'number' ||
+      typeof req.body.notify != 'boolean'
     )
       return res.sendStatus(400);
     return Region_subscriptions.update(
