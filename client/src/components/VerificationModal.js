@@ -7,7 +7,7 @@ import { Component } from 'react-simplified';
  */
 class VerificationModal extends Component {
   modal_content: { title: string, body: React.Node, footer: React.Node } = {};
-  
+
   /**
    * Generates HTML code
    * @returns {*} HTML Element with sub-elements.

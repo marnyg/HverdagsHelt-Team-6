@@ -7,12 +7,20 @@ import RegionService from "../services/RegionService";
 import Notify from './Notify.js';
 import RegionSelect from "./RegionSelect";
 
+/**
+ * Components informing the user that we were unable to locate his/her location using automatic positioning.
+ * Prompts user for input to determin user's location.
+ */
 class NoLocationPage extends Component {
     location = null;
     counties = [];
     regions = [];
     region_id = null;
-
+  
+  /**
+   * Generates HTML code
+   * @returns {*} HTML Element with sub-elements
+   */
     render() {
         return(
             <div className={'no-page'}>
@@ -38,8 +46,11 @@ class NoLocationPage extends Component {
             </div>
         );
     }
-
-    mounted(){
+  
+  /**
+   * When coponent mounts: Fetch current location and set the component object state location.
+   */
+  mounted(){
         let locationService = new LocationService();
         locationService.getLocation()
             .then((location: Location) => {

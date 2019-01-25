@@ -9,7 +9,7 @@ const dateConverter = require('dateformat');
 
 const statusStyles = [{ color: '#CC0000' }, { color: '#0000FF' }, { color: '#007500' }]; // Constant used for colouring status fields in table.
 // Frequently used static methods are put here to reduce overall duplicate code
-
+const standardStyle = { color: '#CC0000' };
 class ToolService {
   static admin_role_id = 1;
   static employee_role_id = 2;
@@ -22,7 +22,12 @@ class ToolService {
      * @returns {{color}|*}
      */
   static getStatusColour(status_id: number) {
-    return statusStyles[status_id - 1];
+      if(status_id - 1 < 0 || status_id - 1 >= statusStyles.length) {
+          // No color
+          return standardStyle;
+      } else {
+          return statusStyles[status_id - 1];
+      }
   }
 
     /**
@@ -157,6 +162,118 @@ class ToolService {
                   text={error.message}
                   onClose={() => onClose}
               />
+          );
+      }
+  }
+
+  static getCreateCategoryErrorAlert(error: Error, onClose) {
+      if(error.response) {
+          if(error.response.status === 400) {
+              // bad req
+              return (
+                  <Alert type={'danger'} text={'Eposten du har oppgitt er ikke en gylidg epostadresse.'} onClose={() => onClose}/>
+              );
+          } else if (error.response.status === 409) {
+              // Conflict
+              return (
+                  <Alert type={'danger'} text={'Det finnes allerede en kategori med dette navnet.'} onClose={() => onClose}/>
+              );
+          } else if (error.response.status === 500) {
+              return (
+                  <Alert type={'danger'} text={'Noe gikk galt med serveren, prøv igjen senere eller ta kontakt med oss.'} onClose={() => onClose}/>
+              );
+          } else {
+              return (
+                  <Alert type={'danger'} text={'Noe gikk galt, prøv igjen senere.'} onClose={() => onClose}/>
+              );
+          }
+      } else {
+          return (
+              <Alert type={'danger'} text={error.message} onClose={() => onClose}/>
+          );
+      }
+  }
+
+  static getCategoryDeleteErrorAlert(error: Error, onClose) {
+      if(error.response) {
+          if(error.response.status === 400) {
+              // bad req
+              return (
+                  <Alert type={'danger'} text={'Eposten du har oppgitt er ikke en gylidg epostadresse.'} onClose={() => onClose}/>
+              );
+          } else if (error.response.status === 409) {
+              // Conflict
+              return (
+                  <Alert type={'danger'} text={'Det finnes saker som bruker denne kategorien, kan ikke slette. '} onClose={() => onClose}/>
+              );
+          } else if (error.response.status === 500) {
+              return (
+                  <Alert type={'danger'} text={'Noe gikk galt med serveren, prøv igjen senere eller ta kontakt med oss.'} onClose={() => onClose}/>
+              );
+          } else {
+              return (
+                  <Alert type={'danger'} text={'Noe gikk galt, prøv igjen senere.'} onClose={() => onClose}/>
+              );
+          }
+      } else {
+          return (
+              <Alert type={'danger'} text={error.message} onClose={() => onClose}/>
+          );
+      }
+  }
+
+  static getStatusDeleteErrorAlert(error: Error, onClose) {
+      if(error.response) {
+          if(error.response.status === 400) {
+              // bad req
+              return (
+                  <Alert type={'danger'} text={'Eposten du har oppgitt er ikke en gylidg epostadresse.'} onClose={() => onClose}/>
+              );
+          } else if (error.response.status === 409) {
+              // Conflict
+              return (
+                  <Alert type={'danger'} text={'Det finnes allerede en status med dette navnet.'} onClose={() => onClose}/>
+              );
+          } else if (error.response.status === 500) {
+              return (
+                  <Alert type={'danger'} text={'Noe gikk galt med serveren, prøv igjen senere eller ta kontakt med oss.'} onClose={() => onClose}/>
+              );
+          } else {
+              return (
+                  <Alert type={'danger'} text={'Noe gikk galt, prøv igjen senere.'} onClose={() => onClose}/>
+              );
+          }
+      } else {
+          return (
+              <Alert type={'danger'} text={error.message} onClose={() => onClose}/>
+          );
+      }
+  }
+
+  static getStatusCreateErrorAlert(error, onClose) {
+      if(error.response) {
+          if(error.response.status === 400) {
+              // bad req
+              return (
+                  <Alert type={'danger'} text={'Eposten du har oppgitt er ikke en gylidg epostadresse.'} onClose={() => onClose}/>
+              );
+          } else if (error.response.status === 409) {
+              // Email does not exist in database
+              return (
+                  <Alert type={'danger'} text={'Det finnes allerede en status med dette navnet.'} onClose={() => onClose}/>
+              );
+          } else if (error.response.status === 500) {
+              return (
+                  <Alert type={'danger'} text={'Noe gikk galt med serveren, prøv igjen senere eller ta kontakt med oss.'} onClose={() => onClose}/>
+              );
+          } else {
+              return (
+                  <Alert type={'danger'} text={'Noe gikk galt, prøv igjen senere.'} onClose={() => onClose}/>
+              );
+          }
+      } else {
+          return (
+              <Alert type={'danger'} text={error.message} onClose={() => onClose}/>
           );
       }
   }
