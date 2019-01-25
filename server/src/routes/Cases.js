@@ -57,7 +57,7 @@ module.exports = {
     if (req.token) {
       let decoded_token = verifyToken(req.token);
       let token_access_level = Number(decoded_token.accesslevel);
-      if (token_access_level < 3) {
+      if (token_access_level < 4) {
         rawQuery = rawQueryCases;
       }
     }
@@ -180,8 +180,18 @@ module.exports = {
    */
   getOneCase: async function(req: Request, res: Response) {
     if (!req.params || isNaN(Number(req.params.case_id))) return res.sendStatus(400);
+
+    let rawQuery = rawQueryCasesNoUserInfo;
+    if (req.token) {
+      let decoded_token = verifyToken(req.token);
+      let token_access_level = Number(decoded_token.accesslevel);
+      if (token_access_level < 4) {
+        rawQuery = rawQueryCases;
+      }
+    }
+
     sequelize
-      .query(rawQueryCases + ' WHERE c.case_id = ?;', {
+      .query(rawQuery + ' WHERE c.case_id = ?;', {
         replacements: [req.params.case_id],
         type: sequelize.QueryTypes.SELECT
       })
@@ -323,6 +333,15 @@ module.exports = {
     )
       return res.sendStatus(400);
 
+    let rawQuery = rawQueryCasesNoUserInfo;
+    if (req.token) {
+      let decoded_token = verifyToken(req.token);
+      let token_access_level = Number(decoded_token.accesslevel);
+      if (token_access_level < 4) {
+        rawQuery = rawQueryCases;
+      }
+    }
+
     let county_check = { 'Sør-Trøndelag': 'Trøndelag', 'Nord-Trøndelag': 'Trøndelag' };
     let county_name = req.params.county_name;
     if (req.params.county_name in county_check) county_name = county_check[req.params.county_name];
@@ -337,7 +356,7 @@ module.exports = {
     let start_limit = (page - 1) * limit;
 
     return sequelize
-      .query(rawQueryCases + ' WHERE r.name = ? AND co.name = ? ' + casesOrder + ' Limit ?,?', {
+      .query(rawQuery + ' WHERE r.name = ? AND co.name = ? ' + casesOrder + ' Limit ?,?', {
         replacements: [req.params.region_name, county_name, start_limit, limit],
         type: sequelize.QueryTypes.SELECT
       })
@@ -363,6 +382,15 @@ module.exports = {
   getAllCasesInRegionById: async function(req: Request, res: Response) {
     if (!req.params || isNaN(Number(req.params.region_id))) return res.sendStatus(400);
 
+    let rawQuery = rawQueryCasesNoUserInfo;
+    if (req.token) {
+      let decoded_token = verifyToken(req.token);
+      let token_access_level = Number(decoded_token.accesslevel);
+      if (token_access_level < 4) {
+        rawQuery = rawQueryCases;
+      }
+    }
+
     let page = 1;
     let limit = 20;
 
@@ -373,7 +401,7 @@ module.exports = {
     let offset = (page - 1) * limit;
 
     sequelize
-      .query(rawQueryCases + ' WHERE c.region_id = ? ' + casesOrder + ' LIMIT ?,?', {
+      .query(rawQuery + ' WHERE c.region_id = ? ' + casesOrder + ' LIMIT ?,?', {
         replacements: [Number(req.params.region_id), offset, limit],
         type: sequelize.QueryTypes.SELECT
       })
