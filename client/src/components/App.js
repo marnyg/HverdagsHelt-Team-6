@@ -64,8 +64,8 @@ class App extends Component {
                         <Route path="/employee" render={() => <EmployeePage/>} />
                         <Route path="/admin" render={() => <AdminPage/>} />
                         <Route exact path="/subscriptions" render={() => <Subscriptions/>} />
+                        <Notify />
                         <div className="content-wrapper">
-                            <Notify />
                             {visited ?
                                 <Route exact path="/" render={() => <ContentWrapper logged_in={this.logged_in} onLogin={() => this.onLogin()}/>} />
                                 :
