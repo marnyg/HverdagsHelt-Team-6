@@ -93,25 +93,7 @@ describe('Create new case', () => {
         done();
       });
   });
-  test('409 status code for POST /api/cases when this case is a duplicate', done => {
-    request(application)
-      .post('/api/cases')
-      .set('Authorization', `Bearer ${user_token}`)
-      .accept('application/json')
-      .field('title', 'Ny sak')
-      .field('description', 'Test test')
-      .field('lat', 10)
-      .field('lon', 12)
-      .field('category_id', 1)
-      .field('region_id', 44)
-      .field('status_id', 1)
-      .attach('images', null)
-      .then(response => {
-        case_id = response.body.case_id;
-        expect(response.statusCode).toBe(409);
-        done();
-      });
-  });
+
   test('200 status code for POST /api/cases', done => {
     request(application)
       .post('/api/cases')
@@ -128,6 +110,25 @@ describe('Create new case', () => {
       .then(response => {
         case_id = response.body.case_id;
         expect(response.statusCode).toBe(200);
+        done();
+      });
+  });
+  test('409 status code for POST /api/cases when this case is a duplicate', done => {
+    request(application)
+      .post('/api/cases')
+      .set('Authorization', `Bearer ${user_token}`)
+      .accept('application/json')
+      .field('title', 'En helt ny sak')
+      .field('description', 'Test test')
+      .field('lat', 90)
+      .field('lon', 70)
+      .field('category_id', 1)
+      .field('region_id', 1)
+      .field('status_id', 1)
+      .attach('images', null)
+      .then(response => {
+        case_id = response.body.case_id;
+        expect(response.statusCode).toBe(409);
         done();
       });
   });
