@@ -37,27 +37,25 @@ class Statistics extends Component {
         <div className="row ">
           <div ref="statPage" className="col border p-5" style={{ maxHeight: '297mm', maxWidth: '210mm', minWidth: '210mm' }}>
             <div className="row">
-              <h4 >Nasjonal statistik</h4>
+              <h4 >Nasjonal statistikk</h4>
               <div className="row">
                 <div className="col" style={{ maxWidth: "150mm", minWidth: '150mm' }} >
                   <Bar ref="bar1" data={this.nationalBar} />
                 </div>
                 <p className="col" >
-                  Ad consequat sit esse elit minim sint ad minim exercitation magna deserunt ipsum ad deserunt. Sunt ut do
-                  anim nulla elit dolor do Lorem tempor magna sit non deserunt exercitation.
-            </p>
+                  Denne grafen viser nasjonal statistikk. Her ser du hvor mange saker som har blitt opprettet og lukket.
+                </p>
               </div>
             </div>
 
             <div className="row">
-              <h4 >Regional statistik</h4>
+              <h4 >Regional statistikk</h4>
               <div className="row">
                 <div className="col" style={{ maxWidth: "150mm", minWidth: '150mm' }} >
                   <Bar data={this.regionalBar} />
                 </div>
                 <p className="col" >
-                  Ad consequat sit esse elit minim sint ad minim exercitation magna deserunt ipsum ad deserunt. Sunt ut do
-                  anim nulla elit dolor do Lorem tempor magna sit non deserunt exercitation.
+                  Denne grafen beskriver din regionale statistikk. Her ser du hvor mange saker som har blitt opprettet og lukket.
             </p>
               </div>
             </div>
@@ -65,16 +63,15 @@ class Statistics extends Component {
             <div className="row">
               <div className="row">
                 <div className="col" style={{ maxWidth: "100mm", minWidth: '100mm' }} >
-                  <h4 >Nasjonal statistik</h4>
+                  <h4 >Nasjonal statistikk</h4>
                   <Pie data={this.nationalPie} />
                 </div>
                 <div className="col" style={{ maxWidth: "100mm", minWidth: '100mm' }} >
-                  <h4 >Regional statistik</h4>
+                  <h4 >Regional statistikk</h4>
                   <Pie data={this.regionalPie} />
                 </div>
                 <p className="col" >
-                  Ad consequat sit esse elit minim sint ad minim exercitation magna deserunt ipsum ad deserunt. Sunt ut do
-                  anim nulla elit dolor do Lorem tempor magna sit non deserunt exercitation.
+                  Disse grafene beskriver antal saker i en gitt kategtori. Her kan du se hvike kategorier som har mest saker, både regionalt og nasjonal.
             </p>
               </div>
             </div>
