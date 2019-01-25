@@ -5,6 +5,7 @@ import RoleService from "../../../services/RoleService";
 import UserService from "../../../services/UserService";
 import {faEdit} from "@fortawesome/free-solid-svg-icons/index";
 import VerificationModal from "../../VerificationModal";
+import ToolService from '../../../services/ToolService';
 
 class SelectedUser extends Component{
     roles = [];
@@ -29,12 +30,16 @@ class SelectedUser extends Component{
                     <select className={'form-control mt-3'} id={'admin-user-form-role-selector'}
                             onChange={(event) => this.selected_role = event.target.value}
                             value={this.selected_role}>
-                        {this.roles.map(e => (
-                            <option key={e.role_id} value={e.role_id}>
-                                {' '}
-                                {e.name}{' '}
-                            </option>
-                        ))}
+                        {this.roles.map(e => {
+                            if(e.role_id !== ToolService.deleted_role_id) {
+                                return(
+                                    <option key={e.role_id} value={e.role_id}>
+                                        {' '}
+                                        {e.name}{' '}
+                                    </option>
+                                );
+                            }
+                        })}
                     </select>
                     <button
                         onClick={(event) => this.setVerificationModalContent(event, this.props.user, this.selected_role)}

@@ -78,7 +78,7 @@ export let User: Class<
     firstname: { type: Sequelize.STRING, allowNull: false },
     lastname: { type: Sequelize.STRING, allowNull: false },
     tlf: { type: Sequelize.BIGINT, allowNull: false },
-    email: { type: Sequelize.STRING, allowNull: false, unique: true },
+    email: { type: Sequelize.STRING, allowNull: true, unique: true },
     hashed_password: { type: Sequelize.STRING, allowNull: false },
     salt: { type: Sequelize.STRING, allowNull: false }
   },

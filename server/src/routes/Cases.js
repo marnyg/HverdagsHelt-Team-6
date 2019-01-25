@@ -30,6 +30,19 @@ let rawQueryCases =
   'JOIN Statuses s ON c.status_id = s.status_id ' +
   'JOIN Categories cg ON c.category_id = cg.category_id ';
 
+let rawQueryCasesNoUserInfo =
+  'Select c.case_id, c.title, c.description, c.lat, c.lon, c.user_id, ' +
+  'co.county_id, co.name AS county_name, ' +
+  'c.region_id, r.name as region_name, ' +
+  'c.status_id, s.name as status_name, ' +
+  'c.category_id, cg.name as category_name, ' +
+  'c.createdAt, c.updatedAt ' +
+  'FROM Cases c JOIN Regions r ON c.region_id = r.region_id ' +
+  'Join Counties co ON r.county_id = co.county_id ' +
+  'JOIN Users u ON c.user_id = u.user_id ' +
+  'JOIN Statuses s ON c.status_id = s.status_id ' +
+  'JOIN Categories cg ON c.category_id = cg.category_id ';
+
 let casesOrder = 'ORDER BY c.updatedAt DESC';
 
 module.exports = {
@@ -40,6 +53,15 @@ module.exports = {
    * @returns {Promise<void>}
    */
   getAllCases: async function(req: Request, res: Response) {
+    let rawQuery = rawQueryCasesNoUserInfo;
+    if (req.token) {
+      let decoded_token = verifyToken(req.token);
+      let token_access_level = Number(decoded_token.accesslevel);
+      if (token_access_level < 4) {
+        rawQuery = rawQueryCases;
+      }
+    }
+
     let page = 1;
     let limit = 20;
 
@@ -48,9 +70,8 @@ module.exports = {
       limit = Number(req.query.limit);
     }
     let offset = (page - 1) * limit;
-
     sequelize
-      .query(rawQueryCases + casesOrder + ' LIMIT ?,?', {
+      .query(rawQuery + casesOrder + ' LIMIT ?,?', {
         replacements: [offset, limit],
         type: sequelize.QueryTypes.SELECT
       })
@@ -159,8 +180,18 @@ module.exports = {
    */
   getOneCase: async function(req: Request, res: Response) {
     if (!req.params || isNaN(Number(req.params.case_id))) return res.sendStatus(400);
+
+    let rawQuery = rawQueryCasesNoUserInfo;
+    if (req.token) {
+      let decoded_token = verifyToken(req.token);
+      let token_access_level = Number(decoded_token.accesslevel);
+      if (token_access_level < 4) {
+        rawQuery = rawQueryCases;
+      }
+    }
+
     sequelize
-      .query(rawQueryCases + ' WHERE c.case_id = ?;', {
+      .query(rawQuery + ' WHERE c.case_id = ?;', {
         replacements: [req.params.case_id],
         type: sequelize.QueryTypes.SELECT
       })
@@ -302,6 +333,15 @@ module.exports = {
     )
       return res.sendStatus(400);
 
+    let rawQuery = rawQueryCasesNoUserInfo;
+    if (req.token) {
+      let decoded_token = verifyToken(req.token);
+      let token_access_level = Number(decoded_token.accesslevel);
+      if (token_access_level < 4) {
+        rawQuery = rawQueryCases;
+      }
+    }
+
     let county_check = { 'Sør-Trøndelag': 'Trøndelag', 'Nord-Trøndelag': 'Trøndelag' };
     let county_name = req.params.county_name;
     if (req.params.county_name in county_check) county_name = county_check[req.params.county_name];
@@ -316,7 +356,7 @@ module.exports = {
     let start_limit = (page - 1) * limit;
 
     return sequelize
-      .query(rawQueryCases + ' WHERE r.name = ? AND co.name = ? ' + casesOrder + ' Limit ?,?', {
+      .query(rawQuery + ' WHERE r.name = ? AND co.name = ? ' + casesOrder + ' Limit ?,?', {
         replacements: [req.params.region_name, county_name, start_limit, limit],
         type: sequelize.QueryTypes.SELECT
       })
@@ -342,6 +382,15 @@ module.exports = {
   getAllCasesInRegionById: async function(req: Request, res: Response) {
     if (!req.params || isNaN(Number(req.params.region_id))) return res.sendStatus(400);
 
+    let rawQuery = rawQueryCasesNoUserInfo;
+    if (req.token) {
+      let decoded_token = verifyToken(req.token);
+      let token_access_level = Number(decoded_token.accesslevel);
+      if (token_access_level < 4) {
+        rawQuery = rawQueryCases;
+      }
+    }
+
     let page = 1;
     let limit = 20;
 
@@ -352,7 +401,7 @@ module.exports = {
     let offset = (page - 1) * limit;
 
     sequelize
-      .query(rawQueryCases + ' WHERE c.region_id = ? ' + casesOrder + ' LIMIT ?,?', {
+      .query(rawQuery + ' WHERE c.region_id = ? ' + casesOrder + ' LIMIT ?,?', {
         replacements: [Number(req.params.region_id), offset, limit],
         type: sequelize.QueryTypes.SELECT
       })

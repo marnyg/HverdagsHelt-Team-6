@@ -207,7 +207,7 @@ module.exports = {
             firstname: 'Bruker',
             lastname: 'Slettet',
             tlf: 0,
-            email: '',
+            email: null,
             hashed_password: '',
             salt: '',
             role_id: 5

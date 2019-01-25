@@ -14,6 +14,7 @@ class ToolService {
   static admin_role_id = 1;
   static employee_role_id = 2;
   static private_user_role_id = 4;
+  static deleted_role_id = 5;
 
     /**
      * Get the defined color for given status_id
@@ -102,7 +103,7 @@ class ToolService {
      * @param error
      * @returns {*}
      */
-  static getUserUpdateErrorAlert(error: Error) {
+  static getUserUpdateErrorAlert(error: Error, onClose) {
       if(error.response) {
           if(error.response.status === 409) {
               // Epost finnes allerede
@@ -110,7 +111,7 @@ class ToolService {
                   <Alert
                       type={'danger'}
                       text={'En bruker med denne epostadressen eksisterer allerede.'}
-                      onClose={() => this.error = null}
+                      onClose={() => onClose}
                   />
               );
           } else if (error.response.status === 400) {
@@ -119,7 +120,7 @@ class ToolService {
                   <Alert
                       type={'danger'}
                       text={'Fyll inn alle feltene riktig før du registrerer.'}
-                      onClose={() => this.error = null}
+                      onClose={() => onClose}
                   />
               );
           } else if (error.response.status === 403) {
@@ -128,7 +129,7 @@ class ToolService {
                   <Alert
                       type={'danger'}
                       text={'Din økt har utgått, logg ut og inn og prøv igjen.'}
-                      onClose={() => this.error = null}
+                      onClose={() => onClose}
                   />
               );
           } else if (error.response.status === 401) {
@@ -137,7 +138,7 @@ class ToolService {
                   <Alert
                       type={'danger'}
                       text={'Du har ikke rettigheter til å utføre denne handlingen.'}
-                      onClose={() => this.error = null}
+                      onClose={() => onClose}
                   />
               );
           } else {
@@ -145,7 +146,7 @@ class ToolService {
                   <Alert
                       type={'danger'}
                       text={error.message}
-                      onClose={() => this.error = null}
+                      onClose={() => onClose}
                   />
               );
           }
@@ -154,7 +155,7 @@ class ToolService {
               <Alert
                   type={'danger'}
                   text={error.message}
-                  onClose={() => this.error = null}
+                  onClose={() => onClose}
               />
           );
       }
