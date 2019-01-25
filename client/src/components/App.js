@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import { BrowserRouter, Route, withRouter} from 'react-router-dom';
+import { HashRouter, Route, withRouter} from 'react-router-dom';
 import '../styles/styles.css';
 import '../styles/loginmodal.css';
 import '../styles/registermodal.css';
@@ -10,8 +10,8 @@ import '../styles/simple-sidebar.css';
 import '../styles/carousel.css';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faEdit, faUsers, faChartLine, faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell } from '@fortawesome/free-solid-svg-icons';
-library.add(faCaretDown,faEdit, faUsers, faChartLine, faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell);
+import { faCaretDown, faCaretLeft, faCaretRight, faEdit, faUsers, faChartLine, faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell } from '@fortawesome/free-solid-svg-icons';
+library.add(faCaretDown, faCaretLeft, faCaretRight ,faEdit, faUsers, faChartLine, faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell);
 import Navbar from './Navbar.js';
 import ContentWrapper from './ContentWrapper.js';
 import Footer from './Footer.js';
@@ -30,10 +30,16 @@ import EmployeePage from "./Employee/EmployeePage";
 import AdminPage from "./Admin/AdminPage";
 import VerificationModal from "./VerificationModal";
 
-axios.interceptors.response.use(response => response.data);
+import Loader from 'react-loader-spinner'; //https://www.npmjs.com/package/react-loader-spinner
+axios.interceptors.response.use(response => response.data); //
+
+/**
+ *
+ */
 
 class App extends Component {
     logged_in: boolean = false;
+    
     render() {
         let visited = JSON.parse(localStorage.getItem('visited'));
         if(!visited){
@@ -42,8 +48,16 @@ class App extends Component {
 
         
         return (
-            <BrowserRouter>
+            <HashRouter>
                 <div className={'h-100 w-100'}>
+                    <div id={'spinner'}>
+                        <Loader
+                            type="Oval"
+                            color="#428bca"
+                            height="200"
+                            width="200"
+                        />
+                    </div>
                     <div className={'h-100 w-100'}>
                         <Navbar
                             logged_in={this.logged_in}
@@ -55,8 +69,8 @@ class App extends Component {
                         <Route path="/employee" render={() => <EmployeePage/>} />
                         <Route path="/admin" render={() => <AdminPage/>} />
                         <Route exact path="/subscriptions" render={() => <Subscriptions/>} />
+                        <Notify />
                         <div className="content-wrapper">
-                            <Notify />
                             {visited ?
                                 <Route exact path="/" render={() => <ContentWrapper logged_in={this.logged_in} onLogin={() => this.onLogin()}/>} />
                                 :
@@ -71,7 +85,7 @@ class App extends Component {
                     </div>
                     <Footer/>
                 </div>
-            </BrowserRouter>
+            </HashRouter>
         );
     }
 

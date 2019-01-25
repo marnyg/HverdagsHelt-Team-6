@@ -6,17 +6,44 @@ import FormData from 'form-data';
 import ToolService from './ToolService';
 
 class CaseService {
-  //Get all cases
+  /**
+   * Get all cases
+   * @returns {AxiosPromise<any>}
+   */
   static getAllCases(): Promise<Case[]> {
     return axios.get('/api/cases');
   }
 
-  //Get one specific case
+  /**
+   * Get one specific case
+   * @param case_id
+   * @returns {AxiosPromise<any>}
+   */
   getCase(case_id: number): Promise<Case> {
-    return axios.get('/api/cases/' + case_id);
+    return new Promise((resolve, reject) => {
+        let token = localStorage.getItem('token');
+        if(token) {
+            axios.get('/api/cases/' + case_id, {
+                headers: {
+                    Authorization: 'Bearer ' + token
+                }
+            })
+                .then((cases: Case) => resolve(cases))
+                .catch((error: Error) => reject(error));
+        } else {
+            axios.get('/api/cases/' + case_id)
+                .then((cases: Case) => resolve(cases))
+                .catch((error: Error) => reject(error));
+        }
+    });
   }
 
-  //Update one specific case
+  /**
+   * Update one specific case
+   * @param case_id
+   * @param c Case
+   * @returns {Promise<void>}
+   */
   updateCase(case_id: number, c: Case): Promise<void> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
@@ -47,7 +74,11 @@ class CaseService {
     });
   }
 
-  //Delete one specific case
+  /**
+   * Delete one specific case
+   * @param case_id
+   * @returns {Promise<void>}
+   */
   deleteCase(case_id: number): Promise<void> {
     //return axios.delete('/api/cases/' + case_id);
     return new Promise((resolve, reject) => {
@@ -79,7 +110,12 @@ class CaseService {
     });
   }
 
-  //Create case
+  /**
+   * Create case
+   * @param c Case
+   * @param pictures
+   * @returns {Promise<Case>}
+   */
   createCase(c: Object, pictures): Promise<Case> {
     console.log('Case:', c);
     console.log('Pictures:', pictures);
@@ -131,7 +167,11 @@ class CaseService {
     });
   }
 
-  //Get all cases given user
+  /**
+   * Get all cases given user
+   * @param user_id
+   * @returns {Promise<Case[]>}
+   */
   getAllCasesGivenUser(user_id: number): Promise<Case[]> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
@@ -162,7 +202,13 @@ class CaseService {
     });
   }
 
-  //Get all cases given user with offset
+  /**
+   * Get all cases given user with offset
+   * @param user_id
+   * @param page
+   * @param items_per_query
+   * @returns {Promise<Case[]>}
+   */
   getAllCasesGivenUser(user_id: number, page: number, items_per_query: number): Promise<Case[]> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
@@ -196,7 +242,11 @@ class CaseService {
     });
   }
 
-  //Get cases given region
+  /**
+   * Get cases given region
+   * @param region_id
+   * @returns {Promise<Case[]>}
+   */
   getAllCasesGivenRegionId(region_id: number): Promise<Case[]> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
@@ -227,7 +277,12 @@ class CaseService {
     });
   }
 
-  //Get all cases given location
+  /**
+   * Get all cases given location
+   * @param county_name
+   * @param region_name
+   * @returns {AxiosPromise<any>}
+   */
   getCasesByLoc(county_name: string, region_name: string): Promise<Case[]> {
     return axios.get(
       '/api/cases/region_cases/' + region_name + '/' + county_name,
@@ -237,7 +292,13 @@ class CaseService {
       }
     );
   }
-  //Get all cases given location
+
+  /**
+   * Get all cases given location
+   * @param county_name
+   * @param region_name
+   * @returns {AxiosPromise<any>}
+   */
   getCasesByLoc(county_name: string, region_name: string): Promise<Case[]> {
     return axios.get(
       '/api/cases/region_cases/' +
@@ -251,18 +312,38 @@ class CaseService {
     );
   }
 
+  /**
+   * Get cases given a region_id
+   * @param region_id
+   * @returns {AxiosPromise<any>}
+   */
   getCaseGivenRegionId(region_id: number): Promise<Case> {
     return axios.get('/api/cases/region_cases/' + region_id, {}, {});
   }
 
-  //Get cases given query string (search)
+  /**
+   * Get cases given query string (search)
+   * @param query
+   * @returns {AxiosPromise<any>}
+   */
   search(query: string): Promise<Case[]> {
     return axios.get('/api/search/' + query, {}, {});
   }
 
-  //Get all cases in region, given region_id, limit and offset
+  /**
+   * Get all cases in region, given region_id, limit and offset
+   * @param region_id
+   * @param limit
+   * @param offset
+   */
   getCasesByRegionWithLimitOffset(region_id: number, limit: number, offset: number) {}
 
+  /**
+   * Upload picture to existing case
+   * @param case_id
+   * @param picture
+   * @returns {Promise<any>}
+   */
   uploadPicture(case_id: number, picture: File): Promise<any> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
@@ -296,6 +377,12 @@ class CaseService {
     });
   }
 
+  /**
+   * Delete picture from case
+   * @param case_id
+   * @param src
+   * @returns {Promise<void>}
+   */
   deletePicture(case_id: number, src: string): Promise<void> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
@@ -320,8 +407,15 @@ class CaseService {
     });
   }
 
+  /**
+   * Get one page of cases, from specific region
+   * @param limit
+   * @param page
+   * @param region_id
+   * @returns {AxiosPromise<any>}
+   */
   getCasePageByRegion(limit: number, page: number, region_id: number) {
-    return axios.get('/api/cases/region_cases/' + region_id + '?page=' + page +'&limit=' + limit);
+    return axios.get('/api/cases/region_cases/' + region_id + '?page=' + page + '&limit=' + limit);
   }
 }
 export default CaseService;

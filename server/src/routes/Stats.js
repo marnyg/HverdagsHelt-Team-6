@@ -8,6 +8,12 @@ type Request = express$Request;
 type Response = express$Response;
 
 module.exports = {
+  /**
+   * Get the amount of closed cases in a year, grouped by month
+   * @param req Request
+   * @param res Response
+   * @returns {JSON}
+   */
   getNationalStatsClosed: function(req: Request, res: Response) {
     if (!req.params.year || typeof Number(req.params.year) !== 'number') return res.sendStatus(400);
 
@@ -26,6 +32,12 @@ module.exports = {
       .then(stats => res.send(stats))
       .catch(err => res.status(500).send(err));
   },
+  /**
+   * Get the amount of opened cases in a year, grouped by month
+   * @param req Request
+   * @param res Response
+   * @returns {JSON}
+   */
   getNationalStatsOpened: function(req: Request, res: Response) {
     if (!req.params.year || typeof Number(req.params.year) !== 'number') return res.sendStatus(400);
 
@@ -43,6 +55,12 @@ module.exports = {
       .then(stats => res.send(stats))
       .catch(err => res.status(500).send(err));
   },
+  /**
+   * Get the amount of closed cases for a region in a year, grouped by month
+   * @param req Request
+   * @param res Response
+   * @returns {JSON}
+   */
   getNationalStatsClosedByRegion: function(req: Request, res: Response) {
     if (
       !req.token ||
@@ -81,6 +99,12 @@ module.exports = {
       }
     });
   },
+  /**
+   * Get the amount of opened cases for a region in a year, grouped by month
+   * @param req Request
+   * @param res Response
+   * @returns {JSON}
+   */
   getNationalStatsOpenedByRegion: function(req: Request, res: Response) {
     if (
       !req.token ||
@@ -118,6 +142,12 @@ module.exports = {
       }
     });
   },
+  /**
+   * Get the amount of cases in each category, for given year
+   * @param req Request
+   * @param res Response
+   * @returns {JSON}
+   */
   getNationalStatsCategories: function(req: Request, res: Response) {
     if (!req.params.year || typeof Number(req.params.year) !== 'number') return res.sendStatus(400);
 
@@ -136,6 +166,12 @@ module.exports = {
       .then(stats => res.send(stats))
       .catch(err => res.status(500).send(err));
   },
+  /**
+   * Get the amout of cases in each category for a region, for given year
+   * @param req Request
+   * @param res Response
+   * @returns {JSON}
+   */
   getStatsCategoriesByRegion: function(req: Request, res: Response) {
     if (
       !req.token ||

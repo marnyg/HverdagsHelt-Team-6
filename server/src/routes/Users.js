@@ -12,22 +12,36 @@ type Response = express$Response;
 const email_subject = 'Bruker opprettet - Hverdagshelt';
 
 module.exports = {
+  /**
+   * Get all users
+   * @param req Request
+   * @param res Response
+   * @returns {User}
+   */
   getAllUsers: function(req: Request, res: Response) {
     if (!req.token) return res.sendStatus(400);
-    let sql_query = "Select u.user_id, u.firstname, u.lastname, " +
-      "u.email, u.tlf, u.region_id, u.role_id, r.name, r.access_level " +
-      "from Users u JOIN Roles r ON u.role_id = r.role_id";
+    let sql_query =
+      'Select u.user_id, u.firstname, u.lastname, ' +
+      'u.email, u.tlf, u.region_id, u.role_id, r.name, r.access_level ' +
+      'from Users u JOIN Roles r ON u.role_id = r.role_id';
 
-    return sequelize.query(
-      sql_query,
-      {
+    return sequelize
+      .query(sql_query, {
         type: sequelize.QueryTypes.SELECT
-      }
-    )
-      .then(users => { return res.send(users) })
-      .catch(error => { return res.status(500).json(error)});
+      })
+      .then(users => {
+        return res.send(users);
+      })
+      .catch(error => {
+        return res.status(500).json(error);
+      });
   },
-
+  /**
+   * Add a new user
+   * @param req Request
+   * @param res Response
+   * @returns {Promise<JSON>}
+   */
   createUser: async function(req: Request, res: Response) {
     if (
       !req.body ||
@@ -90,7 +104,12 @@ module.exports = {
         console.log(err.parent.sqlMessage);
       });
   },
-
+  /**
+   * Get one user with given user_id
+   * @param req Request
+   * @param res Response
+   * @returns {User}
+   */
   getOneUser: function(req: Request, res: Response) {
     if (!req.token || !req.params.user_id || isNaN(Number(req.params.user_id)) || typeof req.token !== 'string')
       return res.sendStatus(400);
@@ -106,7 +125,12 @@ module.exports = {
       attributes: ['user_id', 'firstname', 'lastname', 'email', 'tlf', 'region_id']
     }).then(user => (user ? res.send(user) : res.sendStatus(404)));
   },
-
+  /**
+   * Update a user
+   * @param req Request
+   * @param res Response
+   * @returns {JSON}
+   */
   updateOneUser: function(req: Request, res: Response) {
     if (
       !req.token ||
@@ -159,7 +183,12 @@ module.exports = {
         console.log(err.parent.sqlMessage);
       });
   },
-
+  /**
+   * Delete a user
+   * @param req Request
+   * @param res Response
+   * @returns {*}
+   */
   deleteOneUser: function(req: Request, res: Response) {
     if (!req.token || !req.params.user_id || isNaN(Number(req.params.user_id)) || typeof req.token !== 'string')
       return res.sendStatus(400);
@@ -178,7 +207,7 @@ module.exports = {
             firstname: 'Bruker',
             lastname: 'Slettet',
             tlf: 0,
-            email: '',
+            email: null,
             hashed_password: '',
             salt: '',
             role_id: 5
@@ -190,6 +219,12 @@ module.exports = {
         });
       });
   },
+  /**
+   * Change passoword for a user
+   * @param req Request
+   * @param res Response
+   * @returns {Promise<*>}
+   */
   changePassword: async function(req: Request, res: Response) {
     if (
       !req.token ||
@@ -235,6 +270,12 @@ module.exports = {
       return res.sendStatus(401);
     }
   },
+  /**
+   * Get all region subscriptions for a user
+   * @param req Request
+   * @param res Response
+   * @returns {Region}
+   */
   getRegionSubscriptionsForUser: function(req: Request, res: Response) {
     if (!req.token || !req.params.user_id || isNaN(Number(req.params.user_id)) || typeof req.token !== 'string') {
       return res.sendStatus(400);
@@ -272,7 +313,12 @@ module.exports = {
       })
       .catch(err => res.status(500).send(err));
   },
-
+  /**
+   * Generates a new random password for a user, with given email
+   * @param req Request
+   * @param res Response
+   * @returns {JSON}
+   */
   set_new_password: function(req: Request, res: Response) {
     if (!req.body || typeof req.body.email != 'string') return res.status(400).send();
 

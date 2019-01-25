@@ -58,12 +58,12 @@ class Content extends Component {
                           <div className="btn-group mr-2" role="group">
                               <button
                                   type="button"
-                                  className={'btn btn-secondary'}
+                                  className={'btn btn-secondary grid-list-swapper'}
                                   onClick={() => (this.grid = true)}
                               >
                                   <FontAwesomeIcon icon={faTh} /> Grid
                               </button>
-                              <button type="button" className="btn btn-secondary" onClick={() => (this.grid = false)}>
+                              <button type="button" className="btn btn-secondary grid-list-swapper" onClick={() => (this.grid = false)}>
                                   <FontAwesomeIcon icon={faListUl} /> List
                               </button>
                           </div>
@@ -72,7 +72,8 @@ class Content extends Component {
                               classNameChild={'form-inline'}
                               elementsMargin={'mr-2'}
                               selector_id={'desktop'}
-                              onSubmit={(region_id) => this.props.onSubmit(region_id)}/>
+                              onSubmit={(region_id) => this.props.onSubmit(region_id)}
+                          />
                       </div>
                   </div>
                   {this.props.location ?
@@ -83,11 +84,11 @@ class Content extends Component {
                       {this.grid ? (
                           <div className="content">
                               {this.props.cases.map(e => (
-                                  <CaseItem case={e} key={e.case_id} grid={this.grid} user={this.props.user}/>
+                                  <CaseItem case={e} key={e.case_id} grid={this.grid} user={this.props.user} logged_in={this.props.logged_in}/>
                               ))}
                           </div>
                       ) : (
-                          this.props.cases.map(e => <CaseItem case={e} key={e.case_id} grid={this.grid} user={this.props.user}/>)
+                          this.props.cases.map(e => <CaseItem case={e} key={e.case_id} grid={this.grid} user={this.props.user} logged_in={this.props.logged_in}/>)
                       )}
                   </div>
               </div>

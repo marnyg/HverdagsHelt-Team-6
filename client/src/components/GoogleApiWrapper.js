@@ -12,7 +12,10 @@ export class GoogleMapsContainer extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    this.gmap.panTo(this.props.markerPos);
+    try {
+      this.gmap.panTo(this.props.markerPos);
+    } catch{
+    }
     if (!this.props.isClickable) {
       this.gmap.onClick = null;
       this.gmap.draggable = false

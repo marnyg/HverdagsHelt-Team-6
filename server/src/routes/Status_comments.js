@@ -15,6 +15,12 @@ let all_true = function(val) {
 };
 
 module.exports = {
+  /**
+   * Get all status comments
+   * @param req Request
+   * @param res Response
+   * @returns {Status_comment}
+   */
   getAllStatus_comment: async function(req: Request, res: Response) {
     if (!req.params || isNaN(Number(req.params.case_id))) return res.sendStatus(400);
 
@@ -48,16 +54,12 @@ module.exports = {
         return res.status(500).send(err);
       });
   },
-  // Back up code:
-  // getAllStatus_comment: function(req: Request, res: Response) {
-  //   return Status_comment.findAll({
-  //     where: {
-  //       case_id: req.params.case_id
-  //     },
-  //     order: [['updatedAt', 'DESC']] //Order by updatedAt????
-  //   }).then(comments => res.send(comments));
-  // },
-  // Kun ansatt i riktig kommune kan legge inn kommentarer til den kommunen
+  /**
+   * Add a status comment
+   * @param req Request
+   * @param res Response
+   * @returns {Status_comment}
+   */
   addStatus_comment: function(req: Request, res: Response) {
     if (
       !req.body ||
@@ -121,14 +123,19 @@ module.exports = {
         }
       })
       .then(() => {
-        console.log("Kommer hit");
+        console.log('Kommer hit');
         Case_subscriptions.update({ is_up_to_date: false }, { where: { case_id: Number(req.params.case_id) } });
       })
       .catch(error => {
         return res.status(500).json(error);
       });
   },
-  // Kun den som skrev kommentaren og admin kan endre
+  /**
+   * Update a status comment
+   * @param req Request
+   * @param res Response
+   * @returns {Status_comment}
+   */
   updateStatus_comment: function(req: Request, res: Response) {
     if (
       !req.body ||
@@ -170,7 +177,12 @@ module.exports = {
         }).then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)));
       });
   },
-  // Kun den som skrev kommentaren og admin kan slette
+  /**
+   * Delete a status comment
+   * @param req Request
+   * @param res Response
+   * @returns {*}
+   */
   delStatus_comment: function(req: Request, res: Response) {
     if (
       !req.token ||
@@ -189,6 +201,8 @@ module.exports = {
 
     return Status_comment.destroy({
       where: { status_comment_id: Number(req.params.status_comment_id) }
-    }).then(subscr => {return (subscr ? res.send() : res.sendStatus(404))});
+    }).then(subscr => {
+      return subscr ? res.send() : res.sendStatus(404);
+    });
   }
 };

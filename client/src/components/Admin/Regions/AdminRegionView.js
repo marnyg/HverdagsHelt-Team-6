@@ -10,9 +10,10 @@ import VerificationModal from "../../VerificationModal";
 import EditRegionForm from "./EditRegionForm";
 
 class AdminRegionView extends Component {
+    region = null;
     cases = [];
     render() {
-        if(!this.props.region) {
+        if(!this.region) {
             return(
                 <div style={{'maxHeight': '700px'}}>
                     <div className={'card'}>
@@ -50,18 +51,18 @@ class AdminRegionView extends Component {
                     <div className={'card-body'}>
                         <div className={'card-title'}>
                             <strong>ID: </strong>
-                            {this.props.region.region_id}
+                            {this.region.region_id}
                             <strong className={'ml-3'}>Kommune: </strong>
-                            {this.props.region.name}
+                            {this.region.name}
                             <button
-                                onClick={(event) => this.setDeleteRegionModalContent(this.props.region)}
+                                onClick={(event) => this.setDeleteRegionModalContent(this.region)}
                                 className={'btn btn-danger float-right ml-2'}
                                 type="button" data-toggle="modal"
                                 data-target="#verify-modal">
                                 <FontAwesomeIcon icon={faTrashAlt}/>
                             </button>
                             <button
-                                onClick={(event) => this.setEditRegionModalContent(this.props.region)}
+                                onClick={(event) => this.setEditRegionModalContent(this.region)}
                                 className={'btn btn-primary float-right'}
                                 type="button" data-toggle="modal"
                                 data-target="#verify-modal">
@@ -70,13 +71,13 @@ class AdminRegionView extends Component {
                         </div>
                         <div className={'card-text'}>
                             <strong>Fylke: </strong>
-                            {this.props.region.county_name}
+                            {this.region.county_name}
                             <div className={'text-muted mt-1'}>
                                 <strong>Lokasjon:</strong>
                                 <div className={'ml-3'}>
-                                    Breddegrad: {this.props.region.lat.toString().substring(0, 8)}
+                                    Breddegrad: {this.region.lat.toString().substring(0, 8)}
                                     <br/>
-                                    Lengdegrad: {this.props.region.lon.toString().substring(0, 8)}
+                                    Lengdegrad: {this.region.lon.toString().substring(0, 8)}
                                 </div>
                             </div>
                             <div>
@@ -92,10 +93,21 @@ class AdminRegionView extends Component {
         );
     }
 
+    componentWillReceiveProps(newProps) {
+        console.log('Old: ', this.props.region, ' new:', newProps.region);
+        console.log('Region view receves props');
+        if(newProps.region !== this.props.region) {
+            this.region = newProps.region;
+            this.setState({
+                region: newProps.region
+            });
+        }
+    }
+
     fetchCases(){
-        if(this.props.region){
+        if(this.region){
             let caseService = new CaseService();
-            caseService.getCaseGivenRegionId(this.props.region.region_id)
+            caseService.getCaseGivenRegionId(this.region.region_id)
                 .then((cases: Case[]) => {
                     this.cases = cases;
                 })
@@ -134,15 +146,8 @@ class AdminRegionView extends Component {
     }
 
     editRegion(region) {
-        console.log('submittin new region:', region);
-        let regionService = new RegionService();
-        regionService.updateRegion(region, region.region_id)
-            .then(res => {
-                console.log(res);
-                $('#verify-modal').modal('hide');
-                this.props.onRegionUpdate(region);
-            })
-            .catch((error: Error) => console.error(error));
+        $('#verify-modal').modal('hide');
+        this.props.onRegionUpdate(region);
     }
 
     deleteRegion(event, region) {

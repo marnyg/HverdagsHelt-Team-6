@@ -41,9 +41,9 @@ class EditProfile extends Component<{}, { isEditing: boolean }> {
       case 'tlf':
         this.user.tlf = event.target.value;
         break;
-      case 'password':
-        this.user.password = event.target.value;
-        break;
+      // case 'password':
+      //   this.user.password = event.target.value;
+      //   break;
     }
     console.log(this.user);
   }
@@ -109,12 +109,12 @@ class EditProfile extends Component<{}, { isEditing: boolean }> {
                 <small className={"text-muted"}>Tlf må ha 8 siffer  </small>
               </div>
             </div>
-            <div className={'row list-group-item d-flex'}>
+            {/* <div className={'row list-group-item d-flex'}>
               <div className={'col-sm'}>Bekreft Passord:</div>
               <div className={'col-lg'}>
                 <input type="password" required id="password" onChange={this.handleChange} className="form-control" />
               </div>
-            </div>
+            </div> */}
             <div className={'row list-group-item d-flex'}>
               <div className={'col-sm'}>Hjemme Kommune:</div>
               <div className={'col-lg'}>
@@ -153,7 +153,7 @@ class EditProfile extends Component<{}, { isEditing: boolean }> {
     if (form.checkValidity()) {
       this.user.tlf = Number(this.user.tlf);
       this.us
-        .updateUser(this.user.user_id, this.user)
+        .updateUser(this.user)
         .then(() => {
           localStorage.setItem('user', JSON.stringify(this.user));
           this.props.callback(null, <DisplayProfile callback={this.props.callback} />);

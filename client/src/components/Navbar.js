@@ -33,19 +33,26 @@ class Navbar extends Component<{ logged_in: boolean }> {
         let user = ToolService.getUser();
         if (!user) {
             loginlink = (
-                <div className="nav-link" style={{ cursor: 'pointer' }} data-toggle="modal" data-target="#login-modal">
+                <div className="nav-link"
+                     style={{ cursor: 'pointer' }}
+                     data-toggle="modal"
+                     data-target="#login-modal"
+                     onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                     Registrer sak
                 </div>
             );
         } else if (this.logged_in === false) {
             loginlink = (
-                <div className="nav-link" style={{ cursor: 'pointer' }} data-toggle="modal" data-target="#login-modal">
+                <div className="nav-link" style={{ cursor: 'pointer' }}
+                     data-toggle="modal"
+                     data-target="#login-modal"
+                     onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                     Registrer sak
                 </div>
             );
         } else {
             loginlink = (
-                <NavLink to="/new-case" className="nav-link">
+                <NavLink to="/new-case" className="nav-link" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                     Registrer sak
                 </NavLink>
             );
@@ -53,14 +60,14 @@ class Navbar extends Component<{ logged_in: boolean }> {
         return (
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
                 {this.logged_in ? (
-                    <NavLink to={'/'} className="navbar-left">
+                    <NavLink to={'/'} className="navbar-left" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                         <img src={hverdagsheltLogo} height={29.7} width={185} />
                         <sup className="badge badge-primary mobile-notification">
                             {this.notification_count > 0 ? this.notification_count : null}
                         </sup>
                     </NavLink>
                 ) : (
-                    <NavLink to={'/'} className="navbar-left">
+                    <NavLink to={'/'} className="navbar-left" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                         <img src={hverdagsheltLogo} height={29.7} width={185} />
                     </NavLink>
                 )}
@@ -79,7 +86,7 @@ class Navbar extends Component<{ logged_in: boolean }> {
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav mr-auto">
                         <li className="nav-item">
-                            <NavLink exact to="/" className="nav-link">
+                            <NavLink exact to="/" className="nav-link" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                                 Hjem
                             </NavLink>
                         </li>
@@ -87,14 +94,14 @@ class Navbar extends Component<{ logged_in: boolean }> {
                         <li className="nav-item">{loginlink}</li>
                         <li className="nav-item">
                             {this.logged_in ? (
-                                <NavLink to="/subscriptions" className="nav-link">
+                                <NavLink to="/subscriptions" className="nav-link" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                                     Abonnement
                                 </NavLink>
                             ) : null}
                         </li>
                         <li className="nav-item">
                             {this.logged_in ? (
-                                <NavLink to="/notifications" className="nav-link">
+                                <NavLink to="/notifications" className="nav-link" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                                     Varsler{' '}
                                     <sup className="badge badge-primary">
                                         {this.notification_count > 0 ? this.notification_count : null}
@@ -104,14 +111,14 @@ class Navbar extends Component<{ logged_in: boolean }> {
                         </li>
                         {user && user.role_id === ToolService.employee_role_id ? (
                             <li className="nav-item">
-                                <NavLink exact to="/employee/inbox" className="nav-link">
+                                <NavLink exact to="/employee/inbox" className="nav-link" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                                     Behandle saker
                                 </NavLink>
                             </li>
                         ) : null}
                         {user && user.role_id === ToolService.admin_role_id ? (
                             <li className="nav-item">
-                                <NavLink exact to="/admin/regions" className="nav-link">
+                                <NavLink exact to="/admin/regions" className="nav-link" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                                     Admin
                                 </NavLink>
                             </li>
@@ -125,7 +132,10 @@ class Navbar extends Component<{ logged_in: boolean }> {
                             aria-label="Search"
                             onChange={e => (this.search = e.target.value)}
                         />
-                        <button className="btn btn-outline-success my-2 my-sm-0" type="submit" onClick={this.submitSearch}>
+                        <button className="btn btn-outline-success my-2 my-sm-0" type="submit" onClick={(event) => {
+                            this.submitSearch(event);
+                            $('#navbarSupportedContent').collapse('hide');
+                        }}>
                             Søk
                         </button>
                     </form>
@@ -199,7 +209,7 @@ class Navbar extends Component<{ logged_in: boolean }> {
             return (
                 <ul className="navbar-nav">
                     <li className="nav-item">
-                        <NavLink to="/my-page/my-profile" className="nav-link">
+                        <NavLink to="/my-page/my-profile" className="nav-link" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                             Min Side
                         </NavLink>
                     </li>
@@ -209,7 +219,10 @@ class Navbar extends Component<{ logged_in: boolean }> {
                             to={'/'}
                             className="nav-link"
                             style={{ cursor: 'pointer' }}
-                            onClick={event => this.logout(event)}
+                            onClick={event => {
+                                $('#navbarSupportedContent').collapse('hide');
+                                this.logout(event);
+                            }}
                         >
                             Logg ut
                         </NavLink>
@@ -252,16 +265,24 @@ class Navbar extends Component<{ logged_in: boolean }> {
 
     receiveBcast(message: MessageEvent) {
         let json = JSON.parse(message.data);
-        if (json) {
-            if (this.subscriptions.length > 0) {
-                let id: number = Number(json.case_id);
-                this.notification_count = 0;
-                if (this.subscriptions.some(e => e.case_id === id)) {
-                    this.notification_count++;
+        console.log(json);
+        console.log(this.subscriptions);
+        let user = JSON.parse(localStorage.getItem('user'));
+        if(user) {
+            this.fetch_notifications(user, (subs) => {
+                if (json) {
+                    if (this.subscriptions.length > 0) {
+                        let id: number = Number(json.case_id);
+                        this.notification_count = 0;
+                        this.subscriptions.map(e => e.is_up_to_date === false && e.case_id !== id ? this.notification_count++:null);
+                        if (this.subscriptions.some(e => e.case_id === id)) {
+                            this.notification_count++;
+                        }
+                    }
+                } else {
+                    console.log('Could not parse websocket data from server.');
                 }
-            }
-        } else {
-            console.log('Could not parse websocket data from server.');
+            })
         }
     }
 
@@ -278,7 +299,6 @@ class Navbar extends Component<{ logged_in: boolean }> {
         setTimeout(() => {
             for (let instance of Navbar.instances()) {
                 for(let sub of instance.subscriptions) {
-                    console.log(sub);
                     if(sub.case_id === c.case_id) {
                         instance.subscriptions.splice(instance.subscriptions.indexOf(sub), 1);
                         instance.countPushNotifications(instance.subscriptions);

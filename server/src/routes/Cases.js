@@ -30,10 +30,38 @@ let rawQueryCases =
   'JOIN Statuses s ON c.status_id = s.status_id ' +
   'JOIN Categories cg ON c.category_id = cg.category_id ';
 
+let rawQueryCasesNoUserInfo =
+  'Select c.case_id, c.title, c.description, c.lat, c.lon, c.user_id, ' +
+  'co.county_id, co.name AS county_name, ' +
+  'c.region_id, r.name as region_name, ' +
+  'c.status_id, s.name as status_name, ' +
+  'c.category_id, cg.name as category_name, ' +
+  'c.createdAt, c.updatedAt ' +
+  'FROM Cases c JOIN Regions r ON c.region_id = r.region_id ' +
+  'Join Counties co ON r.county_id = co.county_id ' +
+  'JOIN Users u ON c.user_id = u.user_id ' +
+  'JOIN Statuses s ON c.status_id = s.status_id ' +
+  'JOIN Categories cg ON c.category_id = cg.category_id ';
+
 let casesOrder = 'ORDER BY c.updatedAt DESC';
 
 module.exports = {
+  /**
+   * Get all cases
+   * @param req Request
+   * @param res Response
+   * @returns {Promise<void>}
+   */
   getAllCases: async function(req: Request, res: Response) {
+    let rawQuery = rawQueryCasesNoUserInfo;
+    if (req.token) {
+      let decoded_token = verifyToken(req.token);
+      let token_access_level = Number(decoded_token.accesslevel);
+      if (token_access_level < 4) {
+        rawQuery = rawQueryCases;
+      }
+    }
+
     let page = 1;
     let limit = 20;
 
@@ -42,13 +70,11 @@ module.exports = {
       limit = Number(req.query.limit);
     }
     let offset = (page - 1) * limit;
-
     sequelize
-      .query(rawQueryCases + casesOrder + ' LIMIT ?,?',
-        {
-          replacements: [offset, limit],
-          type: sequelize.QueryTypes.SELECT
-        })
+      .query(rawQuery + casesOrder + ' LIMIT ?,?', {
+        replacements: [offset, limit],
+        type: sequelize.QueryTypes.SELECT
+      })
       .then(async cases => {
         const out = cases.map(async c => {
           let pictures = await Picture.findAll({ where: { case_id: c.case_id }, attributes: ['path'] });
@@ -61,7 +87,12 @@ module.exports = {
         return res.status(500).send(err);
       });
   },
-
+  /**
+   * Creates a new case
+   * @param req Request
+   * @param res Response
+   * @returns {Promise<Case>}
+   */
   createNewCase: async function(req: Request, res: Response) {
     reqAccessLevel(req, res, 4, () => true);
     if (
@@ -128,18 +159,39 @@ module.exports = {
         }
       })
       .then(async () => {
-        let user = await User.findOne({ where: { user_id: user_id }, attributes: ['email']});
-        Epost.send_email(user.email, 'Ny sak opprettet', `Saken din "${req.body.title}" ble opprettet. Du kan følge med på saken din på nettsida. \n\nMvh. Hverdagshelt Team 6`);
+        let user = await User.findOne({ where: { user_id: user_id }, attributes: ['email'] });
+        Epost.send_email(
+          user.email,
+          'Ny sak opprettet',
+          `Saken din "${
+            req.body.title
+          }" ble opprettet. Du kan følge med på saken din på nettsida. \n\nMvh. Hverdagshelt Team 6`
+        );
       })
       .catch(error => {
         return res.status(500).send(error);
       });
   },
-
+  /**
+   * Gets one case, for given case_id
+   * @param req Request
+   * @param res Response
+   * @returns {Promise<Response>}
+   */
   getOneCase: async function(req: Request, res: Response) {
     if (!req.params || isNaN(Number(req.params.case_id))) return res.sendStatus(400);
+
+    let rawQuery = rawQueryCasesNoUserInfo;
+    if (req.token) {
+      let decoded_token = verifyToken(req.token);
+      let token_access_level = Number(decoded_token.accesslevel);
+      if (token_access_level < 4) {
+        rawQuery = rawQueryCases;
+      }
+    }
+
     sequelize
-      .query(rawQueryCases + ' WHERE c.case_id = ?;', {
+      .query(rawQuery + ' WHERE c.case_id = ?;', {
         replacements: [req.params.case_id],
         type: sequelize.QueryTypes.SELECT
       })
@@ -152,7 +204,12 @@ module.exports = {
         return res.status(500).send(err);
       });
   },
-
+  /**
+   * Updates one case
+   * @param req Request
+   * @param res Response
+   * @returns {Case}
+   */
   updateCase: function(req: Request, res: Response) {
     if (
       !req.body ||
@@ -194,7 +251,12 @@ module.exports = {
         else return res.status(500).send(error.message);
       });
   },
-
+  /**
+   * Deletes one case
+   * @param req Request
+   * @param res Response
+   * @returns {Promise<*>}
+   */
   deleteCase: async function(req: Request, res: Response) {
     if (
       !req.token ||
@@ -255,7 +317,12 @@ module.exports = {
         return res.status(500).send(error);
       });
   },
-
+  /**
+   * Gets all cases with given region name
+   * @param req Request
+   * @param res Response
+   * @returns {Case}
+   */
   getAllCasesInRegionByName: function(req: Request, res: Response) {
     if (
       !req.params ||
@@ -265,6 +332,15 @@ module.exports = {
       typeof req.params.region_name != 'string'
     )
       return res.sendStatus(400);
+
+    let rawQuery = rawQueryCasesNoUserInfo;
+    if (req.token) {
+      let decoded_token = verifyToken(req.token);
+      let token_access_level = Number(decoded_token.accesslevel);
+      if (token_access_level < 4) {
+        rawQuery = rawQueryCases;
+      }
+    }
 
     let county_check = { 'Sør-Trøndelag': 'Trøndelag', 'Nord-Trøndelag': 'Trøndelag' };
     let county_name = req.params.county_name;
@@ -280,7 +356,7 @@ module.exports = {
     let start_limit = (page - 1) * limit;
 
     return sequelize
-      .query(rawQueryCases + ' WHERE r.name = ? AND co.name = ? ' + casesOrder + ' Limit ?,?', {
+      .query(rawQuery + ' WHERE r.name = ? AND co.name = ? ' + casesOrder + ' Limit ?,?', {
         replacements: [req.params.region_name, county_name, start_limit, limit],
         type: sequelize.QueryTypes.SELECT
       })
@@ -297,8 +373,23 @@ module.exports = {
         return res.status(500).send(err);
       });
   },
+  /**
+   * Gets all cases with given region_id
+   * @param req Request
+   * @param res Response
+   * @returns {Promise<Response>}
+   */
   getAllCasesInRegionById: async function(req: Request, res: Response) {
     if (!req.params || isNaN(Number(req.params.region_id))) return res.sendStatus(400);
+
+    let rawQuery = rawQueryCasesNoUserInfo;
+    if (req.token) {
+      let decoded_token = verifyToken(req.token);
+      let token_access_level = Number(decoded_token.accesslevel);
+      if (token_access_level < 4) {
+        rawQuery = rawQueryCases;
+      }
+    }
 
     let page = 1;
     let limit = 20;
@@ -310,7 +401,7 @@ module.exports = {
     let offset = (page - 1) * limit;
 
     sequelize
-      .query(rawQueryCases + ' WHERE c.region_id = ? ' + casesOrder + ' LIMIT ?,?', {
+      .query(rawQuery + ' WHERE c.region_id = ? ' + casesOrder + ' LIMIT ?,?', {
         replacements: [Number(req.params.region_id), offset, limit],
         type: sequelize.QueryTypes.SELECT
       })
@@ -326,13 +417,14 @@ module.exports = {
         return res.status(500).send(err);
       });
   },
+  /**
+   * Gets all cases belonging to given user_id
+   * @param req Request
+   * @param res Response
+   * @returns {Promise<Response>}
+   */
   getAllCasesForUser: async function(req: Request, res: Response) {
-    if (
-      !req.token ||
-      !req.params.user_id ||
-      isNaN(Number(req.params.user_id)) ||
-      typeof req.token !== 'string'
-    )
+    if (!req.token || !req.params.user_id || isNaN(Number(req.params.user_id)) || typeof req.token !== 'string')
       return res.sendStatus(400);
 
     let decoded_token = verifyToken(req.token);
@@ -367,6 +459,12 @@ module.exports = {
         return res.status(500).send(err);
       });
   },
+  /**
+   * Get all cases that matches searchstring on title, description, category, county or region
+   * @param req Request
+   * @param res Response
+   * @returns Case
+   */
   search: function(req: Request, res: Response) {
     let search = '%' + req.params.searchtext + '%';
 

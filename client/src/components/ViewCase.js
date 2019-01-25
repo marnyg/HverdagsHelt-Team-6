@@ -41,28 +41,37 @@ const ADMIN: number = 1;
 const EMPLOYEE_ACCESS_LEVEL: number = 2;
 const ADMIN_ACCESS_LEVEL: number = 1;
 
-const MAX_DESCRIPTION_LENGTH: number = 255;
+const MAX_DESCRIPTION_LENGTH: number = 255; // Maximum length of description attribute accepted in database.
 const STATUS_OPEN: number = 1;
 const STATUS_CLOSED: number = 3;
-const COMMENTS_PER_QUERY = 5;
+const COMMENTS_PER_QUERY = 5; // Number of status comments returned per fetch request.
+
+/**
+ * React Component. Provides user with a set display of a case, and logic and elements needed to alter/update said case.
+ * match: params: case_id: case_id which uniquely identifies the case to be displayed.
+ */
 
 class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
-  case: Case = null;
-  statusComment: StatusComment = new StatusComment();
-  subscription: CaseSubscription = null;
-  pos: Location = null;
-  pagenumber: number = 1;
-  statuses: Status[] = [];
-  categories: Category[] = [];
-  statusMessages: StatusComment[] = [];
-  form: HTMLFormElement = null;
-  fetchButton: HTMLButtonElement = null;
-  fileTypes: string[] = ['image/jpeg', 'image/jpg', 'image/png'];
-  imgSync: boolean = false;
-  error = null;
-  loggedIn: boolean = false;
-  edit: boolean = false;
+  case: Case = null; // Case object to be displayed
+  statusComment: StatusComment = new StatusComment(); // Status comment object to be sent if required
+  subscription: CaseSubscription = null; // Subscription object to represent the users current subscription state to this case
+  pos: Location = null; // Location object used for list-selection transitivity.
+  pagenumber: number = 1; // Current page to load status comments
+  statuses: Status[] = []; // List of available statuses
+  categories: Category[] = []; // List of available categories
+  statusMessages: StatusComment[] = []; // List of currently loaded status comments
+  form: HTMLFormElement = null; // Reply form element used for user input
+  fetchButton: HTMLButtonElement = null; // Button element used for status comment fetch requests
+  fileTypes: string[] = ['image/jpeg', 'image/jpg', 'image/png']; // List of accepted image file types. Could be constant.
+  imgSync: boolean = false; // Boolean state. If images are currently being uploaded/downloaded.
+  error = null; // Alert component
+  loggedIn: boolean = false; // Boolean state. If user is logged in or not.
+  edit: boolean = false; // Boolean state. Toggle whether or not to show the edit/reply form
 
+  /**
+   * Returns an HTML element containing sub-elements that presents a case and if the user's authorized; the needs to alter or update it.
+   * Utilizes object variables to alter the state of the HTML element.
+   */
   render() {
     if (!this.case || !this.statusComment) {
       return null;
@@ -79,10 +88,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                 Slutt å følg
               </button>
             ) : (
-              <button className={this.getSubscriptionButtonStyles(this.case)} onClick={this.onClickSubscribeButton}>
-                Følg sak
+                <button className={this.getSubscriptionButtonStyles(this.case)} onClick={this.onClickSubscribeButton}>
+                  Følg sak
               </button>
-            )
+              )
           ) : null}
           {this.error}
           <form
@@ -107,10 +116,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   <td>Kategori</td>
                   <td>{this.case.category_name}</td>
                 </tr>
-                <tr>
-                  <td>Sak sendt av</td>
-                  <td>{this.case.createdBy}</td>
-                </tr>
+                {this.getCreatedBy()}
                 <tr>
                   <td>Sak opprettet</td>
                   <td>{ToolService.dateFormat(this.case.createdAt)}</td>
@@ -124,136 +130,136 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             <h3>Beskrivelse</h3>
             {this.case.description ? <p>{this.case.description}</p> : <p>INGEN BESKRIVELSE GITT</p>}
             {(privilege <= OWNER_EMPLOYEE && this.loggedIn) ||
-            (this.case.status_id === STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE && this.loggedIn) ? (
-              <section>
-                {privilege <= NOT_OWNER_EMPLOYEE ? (
-                  <button
-                    className={this.edit === false ? editButtonStyles[0] : editButtonStyles[1]}
-                    type={'button'}
-                    onClick={this.onClickToggleForm}
-                  >
-                    Svar sak
+              (this.case.status_id === STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE && this.loggedIn) ? (
+                <section>
+                  {privilege <= NOT_OWNER_EMPLOYEE ? (
+                    <button
+                      className={this.edit === false ? editButtonStyles[0] : editButtonStyles[1]}
+                      type={'button'}
+                      onClick={this.onClickToggleForm}
+                    >
+                      Svar sak
                   </button>
-                ) : (
-                  <button
-                    className={this.edit === false ? editButtonStyles[0] : editButtonStyles[1]}
-                    type={'button'}
-                    onClick={this.onClickToggleForm}
-                  >
-                    Rediger sak
-                  </button>
-                )}
-                {this.edit === true ? (
-                  <section>
-                    <h2>Oppdater sak</h2>
-                    <div className={'form-group'}>
-                      <label htmlFor="category">Kategori</label>
-                      <select
-                        defaultValue={this.case.category_id}
-                        onChange={this.categoryListener}
-                        className={'form-control'}
-                        id={'category'}
-                        required
+                  ) : (
+                      <button
+                        className={this.edit === false ? editButtonStyles[0] : editButtonStyles[1]}
+                        type={'button'}
+                        onClick={this.onClickToggleForm}
                       >
-                        {this.categories.map(e => (
-                          <option key={e.category_id} value={e.category_id}>
-                            {' '}
-                            {e.name}{' '}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    {(this.case.status_id === STATUS_OPEN && this.isOwner(this.case)) || privilege === ADMIN ? (
+                        Rediger sak
+                  </button>
+                    )}
+                  {this.edit === true ? (
+                    <section>
+                      <h2>Oppdater sak</h2>
                       <div className={'form-group'}>
-                        <label htmlFor="title">Tittel</label>
-                        <input
-                          className={'form-control'}
-                          type="text"
-                          pattern="^.{2,255}$"
-                          autoComplete="off"
-                          value={this.case.title}
-                          onChange={(event: SyntheticInputEvent<HTMLInputElement>) => {
-                            this.case.title = event.target.value;
-                          }}
-                          placeholder={'Gi saken din en beskrivende tittel'}
-                          required
-                        />
-                      </div>
-                    ) : null}
-                    {privilege <= OWNER_EMPLOYEE ? (
-                      <div className={'form-group'}>
-                        <label htmlFor="status">Saksstatus</label>
+                        <label htmlFor="category">Kategori</label>
                         <select
-                          defaultValue={this.case.status_id}
-                          onChange={this.statusListener}
+                          defaultValue={this.case.category_id}
+                          onChange={this.categoryListener}
                           className={'form-control'}
-                          id={'status'}
+                          id={'category'}
                           required
                         >
-                          {this.statuses.map(e => (
-                            <option key={e.status_id} value={e.status_id}>
+                          {this.categories.map(e => (
+                            <option key={e.category_id} value={e.category_id}>
                               {' '}
                               {e.name}{' '}
                             </option>
                           ))}
                         </select>
                       </div>
-                    ) : null}
-                    {this.case.status_id === STATUS_OPEN || privilege === ADMIN ? (
-                      <div className={'form-group'}>
-                        <label htmlFor="description">Beskrivelse</label>
-                        <textarea
-                          className={'form-control'}
-                          id={'description'}
-                          maxLength={MAX_DESCRIPTION_LENGTH}
-                          placeholder="Gi din sak en beskrivende beskrivelse, så blir det enklere for oss å hjelpe deg."
-                          value={this.case.description}
-                          onChange={this.textareaListener}
-                        />
-                        {this.case.description
-                          ? this.case.description.length + ' av ' + MAX_DESCRIPTION_LENGTH + ' tegn brukt.'
-                          : null}
-                      </div>
-                    ) : null}
-                    {privilege <= OWNER_EMPLOYEE ? (
-                      <div className={'form-group'}>
-                        <label htmlFor="description">Melding</label>
-                        <textarea
-                          className={'form-control'}
-                          id={'message'}
-                          maxLength={255}
-                          minLength={2}
-                          placeholder="Melding om sak"
-                          value={this.statusComment.comment}
-                          onChange={this.textareaListener}
-                          required
-                        />
-                      </div>
-                    ) : null}
-                    {this.case.img.length < MAX_NUMBER_IMG ? (
-                      <div className={'form-group'}>
-                        <label htmlFor={'image-input'}>Legg ved bilder</label>
-                        <input
-                          className={'form-control-file'}
-                          id={'image-inpu'}
-                          type={'file'}
-                          accept={'.png, .jpg, .jpeg'}
-                          onChange={this.fileInputListener}
-                        />
-                      </div>
-                    ) : null}
-                    <button className={'btn btn-primary mr-2'} onClick={this.submit}>
-                      Oppdater
+                      {(this.case.status_id === STATUS_OPEN && this.isOwner(this.case)) || privilege === ADMIN ? (
+                        <div className={'form-group'}>
+                          <label htmlFor="title">Tittel</label>
+                          <input
+                            className={'form-control'}
+                            type="text"
+                            pattern="^.{2,255}$"
+                            autoComplete="off"
+                            value={this.case.title}
+                            onChange={(event: SyntheticInputEvent<HTMLInputElement>) => {
+                              this.case.title = event.target.value;
+                            }}
+                            placeholder={'Gi saken din en beskrivende tittel'}
+                            required
+                          />
+                        </div>
+                      ) : null}
+                      {privilege <= OWNER_EMPLOYEE ? (
+                        <div className={'form-group'}>
+                          <label htmlFor="status">Saksstatus</label>
+                          <select
+                            defaultValue={this.case.status_id}
+                            onChange={this.statusListener}
+                            className={'form-control'}
+                            id={'status'}
+                            required
+                          >
+                            {this.statuses.map(e => (
+                              <option key={e.status_id} value={e.status_id}>
+                                {' '}
+                                {e.name}{' '}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      ) : null}
+                      {this.case.status_id === STATUS_OPEN || privilege === ADMIN ? (
+                        <div className={'form-group'}>
+                          <label htmlFor="description">Beskrivelse</label>
+                          <textarea
+                            className={'form-control'}
+                            id={'description'}
+                            maxLength={MAX_DESCRIPTION_LENGTH}
+                            placeholder="Gi din sak en beskrivende beskrivelse, så blir det enklere for oss å hjelpe deg."
+                            value={this.case.description}
+                            onChange={this.textareaListener}
+                          />
+                          {this.case.description
+                            ? this.case.description.length + ' av ' + MAX_DESCRIPTION_LENGTH + ' tegn brukt.'
+                            : null}
+                        </div>
+                      ) : null}
+                      {privilege <= OWNER_EMPLOYEE ? (
+                        <div className={'form-group'}>
+                          <label htmlFor="description">Melding</label>
+                          <textarea
+                            className={'form-control'}
+                            id={'message'}
+                            maxLength={255}
+                            minLength={2}
+                            placeholder="Melding om sak"
+                            value={this.statusComment.comment}
+                            onChange={this.textareaListener}
+                            required
+                          />
+                        </div>
+                      ) : null}
+                      {this.case.img.length < MAX_NUMBER_IMG ? (
+                        <div className={'form-group'}>
+                          <label htmlFor={'image-input'}>Legg ved bilder</label>
+                          <input
+                            className={'form-control-file'}
+                            id={'image-inpu'}
+                            type={'file'}
+                            accept={'.png, .jpg, .jpeg'}
+                            onChange={this.fileInputListener}
+                          />
+                        </div>
+                      ) : null}
+                      <button className={'btn btn-primary mr-2'} onClick={this.submit}>
+                        Oppdater
                     </button>
-                    {(this.case.status_id === STATUS_OPEN && this.isOwner(this.case)) || privilege === ADMIN ? (
-                      <button className={'btn btn-danger mr-2'} onClick={this.delete}>
-                        Slett
+                      {(this.case.status_id === STATUS_OPEN && this.isOwner(this.case)) || privilege === ADMIN ? (
+                        <button className={'btn btn-danger mr-2'} onClick={this.delete}>
+                          Slett
                       </button>
-                    ) : null}
-                  </section>
-                ) : null}
-              </section>
-            ) : null}
+                      ) : null}
+                    </section>
+                  ) : null}
+                </section>
+              ) : null}
           </form>
           <div className="container my-5">
             <div className="row">
@@ -262,24 +268,31 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   <div className="card">
                     <img src={e.src} alt={e.src} className="card-img-top" />
                     {(privilege <= OWNER_EMPLOYEE && this.case.status_id !== STATUS_CLOSED) ||
-                    (privilege === OWNER_NOT_EMPLOYEE && this.case.status_id === STATUS_OPEN) ||
-                    privilege === ADMIN ? (
-                      <div className="card-img-overlay">
-                        <button
-                          className={'btn btn-danger img-overlay float-right align-text-bottom'}
-                          onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
-                        >
-                          <FontAwesomeIcon icon={faTrashAlt} />
-                        </button>
-                      </div>
-                    ) : null}
+                      (privilege === OWNER_NOT_EMPLOYEE && this.case.status_id === STATUS_OPEN) ||
+                      privilege === ADMIN ? (
+                        <div className="card-img-overlay">
+                          <button
+                            className={'btn btn-danger img-overlay float-right align-text-bottom'}
+                            onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
+                          >
+                            <FontAwesomeIcon icon={faTrashAlt} />
+                          </button>
+                        </div>
+                      ) : null}
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          <div className={'col-md-6 embed-responsive'}>
-            {/*<GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.case.lat, lng: this.case.lon }} /> */}
+          <div style={{ minHeight: "250px" }} className={'col-md-6 google-map'}>
+            <GoogleApiWrapper
+              updatePos={{ lat: this.case.lat, lng: this.case.lon }}
+              isClickable={false}
+
+              userPos={{ lat: this.case.lat, lng: this.case.lon }}
+              centerPos={{ lat: this.case.lat, lng: this.case.lon }}
+            />
+
           </div>
         </div>
         <div className={'col-md-6'}>
@@ -313,6 +326,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     );
   }
 
+  /**
+   * Runs when component is mounted.
+   * Initiates data variables, fetching logic and state logic.
+   */
   mounted() {
     this.case = new Case();
     let cas = new CaseService();
@@ -350,7 +367,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             a.lat,
             a.lon
           );
-            this.props.onCaseOpened(this.case);
+          this.props.onCaseOpened(this.case);
           a.img.map(e => this.case.img.push({ src: e }));
           let userObj: User = ToolService.getUser();
           let statusCommentPoster: number;
@@ -402,14 +419,14 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   if (userObj) {
                     console.log(
                       'Case with id ' +
-                        this.case.case_id +
-                        ' is already up to date for user ' +
-                        userObj.firstname +
-                        ' ' +
-                        userObj.lastname +
-                        ' (id = ' +
-                        userObj.user_id +
-                        ').'
+                      this.case.case_id +
+                      ' is already up to date for user ' +
+                      userObj.firstname +
+                      ' ' +
+                      userObj.lastname +
+                      ' (id = ' +
+                      userObj.user_id +
+                      ').'
                     );
                   }
                 }
@@ -418,14 +435,14 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                 if (userObj) {
                   console.log(
                     'Case with id ' +
-                      this.case.case_id +
-                      ' is not subscribed to user ' +
-                      userObj.firstname +
-                      ' ' +
-                      userObj.lastname +
-                      ' (id = ' +
-                      userObj.user_id +
-                      ').'
+                    this.case.case_id +
+                    ' is not subscribed to user ' +
+                    userObj.firstname +
+                    ' ' +
+                    userObj.lastname +
+                    ' (id = ' +
+                    userObj.user_id +
+                    ').'
                   );
                 } else {
                   console.log('Could not load user object from local storage.');
@@ -436,7 +453,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               console.log('Could not load categories.');
               Notify.danger(
                 'Klarte ikke å hente abbonnementene dine, vi får derfor ikke til å vise om du allerede er abonnement på denne saken eller ikke. Du kan likevel trykke på abonnerknappen for å enten legge til eller slette abonnement. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
-                  err.message
+                err.message
               );
             });
         }
@@ -519,6 +536,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       });
   }
 
+  /**
+   * Detects the users privilege level, if user is logged in.
+   * @returns {number} Number that uniquely identifies the user's privilege level.
+   */
   grantAccess() {
     let userObj = localStorage.getItem('user');
     if (this.case && userObj) {
@@ -549,10 +570,20 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Detects wheter or not the currently logged in user is the owner of the supplied case.
+   * @param c Case object to check for ownership.
+   * @returns {boolean} True if user's user_id matches c.user_id
+   */
   isOwner(c: Case) {
     return ToolService.getUserId() === c.user_id;
   }
 
+  /**
+   *
+   * @param c
+   * @returns {boolean}
+   */
   isSubscribed(c: Case) {
     if (this.subscription) {
       return true;
@@ -561,6 +592,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Detects whether or not user is logged in
+   * @returns {boolean} True if user is logged in. False if user is not logged in.
+   */
   isLoggedIn() {
     let token = localStorage.getItem('token');
     if (token) {
@@ -570,6 +605,11 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Fetches CSS style for Subscription Button
+   * @param c Case item of which status is to be styled.
+   * @returns {*} CSS-style component with predefined style property.
+   */
   getSubscriptionButtonStyles(c: Case) {
     if (this.isSubscribed(c)) {
       return subscriptionButtonStyles[1];
@@ -578,6 +618,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Subscribes the user to this case if user is not currently subscribed, or unsibscribes the user if the user is currently not subscribed.
+   * @param event Source event, created by a HTML Button Element, that called this method.
+   */
   onClickSubscribeButton(event: SyntheticInputEvent<HTMLButtonElement>) {
     console.log('Clicked subscribe button!');
     let sub = new CaseSubscriptionService();
@@ -614,6 +658,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Displays or hides the form with user input, if the user has sufficient privilege.
+   * @param event Source event, created by a HTML Button Element, that called this method.
+   */
   onClickToggleForm(event: SyntheticInputEvent<HTMLButtonElement>) {
     event.preventDefault();
     console.log('Toggling form edit.');
@@ -624,6 +672,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Listens for any changes on a bound HTML Textarea Element and alters the case's description with the changes made to the text field inpput.
+   * @param event Source event, created by a HTML Textarea Element, that called this method.
+   */
   textareaListener(event: SyntheticInputEvent<HTMLInputElement>) {
     if (event.target) {
       if (event.target.id === 'description') {
@@ -634,6 +686,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Listens for any changes to the category drop-down list and alters the case's category_id and category_name accordingly.
+   * @param event Source event, created by a HTML Select Element, that called this method.
+   */
   categoryListener(event: SyntheticEvent<HTMLSelectElement>) {
     if (event.target && event.target instanceof HTMLSelectElement && this.case) {
       this.case.category_id = this.categories[event.target.selectedIndex].category_id;
@@ -642,14 +698,27 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Listens for any changes to the status drop-down list and alters the case's status_id and status_name accordingly.
+   * @param event Source event, created by a HTML Select Element, that called this method.
+   */
   statusListener(event: SyntheticEvent<HTMLSelectElement>) {
     if (event.target && event.target instanceof HTMLSelectElement && this.case) {
       this.case.status_id = this.statuses[event.target.selectedIndex].status_id;
       this.case.status_name = this.statuses[event.target.selectedIndex].name;
       console.log('this.case.status_id: ' + this.case.status_id);
+      if (this.statusComment) {
+        this.statusComment.status_id = this.case.status_id;
+        this.statusComment.status_name = this.case.status_name;
+        console.log('this.statusComment.status_id: ' + this.statusComment.status_id);
+      }
     }
   }
 
+  /**
+   * Listen for changes to the HTML Input Element of type file. Filters associated files and adds files to the case when necessary.
+   * @param event Source event, created by a HTML Input Element, that called this method.
+   */
   fileInputListener(event: SyntheticInputEvent<HTMLInputElement>) {
     if (!this.imgSync) {
       let files = Array.from(event.target.files);
@@ -688,17 +757,17 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           } else {
             console.log(
               'Max number of pictures (' +
-                MAX_NUMBER_IMG +
-                ') reached. \nCurrent embedded images: ' +
-                this.case.img.length +
-                '\nTried to add: ' +
-                files.length +
-                ' new files.'
+              MAX_NUMBER_IMG +
+              ') reached. \nCurrent embedded images: ' +
+              this.case.img.length +
+              '\nTried to add: ' +
+              files.length +
+              ' new files.'
             );
             Notify.warning(
               'Du kan maksimalt feste ' +
-                MAX_NUMBER_IMG +
-                ' til en sak. Noen bilder må slettes før du kan legge til nye.'
+              MAX_NUMBER_IMG +
+              ' til en sak. Noen bilder må slettes før du kan legge til nye.'
             );
           }
         } else {
@@ -712,6 +781,11 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Deletes image associated with the given src parameter from the case object.
+   * @param event Source event, created by a HTML Button Element, that called this method.
+   * @param src Temporary URL of image to be deleted
+   */
   fileInputDeleteImage(event: SyntheticInputEvent<HTMLInputElement>, src: string) {
     if (!this.imgSync) {
       this.imgSync = true;
@@ -737,12 +811,20 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Removes header prefix from local URL resource
+   * @param src URL of image resource
+   * @returns {string} File name of the image, ready for upload.
+   */
   formatImageURL(src: string) {
     let a = src.split('/')[2];
-    console.log(a);
     return a;
   }
 
+  /**
+   * Deletes this case, if status is open.
+   * @param event Source event, created by a HTML Button Element, that called this method.
+   */
   delete(event: SyntheticEvent<HTMLButtonElement>) {
     event.preventDefault();
     console.log('Clicked delete button');
@@ -773,6 +855,9 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Fetches status comments from the server.
+   */
   fetchStatusComments() {
     let cascom = new StatusCommentService();
     cascom
@@ -812,6 +897,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
       });
   }
 
+  /**
+   * Validates all inputfields in the HTML form element.
+   * @returns {boolean} Returns true if all fields are ok, or false if not ok.
+   */
   validate() {
     let privilege = this.grantAccess();
     if ((this.case.status_id === STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE) || privilege <= NOT_OWNER_EMPLOYEE) {
@@ -830,6 +919,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     }
   }
 
+  /**
+   * Checks form validity and then sends the case and, if applicable, status comment to server.
+   * @param event Source event, created by a HTML Button Element, that called this method.
+   */
   submit(event: SyntheticEvent<HTMLButtonElement>) {
     event.preventDefault();
     let privilege = this.grantAccess();
@@ -852,8 +945,9 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               .then(e => {
                 console.log('Received StatusComment Object: ', e);
                 this.statusComment.createdAt = e.createdAt;
-                this.statusMessages.push(this.statusComment);
-                this.statusComment = new StatusComment();
+                this.statusMessages.unshift(this.statusComment);
+                let usr = ToolService.getUser()
+                this.statusComment = new StatusComment(null, this.case.case_id, this.case.status_id, usr.user_id, this.case.status_name, "", usr.firstname + " " + usr.lastname, null);
               })
               .catch((err: Error) => {
                 console.log('Uploading status comment failed for case ' + this.case.case_id + '. Error: ', err);
@@ -892,6 +986,23 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               err.message
           );*/
         });
+    }
+  }
+  getCreatedBy() {
+    let user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      if (user.role_id === ToolService.admin_role_id || user.role_id === ToolService.employee_role_id) {
+        return (
+          <tr>
+            <td>Sak sendt av</td>
+            <td>{this.case.createdBy}</td>
+          </tr>
+        );
+      } else {
+        return null;
+      }
+    } else {
+      return null;
     }
   }
 }
