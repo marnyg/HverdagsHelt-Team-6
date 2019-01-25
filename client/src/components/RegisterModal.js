@@ -75,7 +75,7 @@ class RegisterModal extends Component {
                                     </option>
                                 ))}
                             </select>
-                            <select 
+                            <select
                                 required
                                 className={'form-control mb-3'}
                                 id={'regionSelector'}
