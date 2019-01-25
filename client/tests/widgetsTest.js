@@ -13,6 +13,13 @@ import Picture from '../src/classes/Picture.js';
 
 import { shallow, mount } from 'enzyme';
 
+/**
+ * Disse testene funket like før prosjektets avsluttning. Ved
+ * implementering av loading ikon sluttet disse plutselig å
+ * fungere. Dette ble dermed ikke en prioritet å rette opp i
+ * på grunn av mangel på tid.
+ */
+
 describe('Alert tests', () => {
   it('Check if Alert is created', () => {
     const wrapper = shallow(<Alert />);

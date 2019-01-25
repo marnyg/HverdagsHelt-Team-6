@@ -4,7 +4,14 @@ import { Component } from 'react-simplified';
 import AdminTeamForm from "./AdminTeamForm";
 import AdminTeamList from './AdminTeamList';
 
+/**
+ * Component for managing employees in regions.
+ */
 class AdminTeamView extends Component {
+  /**
+   * Generates HTML code
+   * @returns {*} HTML Element with sub-elements.
+   */
     render() {
         if(this.props.region === undefined || this.props.region === null) {
             return(

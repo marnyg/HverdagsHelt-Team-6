@@ -12,6 +12,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEnvelope, faCheck, faTrashAlt } from '@fortawesome/free-solid-svg-icons/index';
 import UserService from '../services/UserService';
 
+
+
 class MyRegions extends Component<{}, { isEditing: boolean }> {
     regionService = new RegionService();
     countyService = new CountyService();

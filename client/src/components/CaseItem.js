@@ -10,11 +10,23 @@ import ToolService from "../services/ToolService";
 
 
 const max_title_length = 24;
-class CaseItem extends Component {
-  images = [];
-  button_type = "primary";
 
-  render() {
+/**
+ * This component is representing a case on the webpage.
+ */
+
+class CaseItem extends Component {
+  images = []; //Array for the given images registered to a case
+  button_type = "primary"; //Setting the colour for the subscribe button
+
+    /**
+     * The render method is rendering the caseItems on the given places onto the webpage.
+     * @returns {*} Displaying an array of HTML elements in different kind of views, decided
+     *              by the grid.
+     */
+
+
+    render() {
     if (this.props.grid) {
       return (
         <div className="item bg-light">
@@ -95,6 +107,12 @@ class CaseItem extends Component {
       }
   }
 
+    /**
+     * The mounted function is handling:
+     * If the given user is subscribed to the case, button will change to success (change colour).
+     * The images in the image array - those will be shown in the specific case item.
+     */
+
   mounted() {
       if(this.props.case.subscribed){
           this.button_type = "success";
@@ -110,12 +128,25 @@ class CaseItem extends Component {
       }
   }
 
+    /**
+     * This function is checking the image
+     * @param src   The image source
+     * @param resolve   When the image loads it will be set as resolve
+     * @param reject    If an error occurs it will be set as reject
+     */
+
   checkImage(src, resolve, reject){
       let img = new Image();
       img.onload = resolve;
       img.onerror = reject;
       img.src = src;
   }
+
+    /**
+     * This function is handeling the subscribed function for a given user. A user subscription will
+     * determine the colour of the button.
+     * @param event To respond on a click
+     */
 
   subscribe(event) {
     event.preventDefault();

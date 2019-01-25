@@ -16,10 +16,21 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CaseItem from './CaseItem.js';
 import { faListUl, faTh } from '@fortawesome/free-solid-svg-icons/index';
 
+/**
+ * This component is representing the user's notifications page.
+ */
+
 class Notifications extends Component {
-    grid = true;
-    cases: [] = null;
-    user = JSON.parse(localStorage.getItem('user'));
+  grid = true;  //Used to display cases in different view, depending on the user's preferences
+  cases = [];   //Array of cases that there exists notifications on
+  user = JSON.parse(localStorage.getItem('user'));  //Getting user information from the localStorage
+
+    /**
+     * If there is any new notifications those will be displayed in this element.
+     * If there is no new notifications, the user will be presented with necessary information about
+     * how to subscribe to cases.
+     * @returns {*} HTML element containing information about case notifications, depending on the result.
+     */
 
     render() {
         if(this.cases === undefined || this.cases === null) {
@@ -78,6 +89,10 @@ class Notifications extends Component {
         );
     }
 
+    /**
+     * Getting all the cases that is outdated, to present new notifications for the user.
+     */
+
     mounted() {
         $('#spinner').show();
         let caseSubscriptionService = new CaseSubscriptionService();
@@ -96,6 +111,12 @@ class Notifications extends Component {
                 $('#spinner').hide();
             });
     }
+
+    /**
+     * Function to format the date properly.
+     * @param date  Dateformat from the database. Used to convert to a more readable format.
+     * @returns {string}    Date result returned on a more readable format.
+     */
 
     dateFormat(date: string) {
         if (date) {

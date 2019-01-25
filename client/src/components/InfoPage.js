@@ -2,6 +2,11 @@
 import * as React from 'react';
 import { Component } from 'react-simplified';
 
+/**
+ * This component is rendering the infopage of the webpage. This is shown every
+ * first time a user visit the page.
+ */
+
 class InfoPage extends Component {
 
     render() {
