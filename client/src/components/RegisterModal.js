@@ -7,7 +7,7 @@ import Region from '../classes/Region.js';
 import UserService from '../services/UserService.js';
 import User from '../classes/User.js';
 import Alert from './Alert.js';
-
+import ToolService from '../services/ToolService';
 
 class RegisterModal extends Component {
     _isMounted = false; // Used to not update state (promise resolve) when component has unmounted
@@ -16,6 +16,7 @@ class RegisterModal extends Component {
     validemail = true;
     validpasswords = false;
     region_id = null;
+    error = null;
 
     constructor() {
         super();
@@ -40,6 +41,7 @@ class RegisterModal extends Component {
     }
 
     render() {
+        console.log('Registermodal rendering');
         return (
             <div className="modal fade" id="register-modal" tabIndex="-1" role="dialog"
                 aria-labelledby="myModalLabel" aria-hidden="true">
@@ -73,7 +75,7 @@ class RegisterModal extends Component {
                                     </option>
                                 ))}
                             </select>
-                            <select
+                            <select 
                                 required
                                 className={'form-control mb-3'}
                                 id={'regionSelector'}
@@ -93,7 +95,7 @@ class RegisterModal extends Component {
                             </select>
                             <small className="text-muted">Tlf må inneholde 8 tall</small>
                             <input ref="tlf" className={"form-control my-2 py-3"} pattern="^[\d]{8}" type="tel" required placeholder="Telefonnummer" />
-                            <input name="login" className="btn btn-primary" value="Register" onChange={this.submit} onClick={this.submit} />
+                            <input name="login" className="btn btn-primary w-100" value="Register" onChange={this.submit} onClick={this.submit} />
                         </form>
                     </div>
                 </div>
@@ -164,7 +166,13 @@ class RegisterModal extends Component {
                         })
                         .catch((error: Error) => console.error(error));
                 })
-                .catch((error: Error) => { console.error(error) });
+                .catch((error: Error) => {
+                    console.log('FVEWEWNIOVMEWIOFMEWO');
+                    this.error = ToolService.getUserUpdateErrorAlert(error, () => {
+                        console.log('Alert closing');
+                        this.error = null
+                    });
+                });
 
 
         } else {

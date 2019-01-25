@@ -47,10 +47,10 @@ class App extends Component {
                 <div className={'h-100 w-100'}>
                     <div id={'spinner'}>
                         <Loader
-                            type="TailSpin"
-                            color="#00BFFF"
-                            height="100"
-                            width="100"
+                            type="Oval"
+                            color="#428bca"
+                            height="200"
+                            width="200"
                         />
                     </div>
                     <div className={'h-100 w-100'}>

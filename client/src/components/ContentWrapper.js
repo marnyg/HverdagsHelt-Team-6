@@ -33,7 +33,7 @@ class ContentWrapper extends Component {
             if(this.cases !== null && this.cases.length > 0){ // No response from the locationservice has been given, wait before showing
                 $('#loader').hide();
                 return (
-                    <div>
+                    <div className={'container'}>
                         <Content
                             user={this.user}
                             onSubmit={(region_id) => this.onRegionSelected(region_id)}
@@ -50,7 +50,7 @@ class ContentWrapper extends Component {
                 if(this.cases !== null){ // cases.length === 0
                     $('#loader').hide();
                     return(
-                        <div>
+                        <div className={'container'}>
                             <Content
                                 user={this.user}
                                 onSubmit={(region_id) => this.onRegionSelected(region_id)}
@@ -71,7 +71,7 @@ class ContentWrapper extends Component {
             if(this.cases !== null && this.cases.length > 0){
                 $('#loader').hide();
                 return(
-                    <div>
+                    <div className={'container'}>
                         <Content
                             user={this.user}
                             onSubmit={(region_id) => this.onRegionSelected(region_id)}
@@ -218,6 +218,7 @@ class ContentWrapper extends Component {
     }
 
     onRegionSelected(region_id) {
+        $('#spinner').show();
         let regionService = new RegionService();
         regionService.getRegionGivenId(region_id)
             .then((region: Region) => {
@@ -229,14 +230,20 @@ class ContentWrapper extends Component {
                 this.location = new Location(region.lat, region.lon, region.name, null, null);
                 this.region = region.region_id;
             })
-            .catch((error: Error) => console.error(error));
+            .catch((error: Error) => {
+                console.error(error)
+            });
 
         let caseService = new CaseService();
         caseService.getCaseGivenRegionId(region_id)
             .then((cases: Case[]) => {
                 this.cases = cases;
+                $('#spinner').hide();
             })
-            .catch((error: Error) => console.error(error));
+            .catch((error: Error) => {
+                $('#spinner').hide();
+                console.error(error);
+            });
     }
 
     loadResults(){
