@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { Component } from 'react-simplified';
 import UserService from "../services/UserService";
+import ToolService from '../services/ToolService';
 
 class ForgottenPWModal extends Component{
     error = null;
@@ -38,9 +39,11 @@ class ForgottenPWModal extends Component{
             userService.forgottenPassword(email)
                 .then(res => {
                     console.log(res);
+                    this.props.onSubmitted();
                 })
                 .catch((error: Error) => {
                     console.error(error);
+                    this.error = ToolService.getForgottenPWErrorAlert(error, () => {this.error = null});
                 })
         } else {
             form.reportValidity();

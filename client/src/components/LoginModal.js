@@ -100,7 +100,7 @@ class LoginModal extends Component {
         $('#' + this.props.modal_id).modal('hide');
         let modal_header = "Skriv inn eposten din";
         let modal_body = (
-            <ForgottenPWModal onSubmitted={() => {}}/>
+            <ForgottenPWModal onSubmitted={() => {$('#verify-modal').modal('hide');}}/>
         );
         let modal_footer = (
             <div>
