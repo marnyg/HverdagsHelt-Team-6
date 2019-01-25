@@ -40,7 +40,6 @@ class MyPage extends Component {
                     <Route exact path="/my-page/my-profile" render={() => <MyProfile/>} />
                 </div>
             </div>
-            {this.error}
         </div>
       </div>
     );
