@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Component } from 'react-simplified';
 import Notify from "../Notify";
 import { withRouter } from 'react-router-dom';
+import ToolService from "../../services/ToolService";
 
 const statusClosed = 3;
 const statusProcesing = 2;
@@ -35,10 +36,10 @@ class Inbox extends Component{
                                         c.title.trim().length > 25 ? c.title.trim().substring(0, 25) : c.title.trim()
                                     }
                                 </td>
-                                <td style={this.getStatusColour(c.status_id)}>{c.status_name}</td>
+                                <td style={ToolService.getStatusColour(c.status_id)}>{c.status_name}</td>
                                 <td className={'desktop-table-column'}>{c.region_name}</td>
-                                <td className={'desktop-table-column'}>{this.getTimeString(c.createdAt)}</td>
-                                <td className={'desktop-table-column'}>{this.getTimeString(c.updatedAt)}</td>
+                                <td className={'desktop-table-column'}>{ToolService.dateFormat(c.createdAt)}</td>
+                                <td className={'desktop-table-column'}>{ToolService.dateFormat(c.updatedAt)}</td>
                             </tr>
                         ))}
                         </tbody>

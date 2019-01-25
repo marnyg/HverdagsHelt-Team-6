@@ -159,7 +159,7 @@ class RegisterModal extends Component {
                 .then((user_out: User) => {
                     //email: string, password: string
                     console.log('Registered');
-                    userService.login(this.email, this.password1)
+                    userService.login(this.props.email.value, this.props.pass1.value)
                         .then(res => {
                             $('#register-modal').modal('hide');
                             this.props.onLogin();

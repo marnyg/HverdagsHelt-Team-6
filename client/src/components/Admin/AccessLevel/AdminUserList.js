@@ -2,6 +2,8 @@
 import * as React from 'react';
 import { Component } from 'react-simplified';
 import RoleService from "../../../services/RoleService";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 
 class AdminUserList extends Component{
     roles = [];
@@ -17,6 +19,7 @@ class AdminUserList extends Component{
                             <th scope="col">ID</th>
                             <th scope="col">Epost</th>
                             <th scope="col">Tilgangsnivå</th>
+                            <th scope="col">Slett</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -26,6 +29,12 @@ class AdminUserList extends Component{
                                     <td onClick={(event) => this.props.onUserSelected(user)}>{user.user_id}</td>
                                     <td onClick={(event) => this.props.onUserSelected(user)}>{user.email}</td>
                                     <td onClick={(event) => this.props.onUserSelected(user)}>{this.getRole(user.role_id)}</td>
+                                    <td onClick={(event) => this.props.deleteUser(user)}>
+                                        <button className={'btn btn-danger'} type="button" data-toggle="modal"
+                                                data-target="#verify-modal">
+                                            <FontAwesomeIcon icon={faTrashAlt}/>
+                                        </button>
+                                    </td>
                                 </tr>
                             );
                         })}

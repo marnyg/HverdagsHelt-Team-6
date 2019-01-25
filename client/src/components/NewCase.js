@@ -43,12 +43,18 @@ class NewCase extends Component {
   isMapClickable: boolean = false;
   error = null;
 
+  /**
+   * Overrides default constructor. Flushes (removes) any summoned notifications from the Notify component.
+   */
   constructor() {
     super();
     Notify.flush();
   }
 
-
+  /**
+   * Generates HTML Element with sub-elements.
+   * @returns {*} HTML Element with sub-elements.
+   */
   render() {
     if (!this.case) {
       return null;
@@ -78,7 +84,7 @@ class NewCase extends Component {
                 >
                   <option value={''} disabled>
                     Kategori
-                                    </option>
+                  </option>
                   {this.categories.map(e => (
                     <option key={e.category_id} value={e.category_id}>
                       {' '}
@@ -119,8 +125,12 @@ class NewCase extends Component {
                   : null}
               </div>
               <div>
-                Posisjon: {document.querySelector('#radio1') && document.querySelector('#radio1').checked ?
-                  <strong>{ToolService.cleanQueryString(this.pos.city)} {ToolService.cleanQueryString(this.pos.region)}</strong> : null}
+                Posisjon:{' '}
+                {document.querySelector('#radio1') && document.querySelector('#radio1').checked ? (
+                  <strong>
+                    {ToolService.cleanQueryString(this.pos.city)} {ToolService.cleanQueryString(this.pos.region)}
+                  </strong>
+                ) : null}
                 <div className={'form-check'}>
                   <input
                     id={'radio1'}
@@ -133,7 +143,7 @@ class NewCase extends Component {
                   />
                   <label htmlFor={'radio1'} className={'form-check-label'}>
                     Hent automatisk
-                                    </label>
+                  </label>
                 </div>
                 <div className={'form-check'}>
                   <input
@@ -146,7 +156,7 @@ class NewCase extends Component {
                   />
                   <label htmlFor={'radio2'} className={'form-check-label'}>
                     Marker på kart
-                                    </label>
+                  </label>
                 </div>
                 <div className={'form-check'}>
                   <input
@@ -159,7 +169,7 @@ class NewCase extends Component {
                   />
                   <label htmlFor={'radio3'} className={'form-check-label'}>
                     Velg fra liste
-                                    </label>
+                  </label>
                 </div>
               </div>
               <div className={'form-group ml-3 my-3'}>
@@ -175,7 +185,7 @@ class NewCase extends Component {
                 >
                   <option value={''} disabled>
                     Velg fylke
-                                    </option>
+                  </option>
                   {this.counties.map(e => (
                     <option key={e.county_id} value={e.county_id}>
                       {' '}
@@ -200,7 +210,7 @@ class NewCase extends Component {
                 >
                   <option value={''} disabled>
                     Velg kommune
-                                    </option>
+                  </option>
                   {this.municipalities.map(e => (
                     <option key={e.region_id} value={e.region_id}>
                       {' '}
@@ -217,7 +227,7 @@ class NewCase extends Component {
                   hidden
                 >
                   Adresse
-                                </label>
+                </label>
                 <input
                   ref={e => {
                     this.lastResortAddress = e;
@@ -246,17 +256,32 @@ class NewCase extends Component {
             <div>
               <button ref="sendButton" className={'btn btn-primary mr-2'} onClick={this.send}>
                 Send sak
-                            </button>
+              </button>
               <NavLink className={'btn btn-secondary'} exact to="/">
                 Avbryt
-                            </NavLink>
+              </NavLink>
             </div>
           </div>
-          <div className={"col-lg google-map " + (document.querySelector('#radio2') && !document.querySelector('#radio2').checked ? "mobile-map-hidden" : "")}>
+          <div
+            className={
+              'col-lg google-map ' +
+              (document.querySelector('#radio2') && !document.querySelector('#radio2').checked
+                ? 'mobile-map-hidden'
+                : '')
+            }
+          >
             <GoogleApiWrapper
-              centerPos={this.case.lat !== undefined && this.case.lon !== undefined ? { lat: this.case.lat, lng: this.case.lon } : { lat: this.lastResortPos.lat, lng: this.lastResortPos.lon }}
+              centerPos={
+                this.case.lat !== undefined && this.case.lon !== undefined
+                  ? { lat: this.case.lat, lng: this.case.lon }
+                  : { lat: this.lastResortPos.lat, lng: this.lastResortPos.lon }
+              }
               updatePos={this.updatePos}
-              markerPos={this.case.lat !== undefined && this.case.lon !== undefined ? { lat: this.case.lat, lng: this.case.lon } : { lat: this.lastResortPos.lat, lng: this.lastResortPos.lon }}
+              markerPos={
+                this.case.lat !== undefined && this.case.lon !== undefined
+                  ? { lat: this.case.lat, lng: this.case.lon }
+                  : { lat: this.lastResortPos.lat, lng: this.lastResortPos.lon }
+              }
               isClickable={this.isMapClickable}
               chosenMuni={this.list2 ? this.municipalities[this.list2.selectedIndex - 1] : null}
             />
@@ -281,10 +306,13 @@ class NewCase extends Component {
             ))}
           </div>
         </div>
-      </div>)
+      </div>
+    );
   }
 
-
+  /**
+   * When component mounts: initiates fetching logic and sets component variable states.
+   */
   mounted() {
     this.case.user_id = ToolService.getUserId();
     let locationService = new LocationService();
@@ -341,7 +369,7 @@ class NewCase extends Component {
               '\n\nFeilmelding: ' +
               err.toString()
             }
-            onClose={() => this.error = null}
+            onClose={() => (this.error = null)}
           />
         );
         /*Notify.danger(
@@ -367,7 +395,7 @@ class NewCase extends Component {
               '\n\nFeilmelding: ' +
               err.toString()
             }
-            onClose={() => this.error = null}
+            onClose={() => (this.error = null)}
           />
         );
         /*Notify.danger(
@@ -379,6 +407,10 @@ class NewCase extends Component {
       });
   }
 
+  /**
+   * Listener function that monitors the current state of the radio selection part of the register case form and calls the desired positioning method..
+   * @param event Source event, created by the HTML Input Element of type radio of which was clicked/changed.
+   */
   radioListener(event: SyntheticInputEvent<HTMLInputElement>) {
     let radio = event.target;
     let index = this.radioSelector();
@@ -395,6 +427,11 @@ class NewCase extends Component {
     }
   }
 
+  /**
+   * Determins the selected radio, either auto positioning, map marker positioning or last-resort positioning.
+   * Used by validation methods.
+   * @returns {number} Unique number, identifying one specific method of positioning.
+   */
   radioSelector(): number {
     if (this.form) {
       let posSelector: NodeList<HTMLElement> = this.form.querySelectorAll('input[name="pos"]');
@@ -419,6 +456,9 @@ class NewCase extends Component {
     }
   }
 
+  /**
+   * Logic for setting case position using automatic positioning.
+   */
   radio1() {
     // Automatic location discovery
     if (this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
@@ -441,7 +481,6 @@ class NewCase extends Component {
           this.markerPos = e;
         }
       })
-      // TODO Tar ikke hensyn til to Bø kommuner!!!
       .then(() => {
         let reg = new RegionService();
         reg
@@ -461,7 +500,7 @@ class NewCase extends Component {
                 <Alert
                   type="warning"
                   text="Vi klarte ikke å plassere din posisjon i en kommune registrert hos oss. Vennligst benytt en annen metode for å sette din posisjon, ellers blir posisjonen satt til din angitte hjemkommune."
-                  onClose={() => this.error = null}
+                  onClose={() => (this.error = null)}
                 />
               );
               /*Notify.warning(
@@ -481,7 +520,7 @@ class NewCase extends Component {
           <Alert
             type="danger"
             text={'Det oppstod en feil ved henting av automatisk posisjon. \n\nFeilmelding: ' + err.message}
-            onClose={() => this.error = null}
+            onClose={() => (this.error = null)}
           />
         );
         /*Notify.danger('Det oppstod en feil ved henting av automatisk posisjon. \n\nFeilmelding: ' + err.message);*/
@@ -489,6 +528,9 @@ class NewCase extends Component {
     console.log('THIS.POS', JSON.stringify(this.pos));
   }
 
+  /**
+   * Logic for setting case position using map marker positioning.
+   */
   radio2() {
     // Map marker location discovery
     if (this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
@@ -502,6 +544,9 @@ class NewCase extends Component {
     }
   }
 
+  /**
+   * Logic for setting case position using last-resort positioning.
+   */
   radio3() {
     // Last resort list location selection
     if (this.list1 && this.list2 && this.lastResortAddress && this.lastResortAddressLabel) {
@@ -525,16 +570,20 @@ class NewCase extends Component {
     }
   }
 
+  /**
+   * Listener that monitors the state of the last-resoirt County list. Used for fetching municipalities given county.
+   * @param event Source event, generated by the HTML Select Element that created it.
+   */
   countyListener(event: SyntheticEvent<HTMLSelectElement>) {
     console.log('Selecting county from drop-down list.');
     if (this.list2 && this.list2) {
       let county = event.target;
       console.log(
         'Slected ' +
-        event.target.options[event.target.selectedIndex].text +
-        ' with id = ' +
-        event.target.value +
-        ' as county from drop-down list.'
+          event.target.options[event.target.selectedIndex].text +
+          ' with id = ' +
+          event.target.value +
+          ' as county from drop-down list.'
       );
       this.list2.hidden = false;
       this.fetchMunicipalities(county.value);
@@ -543,6 +592,10 @@ class NewCase extends Component {
     }
   }
 
+  /**
+   * Listener that monitors the state of the last-resoirt Municipality list. Used for setting region_id for the case object.
+   * @param event Source event, generated by the HTML Select Element that created it.
+   */
   municipalityListener(event: SyntheticInputEvent<HTMLSelectElement>) {
     console.log('Selecting municipality from drop-down list.');
     if (this.lastResortAddress && this.lastResortAddressLabel) {
@@ -552,10 +605,10 @@ class NewCase extends Component {
         console.log(
           muni,
           'Slected ' +
-          muni.options[muni.selectedIndex].text +
-          ' with id = ' +
-          muni.value +
-          ' as municipality from drop-down list.'
+            muni.options[muni.selectedIndex].text +
+            ' with id = ' +
+            muni.value +
+            ' as municipality from drop-down list.'
         );
       }
       this.lastResortAddress.hidden = false;
@@ -566,14 +619,18 @@ class NewCase extends Component {
     }
   }
 
+  /**
+   * Fetches municipalities given the input region_id.
+   * @param county_id Unique id number of a county.
+   */
   fetchMunicipalities(county_id: number) {
     if (this.list1 && this.list1 instanceof HTMLSelectElement) {
       console.log(
         'Fetching municipalities for county: ' +
-        this.list1.options[this.list1.selectedIndex].text +
-        ' (county_id = ' +
-        county_id +
-        ').'
+          this.list1.options[this.list1.selectedIndex].text +
+          ' (county_id = ' +
+          county_id +
+          ').'
       );
       // Fetching logic here
       let reg = new RegionService();
@@ -595,7 +652,7 @@ class NewCase extends Component {
                   '\n\nFeilmelding: ' +
                   err.toString()
                 }
-                onClose={() => this.error = null}
+                onClose={() => (this.error = null)}
               />
             );
             /*Notify.danger(
@@ -611,12 +668,19 @@ class NewCase extends Component {
     }
   }
 
+  /**
+   * Whenever called: sets the municipality select drop-down list to index 0, which contains placeholder text.
+   */
   resetMunicipalityList() {
     if (this.list2 instanceof HTMLSelectElement) {
       this.list2.selectedIndex = 0;
     }
   }
 
+  /**
+   * Listens for changes to the HTML Input file type element. Creates Picture objects and stores them in the case object.
+   * @param event Source event, generated by the HTML Input file type element that created it.
+   */
   fileInputListener(event: SyntheticInputEvent<HTMLInputElement>) {
     let files = Array.from(event.target.files);
     console.log('Files in file-input:', files);
@@ -644,7 +708,7 @@ class NewCase extends Component {
           <Alert
             type="warning"
             text="Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png."
-            onClose={() => this.error = null}
+            onClose={() => (this.error = null)}
           />
         );
         /*Notify.warning('Filtypen er ikke støttet. Vennligst velg et bilde med format .jpg, .jpeg eller .png.');*/
@@ -652,11 +716,20 @@ class NewCase extends Component {
     }
   }
 
+  /**
+   * Removes/disassociates an image with this case object.
+   * @param event Source event, generated by the HTML Button element that created it.
+   * @param src URL to the image resource.
+   */
   fileInputDeleteImage(event: SyntheticInputEvent<HTMLInputElement>, src) {
     this.case.img = this.case.img.filter(e => e.src !== src);
     console.log('Deleting image file with src = ' + src);
   }
 
+  /**
+   * Finds region_id for a region, given it's name.
+   * @param name Name for region to query.
+   */
   getRegionId(name: string) {
     let service = new RegionService();
     service
@@ -670,9 +743,9 @@ class NewCase extends Component {
         if (region) {
           return region.region_id;
         } else {
-          this.error = <Alert type="danger" text="Ingen kommuner passer ditt valg."
-            onClose={() => this.error = null}
-          />;
+          this.error = (
+            <Alert type="danger" text="Ingen kommuner passer ditt valg." onClose={() => (this.error = null)} />
+          );
           /*Notify.danger('Ingen kommuner passer ditt valg.');*/
           return null;
         }
@@ -686,7 +759,7 @@ class NewCase extends Component {
               'Kunne ikke hente kommunedata fra server for å sammenlikne med din valgte kommune. \n\nFeilmelding: ' +
               err.message
             }
-            onClose={() => this.error = null}
+            onClose={() => (this.error = null)}
           />
         );
         /*Notify.danger(
@@ -697,13 +770,23 @@ class NewCase extends Component {
       });
   }
 
+  /**
+   * Validates the entire HTML Form.
+   * @param index Index referring to either automatic location, map marker location or last-resort list location.
+   * @returns {Promise<*>} Returns true if form is valid or false if the form is not valid.
+   */
   async validate(index: number): Promise<boolean> {
     if (!this.form.checkValidity()) {
       this.form.reportValidity();
       console.log('Basic HTML Form validation failed!');
-      $("#spinner").hide();
-      this.error = <Alert type="warning" text="Vennligst fyll in de påkrevde feltene og prøv igjen."
-        onClose={() => this.error = null} />;
+      $('#spinner').hide();
+      this.error = (
+        <Alert
+          type="warning"
+          text="Vennligst fyll in de påkrevde feltene og prøv igjen."
+          onClose={() => (this.error = null)}
+        />
+      );
       //Notify.warning('Vennligst fyll in de påkrevde feltene og prøv igjen.');
       return false;
     }
@@ -732,14 +815,14 @@ class NewCase extends Component {
               }
             });
           } else {
-            $("#spinner").hide();
+            $('#spinner').hide();
             this.error = (
               <Alert
                 type="warning"
                 text={
                   'Din valgte posisjon er ikke i vår database, dette er enten fordi kommunen ikke er medlem av vårt system, eller ikke i norge'
                 }
-                onClose={() => this.error = null}
+                onClose={() => (this.error = null)}
               />
             );
             console.log('Automatic position is not valid.');
@@ -770,10 +853,10 @@ class NewCase extends Component {
                 text={
                   'Din valgte posisjon er ikke i vår database, dette er enten fordi kommunen ikke er medlem av vårt system, eller ikke i norge'
                 }
-                onClose={() => this.error = null}
+                onClose={() => (this.error = null)}
               />
             );
-            $("#spinner").hide();
+            $('#spinner').hide();
             console.log('Automatic position is not valid.');
             return false;
           }
@@ -789,11 +872,12 @@ class NewCase extends Component {
             console.log('Last-resort-list validation is valid.');
             return true;
           } else {
-            $("#spinner").hide();
+            $('#spinner').hide();
             this.error = (
-              <Alert type="danger" text="Vennligst velg et fylke og en kommune hvor saken finner sted og prøv igjen."
-                onClose={() => this.error = null}
-
+              <Alert
+                type="danger"
+                text="Vennligst velg et fylke og en kommune hvor saken finner sted og prøv igjen."
+                onClose={() => (this.error = null)}
               />
             );
             console.warn('County or municipality has not been set.');
@@ -803,6 +887,10 @@ class NewCase extends Component {
     }
   }
 
+  /**
+   * Validates whether county in this.pos object is valid: if it exists in the database.
+   * @returns {Promise<any>} When finished, returns.
+   */
   async doCheck1() {
     if (this.pos.region === 'Sør-Trøndelag') {
       this.pos.region = 'Trøndelag';
@@ -824,14 +912,19 @@ class NewCase extends Component {
           text={
             'Din valgte posisjon er ikke i vår database, dette er enten fordi kommunen ikke er medlem av vårt system, eller ikke i norge'
           }
-          onClose={() => this.error = null}
+          onClose={() => (this.error = null)}
         />
       );
-      $("#spinner").hide();
+      $('#spinner').hide();
       return false;
     });
   }
 
+  /**
+   * Validates whether municipality in this.pos object is valid, given county id: if it exists in the database.
+   * @param county Unique number identifying a county in the database.
+   * @returns {Promise<any>} When finished, returns.
+   */
   async doCheck2(county) {
     let reg = new RegionService();
     console.log('got to chech2');
@@ -854,15 +947,11 @@ class NewCase extends Component {
             this.error = (
               <Alert
                 type="danger"
-                text={
-                  'Komunen ' + this.pos.city + ' er ikke registrert i vårt system.'
-                  +
-                  err.message
-                }
-                onClose={() => this.error = null}
-              />)
-            $("#spinner").hide();
-
+                text={'Komunen ' + this.pos.city + ' er ikke registrert i vårt system.' + err.message}
+                onClose={() => (this.error = null)}
+              />
+            );
+            $('#spinner').hide();
 
             console.log('Region ' + this.pos.city + ' was not found in county' + this.pos.region + ' in database.');
             resolve(false);
@@ -876,18 +965,22 @@ class NewCase extends Component {
                 'Det oppstod en feil ved validering av din posisjon fra kart. Vi kunne ikke hente kommunedata. Vennligst prøv igjen. \n\nFeilmelding: ' +
                 err.message
               }
-              onClose={() => this.error = null}
+              onClose={() => (this.error = null)}
             />
           );
-          $("#spinner").hide();
+          $('#spinner').hide();
 
           resolve(false);
         });
     });
   }
 
+  /**
+   * Initiates validation, and if it passes: sends the case object to the database.
+   * @returns {Promise<void>}
+   */
   async send() {
-    $("#spinner").show();
+    $('#spinner').show();
 
     console.log(this.case && this.form);
 
@@ -911,22 +1004,21 @@ class NewCase extends Component {
           .createCase(this.case, this.case.img)
           .then(e => {
             if (e) {
-              $("#spinner").hide();
+              $('#spinner').hide();
               this.error = (
                 <Alert
                   type="success"
                   text={'Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id}
-                  onClose={() => this.error = null}
+                  onClose={() => (this.error = null)}
                 />
               );
               //Notify.success('Din henvendelse er sendt og mottat. Din nyopprettede saks-ID er ' + e.case_id);
               console.log('Form data transmission success! Case ID: ' + e.case_id);
 
-              $("#spinner").hide();
+              $('#spinner').hide();
               this.props.history.push('/case/' + e.case_id);
             } else {
-              $("#spinner").hide();
-
+              $('#spinner').hide();
 
               this.error = (
                 <Alert
@@ -934,7 +1026,7 @@ class NewCase extends Component {
                   text={
                     'Det skjedde en feil ved prosessering av din nye sak. Du kan prøve å finne saken din på Min side > Mine Saker'
                   }
-                  onClose={() => this.error = null}
+                  onClose={() => (this.error = null)}
                 />
               );
               /*Notify.danger(
@@ -945,18 +1037,18 @@ class NewCase extends Component {
           })
           .catch((err: Error) => {
             if (err.message === 'Request failed with status code 409') {
-              $("#spinner").hide();
+              $('#spinner').hide();
               this.error = (
                 <Alert
                   type="warning"
                   text={
                     'Duplikatsjekk feilet. Dette kommer av at det allerede ligger inn liknende saker i vårt system som enda ikke er under behandling. For å stoppe overflod av henvendelser blir derfor din innsending avslått.'
                   }
-                  onClose={() => this.error = null}
+                  onClose={() => (this.error = null)}
                 />
               );
             } else {
-              $("#spinner").hide();
+              $('#spinner').hide();
               this.error = (
                 <Alert
                   type="danger"
@@ -965,7 +1057,7 @@ class NewCase extends Component {
                     'Hvis problemet vedvarer kan du kontakte oss. \n\nFeilmelding: ' +
                     err.message
                   }
-                  onClose={() => this.error = null}
+                  onClose={() => (this.error = null)}
                 />
               );
             }
@@ -980,23 +1072,30 @@ class NewCase extends Component {
         console.log('Form is not valid.');
       }
     } else {
-      $("#spinner").hide();
-      this.error = <Alert type="warning" text={'En kritisk feil har oppstått. Vennligst last sida på nytt.'}
-        onClose={() => this.error = null}
-
-      />;
-      $("#spinner").hide();
+      $('#spinner').hide();
+      this.error = (
+        <Alert
+          type="warning"
+          text={'En kritisk feil har oppstått. Vennligst last sida på nytt.'}
+          onClose={() => (this.error = null)}
+        />
+      );
+      $('#spinner').hide();
       /*Notify.warning('En kritisk feil har oppstått. Vennligst last sida på nytt.');*/
     }
   }
 
+  /**
+   * Called by the Google Map. Sets this.pos to the map marker positioning set by the user.
+   * @param newPos Location object to associate with this.pos.
+   */
   updatePos(newPos) {
     console.log(this.pos);
     console.log('new pos', newPos);
 
-    $("#spinner").show();
-    this.refs.sendButton.disabled = true
-    this.sen
+    $('#spinner').show();
+    this.refs.sendButton.disabled = true;
+    this.sen;
     this.pos.lon = newPos.lon;
     this.pos.lat = newPos.lat;
     this.case.lat = newPos.lat;
@@ -1029,9 +1128,9 @@ class NewCase extends Component {
           .getAllRegions()
           .then(e => {
             console.log(e);
-            $("#spinner").hide();
+            $('#spinner').hide();
             console.log(this.refs.sendButton);
-            this.refs.sendButton.disabled = false
+            this.refs.sendButton.disabled = false;
             console.log(this.refs.sendButton);
 
             let region = e.find(e => e.name === this.pos.city);
@@ -1044,13 +1143,13 @@ class NewCase extends Component {
               // Region detected by Google Location was not found in database
               // Proceeding to set this.case_region_id = undefined. This'll enable the validate() method to tell the user that automatic positioning failed
               this.case.region_id = undefined;
-              $("#spinner").hide();
-              this.refs.sendButton.disabled = false
+              $('#spinner').hide();
+              this.refs.sendButton.disabled = false;
               this.error = (
                 <Alert
                   type="warning"
                   text="Vi klarte ikke å plassere din posisjon i en kommune registrert hos oss. Vennligst benytt en annen metode for å sette din posisjon, ellers blir posisjonen satt til din angitte hjemkommune."
-                  onClose={() => this.error = null}
+                  onClose={() => (this.error = null)}
                 />
               );
               /*Notify.warning(
@@ -1059,8 +1158,8 @@ class NewCase extends Component {
             }
           })
           .catch((err: Error) => {
-            this.refs.sendButton.disabled = false
-            $("#spinner").hide();
+            this.refs.sendButton.disabled = false;
+            $('#spinner').hide();
             console.log('Could not load regions from server. Error: ' + err.message);
             throw new Error(
               'Klarte ikke å sammenlikne automatisk posisjon med en kommune. \n\nFeilmelding: ' + err.message

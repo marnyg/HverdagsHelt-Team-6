@@ -26,7 +26,7 @@ class LoginModal extends Component {
                         {this.error}
                         <input type="text" name="user" placeholder="Epost" onKeyPress={this.keyCheck} onChange={this.emailChange}></input>
                         <input type="password" name="pass" placeholder="Passord" onKeyPress={this.keyCheck} onChange={this.pwChange}></input>
-                        <input name="login" className="btn btn-primary" value="Login" onChange={this.submit} onClick={this.submit}></input>
+                        <input name="login" className="btn btn-primary" value="Logg inn" onChange={this.submit} onClick={this.submit}></input>
                         <div className="login-help">
                             <a href="#">Glemt passordet ditt?</a>
                             <br/>
