@@ -1,8 +1,13 @@
+// @flow
+
 import { User, sequelize } from './models.js';
 const crypto = require('crypto');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const path = require('path');
+
+type Request = express$Request;
+type Response = express$Response;
 
 const privatePath = path.join(__dirname, 'private.key');
 const publicPath = path.join(__dirname, 'public.key');
@@ -15,14 +20,21 @@ let tokens = {};
  * @function
  * @param {number} length - Length of the random string.
  */
-let genRandomString = function(length) {
+let genRandomString = function(length: number) {
   return crypto
     .randomBytes(Math.ceil(length / 2))
     .toString('hex') /** convert to hexadecimal format */
     .slice(0, length); /** return required number of characters */
 };
 
-let sha512 = function(password, salt) {
+/**
+ * generates a password object containing the password-hash
+ * and salt used in the hash.
+ * @param password
+ * @param salt
+ * @returns {{salt: *, passwordHash: string}}
+ */
+let sha512 = function(password: string, salt: string) {
   let hash = crypto.createHmac('sha512', salt); /** Hashing algorithm sha512 */
   hash.update(password);
   let value = hash.digest('hex');
@@ -32,12 +44,24 @@ let sha512 = function(password, salt) {
   };
 };
 
-export function hashPassword(password, salt = genRandomString(32)) {
+/**
+ * uses a specified salt, if give, to create a passwordHash object
+ * @param password - password to hash
+ * @param salt - specific salt to use, if not given a salt is generated
+ * @returns {{salt: *, passwordHash: string}}
+ */
+export function hashPassword(password: string, salt: string = genRandomString(32)) {
   let passwordHash = sha512(password, salt);
   return passwordHash;
 }
 
-export function createToken(accessLevel, user_id) {
+/**
+ * creates a token with accessLevel and user_id in payload
+ * @param accessLevel {number}
+ * @param user_id {number}
+ * @returns {*}
+ */
+export function createToken(accessLevel: number, user_id: number) {
   const payload = {
     accesslevel: accessLevel,
     user_id: user_id
@@ -52,7 +76,12 @@ export function createToken(accessLevel, user_id) {
   return jwt.sign(payload, privateKEY, signOptions);
 }
 
-export function verifyToken(token) {
+/**
+ *
+ * @param token
+ * @returns {*}
+ */
+export function verifyToken(token: string) {
   const verifyOptions = {
     issuer: 'Hverdagshelter',
     subject: 'access-token',
@@ -66,7 +95,14 @@ export function verifyToken(token) {
   }
 }
 
-export async function loginOk(email, password) {
+/**
+ * checks if given password matches to the password stored in the database
+ * with the same email.
+ * @param email {string}
+ * @param password {string}
+ * @returns {Promise<*>}
+ */
+export async function loginOk(email: string, password:string) {
   let user = sequelize.query(
     'Select * FROM Users natural join Roles WHERE email = ?',
     { replacements: [email] },
@@ -87,9 +123,18 @@ export async function loginOk(email, password) {
   }
 }
 
-export function reqAccessLevel(req, res, accessLevel = 4, wrappedFunction) {
+/**
+ * Wrapper function that tests if a Bearertoken is authentic
+ * and that the accesslevel is sufficient.
+ * @param req Request
+ * @param res Response
+ * @param accessLevel number - required access level
+ * @param wrappedFunction function - the function to execute if the check is ok.
+ * @returns {*}
+ */
+export function reqAccessLevel(req: Request, res: Response, accessLevel: number = 4, wrappedFunction) {
   if (!req.token) return res.status(403).send({ msg: "User not logged in." });
-  let token = req.token;
+  let token: string = req.token;
   let decoded = verifyToken(token);
   if (decoded && decoded.accesslevel <= accessLevel && token in tokens) {
     console.log(token);
@@ -99,6 +144,12 @@ export function reqAccessLevel(req, res, accessLevel = 4, wrappedFunction) {
   }
 }
 
+/**
+ * logs in a user and returns a token in response if login is ok.
+ * @param req Request
+ * @param res Response
+ * @returns {Promise<*>}
+ */
 export async function login(req: Request, res: Response) {
   if (!req.body || typeof req.body.email !== 'string' || typeof req.body.password !== 'string')
     return res.sendStatus(400);
@@ -119,18 +170,28 @@ export async function login(req: Request, res: Response) {
   }
 }
 
-
+/**
+ * logs out a user
+ * @param req Request
+ * @param res Response
+ * @returns res Response
+ */
 export function logout(req: Request, res: Response) {
   if (!req.token) {
     return res.sendStatus(400);
   } else {
-    let token = req.token;
+    let token: string = req.token;
     delete tokens[token];
     return res.sendStatus(200);
   }
 }
 
-export function remove_token(token) {
+/**
+ * removes a given token from the server session.
+ * @param token
+ * @returns {boolean}
+ */
+export function remove_token(token: string) {
   if(token in tokens) {
     delete tokens[token];
     return true
