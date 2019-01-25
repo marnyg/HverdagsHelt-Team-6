@@ -52,7 +52,7 @@ class RegisterModal extends Component {
      * @returns {*} HTML element that represents the register new user form.
      */
     render() {
-        t         return (
+        return (
             <div className="modal fade" id="register-modal" tabIndex="-1" role="dialog"
                 aria-labelledby="myModalLabel" aria-hidden="true">
                 <div className="modal-dialog">
