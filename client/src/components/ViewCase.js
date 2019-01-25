@@ -88,10 +88,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                 Slutt å følg
               </button>
             ) : (
-                <button className={this.getSubscriptionButtonStyles(this.case)} onClick={this.onClickSubscribeButton}>
-                  Følg sak
+              <button className={this.getSubscriptionButtonStyles(this.case)} onClick={this.onClickSubscribeButton}>
+                Følg sak
               </button>
-              )
+            )
           ) : null}
           {this.error}
           <form
@@ -130,136 +130,138 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             <h3>Beskrivelse</h3>
             {this.case.description ? <p>{this.case.description}</p> : <p>INGEN BESKRIVELSE GITT</p>}
             {(privilege <= OWNER_EMPLOYEE && this.loggedIn) ||
-              (this.case.status_id === STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE && this.loggedIn) ? (
-                <section>
-                  {privilege <= NOT_OWNER_EMPLOYEE ? (
-                    <button
-                      className={this.edit === false ? editButtonStyles[0] : editButtonStyles[1]}
-                      type={'button'}
-                      onClick={this.onClickToggleForm}
-                    >
-                      Svar sak
+            (this.case.status_id === STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE && this.loggedIn) ? (
+              <section>
+                {privilege <= NOT_OWNER_EMPLOYEE ? (
+                  <button
+                    className={this.edit === false ? editButtonStyles[0] : editButtonStyles[1]}
+                    type={'button'}
+                    onClick={this.onClickToggleForm}
+                  >
+                    Svar sak
                   </button>
-                  ) : (
-                      <button
-                        className={this.edit === false ? editButtonStyles[0] : editButtonStyles[1]}
-                        type={'button'}
-                        onClick={this.onClickToggleForm}
+                ) : (
+                  <button
+                    className={this.edit === false ? editButtonStyles[0] : editButtonStyles[1]}
+                    type={'button'}
+                    onClick={this.onClickToggleForm}
+                  >
+                    Rediger sak
+                  </button>
+                )}
+                {this.edit === true ? (
+                  <section>
+                    <h2>Oppdater sak</h2>
+                    <div className={'form-group'}>
+                      <label htmlFor="category">Kategori</label>
+                      <select
+                        defaultValue={this.case.category_id}
+                        onChange={this.categoryListener}
+                        className={'form-control'}
+                        id={'category'}
+                        required
                       >
-                        Rediger sak
-                  </button>
-                    )}
-                  {this.edit === true ? (
-                    <section>
-                      <h2>Oppdater sak</h2>
+                        {this.categories.map(e => (
+                          <option key={e.category_id} value={e.category_id}>
+                            {' '}
+                            {e.name}{' '}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    {(this.case.status_id === STATUS_OPEN && this.isOwner(this.case)) || privilege === ADMIN ? (
                       <div className={'form-group'}>
-                        <label htmlFor="category">Kategori</label>
-                        <select
-                          defaultValue={this.case.category_id}
-                          onChange={this.categoryListener}
+                        <label htmlFor="title">Tittel</label>
+                        <input
                           className={'form-control'}
-                          id={'category'}
+                          type="text"
+                          pattern="^.{2,255}$"
+                          autoComplete="off"
+                          value={this.case.title}
+                          onChange={(event: SyntheticInputEvent<HTMLInputElement>) => {
+                            this.case.title = event.target.value;
+                          }}
+                          placeholder={'Gi saken din en beskrivende tittel'}
+                          required
+                        />
+                      </div>
+                    ) : null}
+                    {privilege <= OWNER_EMPLOYEE ? (
+                      <div className={'form-group'}>
+                        <label htmlFor="status">Saksstatus</label>
+                        <select
+                          defaultValue={this.case.status_id}
+                          onChange={this.statusListener}
+                          className={'form-control'}
+                          id={'status'}
                           required
                         >
-                          {this.categories.map(e => (
-                            <option key={e.category_id} value={e.category_id}>
+                          {this.statuses.map(e => (
+                            <option key={e.status_id} value={e.status_id}>
                               {' '}
                               {e.name}{' '}
                             </option>
                           ))}
                         </select>
                       </div>
-                      {(this.case.status_id === STATUS_OPEN && this.isOwner(this.case)) || privilege === ADMIN ? (
-                        <div className={'form-group'}>
-                          <label htmlFor="title">Tittel</label>
-                          <input
-                            className={'form-control'}
-                            type="text"
-                            pattern="^.{2,255}$"
-                            autoComplete="off"
-                            value={this.case.title}
-                            onChange={(event: SyntheticInputEvent<HTMLInputElement>) => {
-                              this.case.title = event.target.value;
-                            }}
-                            placeholder={'Gi saken din en beskrivende tittel'}
-                            required
-                          />
-                        </div>
-                      ) : null}
-                      {privilege <= OWNER_EMPLOYEE ? (
-                        <div className={'form-group'}>
-                          <label htmlFor="status">Saksstatus</label>
-                          <select
-                            defaultValue={this.case.status_id}
-                            onChange={this.statusListener}
-                            className={'form-control'}
-                            id={'status'}
-                            required
-                          >
-                            {this.statuses.map(e => (
-                              <option key={e.status_id} value={e.status_id}>
-                                {' '}
-                                {e.name}{' '}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      ) : null}
-                      {this.case.status_id === STATUS_OPEN || privilege === ADMIN ? (
-                        <div className={'form-group'}>
-                          <label htmlFor="description">Beskrivelse</label>
-                          <textarea
-                            className={'form-control'}
-                            id={'description'}
-                            maxLength={MAX_DESCRIPTION_LENGTH}
-                            placeholder="Gi din sak en beskrivende beskrivelse, så blir det enklere for oss å hjelpe deg."
-                            value={this.case.description}
-                            onChange={this.textareaListener}
-                          />
-                          {this.case.description
-                            ? this.case.description.length + ' av ' + MAX_DESCRIPTION_LENGTH + ' tegn brukt.'
-                            : null}
-                        </div>
-                      ) : null}
-                      {privilege <= OWNER_EMPLOYEE ? (
-                        <div className={'form-group'}>
-                          <label htmlFor="description">Melding</label>
-                          <textarea
-                            className={'form-control'}
-                            id={'message'}
-                            maxLength={255}
-                            minLength={2}
-                            placeholder="Melding om sak"
-                            value={this.statusComment.comment}
-                            onChange={this.textareaListener}
-                            required
-                          />
-                        </div>
-                      ) : null}
-                      {this.case.img.length < MAX_NUMBER_IMG ? (
-                        <div className={'form-group'}>
-                          <label htmlFor={'image-input'}>Legg ved bilder</label>
-                          <input
-                            className={'form-control-file'}
-                            id={'image-inpu'}
-                            type={'file'}
-                            accept={'.png, .jpg, .jpeg'}
-                            onChange={this.fileInputListener}
-                          />
-                        </div>
-                      ) : null}
-                      <button className={'btn btn-primary mr-2'} onClick={this.submit}>
-                        Oppdater
+                    ) : null}
+                    {this.case.status_id === STATUS_OPEN || privilege === ADMIN ? (
+                      <div className={'form-group'}>
+                        <label htmlFor="description">Beskrivelse</label>
+                        <textarea
+                          className={'form-control'}
+                          id={'description'}
+                          maxLength={MAX_DESCRIPTION_LENGTH}
+                          placeholder="Gi din sak en beskrivende beskrivelse, så blir det enklere for oss å hjelpe deg."
+                          value={this.case.description}
+                          onChange={this.textareaListener}
+                        />
+                        {this.case.description
+                          ? this.case.description.length + ' av ' + MAX_DESCRIPTION_LENGTH + ' tegn brukt.'
+                          : null}
+                      </div>
+                    ) : null}
+                    {privilege <= OWNER_EMPLOYEE ? (
+                      <div className={'form-group'}>
+                        <label htmlFor="description">Melding</label>
+                        <textarea
+                          className={'form-control'}
+                          id={'message'}
+                          maxLength={255}
+                          minLength={2}
+                          placeholder="Melding om sak"
+                          value={this.statusComment.comment}
+                          onChange={this.textareaListener}
+                          required
+                        />
+                      </div>
+                    ) : null}
+                    {this.case.img.length < MAX_NUMBER_IMG ? (
+                      <div className={'form-group'}>
+                        <label htmlFor={'image-input'}>Legg ved bilder</label>
+                        <input
+                          className={'form-control-file'}
+                          id={'image-inpu'}
+                          type={'file'}
+                          accept={'.png, .jpg, .jpeg'}
+                          onChange={this.fileInputListener}
+                        />
+                      </div>
+                    ) : null}
+                    <button className={'btn btn-primary mr-2'} onClick={this.submit}>
+                      Oppdater
                     </button>
-                      {(this.case.status_id === STATUS_OPEN && this.isOwner(this.case)) || privilege === ADMIN ? (
-                        <button className={'btn btn-danger mr-2'} onClick={this.delete}>
-                          Slett
+                    {(this.case.status_id === STATUS_OPEN && this.isOwner(this.case)) ||
+                    privilege === ADMIN ||
+                    (ToolService.getUser().region_id === this.case.region_id && privilege <= OWNER_EMPLOYEE) ? (
+                      <button className={'btn btn-danger mr-2'} onClick={this.delete}>
+                        Slett
                       </button>
-                      ) : null}
-                    </section>
-                  ) : null}
-                </section>
-              ) : null}
+                    ) : null}
+                  </section>
+                ) : null}
+              </section>
+            ) : null}
           </form>
           <div className="container my-5">
             <div className="row">
@@ -268,31 +270,29 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   <div className="card">
                     <img src={e.src} alt={e.src} className="card-img-top" />
                     {(privilege <= OWNER_EMPLOYEE && this.case.status_id !== STATUS_CLOSED) ||
-                      (privilege === OWNER_NOT_EMPLOYEE && this.case.status_id === STATUS_OPEN) ||
-                      privilege === ADMIN ? (
-                        <div className="card-img-overlay">
-                          <button
-                            className={'btn btn-danger img-overlay float-right align-text-bottom'}
-                            onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
-                          >
-                            <FontAwesomeIcon icon={faTrashAlt} />
-                          </button>
-                        </div>
-                      ) : null}
+                    (privilege === OWNER_NOT_EMPLOYEE && this.case.status_id === STATUS_OPEN) ||
+                    privilege === ADMIN ? (
+                      <div className="card-img-overlay">
+                        <button
+                          className={'btn btn-danger img-overlay float-right align-text-bottom'}
+                          onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
+                        >
+                          <FontAwesomeIcon icon={faTrashAlt} />
+                        </button>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          <div style={{ minHeight: "250px" }} className={'col-md-6 google-map'}>
+          <div style={{ minHeight: '250px' }} className={'col-md google-map'}>
             <GoogleApiWrapper
-              updatePos={{ lat: this.case.lat, lng: this.case.lon }}
               isClickable={false}
-
               userPos={{ lat: this.case.lat, lng: this.case.lon }}
               centerPos={{ lat: this.case.lat, lng: this.case.lon }}
+              markerPos={{ lat: this.case.lat, lng: this.case.lon }}
             />
-
           </div>
         </div>
         <div className={'col-md-6'}>
@@ -331,6 +331,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
    * Initiates data variables, fetching logic and state logic.
    */
   mounted() {
+    $('#spinner').hide();
     this.case = new Case();
     let cas = new CaseService();
     let cascom = new StatusCommentService();
@@ -419,14 +420,14 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   if (userObj) {
                     console.log(
                       'Case with id ' +
-                      this.case.case_id +
-                      ' is already up to date for user ' +
-                      userObj.firstname +
-                      ' ' +
-                      userObj.lastname +
-                      ' (id = ' +
-                      userObj.user_id +
-                      ').'
+                        this.case.case_id +
+                        ' is already up to date for user ' +
+                        userObj.firstname +
+                        ' ' +
+                        userObj.lastname +
+                        ' (id = ' +
+                        userObj.user_id +
+                        ').'
                     );
                   }
                 }
@@ -435,14 +436,14 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                 if (userObj) {
                   console.log(
                     'Case with id ' +
-                    this.case.case_id +
-                    ' is not subscribed to user ' +
-                    userObj.firstname +
-                    ' ' +
-                    userObj.lastname +
-                    ' (id = ' +
-                    userObj.user_id +
-                    ').'
+                      this.case.case_id +
+                      ' is not subscribed to user ' +
+                      userObj.firstname +
+                      ' ' +
+                      userObj.lastname +
+                      ' (id = ' +
+                      userObj.user_id +
+                      ').'
                   );
                 } else {
                   console.log('Could not load user object from local storage.');
@@ -453,7 +454,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               console.log('Could not load categories.');
               Notify.danger(
                 'Klarte ikke å hente abbonnementene dine, vi får derfor ikke til å vise om du allerede er abonnement på denne saken eller ikke. Du kan likevel trykke på abonnerknappen for å enten legge til eller slette abonnement. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
-                err.message
+                  err.message
               );
             });
         }
@@ -482,10 +483,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                 />
               );
               /*Notify.danger(
-                'Klarte ikke å hente statuser. ' +
-                  'Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
-                  err.message
-              );*/
+                              'Klarte ikke å hente statuser. ' +
+                                'Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+                                err.message
+                            );*/
             });
         }
         cat
@@ -509,9 +510,9 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               />
             );
             /*Notify.danger(
-              'Klarte ikke å hente statuser. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
-                err.message
-            );*/
+                          'Klarte ikke å hente statuser. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+                            err.message
+                        );*/
           });
       })
       .catch((err: Error) => {
@@ -528,11 +529,11 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           />
         );
         /*Notify.danger(
-          'Klarte ikke å hente sak med id ' +
-            this.props.match.params.case_id +
-            '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
-            err.message
-        );*/
+                  'Klarte ikke å hente sak med id ' +
+                    this.props.match.params.case_id +
+                    '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+                    err.message
+                );*/
       });
   }
 
@@ -580,9 +581,9 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   }
 
   /**
-   *
-   * @param c
-   * @returns {boolean}
+   * Detects whether the user is currently subscribed to the goven case or not.
+   * @param c Case to check for subscription status.
+   * @returns {boolean} True if user is subscribed to case c, or false if not subscribed to case c.
    */
   isSubscribed(c: Case) {
     if (this.subscription) {
@@ -757,17 +758,17 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           } else {
             console.log(
               'Max number of pictures (' +
-              MAX_NUMBER_IMG +
-              ') reached. \nCurrent embedded images: ' +
-              this.case.img.length +
-              '\nTried to add: ' +
-              files.length +
-              ' new files.'
+                MAX_NUMBER_IMG +
+                ') reached. \nCurrent embedded images: ' +
+                this.case.img.length +
+                '\nTried to add: ' +
+                files.length +
+                ' new files.'
             );
             Notify.warning(
               'Du kan maksimalt feste ' +
-              MAX_NUMBER_IMG +
-              ' til en sak. Noen bilder må slettes før du kan legge til nye.'
+                MAX_NUMBER_IMG +
+                ' til en sak. Noen bilder må slettes før du kan legge til nye.'
             );
           }
         } else {
@@ -946,8 +947,17 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                 console.log('Received StatusComment Object: ', e);
                 this.statusComment.createdAt = e.createdAt;
                 this.statusMessages.unshift(this.statusComment);
-                let usr = ToolService.getUser()
-                this.statusComment = new StatusComment(null, this.case.case_id, this.case.status_id, usr.user_id, this.case.status_name, "", usr.firstname + " " + usr.lastname, null);
+                let usr = ToolService.getUser();
+                this.statusComment = new StatusComment(
+                  null,
+                  this.case.case_id,
+                  this.case.status_id,
+                  usr.user_id,
+                  this.case.status_name,
+                  '',
+                  usr.firstname + ' ' + usr.lastname,
+                  null
+                );
               })
               .catch((err: Error) => {
                 console.log('Uploading status comment failed for case ' + this.case.case_id + '. Error: ', err);

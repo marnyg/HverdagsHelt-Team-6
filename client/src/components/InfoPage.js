@@ -12,7 +12,6 @@ class InfoPage extends Component {
                     Det ser ikke ut til at du har vært her før!<br/>
                     Dette er HverdagsHelt-(en?), en plattform for å varsle kommunene rundt om i Norge om feil og mangler på kommunal infrastruktur.<br/>
                     Så er det såpeglatt utenfor mormors hus? Eller har det vært enormt snøfall og nå sitter bilen fast? <br/>
-                    Eller har jordraset tatt hele blokka og nå ligger familien kalde begravet i jorden?<br/>
                 </p>
                 <p>
                     <strong> Da er HverdagsHelt stedet for deg!</strong>
@@ -36,6 +35,10 @@ class InfoPage extends Component {
                 </p>
             </div>
         );
+    }
+
+    mounted() {
+        $('#spinner').hide();
     }
 }
 export default InfoPage;

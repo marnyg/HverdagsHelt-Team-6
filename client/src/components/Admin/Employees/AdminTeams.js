@@ -76,8 +76,11 @@ class AdminTeams extends Component {
                 $('#spinner').hide();
             });
     }
-
-    mounted() {
+  
+  /**
+   * When component mounts: fetch regions and counties and set component region and county variable object state.
+   */
+  mounted() {
         $('#spinner').show();
         let regionService = new RegionService();
         regionService.getAllRegions()

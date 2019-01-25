@@ -5,9 +5,17 @@ import ToolService from "../../../services/ToolService";
 import RegionService from "../../../services/RegionService";
 import CountyService from "../../../services/CountyService";
 
+/**
+ * Creates a list of regions for the admin user to view and edit.
+ */
 class AdminRegionsList extends Component {
     regions = [];
-    render() {
+  
+  /**
+   * Generates HTML code
+   * @returns {*} HTML Element with sub-elements
+   */
+  render() {
         return(
             <div className={'card mb-3'} style={{'overflow':'scroll','maxHeight': '700px'}}>
                 <table className="table table-hover table-striped">

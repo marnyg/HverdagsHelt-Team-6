@@ -52,13 +52,17 @@ class Navbar extends Component<{ logged_in: boolean }> {
             );
         } else {
             loginlink = (
-                <NavLink to="/new-case" className="nav-link" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
+                <NavLink to="/new-case"
+                         className="nav-link"
+                         onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                     Registrer sak
                 </NavLink>
             );
         }
         return (
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
+                <RegisterModal onLogin={() => this.onLogin()} />
+                <LoginModal modal_id={'login-modal'} onLogin={() => this.onLogin()} />
                 {this.logged_in ? (
                     <NavLink to={'/'} className="navbar-left" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                         <img src={hverdagsheltLogo} height={29.7} width={185} />
@@ -86,7 +90,10 @@ class Navbar extends Component<{ logged_in: boolean }> {
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav mr-auto">
                         <li className="nav-item">
-                            <NavLink exact to="/" className="nav-link" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
+                            <NavLink exact to="/" className="nav-link" onClick={(event) => {
+                                $('#navbarSupportedContent').collapse('hide');
+                                window.location.reload();
+                            }}>
                                 Hjem
                             </NavLink>
                         </li>
@@ -159,7 +166,9 @@ class Navbar extends Component<{ logged_in: boolean }> {
                     this.fetch_notifications(user, this.countPushNotifications);
                 }
             })
-            .catch((error: Error) => console.error(error));
+            .catch((error: Error) => {
+                // user is not logged in
+            });
     }
 
     fetch_notifications(user: User, cb) {
@@ -236,13 +245,11 @@ class Navbar extends Component<{ logged_in: boolean }> {
                         <div className="nav-link" style={{ cursor: 'pointer' }} data-toggle="modal" data-target="#register-modal">
                             Ny bruker
                         </div>
-                        <RegisterModal onLogin={() => this.onLogin()} />
                     </li>
                     <li className="nav-item">
                         <div className="nav-link" style={{ cursor: 'pointer' }} data-toggle="modal" data-target="#login-modal">
                             Logg inn
                         </div>
-                        <LoginModal modal_id={'login-modal'} onLogin={() => this.onLogin()} />
                     </li>
                 </ul>
             );

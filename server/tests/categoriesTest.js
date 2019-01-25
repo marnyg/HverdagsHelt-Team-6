@@ -191,7 +191,7 @@ describe('Delete one in categories', () => {
   });
   test('409 status code for DELETE /api/categories/:category_id when id is connected to cases', done => {
     request(application)
-      .delete(`/api/categories/${1}`)
+      .delete(`/api/categories/${2}`)
       .set('Authorization', `Bearer ${admin_token}`)
       .then(response => {
         expect(response.statusCode).toBe(409);

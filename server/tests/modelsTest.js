@@ -14,6 +14,7 @@ import {
   Region_subscriptions,
   sync
 } from '../src/models.js';
+import {application} from "../src/server";
 
 beforeAll(async () => {
   await sync;

@@ -41,7 +41,6 @@ class RegisterModal extends Component {
     }
 
     render() {
-        console.log('Registermodal rendering');
         return (
             <div className="modal fade" id="register-modal" tabIndex="-1" role="dialog"
                 aria-labelledby="myModalLabel" aria-hidden="true">
@@ -144,22 +143,18 @@ class RegisterModal extends Component {
         //user_id, role_id, region_id, firstname, lastname, tlf, email, hash_password, salt){
         if (this.refs.form.checkValidity() && this.refs.pass1.value === this.refs.pass2.value) {
             console.log("true");
-            this.refs.pass2.setCustomValidity("")
+            this.refs.pass2.setCustomValidity("");
 
 
             let user = new User(null, null, Number(this.region_id),
                 this.refs.fn.value, this.refs.ln.value, Number(this.refs.tlf.value),
                 this.refs.email.value, this.refs.pass1.value);
-            console.log(user);
-
-
             let userService = new UserService();
 
             userService.createUser(user)
                 .then((user_out: User) => {
                     //email: string, password: string
-                    console.log('Registered');
-                    userService.login(this.props.email.value, this.props.pass1.value)
+                    userService.login(this.refs.email.value, this.refs.pass1.value)
                         .then(res => {
                             $('#register-modal').modal('hide');
                             this.props.onLogin();
@@ -167,9 +162,8 @@ class RegisterModal extends Component {
                         .catch((error: Error) => console.error(error));
                 })
                 .catch((error: Error) => {
-                    console.log('FVEWEWNIOVMEWIOFMEWO');
+                    console.error(error);
                     this.error = ToolService.getUserUpdateErrorAlert(error, () => {
-                        console.log('Alert closing');
                         this.error = null
                     });
                 });
