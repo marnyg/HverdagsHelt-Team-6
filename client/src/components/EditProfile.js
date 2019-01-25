@@ -9,10 +9,20 @@ import DisplayProfile from './DisplayProfile';
 import CountyService from '../services/CountyService';
 import RegionService from '../services/RegionService';
 
+/**
+ * This component is used present the edit profile page.
+ */
+
 class EditProfile extends Component<{}, { isEditing: boolean }> {
   isEditing = false;
   us = new UserService();
   user = JSON.parse(localStorage.getItem('user'));
+
+    /**
+     * If the user exist, it will rend the edit profile form.
+     * If the user not exist it will render the 404 error page.
+     * @returns {*} HTML element displaying the 404 page or the edit profile form.
+     */
 
   render() {
     {
@@ -26,6 +36,11 @@ class EditProfile extends Component<{}, { isEditing: boolean }> {
     }
     return <div>{this.getForm()}</div>;
   }
+
+    /**
+     * This function is handeling the change of input fields, and storing the changed.
+     * @param event To be triggered by change in input-fields.
+     */
 
   handleChange(event: React.ChangeEvent<HTMLInpuStElement>) {
     switch (event.target.id) {
@@ -47,6 +62,11 @@ class EditProfile extends Component<{}, { isEditing: boolean }> {
     }
     console.log(this.user);
   }
+
+    /**
+     * This function is rendering the edit profile page.
+     * @returns {*} HTML element displaying the edit profile form.
+     */
 
   getForm() {
     return (
@@ -142,9 +162,21 @@ class EditProfile extends Component<{}, { isEditing: boolean }> {
       </div>
     );
   }
-  setRegionID(regID) {
+
+    /**
+     * This function is setting the region-id where the specific user is registered.
+     * @param regID The region-id to change to.
+     */
+
+    setRegionID(regID) {
     this.user.region_id = regID
   }
+
+    /**
+     * This function is updateing the user with the new variables.
+     * @param event Triggered by a button-click.
+     */
+
   validateForm(event: Event) {
     event.preventDefault();
     let form = this.refs.form;
@@ -167,9 +199,19 @@ class EditProfile extends Component<{}, { isEditing: boolean }> {
 
 export default EditProfile;
 
+/**
+ * This component is used to subscribe to new regions and counties.
+ */
+
 class RegionSelect extends Component {
-  regions = [];
-  counties = [];
+  regions = []; //Array stroing all regions from database
+  counties = [];    //Arrray storing all counties from the database
+
+    /**
+     * This is redering the area where to select the regions and the counties.
+     * @returns {*} HTML element containing the the form for regions and their counties.
+     */
+
   render() {
     return (
       <div className={this.props.className}>
@@ -199,6 +241,11 @@ class RegionSelect extends Component {
     );
   }
 
+    /**
+     * This funciton is getting all the counties and storing them into the
+     * counties array.
+     */
+
   mounted() {
     let countyService = new CountyService();
     countyService.getAllCounties()
@@ -207,6 +254,12 @@ class RegionSelect extends Component {
       })
       .catch((error: Error) => console.error(error));
   }
+
+    /**
+     * This function is getting all the regions given selected county.
+     * The regions is getting stored into the region array.
+     * @param event Triggered by the selected county from list.
+     */
 
   countySelected(event) {
     event.preventDefault();
@@ -219,6 +272,11 @@ class RegionSelect extends Component {
       })
       .catch((error: Error) => console.error(error));
   }
+
+    /**
+     * This function is selecting the specific region to add to the user.
+     * @param event Triggered by button-click.
+     */
 
   regionSelected(event) {
     event.preventDefault();

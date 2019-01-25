@@ -5,6 +5,10 @@ import { NavLink } from 'react-router-dom';
 import { faCoffee } from '@fortawesome/free-solid-svg-icons/index';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+/**
+ * This component is representing the footer at the webpage.
+ */
+
 class Footer extends Component {
     render() {
         return (

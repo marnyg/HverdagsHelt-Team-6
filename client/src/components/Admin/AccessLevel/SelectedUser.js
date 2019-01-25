@@ -7,9 +7,19 @@ import {faEdit} from "@fortawesome/free-solid-svg-icons/index";
 import VerificationModal from "../../VerificationModal";
 import ToolService from '../../../services/ToolService';
 
+/**
+ * This component is representing the modal presenting information about a selected user
+ * from the admin user list.
+ */
+
 class SelectedUser extends Component{
-    roles = [];
-    selected_role = null;
+    roles = []; //Array containing all the registered roles in the database
+    selected_role = null;   //Variable to set the selected role
+
+    /**
+     * Rendering the modal for selected user, which lists the user-information.
+     * @returns {*} HTML elements containing the modal for selected user.
+     */
 
     render() {
         if(!this.props.user){
@@ -53,6 +63,12 @@ class SelectedUser extends Component{
         );
     }
 
+    /**
+     * Function to update state values with new props. This method will get called whenever
+     * any change happens to props values.
+     * @param newProps  New values for state props.
+     */
+
     componentWillReceiveProps(newProps) {
         if(newProps.user !== this.props.user) {
             this.selected_role = newProps.user.role_id;
@@ -62,6 +78,11 @@ class SelectedUser extends Component{
         }
     }
 
+    /**
+     * Function to get all roles registered to the database. The results will
+     * be store into the array 'roles'.
+     */
+
     mounted() {
         let roleService = new RoleService();
         roleService.getAllRoles()
@@ -70,6 +91,10 @@ class SelectedUser extends Component{
             })
             .catch((error: Error) => console.error(error));
     }
+
+    /**
+     * Function to submit the registration. This is triggered by a button-click.
+     */
 
     submit() {
         if(this.selected_role !== this.props.user.role_id){
@@ -98,6 +123,14 @@ class SelectedUser extends Component{
             alert('Ingen oppdatering å gjøre');
         }
     }
+
+    /**
+     * Function used as a verification to submitted role-changes of a give user. You will
+     * be asked to confirm or decline changes.
+     * @param event Triggered by a button-click.
+     * @param user  The user that will be affected by the changes.
+     * @param selected_role The new role that the specific user will be updated with.
+     */
 
     setVerificationModalContent(event, user, selected_role) {
         selected_role = Number(selected_role);
@@ -133,6 +166,12 @@ class SelectedUser extends Component{
             VerificationModal.setcontent(modal_header, modal_body, modal_footer);
         }
     }
+
+    /**
+     * Function to get role name, given role-id.
+     * @param role_id   The role-id of the role that you want the role name of.
+     * @returns {string}    The role name.
+     */
 
     getRoleName(role_id) {
         for (let i = 0; i < this.roles.length; i++) {

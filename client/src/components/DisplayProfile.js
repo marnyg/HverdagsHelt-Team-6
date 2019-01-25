@@ -7,6 +7,12 @@ import UserService from '../services/UserService';
 import EditPassword from './EditPassword';
 import EditProfile from './EditProfile';
 
+/**
+ * This component is representing the area for the user profile. You will
+ * be able to view all given information about the signed in user, and
+ * change your own password and edit your profile.
+ */
+
 class DisplayProfile extends Component {
     user = JSON.parse(localStorage.getItem("user"));
     render() {
