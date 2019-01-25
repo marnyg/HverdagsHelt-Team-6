@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for src/routes/Regions.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="..\..\prettify.css" />
+    <link rel="stylesheet" href="..\..\base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(..\..\sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="..\..\index.html">All files</a> / <a href="index.html">src/routes</a> Regions.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">94.74% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>36/38</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">89.13% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>41/46</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">94.12% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>16/17</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">93.94% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>31/33</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// @flow
+&nbsp;
+import { Region, User } from '../models.js';
+import County from './Counties';
+import { regexNames } from '../utils/Regex';
+&nbsp;
+type Request = express$Request;
+type Response = express$Response;
+&nbsp;
+module.exports = {
+  /**
+   * Get all region belonging to given county
+   * @param req Request
+   * @param res Response
+   * @returns {Region}
+   */
+  getAllRegionsInCounty: function(req: Request, res: Response) {
+    if (!req.params || isNaN(Number(req.params.county_id))) return res.sendStatus(400);
+    return Region.findAll({ where: { county_id: Number(req.params.county_id) } }).then(regions =&gt;
+      regions ? res.send(regions) : <span class="branch-1 cbranch-no" title="branch not covered" >res.sendStatus(404)</span>
+    );
+  },
+  /**
+   * Get all regions
+   * @param req Request
+   * @param res Response
+   * @returns {Region}
+   */
+  getAllRegions: function(req: Request, res: Response) {
+    return Region.findAll().then(regions =&gt; res.send(regions));
+  },
+  /**
+   * Add a new region
+   * @param req Request
+   * @param res Response
+   * @returns {Region}
+   */
+  addRegion: function(req: Request, res: Response) {
+    if (
+      !req.body ||
+      typeof req.body.name !== 'string' ||
+      typeof req.body.lat !== 'number' ||
+      typeof req.body.lon !== 'number' ||
+      typeof req.body.county_id !== 'number' ||
+      !regexNames.test(req.body.name)
+    )
+      return res.sendStatus(400);
+    return Region.create({
+      name: req.body.name,
+      lat: req.body.lat,
+      lon: req.body.lon,
+      county_id: req.body.county_id
+    }).then(regions =&gt; (regions ? res.send(regions) : <span class="branch-1 cbranch-no" title="branch not covered" >res.sendStatus(404))</span>);
+  },
+  /**
+   * Get a region, given region_id
+   * @param req Request
+   * @param res Response
+   * @returns {Region}
+   */
+  getRegion: function(req: Request, res: Response) {
+    if (!req.params || isNaN(Number(req.params.region_id))) return res.sendStatus(400);
+    return Region.findOne({ where: { region_id: Number(req.params.region_id) } }).then(region =&gt;
+      region ? res.send(region) : res.sendStatus(404)
+    );
+  },
+  /**
+   * Update a region
+   * @param req Request
+   * @param res Response
+   * @returns {Region}
+   */
+  updateRegion: function(req: Request, res: Response) {
+    if (
+      !req.body ||
+      !req.params ||
+      isNaN(Number(req.params.region_id)) ||
+      typeof req.body.name !== 'string' ||
+      typeof req.body.lat !== 'number' ||
+      typeof req.body.lon !== 'number' ||
+      typeof req.body.county_id !== 'number' ||
+      !regexNames.test(req.body.name)
+    )
+      return res.sendStatus(400);
+&nbsp;
+    return Region.update(
+      {
+        name: req.body.name,
+        lat: req.body.lat,
+        lon: req.body.lon,
+        county_id: req.body.county_id
+      },
+      { where: { region_id: Number(req.params.region_id) } }
+    ).then(regions =&gt; (regions ? res.send(regions) : <span class="branch-1 cbranch-no" title="branch not covered" >res.sendStatus(404))</span>);
+  },
+  /**
+   * Delete a region
+   * @param req Request
+   * @param res Response
+   * @returns {*}
+   */
+  delRegion: function(req: Request, res: Response) {
+    if (!req.params || isNaN(Number(req.params.region_id))) return res.sendStatus(400);
+&nbsp;
+    return Region.destroy({ where: { region_id: Number(req.params.region_id) } })
+      .then(regions =&gt; (regions ? res.send() : <span class="branch-1 cbranch-no" title="branch not covered" >res.status(500).send())</span>)
+      .catch(err =&gt; {
+        err.description =
+          'Kommunen kan ikke slettes, fordi det er brukere og/eller saker knyttet til den. Slett disse først.';
+        res.status(409).json(err);
+        console.log(err.parent.sqlMessage);
+      });
+  },
+  /**
+   * Get all employees working in a region
+   * @param req Request
+   * @param res Response
+   * @returns {User}
+   */
+  getRegionStaff: function(req: Request, res: Response) {
+    if (!req.params || isNaN(Number(req.params.region_id))) return res.sendStatus(400);
+&nbsp;
+    User.findAll({
+      where: {
+        region_id: Number(req.params.region_id),
+        role_id: 2
+      }
+    })
+      .then(users =&gt; {
+        let my_users;
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (users) {
+          my_users = [...users];
+          my_users.forEach(user =&gt; {
+            console.log(user);
+            delete user.dataValues['hashed_password'];
+            delete user.dataValues['salt'];
+          });
+          return res.send(my_users);
+        }
+      })
+      .catch(<span class="fstat-no" title="function not covered" >er</span>ror =&gt; {
+<span class="cstat-no" title="statement not covered" >        console.log(error);</span>
+<span class="cstat-no" title="statement not covered" >        return res.status(500).json(error);</span>
+      });
+  }
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Fri Jan 25 2019 14:07:59 GMT+0100 (Central European Standard Time)
+</div>
+</div>
+<script src="..\..\prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="..\..\sorter.js"></script>
+</body>
+</html>

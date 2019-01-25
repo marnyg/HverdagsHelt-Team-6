@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for src/auth.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="..\prettify.css" />
+    <link rel="stylesheet" href="..\base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(..\sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="..\index.html">All files</a> / <a href="index.html">src</a> auth.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">86.15% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>56/65</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">79.17% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>19/24</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">81.82% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>9/11</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">85.71% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>54/63</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">165x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">165x</span>
+<span class="cline-any cline-yes">165x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">37x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">178x</span>
+<span class="cline-any cline-yes">141x</span>
+<span class="cline-any cline-yes">141x</span>
+<span class="cline-any cline-yes">141x</span>
+<span class="cline-any cline-yes">104x</span>
+<span class="cline-any cline-yes">104x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">37x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-yes">26x</span>
+<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { User, sequelize } from './models.js';
+const crypto = require('crypto');
+const fs = require('fs');
+const jwt = require('jsonwebtoken');
+const path = require('path');
+&nbsp;
+const privatePath = path.join(__dirname, 'private.key');
+const publicPath = path.join(__dirname, 'public.key');
+const privateKEY = fs.readFileSync(privatePath, 'utf-8');
+const publicKEY = fs.readFileSync(publicPath, 'utf-8');
+let tokens = {};
+&nbsp;
+/**
+ * generates random string of characters i.e salt
+ * @function
+ * @param {number} length - Length of the random string.
+ */
+let genRandomString = function(length) {
+  return crypto
+    .randomBytes(Math.ceil(length / 2))
+    .toString('hex') /** convert to hexadecimal format */
+    .slice(0, length); /** return required number of characters */
+};
+&nbsp;
+let sha512 = function(password, salt) {
+  let hash = crypto.createHmac('sha512', salt); /** Hashing algorithm sha512 */
+  hash.update(password);
+  let value = hash.digest('hex');
+  return {
+    salt: salt,
+    passwordHash: value
+  };
+};
+&nbsp;
+export function hashPassword(password, salt = genRandomString(32)) {
+  let passwordHash = sha512(password, salt);
+  return passwordHash;
+}
+&nbsp;
+export function createToken(accessLevel, user_id) {
+  const payload = {
+    accesslevel: accessLevel,
+    user_id: user_id
+  };
+&nbsp;
+  const signOptions = {
+    issuer: 'Hverdagshelter',
+    subject: 'access-token',
+    expiresIn: '12h',
+    algorithm: 'RS256'
+  };
+  return jwt.sign(payload, privateKEY, signOptions);
+}
+&nbsp;
+export function verifyToken(token) {
+  const verifyOptions = {
+    issuer: 'Hverdagshelter',
+    subject: 'access-token',
+    expiresIn: '12h',
+    algorithm: ['RS256']
+  };
+  try {
+    return jwt.verify(token, publicKEY, verifyOptions);
+  } catch (err) {
+    return false;
+  }
+}
+&nbsp;
+export async function loginOk(email, password) {
+  let user = sequelize.query(
+    'Select * FROM Users natural join Roles WHERE email = ?',
+    { replacements: [email] },
+    { type: sequelize.QueryTypes.SELECT }
+  );
+  let result = await user;
+  let userObj = result[0][0];
+  if (!userObj) {
+    return null;
+  }
+  let salt = userObj.salt;
+  let password_hash = userObj.hashed_password;
+  let givenPassword = hashPassword(password, salt);
+  if (givenPassword.passwordHash !== password_hash) {
+    return null;
+  } else {
+    return userObj;
+  }
+}
+&nbsp;
+export function reqAccessLevel(req, res, accessLevel = <span class="branch-0 cbranch-no" title="branch not covered" >4,</span> wrappedFunction) {
+  if (!req.token) return res.status(403).send({ msg: "User not logged in." });
+  let token = req.token;
+  let decoded = verifyToken(token);
+  if (decoded &amp;&amp; decoded.accesslevel &lt;= accessLevel &amp;&amp; token in tokens) {
+    console.log(token);
+    return wrappedFunction(req, res);
+  } else {
+    return res.status(401).send();
+  }
+}
+&nbsp;
+export async function login(req: Request, res: Response) {
+  if (!req.body || typeof req.body.email !== 'string' || typeof req.body.password !== 'string')
+    return res.sendStatus(400);
+&nbsp;
+  let login = await loginOk(req.body.email, req.body.password);
+  if (login) {
+    let token = createToken(login.access_level, login.user_id);
+    tokens[token] = req.body.email;
+    let user_obj = {...login};
+    ['hashed_password', 'salt'].forEach(e =&gt; delete user_obj[e]);
+    let return_data = {
+      token: token,
+      user: user_obj
+    };
+    return res.status(200).send(return_data);
+  } else {
+    return res.sendStatus(401);
+  }
+}
+&nbsp;
+&nbsp;
+export function <span class="fstat-no" title="function not covered" >logout(</span>req: Request, res: Response) {
+<span class="cstat-no" title="statement not covered" >  if (!req.token) {</span>
+<span class="cstat-no" title="statement not covered" >    return res.sendStatus(400);</span>
+  } else {
+    let token = <span class="cstat-no" title="statement not covered" >req.token;</span>
+<span class="cstat-no" title="statement not covered" >    delete tokens[token];</span>
+<span class="cstat-no" title="statement not covered" >    return res.sendStatus(200);</span>
+  }
+}
+&nbsp;
+export function <span class="fstat-no" title="function not covered" >remove_token(</span>token) {
+<span class="cstat-no" title="statement not covered" >  if(token in tokens) {</span>
+<span class="cstat-no" title="statement not covered" >    delete tokens[token];</span>
+<span class="cstat-no" title="statement not covered" >    return true</span>
+  }
+<span class="cstat-no" title="statement not covered" >  return false</span>
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Fri Jan 25 2019 14:07:59 GMT+0100 (Central European Standard Time)
+</div>
+</div>
+<script src="..\prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="..\sorter.js"></script>
+</body>
+</html>
