@@ -25,6 +25,7 @@ import Picture from '../classes/Picture';
 import ToolService from '../services/ToolService';
 import CaseSubscription from '../classes/CaseSubscription';
 import Alert from './Alert.js';
+import ModalImage from 'react-modal-image'
 
 const MAX_NUMBER_IMG: number = 3; // Maximum number of images allowed in a single case.
 const subscriptionButtonStyles = ['btn btn-info', 'btn btn-outline-info'];
@@ -267,21 +268,19 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             <div className="row">
               {this.case.img.map(e => (
                 <div key={e.src} className="col-md-3">
-                  <div className="card">
-                    <img src={e.src} alt={e.src} className="card-img-top" />
+                    <ModalImage small={e.src} large={e.src} alt={e.src}/>
                     {(privilege <= OWNER_EMPLOYEE && this.case.status_id !== STATUS_CLOSED) ||
                     (privilege === OWNER_NOT_EMPLOYEE && this.case.status_id === STATUS_OPEN) ||
                     privilege === ADMIN ? (
                       <div className="card-img-overlay">
                         <button
-                          className={'btn btn-danger img-overlay float-right align-text-bottom'}
+                          className={'btn btn-danger img-overlay'}
                           onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
                         >
                           <FontAwesomeIcon icon={faTrashAlt} />
                         </button>
                       </div>
                     ) : null}
-                  </div>
                 </div>
               ))}
             </div>
