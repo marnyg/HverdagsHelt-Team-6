@@ -16,7 +16,7 @@ export let sequelize = new Sequelize(
       max: 100,
       min: 0,
       acquire: 30000,
-      idle: 30000
+      idle: 10000
     }
   }
 );

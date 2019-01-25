@@ -21,7 +21,7 @@ run_tests:
     - npm test
   artifacts:
     paths:
-      - ./tests/testReport/report.html
+      - ./../tests/testReport/report.html
 
 pages:
   stage: deploy
