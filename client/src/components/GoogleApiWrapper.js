@@ -15,6 +15,8 @@ export class GoogleMapsContainer extends Component {
     try {
       this.gmap.panTo(this.props.markerPos);
     } catch{
+      console.log("catch");
+
     }
     if (!this.props.isClickable) {
       this.gmap.onClick = null;
