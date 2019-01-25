@@ -191,6 +191,8 @@ class Statistics extends Component {
           backgroundColor: [
             'red',
             'green',
+            'aqua',
+            'darkred',
             'yellow',
             'blue',
             'orange',
@@ -201,9 +203,7 @@ class Statistics extends Component {
             'black',
             'magenta',
             'olive',
-            'aqua',
             'violet',
-            'darkred',
             'lawngreen',
             'lightblue',
             'navy',
