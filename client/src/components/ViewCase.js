@@ -284,8 +284,15 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               ))}
             </div>
           </div>
-          <div className={'col-md-6 embed-responsive'}>
-            {/*<GoogleApiWrapper updatePos={this.updatePos} userPos={{ lat: this.case.lat, lng: this.case.lon }} /> */}
+          <div style={{ minHeight: "250px" }} className={'col-md-6 google-map'}>
+            <GoogleApiWrapper
+              updatePos={{ lat: this.case.lat, lng: this.case.lon }}
+              isClickable={false}
+
+              userPos={{ lat: this.case.lat, lng: this.case.lon }}
+              centerPos={{ lat: this.case.lat, lng: this.case.lon }}
+            />
+
           </div>
         </div>
         <div className={'col-md-6'}>
@@ -360,7 +367,7 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             a.lat,
             a.lon
           );
-            this.props.onCaseOpened(this.case);
+          this.props.onCaseOpened(this.case);
           a.img.map(e => this.case.img.push({ src: e }));
           let userObj: User = ToolService.getUser();
           let statusCommentPoster: number;
@@ -983,16 +990,16 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   }
   getCreatedBy() {
     let user = JSON.parse(localStorage.getItem('user'));
-    if(user) {
-      if(user.role_id === ToolService.admin_role_id || user.role_id === ToolService.employee_role_id) {
-          return(
-              <tr>
-                  <td>Sak sendt av</td>
-                  <td>{this.case.createdBy}</td>
-              </tr>
-          );
+    if (user) {
+      if (user.role_id === ToolService.admin_role_id || user.role_id === ToolService.employee_role_id) {
+        return (
+          <tr>
+            <td>Sak sendt av</td>
+            <td>{this.case.createdBy}</td>
+          </tr>
+        );
       } else {
-          return null;
+        return null;
       }
     } else {
       return null;
