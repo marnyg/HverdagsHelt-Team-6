@@ -70,22 +70,22 @@ export function createToken(accessLevel: number, user_id: number) {
   const signOptions = {
     issuer: 'Hverdagshelter',
     subject: 'access-token',
-    expiresIn: '12h',
+    expiresIn: '24h',
     algorithm: 'RS256'
   };
   return jwt.sign(payload, privateKEY, signOptions);
 }
 
 /**
- *
- * @param token
- * @returns {*}
+ * verifies if a token is valid
+ * @param token {strig}
+ * @returns {*} 'token' if valid, false if not
  */
 export function verifyToken(token: string) {
   const verifyOptions = {
     issuer: 'Hverdagshelter',
     subject: 'access-token',
-    expiresIn: '12h',
+    expiresIn: '24h',
     algorithm: ['RS256']
   };
   try {
@@ -125,7 +125,7 @@ export async function loginOk(email: string, password:string) {
 
 /**
  * Wrapper function that tests if a Bearertoken is authentic
- * and that the accesslevel is sufficient.
+ * and that the accesslevel is sufficient. Removes token from tokens if token has expired.
  * @param req Request
  * @param res Response
  * @param accessLevel number - required access level
@@ -137,9 +137,12 @@ export function reqAccessLevel(req: Request, res: Response, accessLevel: number 
   let token: string = req.token;
   let decoded = verifyToken(token);
   if (decoded && decoded.accesslevel <= accessLevel && token in tokens) {
-    console.log(token);
     return wrappedFunction(req, res);
   } else {
+    if(!decoded && token in tokens){
+      delete tokens[token];
+      return res.status(403).send( {msg: "Token has expired."});
+    }
     return res.status(401).send();
   }
 }
@@ -194,7 +197,6 @@ export function logout(req: Request, res: Response) {
 export function remove_token(token: string) {
   if(token in tokens) {
     delete tokens[token];
-    return true
   }
-  return false
+  return true
 }
