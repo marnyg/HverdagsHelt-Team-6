@@ -5,18 +5,18 @@ import type { Model } from 'sequelize';
 require('dotenv').config();
 
 export let sequelize = new Sequelize(
-  process.env.CI ? 'School' : process.env.DB_USER,
-  process.env.CI ? 'root' : process.env.DB_USER,
-  process.env.CI ? '' : process.env.DB_PW,
+  process.env.CI ? process.env.TEST_DB_DB : process.env.DB_USER,
+  process.env.CI ? process.env.TEST_DB_USER : process.env.DB_USER,
+  process.env.CI ? process.env.TEST_DB_PASS : process.env.DB_PW,
   {
-    host: process.env.CI ? 'mysql' : process.env.DB_HOST, // The host is 'mysql' when running in gitlab CI
+    host: process.env.CI ? process.env.TEST_DB_HOST : process.env.DB_HOST, // The host is 'mysql' when running in gitlab CI
     dialect: 'mysql',
 
     pool: {
-      max: 5,
+      max: 100,
       min: 0,
       acquire: 30000,
-      idle: 10000
+      idle: 30000
     }
   }
 );
@@ -190,8 +190,12 @@ Case_subscriptions.belongsTo(User, { foreignKey: { name: 'user_id', allowNull: f
 Case_subscriptions.belongsTo(Case, { foreignKey: { name: 'case_id', allowNull: false }, onDelete: 'CASCADE' });
 
 // Drop tables and create test data when not in production environment
-let production = process.env.NODE_ENV === 'production';
+let production = process.env.NODE_ENV === 'production' ;
 production = true; // Gjør at databasen er statisk
+if(process.env.IN_CI_ENVIRONMENT) {
+  console.log('------------ IN CI! ------------');
+}
+else console.log('------------ NOT IN CI ---------------');
 // The sync promise can be used to wait for the database to be ready (for instance in your tests)
 export let sync = sequelize.sync({ force: production ? false : true }).then(
   () => {
