@@ -95,6 +95,13 @@ export function verifyToken(token: string) {
   }
 }
 
+/**
+ * checks if given password matches to the password stored in the database
+ * with the same email.
+ * @param email {string}
+ * @param password {string}
+ * @returns {Promise<*>}
+ */
 export async function loginOk(email: string, password:string) {
   let user = sequelize.query(
     'Select * FROM Users natural join Roles WHERE email = ?',
@@ -116,6 +123,15 @@ export async function loginOk(email: string, password:string) {
   }
 }
 
+/**
+ * Wrapper function that tests if a Bearertoken is authentic
+ * and that the accesslevel is sufficient.
+ * @param req Request
+ * @param res Response
+ * @param accessLevel number - required access level
+ * @param wrappedFunction function - the function to execute if the check is ok.
+ * @returns {*}
+ */
 export function reqAccessLevel(req: Request, res: Response, accessLevel: number = 4, wrappedFunction) {
   if (!req.token) return res.status(403).send({ msg: "User not logged in." });
   let token: string = req.token;
@@ -128,6 +144,12 @@ export function reqAccessLevel(req: Request, res: Response, accessLevel: number 
   }
 }
 
+/**
+ * logs in a user and returns a token in response if login is ok.
+ * @param req Request
+ * @param res Response
+ * @returns {Promise<*>}
+ */
 export async function login(req: Request, res: Response) {
   if (!req.body || typeof req.body.email !== 'string' || typeof req.body.password !== 'string')
     return res.sendStatus(400);
@@ -148,18 +170,28 @@ export async function login(req: Request, res: Response) {
   }
 }
 
-
+/**
+ * logs out a user
+ * @param req Request
+ * @param res Response
+ * @returns res Response
+ */
 export function logout(req: Request, res: Response) {
   if (!req.token) {
     return res.sendStatus(400);
   } else {
-    let token = req.token;
+    let token: string = req.token;
     delete tokens[token];
     return res.sendStatus(200);
   }
 }
 
-export function remove_token(token) {
+/**
+ * removes a given token from the server session.
+ * @param token
+ * @returns {boolean}
+ */
+export function remove_token(token: string) {
   if(token in tokens) {
     delete tokens[token];
     return true
