@@ -23,7 +23,7 @@ class ContentWrapper extends Component {
   cant_find_loaction = null;
   logged_in = false;
   nextPageButton: HTMLButtonElement = null;
-  
+
   /**
    * Overrides default constructor behaviour. Flushes (removes) all prior notifications from the Notify component.
    */
@@ -31,7 +31,7 @@ class ContentWrapper extends Component {
     super();
     Notify.flush();
   }
-  
+
   /**
    * Generates HTML component containing all requested items.
    * @returns {*} HTML Element with sub-elements.
@@ -273,6 +273,7 @@ class ContentWrapper extends Component {
         } else {
           this.nextPageButton.disabled = false;
         }
+        window.scrollTo(0, 50)
       })
       .catch((error: Error) => {
         console.error(error);
