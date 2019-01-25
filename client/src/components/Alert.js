@@ -3,21 +3,21 @@
 import * as React from 'react';
 import { Component } from 'react-simplified';
 
-//Ulike farger for feilmeldinger:
-/*
--danger
--warning
--info
--success
-*/
-
 class Alert extends Component<{type: string, text: any}>{
+
+  //Ulike farger for feilmeldinger:
+  /*
+  -danger
+  -warning
+  -info
+  -success
+  */
 
   shouldComponentUpdate(nextProps: any) {
         const differentType = this.props.type !== nextProps.type;
         const differentText = this.props.text !== nextProps.text;
         return differentType || differentText;
-    }
+  }
   render() {
     if(!this.props){
       return null;
