@@ -82,7 +82,7 @@ class Statistics extends Component {
                   <Pie data={this.regionalPie} />
                 </div>
                 <p className="col" >
-                  Disse grafene beskriver antal saker i en gitt kategtori. Her kan du se hvike kategorier som har mest saker, både regionalt og nasjonal.
+                  Disse grafene beskriver antall saker i en gitt kategtori. Her kan du se hvike kategorier som har mest saker, både regionalt og nasjonal.
             </p>
               </div>
             </div>
