@@ -88,10 +88,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                                 Slutt å følg
                             </button>
                         ) : (
-                            <button className={this.getSubscriptionButtonStyles(this.case)} onClick={this.onClickSubscribeButton}>
-                                Følg sak
+                                <button className={this.getSubscriptionButtonStyles(this.case)} onClick={this.onClickSubscribeButton}>
+                                    Følg sak
                             </button>
-                        )
+                            )
                     ) : null}
                     {this.error}
                     <form
@@ -102,164 +102,164 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                         <h1>{this.case.title}</h1>
                         <table className={'table'}>
                             <tbody>
-                            <tr>
-                                <td>Status</td>
-                                <td style={ToolService.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
-                            </tr>
-                            <tr>
-                                <td>Sted</td>
-                                <td>
-                                    {this.case.region_name} ({this.case.county_name})
+                                <tr>
+                                    <td>Status</td>
+                                    <td style={ToolService.getStatusColour(this.case.status_id)}>{this.case.status_name}</td>
+                                </tr>
+                                <tr>
+                                    <td>Sted</td>
+                                    <td>
+                                        {this.case.region_name} ({this.case.county_name})
                                 </td>
-                            </tr>
-                            <tr>
-                                <td>Kategori</td>
-                                <td>{this.case.category_name}</td>
-                            </tr>
-                            {this.getCreatedBy()}
-                            <tr>
-                                <td>Sak opprettet</td>
-                                <td>{ToolService.dateFormat(this.case.createdAt)}</td>
-                            </tr>
-                            <tr>
-                                <td>Sist oppdatert</td>
-                                <td>{ToolService.dateFormat(this.case.updatedAt)}</td>
-                            </tr>
+                                </tr>
+                                <tr>
+                                    <td>Kategori</td>
+                                    <td>{this.case.category_name}</td>
+                                </tr>
+                                {this.getCreatedBy()}
+                                <tr>
+                                    <td>Sak opprettet</td>
+                                    <td>{ToolService.dateFormat(this.case.createdAt)}</td>
+                                </tr>
+                                <tr>
+                                    <td>Sist oppdatert</td>
+                                    <td>{ToolService.dateFormat(this.case.updatedAt)}</td>
+                                </tr>
                             </tbody>
                         </table>
                         <h3>Beskrivelse</h3>
                         {this.case.description ? <p>{this.case.description}</p> : <p>INGEN BESKRIVELSE GITT</p>}
                         {(privilege <= OWNER_EMPLOYEE && this.loggedIn) ||
-                        (this.case.status_id === STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE && this.loggedIn) ? (
-                            <section>
-                                {privilege <= NOT_OWNER_EMPLOYEE ? (
-                                    <button
-                                        className={this.edit === false ? editButtonStyles[0] : editButtonStyles[1]}
-                                        type={'button'}
-                                        onClick={this.onClickToggleForm}
-                                    >
-                                        Svar sak
+                            (this.case.status_id === STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE && this.loggedIn) ? (
+                                <section>
+                                    {privilege <= NOT_OWNER_EMPLOYEE ? (
+                                        <button
+                                            className={this.edit === false ? editButtonStyles[0] : editButtonStyles[1]}
+                                            type={'button'}
+                                            onClick={this.onClickToggleForm}
+                                        >
+                                            Svar sak
                                     </button>
-                                ) : (
-                                    <button
-                                        className={this.edit === false ? editButtonStyles[0] : editButtonStyles[1]}
-                                        type={'button'}
-                                        onClick={this.onClickToggleForm}
-                                    >
-                                        Rediger sak
-                                    </button>
-                                )}
-                                {this.edit === true ? (
-                                    <section>
-                                        <h2>Oppdater sak</h2>
-                                        <div className={'form-group'}>
-                                            <label htmlFor="category">Kategori</label>
-                                            <select
-                                                defaultValue={this.case.category_id}
-                                                onChange={this.categoryListener}
-                                                className={'form-control'}
-                                                id={'category'}
-                                                required
+                                    ) : (
+                                            <button
+                                                className={this.edit === false ? editButtonStyles[0] : editButtonStyles[1]}
+                                                type={'button'}
+                                                onClick={this.onClickToggleForm}
                                             >
-                                                {this.categories.map(e => (
-                                                    <option key={e.category_id} value={e.category_id}>
-                                                        {' '}
-                                                        {e.name}{' '}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                        {(this.case.status_id === STATUS_OPEN && this.isOwner(this.case)) || privilege === ADMIN ? (
+                                                Rediger sak
+                                    </button>
+                                        )}
+                                    {this.edit === true ? (
+                                        <section>
+                                            <h2>Oppdater sak</h2>
                                             <div className={'form-group'}>
-                                                <label htmlFor="title">Tittel</label>
-                                                <input
-                                                    className={'form-control'}
-                                                    type="text"
-                                                    pattern="^.{2,255}$"
-                                                    autoComplete="off"
-                                                    value={this.case.title}
-                                                    onChange={(event: SyntheticInputEvent<HTMLInputElement>) => {
-                                                        this.case.title = event.target.value;
-                                                    }}
-                                                    placeholder={'Gi saken din en beskrivende tittel'}
-                                                    required
-                                                />
-                                            </div>
-                                        ) : null}
-                                        {privilege <= OWNER_EMPLOYEE ? (
-                                            <div className={'form-group'}>
-                                                <label htmlFor="status">Saksstatus</label>
+                                                <label htmlFor="category">Kategori</label>
                                                 <select
-                                                    defaultValue={this.case.status_id}
-                                                    onChange={this.statusListener}
+                                                    defaultValue={this.case.category_id}
+                                                    onChange={this.categoryListener}
                                                     className={'form-control'}
-                                                    id={'status'}
+                                                    id={'category'}
                                                     required
                                                 >
-                                                    {this.statuses.map(e => (
-                                                        <option key={e.status_id} value={e.status_id}>
+                                                    {this.categories.map(e => (
+                                                        <option key={e.category_id} value={e.category_id}>
                                                             {' '}
                                                             {e.name}{' '}
                                                         </option>
                                                     ))}
                                                 </select>
                                             </div>
-                                        ) : null}
-                                        {this.case.status_id === STATUS_OPEN || privilege === ADMIN ? (
-                                            <div className={'form-group'}>
-                                                <label htmlFor="description">Beskrivelse</label>
-                                                <textarea
-                                                    className={'form-control'}
-                                                    id={'description'}
-                                                    maxLength={MAX_DESCRIPTION_LENGTH}
-                                                    placeholder="Gi din sak en beskrivende beskrivelse, så blir det enklere for oss å hjelpe deg."
-                                                    value={this.case.description}
-                                                    onChange={this.textareaListener}
-                                                />
-                                                {this.case.description
-                                                    ? this.case.description.length + ' av ' + MAX_DESCRIPTION_LENGTH + ' tegn brukt.'
-                                                    : null}
-                                            </div>
-                                        ) : null}
-                                        {privilege <= OWNER_EMPLOYEE ? (
-                                            <div className={'form-group'}>
-                                                <label htmlFor="description">Melding</label>
-                                                <textarea
-                                                    className={'form-control'}
-                                                    id={'message'}
-                                                    maxLength={255}
-                                                    minLength={2}
-                                                    placeholder="Melding om sak"
-                                                    value={this.statusComment.comment}
-                                                    onChange={this.textareaListener}
-                                                    required
-                                                />
-                                            </div>
-                                        ) : null}
-                                        {this.case.img.length < MAX_NUMBER_IMG ? (
-                                            <div className={'form-group'}>
-                                                <label htmlFor={'image-input'}>Legg ved bilder</label>
-                                                <input
-                                                    className={'form-control-file'}
-                                                    id={'image-inpu'}
-                                                    type={'file'}
-                                                    accept={'.png, .jpg, .jpeg'}
-                                                    onChange={this.fileInputListener}
-                                                />
-                                            </div>
-                                        ) : null}
-                                        <button className={'btn btn-primary mr-2'} onClick={this.submit}>
-                                            Oppdater
+                                            {(this.case.status_id === STATUS_OPEN && this.isOwner(this.case)) || privilege === ADMIN ? (
+                                                <div className={'form-group'}>
+                                                    <label htmlFor="title">Tittel</label>
+                                                    <input
+                                                        className={'form-control'}
+                                                        type="text"
+                                                        pattern="^.{2,255}$"
+                                                        autoComplete="off"
+                                                        value={this.case.title}
+                                                        onChange={(event: SyntheticInputEvent<HTMLInputElement>) => {
+                                                            this.case.title = event.target.value;
+                                                        }}
+                                                        placeholder={'Gi saken din en beskrivende tittel'}
+                                                        required
+                                                    />
+                                                </div>
+                                            ) : null}
+                                            {privilege <= OWNER_EMPLOYEE ? (
+                                                <div className={'form-group'}>
+                                                    <label htmlFor="status">Saksstatus</label>
+                                                    <select
+                                                        defaultValue={this.case.status_id}
+                                                        onChange={this.statusListener}
+                                                        className={'form-control'}
+                                                        id={'status'}
+                                                        required
+                                                    >
+                                                        {this.statuses.map(e => (
+                                                            <option key={e.status_id} value={e.status_id}>
+                                                                {' '}
+                                                                {e.name}{' '}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            ) : null}
+                                            {this.case.status_id === STATUS_OPEN || privilege === ADMIN ? (
+                                                <div className={'form-group'}>
+                                                    <label htmlFor="description">Beskrivelse</label>
+                                                    <textarea
+                                                        className={'form-control'}
+                                                        id={'description'}
+                                                        maxLength={MAX_DESCRIPTION_LENGTH}
+                                                        placeholder="Gi din sak en beskrivende beskrivelse, så blir det enklere for oss å hjelpe deg."
+                                                        value={this.case.description}
+                                                        onChange={this.textareaListener}
+                                                    />
+                                                    {this.case.description
+                                                        ? this.case.description.length + ' av ' + MAX_DESCRIPTION_LENGTH + ' tegn brukt.'
+                                                        : null}
+                                                </div>
+                                            ) : null}
+                                            {privilege <= OWNER_EMPLOYEE ? (
+                                                <div className={'form-group'}>
+                                                    <label htmlFor="description">Melding</label>
+                                                    <textarea
+                                                        className={'form-control'}
+                                                        id={'message'}
+                                                        maxLength={255}
+                                                        minLength={2}
+                                                        placeholder="Melding om sak"
+                                                        value={this.statusComment.comment}
+                                                        onChange={this.textareaListener}
+                                                        required
+                                                    />
+                                                </div>
+                                            ) : null}
+                                            {this.case.img.length < MAX_NUMBER_IMG ? (
+                                                <div className={'form-group'}>
+                                                    <label htmlFor={'image-input'}>Legg ved bilder</label>
+                                                    <input
+                                                        className={'form-control-file'}
+                                                        id={'image-inpu'}
+                                                        type={'file'}
+                                                        accept={'.png, .jpg, .jpeg'}
+                                                        onChange={this.fileInputListener}
+                                                    />
+                                                </div>
+                                            ) : null}
+                                            <button className={'btn btn-primary mr-2'} onClick={this.submit}>
+                                                Oppdater
                                         </button>
-                                        {(this.case.status_id === STATUS_OPEN && this.isOwner(this.case)) || privilege === ADMIN ? (
-                                            <button className={'btn btn-danger mr-2'} onClick={this.delete}>
-                                                Slett
+                                            {(this.case.status_id === STATUS_OPEN && this.isOwner(this.case)) || privilege === ADMIN ? (
+                                                <button className={'btn btn-danger mr-2'} onClick={this.delete}>
+                                                    Slett
                                             </button>
-                                        ) : null}
-                                    </section>
-                                ) : null}
-                            </section>
-                        ) : null}
+                                            ) : null}
+                                        </section>
+                                    ) : null}
+                                </section>
+                            ) : null}
                     </form>
                     <div className="container my-5">
                         <div className="row">
@@ -268,27 +268,27 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                                     <div className="card">
                                         <img src={e.src} alt={e.src} className="card-img-top" />
                                         {(privilege <= OWNER_EMPLOYEE && this.case.status_id !== STATUS_CLOSED) ||
-                                        (privilege === OWNER_NOT_EMPLOYEE && this.case.status_id === STATUS_OPEN) ||
-                                        privilege === ADMIN ? (
-                                            <div className="card-img-overlay">
-                                                <button
-                                                    className={'btn btn-danger img-overlay float-right align-text-bottom'}
-                                                    onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
-                                                >
-                                                    <FontAwesomeIcon icon={faTrashAlt} />
-                                                </button>
-                                            </div>
-                                        ) : null}
+                                            (privilege === OWNER_NOT_EMPLOYEE && this.case.status_id === STATUS_OPEN) ||
+                                            privilege === ADMIN ? (
+                                                <div className="card-img-overlay">
+                                                    <button
+                                                        className={'btn btn-danger img-overlay float-right align-text-bottom'}
+                                                        onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
+                                                    >
+                                                        <FontAwesomeIcon icon={faTrashAlt} />
+                                                    </button>
+                                                </div>
+                                            ) : null}
                                     </div>
                                 </div>
                             ))}
                         </div>
                     </div>
-                    <div style={{ minHeight: "250px" }} className={'col-md-6 google-map'}>
+                    <div style={{ minHeight: "250px" }} className={'col-md google-map'}>
                         <GoogleApiWrapper
-                            updatePos={{ lat: this.case.lat, lng: this.case.lon }}
+                            ref="map"
+                            markerPos={{ lat: this.case.lat, lng: this.case.lon }}
                             isClickable={false}
-
                             userPos={{ lat: this.case.lat, lng: this.case.lon }}
                             centerPos={{ lat: this.case.lat, lng: this.case.lon }}
                         />
