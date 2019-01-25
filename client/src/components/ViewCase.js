@@ -286,12 +286,12 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               ))}
             </div>
           </div>
-          <div style={{ minHeight: '250px' }} className={'col-md-6 google-map'}>
+          <div style={{ minHeight: '250px' }} className={'col-md google-map'}>
             <GoogleApiWrapper
-              updatePos={{ lat: this.case.lat, lng: this.case.lon }}
               isClickable={false}
               userPos={{ lat: this.case.lat, lng: this.case.lon }}
               centerPos={{ lat: this.case.lat, lng: this.case.lon }}
+              markerPos={{ lat: this.case.lat, lng: this.case.lon }}
             />
           </div>
         </div>
