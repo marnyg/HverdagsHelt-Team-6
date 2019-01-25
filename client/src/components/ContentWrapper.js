@@ -273,7 +273,7 @@ class ContentWrapper extends Component {
         } else {
           this.nextPageButton.disabled = false;
         }
-        window.scrollTo(0, 50)
+        window.scrollTo(0, 50);
       })
       .catch((error: Error) => {
         console.error(error);
