@@ -18,14 +18,24 @@ import CountyService from "../services/CountyService";
 import RegionSelect from "./RegionSelect";
 import LoginModal from './LoginModal';
 
+/**
+ *
+ */
 class Content extends Component {
   grid = true;
-
+  
+  /**
+   * Overrides default constructor. Flushes/removes any previous notifications from the Notify component.
+   */
   constructor() {
     super();
     Notify.flush();
   }
-
+  
+  /**
+   * Generates HTML code
+   * @returns {*} HTML Element with sub-elements.
+   */
   render() {
       let registerButton = null;
       let user = JSON.parse(localStorage.getItem('user'));
