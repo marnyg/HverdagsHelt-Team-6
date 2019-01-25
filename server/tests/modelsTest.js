@@ -20,10 +20,6 @@ beforeAll(async () => {
   await sync;
 });
 
-afterAll(()=> {
-  application.close();
-});
-
 describe('Sequelize model findAll() tests', () => {
   it('County.findAll()  returns correct data', async () => {
     let county = await County.findAll();

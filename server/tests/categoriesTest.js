@@ -17,10 +17,6 @@ beforeAll(done => {
     });
 });
 
-afterAll(()=> {
-  application.close();
-});
-
 // ***************** Categories *****************
 describe('Find all categories', () => {
   test('200 status code for GET /api/categories', done => {

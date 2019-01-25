@@ -17,10 +17,6 @@ beforeAll(done => {
     });
 });
 
-afterAll(()=> {
-  application.close();
-});
-
 // ***************** Roles *****************
 describe('Find all roles', () => {
   test('401 status code for GET /api/roles without valid token', done => {

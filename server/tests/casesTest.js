@@ -41,10 +41,6 @@ beforeAll(done => {
     });
 });
 
-afterAll(()=> {
-  application.close();
-});
-
 // ***************** Cases *****************
 describe('Find all cases', () => {
   test('200 status code for GET /api/cases', done => {

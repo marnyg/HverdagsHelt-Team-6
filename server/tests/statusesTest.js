@@ -17,10 +17,6 @@ beforeAll(done => {
     });
 });
 
-afterAll(done => {
-  application.close();
-});
-
 // ***************** statuses *****************
 describe('Find all statuses', () => {
   test('200 status code for GET /api/statuses', done => {
