@@ -7,6 +7,7 @@ import EmployeeService from "../../services/EmployeeService";
 import Statistics from "../Statistics";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartLine, faUsers } from '@fortawesome/free-solid-svg-icons/index';
+import ToolService from "../../services/ToolService";
 
 class EmployeePage extends Component{
     inbox = [];
@@ -14,11 +15,12 @@ class EmployeePage extends Component{
     started = [];
 
     render() {
+        console.log(ToolService.getStatusColour(1));
         let inbox_tab = {
             path:'/employee/inbox', name: (
                 <div>
                     Innboks
-                    <div className="badge badge-danger ml-2">{this.inbox.length}</div>
+                    <div className="badge ml-2" style={{'backgroundColor': ToolService.getStatusColour(1).color, 'color': 'white'}}>{this.inbox.length}</div>
                 </div>
             ),
             component: <Inbox cases={this.inbox}/>
@@ -27,7 +29,7 @@ class EmployeePage extends Component{
             path:'/employee/started', name: (
                 <div>
                     Under behandling
-                    <div className="badge badge-warning ml-2">{this.started.length}</div>
+                    <div className="badge ml-2" style={{'backgroundColor': ToolService.getStatusColour(2).color, 'color': 'white'}}>{this.started.length}</div>
                 </div>
             ), component: <Inbox cases={this.started}/>
         };
@@ -35,7 +37,7 @@ class EmployeePage extends Component{
             path:'/employee/closed', name: (
                 <div>
                     Lukket
-                    <div className="badge badge-success ml-2">{this.closed.length}</div>
+                    <div className="badge ml-2" style={{'backgroundColor': ToolService.getStatusColour(3).color, 'color': 'white'}}>{this.closed.length}</div>
                 </div>
             ), component: <Inbox cases={this.closed}/>
         };
@@ -43,7 +45,7 @@ class EmployeePage extends Component{
             path:'/employee/statistics',
             name: (
                 <div>
-                    <div className="badge badge-primary">
+                    <div className="badge" style={{'backgroundColor': ToolService.getStatusColour(2).color, 'color': 'white'}}>
                         <FontAwesomeIcon icon={faChartLine}/>
                     </div> Statistikk
                 </div>
@@ -55,7 +57,7 @@ class EmployeePage extends Component{
             path:'/employee/team',
             name: (
                 <div>
-                    <div className="badge badge-primary">
+                    <div className="badge" style={{'backgroundColor': ToolService.getStatusColour(2).color, 'color': 'white'}}>
                         <FontAwesomeIcon icon={faUsers}/>
                     </div> Ditt Team
                 </div>

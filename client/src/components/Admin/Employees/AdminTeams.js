@@ -49,27 +49,36 @@ class AdminTeams extends Component {
     }
 
     onRegionSelected(region) {
+        $('#spinner').show();
         this.region = region;
         let userService = new UserService();
         userService.getAllEmployeesInRegion(region.region_id)
             .then((users: User[]) => {
                 //this.team = users.filter(u => (u.role_id === region_employee_id && u.region_id === region.region_id));
                 this.team = users;
+                $('#spinner').hide();
             })
-            .catch((error: Error) => console.error(error));
+            .catch((error: Error) => {
+                $('#spinner').hide();
+            });
     }
 
     onTeamChange(user: User) {
+        $('#spinner').show();
         console.log('Team changed');
         let userService = new UserService();
         userService.getAllEmployeesInRegion(this.region.region_id)
             .then((users: User[]) => {
                 this.team = users;
+                $('#spinner').hide();
             })
-            .catch((error: Error) => console.error(error));
+            .catch((error: Error) => {
+                $('#spinner').hide();
+            });
     }
 
     mounted() {
+        $('#spinner').show();
         let regionService = new RegionService();
         regionService.getAllRegions()
             .then((regions: Region[]) => {
@@ -87,10 +96,17 @@ class AdminTeams extends Component {
                                 }
                             }
                         }
+                        $('#spinner').hide();
                     })
-                    .catch((error: Error) => console.error(error));
+                    .catch((error: Error) => {
+                        $('#spinner').hide();
+                        console.error(error);
+                    });
             })
-            .catch((error: Error) => console.error(error));
+            .catch((error: Error) => {
+                $('#spinner').hide();
+                console.error(error);
+            });
     }
 }
 export default AdminTeams;

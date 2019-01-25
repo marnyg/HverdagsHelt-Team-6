@@ -5,16 +5,24 @@ import { NavLink } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
-import CaseSubscriptionService from "../services/CaseSubscriptionService";
-import CaseSubscription from "../classes/CaseSubscription";
+import CaseSubscriptionService from '../services/CaseSubscriptionService';
+import CaseSubscription from '../classes/CaseSubscription';
+import User from '../classes/User';
+import ToolService from '../services/ToolService';
 import hverdagsheltLogo from '../../public/hverdagsheltLogo2Trans.png';
+import LoginService from "../services/LoginService";
+import Notify from "./Notify";
 
-const region_employee_id = 4; // Change to 2 upon delivery
-const admin_id = 4 ; // Change to 1 upon delivery
+const SERVER_IP: string = 'localhost';
+const SERVER_PORT: number = 3000;
 
-class Navbar extends Component {
-    notification_count = 0;
-    notifications = [];
+class Navbar extends Component<{ logged_in: boolean }> {
+    notification_count: number = 0;
+    subscriptions: CaseSubscription[] = [];
+    search: string = '';
+    socket: WebSocket = null;
+    logged_in: boolean = false;
+
     constructor() {
         super();
         this.submitSearch = this.submitSearch.bind(this);
@@ -22,36 +30,47 @@ class Navbar extends Component {
 
     render() {
         let loginlink = null;
-        let user = JSON.parse(localStorage.getItem('user'));
-        if(user === null){
+        let user = ToolService.getUser();
+        if (!user) {
             loginlink = (
-                <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#login-modal">
+                <div className="nav-link"
+                     style={{ cursor: 'pointer' }}
+                     data-toggle="modal"
+                     data-target="#login-modal"
+                     onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                     Registrer sak
                 </div>
             );
-        } else if(this.props.logged_in === false){
+        } else if (this.logged_in === false) {
             loginlink = (
-                <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#login-modal">
+                <div className="nav-link" style={{ cursor: 'pointer' }}
+                     data-toggle="modal"
+                     data-target="#login-modal"
+                     onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                     Registrer sak
                 </div>
             );
         } else {
             loginlink = (
-                <NavLink to="/new-case" className="nav-link">
+                <NavLink to="/new-case" className="nav-link" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                     Registrer sak
                 </NavLink>
             );
         }
         return (
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
-                {this.props.logged_in ?
-                    <NavLink to={'/'} className="navbar-left">
-                        <img src={hverdagsheltLogo} height={29.7} width={185}/>
-                        <sup className="badge badge-primary mobile-notification">{this.notification_count > 0 ? this.notification_count:null}</sup>
+                {this.logged_in ? (
+                    <NavLink to={'/'} className="navbar-left" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
+                        <img src={hverdagsheltLogo} height={29.7} width={185} />
+                        <sup className="badge badge-primary mobile-notification">
+                            {this.notification_count > 0 ? this.notification_count : null}
+                        </sup>
                     </NavLink>
-                    :
-                    <NavLink to={'/'} className="navbar-left"><img src={hverdagsheltLogo} height={29.7} width={185}/></NavLink>
-                }
+                ) : (
+                    <NavLink to={'/'} className="navbar-left" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
+                        <img src={hverdagsheltLogo} height={29.7} width={185} />
+                    </NavLink>
+                )}
                 <button
                     className="navbar-toggler"
                     type="button"
@@ -67,40 +86,43 @@ class Navbar extends Component {
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav mr-auto">
                         <li className="nav-item">
-                            <NavLink exact to="/" className="nav-link">
+                            <NavLink exact to="/" className="nav-link" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                                 Hjem
                             </NavLink>
                         </li>
 
                         <li className="nav-item">{loginlink}</li>
                         <li className="nav-item">
-                            {this.props.logged_in ? (
-                                <NavLink to="/subscriptions" className="nav-link">
+                            {this.logged_in ? (
+                                <NavLink to="/subscriptions" className="nav-link" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                                     Abonnement
                                 </NavLink>
                             ) : null}
                         </li>
                         <li className="nav-item">
-                            {this.props.logged_in ? (
-                                <NavLink to="/notifications" className="nav-link">
-                                    Varsler <sup className="badge badge-primary">{this.notification_count > 0 ? this.notification_count:null}</sup>
+                            {this.logged_in ? (
+                                <NavLink to="/notifications" className="nav-link" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
+                                    Varsler{' '}
+                                    <sup className="badge badge-primary">
+                                        {this.notification_count > 0 ? this.notification_count : null}
+                                    </sup>
                                 </NavLink>
                             ) : null}
                         </li>
-                        {user && user.role_id <= region_employee_id ? (
+                        {user && user.role_id === ToolService.employee_role_id ? (
                             <li className="nav-item">
-                                <NavLink exact to="/employee/inbox" className="nav-link">
+                                <NavLink exact to="/employee/inbox" className="nav-link" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                                     Behandle saker
                                 </NavLink>
                             </li>
-                        ): null}
-                        {user && user.role_id <= admin_id ? (
+                        ) : null}
+                        {user && user.role_id === ToolService.admin_role_id ? (
                             <li className="nav-item">
-                                <NavLink exact to="/admin/regions" className="nav-link">
+                                <NavLink exact to="/admin/regions" className="nav-link" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                                     Admin
                                 </NavLink>
                             </li>
-                        ): null}
+                        ) : null}
                     </ul>
                     <form className="form-inline my-2 my-lg-1" onSubmit={this.submitSearch}>
                         <input
@@ -110,7 +132,10 @@ class Navbar extends Component {
                             aria-label="Search"
                             onChange={e => (this.search = e.target.value)}
                         />
-                        <button className="btn btn-outline-success my-2 my-sm-0" type="submit" onClick={this.submitSearch}>
+                        <button className="btn btn-outline-success my-2 my-sm-0" type="submit" onClick={(event) => {
+                            this.submitSearch(event);
+                            $('#navbarSupportedContent').collapse('hide');
+                        }}>
                             Søk
                         </button>
                     </form>
@@ -122,43 +147,83 @@ class Navbar extends Component {
 
     mounted() {
         // Check if user is logged in
-        //console.log('Navbar mounted');
-        if(this.props.logged_in === true){
-            // get notifications
-            let subscriptionService = new CaseSubscriptionService();
-            let user = JSON.parse(localStorage.getItem('user'));
-            subscriptionService.getAllCaseSubscriptions(user.user_id)
-                .then((cs: CaseSubscription[]) => {
-                    for (let i = 0; i < cs.length; i++) {
-                        if(cs[i].is_up_to_date === false){
-                            this.notification_count++;
-                        }
-                    }
-                    this.notifications = cs;
-                })
-                .catch((error: Error) => console.error(error));
+        this.logged_in = this.props.logged_in;
+        this.setState({
+            logged_in: this.props.logged_in
+        });
+        let loginService = new LoginService();
+        loginService.isLoggedIn()
+            .then((logged_in: boolean) => {
+                if(logged_in === true){
+                    let user: User = ToolService.getUser();
+                    this.fetch_notifications(user, this.countPushNotifications);
+                }
+            })
+            .catch((error: Error) => console.error(error));
+    }
+
+    fetch_notifications(user: User, cb) {
+        let subscriptionService = new CaseSubscriptionService();
+        subscriptionService
+            .getAllCaseSubscriptions(user.user_id)
+            .then((cs: CaseSubscription[]) => {
+                this.subscriptions = cs;
+                cb(cs);
+            })
+            .catch((error: Error) => console.error(error));
+    }
+
+    countPushNotifications(subscriptions: []) {
+        this.notification_count = 0;
+        subscriptions.map(e => e.is_up_to_date === false ? this.notification_count++:null);
+    }
+
+    componentWillReceiveProps(newProps) {
+        if(newProps.logged_in !== this.props.logged_in) {
+            this.logged_in = newProps.logged_in;
+            this.setState({
+                logged_in: newProps.logged_in
+            });
+        }
+
+        if(this.logged_in === true) {
+            if(this.socket === undefined || this.socket === null) {
+                this.initSocket();
+            }
+            let user: User = ToolService.getUser();
+            if(user) {
+                this.fetch_notifications(user, this.countPushNotifications);
+            }
         }
     }
 
     submitSearch(event) {
         event.preventDefault();
-        console.log(this.search);
         if (this.search !== undefined && this.search !== '') {
             this.props.history.push('/search/' + this.search);
         }
     }
 
     logincheck() {
-        if (this.props.logged_in) {
+        if (this.logged_in) {
             return (
                 <ul className="navbar-nav">
                     <li className="nav-item">
-                        <NavLink to="/my-page/my-profile" className="nav-link">
+                        <NavLink to="/my-page/my-profile" className="nav-link" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
                             Min Side
                         </NavLink>
                     </li>
                     <li className="nav-item">
-                        <NavLink exact to={'/'} className="nav-link" style={{cursor: 'pointer'}} onClick={(event) => this.logout(event)}>
+                        <NavLink
+                            exact
+                            to={'/'}
+                            className="nav-link"
+                            style={{ cursor: 'pointer' }}
+                            onClick={event => {
+                                $('#navbarSupportedContent').collapse('hide');
+                                this.logout(event);
+                            }}
+                        >
                             Logg ut
                         </NavLink>
                     </li>
@@ -168,13 +233,13 @@ class Navbar extends Component {
             return (
                 <ul className="navbar-nav">
                     <li className="nav-item">
-                        <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#register-modal">
+                        <div className="nav-link" style={{ cursor: 'pointer' }} data-toggle="modal" data-target="#register-modal">
                             Ny bruker
                         </div>
-                        <RegisterModal onLogin={() => this.onLogin()}/>
+                        <RegisterModal onLogin={() => this.onLogin()} />
                     </li>
                     <li className="nav-item">
-                        <div className="nav-link" style={{cursor: 'pointer'}} data-toggle="modal" data-target="#login-modal">
+                        <div className="nav-link" style={{ cursor: 'pointer' }} data-toggle="modal" data-target="#login-modal">
                             Logg inn
                         </div>
                         <LoginModal modal_id={'login-modal'} onLogin={() => this.onLogin()} />
@@ -189,7 +254,60 @@ class Navbar extends Component {
     }
 
     logout(event) {
+        if(this.socket !== undefined && this.socket !== null) {
+            this.socket.onclose = function() {
+                console.log('socket closing');
+            };
+            this.socket.close();
+        }
         this.props.logout(event);
+    }
+
+    receiveBcast(message: MessageEvent) {
+        let json = JSON.parse(message.data);
+        console.log(json);
+        console.log(this.subscriptions);
+        let user = JSON.parse(localStorage.getItem('user'));
+        if(user) {
+            this.fetch_notifications(user, (subs) => {
+                if (json) {
+                    if (this.subscriptions.length > 0) {
+                        let id: number = Number(json.case_id);
+                        this.notification_count = 0;
+                        this.subscriptions.map(e => e.is_up_to_date === false && e.case_id !== id ? this.notification_count++:null);
+                        if (this.subscriptions.some(e => e.case_id === id)) {
+                            this.notification_count++;
+                        }
+                    }
+                } else {
+                    console.log('Could not parse websocket data from server.');
+                }
+            })
+        }
+    }
+
+    initSocket() {
+        let socketArgument: string = 'ws://' + SERVER_IP + ':' + SERVER_PORT.toString();
+        console.log(socketArgument);
+        this.socket = new WebSocket(socketArgument);
+        this.socket.onmessage = (msg: MessageEvent) => this.receiveBcast(msg);
+        this.socket.onerror = (err: Event) => console.log('WebSocket error:', err);
+        this.socket.onopen = (e: Event) => console.log('Connected to ', e);
+    }
+
+    static onCaseOpened(c) {
+        setTimeout(() => {
+            for (let instance of Navbar.instances()) {
+                for(let sub of instance.subscriptions) {
+                    if(sub.case_id === c.case_id) {
+                        instance.subscriptions.splice(instance.subscriptions.indexOf(sub), 1);
+                        instance.countPushNotifications(instance.subscriptions);
+                        break;
+                    }
+                }
+            }
+        });
+
     }
 }
 export default withRouter(Navbar);

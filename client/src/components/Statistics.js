@@ -37,7 +37,7 @@ class Statistics extends Component {
         <div className="row ">
           <div ref="statPage" className="col border p-5" style={{ maxHeight: '297mm', maxWidth: '210mm', minWidth: '210mm' }}>
             <div className="row">
-              <h4 >National statistik</h4>
+              <h4 >Nasjonal statistik</h4>
               <div className="row">
                 <div className="col" style={{ maxWidth: "150mm", minWidth: '150mm' }} >
                   <Bar ref="bar1" data={this.nationalBar} />
@@ -65,7 +65,7 @@ class Statistics extends Component {
             <div className="row">
               <div className="row">
                 <div className="col" style={{ maxWidth: "100mm", minWidth: '100mm' }} >
-                  <h4 >National statistik</h4>
+                  <h4 >Nasjonal statistik</h4>
                   <Pie data={this.nationalPie} />
                 </div>
                 <div className="col" style={{ maxWidth: "100mm", minWidth: '100mm' }} >
@@ -81,7 +81,7 @@ class Statistics extends Component {
 
           </div>
           <div className="col">
-            <h3>toolbar</h3>
+            {/* <h3>toolbar</h3> */}
             <select ref="year" onChange={this.changeYear}>
               <option value="2019">2019</option>
               <option value="2020">2020</option>
@@ -90,11 +90,6 @@ class Statistics extends Component {
             <button className="btn btn-primary" onClick={this.generatePdf}>
               Last ned som PDF
             </button>
-            <button
-              className="btn btn-primary"
-              onClick={() =>
-                console.log(this.nationalBar, this.refs.bar1)
-              } > log </button>
           </div>
         </div>
       </div >
@@ -170,7 +165,7 @@ class Statistics extends Component {
   }
   formatBarData(data) {
     let ds = {
-      labels: ['January', 'February', 'March', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'],
+      labels: ['Januar', 'Februar', 'Mars', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktrober', 'November', 'Desember'],
       datasets: [
         {
           label: 'Saker opprettet',
@@ -180,7 +175,7 @@ class Statistics extends Component {
           data: data.map(e => e.opened_cases)
         },
         {
-          label: 'Saker lukket ',
+          label: 'Saker lukket',
           borderWidth: 1,
           backgroundColor: '#FFCE56',
           // hoverBackgroundColor: ['#FFCE56',

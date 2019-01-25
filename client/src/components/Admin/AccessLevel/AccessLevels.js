@@ -21,7 +21,7 @@ class AccessLevels extends Component{
                         />
                     </div>
                     <div className={'col-lg'}>
-                        <AdminUserView user={this.viewing_user}/>
+                        <AdminUserView user={this.viewing_user} onUserUpdated={() => this.onUserUpdated()}/>
                     </div>
                 </div>
             </div>
@@ -29,12 +29,21 @@ class AccessLevels extends Component{
     }
 
     mounted() {
+        this.fetch_users();
+    }
+
+    fetch_users() {
         let userService = new UserService();
         userService.getAllUsers()
             .then((users: User[]) => {
                 this.users = users;
             })
             .catch((error: Error) => console.error(error));
+    }
+
+    onUserUpdated() {
+        console.log('User updated');
+        this.fetch_users();
     }
 
     onUserSelected(user) {

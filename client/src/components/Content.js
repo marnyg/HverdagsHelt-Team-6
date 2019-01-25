@@ -72,7 +72,8 @@ class Content extends Component {
                               classNameChild={'form-inline'}
                               elementsMargin={'mr-2'}
                               selector_id={'desktop'}
-                              onSubmit={(region_id) => this.props.onSubmit(region_id)}/>
+                              onSubmit={(region_id) => this.props.onSubmit(region_id)}
+                          />
                       </div>
                   </div>
                   {this.props.location ?
@@ -83,11 +84,11 @@ class Content extends Component {
                       {this.grid ? (
                           <div className="content">
                               {this.props.cases.map(e => (
-                                  <CaseItem case={e} key={e.case_id} grid={this.grid} user={this.props.user}/>
+                                  <CaseItem case={e} key={e.case_id} grid={this.grid} user={this.props.user} logged_in={this.props.logged_in}/>
                               ))}
                           </div>
                       ) : (
-                          this.props.cases.map(e => <CaseItem case={e} key={e.case_id} grid={this.grid} user={this.props.user}/>)
+                          this.props.cases.map(e => <CaseItem case={e} key={e.case_id} grid={this.grid} user={this.props.user} logged_in={this.props.logged_in}/>)
                       )}
                   </div>
               </div>

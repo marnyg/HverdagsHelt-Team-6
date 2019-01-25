@@ -6,7 +6,10 @@ import { faBell, faCheck } from '@fortawesome/free-solid-svg-icons/index';
 import CaseSubscriptionService from "../services/CaseSubscriptionService";
 import CaseSubscription from "../classes/CaseSubscription";
 import LoginService from "../services/LoginService";
+import ToolService from "../services/ToolService";
 
+
+const max_title_length = 24;
 class CaseItem extends Component {
   images = [];
   button_type = "primary";
@@ -17,18 +20,23 @@ class CaseItem extends Component {
         <div className="item bg-light">
           <NavLink to={'/case/' + this.props.case.case_id} className="preview">
             {this.images.length > 0 ? (
-              <div className="thumb" style={{ backgroundImage: 'url(' + this.images[0] + ')' }} />
+                <div className="thumb" style={{ backgroundImage: 'url(' + this.images[0] + ')' }}>
+                    <span role="img" aria-label="Bilde sendt inn av bruker"/>
+                </div>
             ) : (
-              <div className="thumb" style={{ backgroundImage: 'url(/no-image.png)' }} />
+                <div className="thumb" style={{ backgroundImage: 'url(/no-image.png)' }}>
+                    <span role="img" aria-label="Bilde sendt inn av bruker"/>
+                </div>
             )}
             <div className="d-inline">
               <div className="card-body">
+                <h2 className="card-title">{this.props.case.title.length > max_title_length ? this.props.case.title.substring(0, max_title_length-5)+'...': this.props.case.title}</h2>
                 <div className="card-text text-muted">{this.props.case.region_name} {this.props.case.county_name}</div>
                 <h2 className="card-title">{this.props.case.category_name}</h2>
                 <div className=" d-inline">
-                  <small className="text-muted">{this.getTimeString(this.props.case.createdAt)}</small>
+                  <small className="text-muted">{ToolService.dateFormat(this.props.case.updatedAt)}</small>
                 </div>
-                {this.props.user ?
+                {this.props.logged_in ?
                     <button onClick={this.subscribe.bind(this)} className={"btn btn-" + this.button_type + " float-right"}>
                         <FontAwesomeIcon
                             id={'subscribe'}
@@ -52,9 +60,9 @@ class CaseItem extends Component {
               <div className="row ">
                 <div className="col-md-4">
                   {this.images.length > 0 ? (
-                    <img className="w-100" src={this.images[0]} />
+                    <img className="w-100" src={this.images[0]} alt={'Bilde sendt inn av bruker'}/>
                   ) : (
-                    <img className="w-100" src={'/no-image.png'} />
+                    <img className="w-100" src={'/no-image.png'} alt={'Bilde sendt inn av bruker'}/>
                   )}
                 </div>
                 <div className="col-md-8">
@@ -66,7 +74,7 @@ class CaseItem extends Component {
 
                     <p className="card-text text-justify">{this.props.case.description ? this.props.case.description:"Ingen beskrivelse"}</p>
                     <p className="card-text">
-                      <small className="text-muted">{this.getTimeString(this.props.case.createdAt)}</small>
+                      <small className="text-muted">{ToolService.dateFormat(this.props.case.updatedAt)}</small>
                     </p>
                     <button className={"btn btn-" + this.button_type + " float-right"} onClick={this.subscribe.bind(this)}>
                         {this.props.case.subscribed ? "Du abonnerer på denne saken":"Abonner på denne saken"}
@@ -79,6 +87,12 @@ class CaseItem extends Component {
         </NavLink>
       );
     }
+  }
+
+  componentWillReceiveProps(newProps) {
+      if(newProps.case.subscribed){
+          this.button_type = "success";
+      }
   }
 
   mounted() {
@@ -138,24 +152,5 @@ class CaseItem extends Component {
             .catch((error: Error) => console.error(error));
     }
   }
-
-  getTimeString(dateobject){
-        if(dateobject){
-            var basedate = dateobject.split("T")[0];
-            var basetime = dateobject.split("T")[1].slice(0, -8);
-            var YYYYMMDD = basedate.split("-");
-            var outtime = basetime + " ";
-            for(var i = YYYYMMDD.length-1; i >= 0; i--){
-                if(i === 0){
-                    outtime += YYYYMMDD[i] + "";
-                } else {
-                    outtime += YYYYMMDD[i] + "-";
-                }
-            }
-            return outtime;
-        } else {
-            return "Could not calculate date"
-        }
-    }
 }
 export default CaseItem;

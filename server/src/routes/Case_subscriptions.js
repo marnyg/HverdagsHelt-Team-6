@@ -7,6 +7,12 @@ type Request = express$Request;
 type Response = express$Response;
 
 module.exports = {
+  /**
+   * Get all Case_subscription entries
+   * @param req, Request
+   * @param res, Response
+   * @returns {Case_subscriptions}
+   */
   getAllCase_subscriptions: function(req: Request, res: Response) {
     if (!req.token || !req.params.user_id || isNaN(Number(req.params.user_id)) || typeof req.token !== 'string')
       return res.sendStatus(400);
@@ -23,6 +29,12 @@ module.exports = {
       }
     }).then(cases => res.send(cases));
   },
+  /**
+   * Get all case items connected to Case_subscription entries
+   * @param req Request
+   * @param res Response
+   * @returns {Promise<Response>}
+   */
   getAllCase_subscriptionCases: async function(req: Request, res: Response) {
     if (!req.token || !req.params.user_id || isNaN(Number(req.params.user_id)) || typeof req.token !== 'string')
       return res.sendStatus(400);
@@ -36,13 +48,7 @@ module.exports = {
     let page = 1;
     let limit = 20;
 
-    if(
-      req.query &&
-      req.query.page &&
-      req.query.limit &&
-      Number(req.query.page) > 0 &&
-      Number(req.query.limit) > 0
-    ) {
+    if (req.query && req.query.page && req.query.limit && Number(req.query.page) > 0 && Number(req.query.limit) > 0) {
       page = Number(req.query.page);
       limit = Number(req.query.limit);
     }
@@ -78,6 +84,12 @@ module.exports = {
         return res.status(500).send(err);
       });
   },
+  /**
+   * Add ned case subscription
+   * @param req Request
+   * @param res Response
+   * @returns {Case_subscriptions}
+   */
   addCase_subscriptions: function(req: Request, res: Response) {
     if (
       !req.body ||
@@ -110,6 +122,12 @@ module.exports = {
         console.log(err.parent.sqlMessage);
       });
   },
+  /**
+   * Updates a Case_subscription
+   * @param req Request
+   * @param res Response
+   * @returns {Case_subscriptions}
+   */
   updateCase_subscriptions: function(req: Request, res: Response) {
     if (
       !req.body ||
@@ -129,17 +147,20 @@ module.exports = {
     let case_sub_obj = {
       is_up_to_date: req.body.is_up_to_date
     };
-    if(req.body.notify_by_email !== null) case_sub_obj['notify_by_email'] = req.body.notify_by_email;
+    if (req.body.notify_by_email !== null) case_sub_obj['notify_by_email'] = req.body.notify_by_email;
 
     if (decoded_token.accesslevel !== 1 && user_id_token !== user_id_param) return res.sendStatus(401);
 
-    return Case_subscriptions.update(
-      case_sub_obj,
-      {
-        where: { case_id: Number(req.params.case_id), user_id: req.body.user_id }
-      }
-    ).then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)));
+    return Case_subscriptions.update(case_sub_obj, {
+      where: { case_id: Number(req.params.case_id), user_id: req.body.user_id }
+    }).then(subscr => (subscr ? res.send(subscr) : res.sendStatus(404)));
   },
+  /**
+   * Deletes a Case_subscription
+   * @param req Request
+   * @param res Response
+   * @returns {*}
+   */
   delCase_subscriptions: function(req: Request, res: Response) {
     if (!req.token || !req.params || isNaN(Number(req.params.case_id)) || typeof req.token !== 'string')
       return res.sendStatus(400);
@@ -154,13 +175,14 @@ module.exports = {
       where: { case_id: Number(req.params.case_id), user_id: Number(req.params.user_id) }
     }).then(cases => (cases ? res.send() : res.status(500).send()));
   },
+  /**
+   * Get all not up to date Case_subscriptions
+   * @param req Request
+   * @param res Response
+   * @returns {Promise<Response>}
+   */
   getAllCase_subscriptionCasesIs_up_to_date: async function(req: Request, res: Response) {
-    if (
-      !req.token ||
-      !req.params.user_id ||
-      isNaN(Number(req.params.user_id)) ||
-      typeof req.token !== 'string'
-    )
+    if (!req.token || !req.params.user_id || isNaN(Number(req.params.user_id)) || typeof req.token !== 'string')
       return res.sendStatus(400);
 
     let decoded_token = verifyToken(req.token);

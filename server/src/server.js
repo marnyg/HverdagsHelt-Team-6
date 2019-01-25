@@ -31,7 +31,9 @@ type Response = express$Response;
 
 const public_path = path.join(__dirname, '/../../client/public');
 
-let app = express();
+let expressws = require('express-ws');
+expressws = expressws(express());
+let app = expressws.app;
 
 app.use(express.static(public_path));
 app.use(express.json()); // For parsing application/json
@@ -55,7 +57,16 @@ app.get('/', (req: Request, res: Response) => res.sendFile(public_path + '/index
 
 // ***************************** Log in and Log out *****************************
 
+let aWss = expressws.getWss('/');
+
+app.ws('/api/login', function(ws, req) {
+  console.log('')
+});
+
 app.post('/api/login', (req: Request, res: Response) => {
+  aWss.clients.forEach(function (client) {
+    client.send(JSON.stringify({ "message": "Socket connected." } ));
+  });
   return login(req, res);
 });
 
@@ -69,6 +80,19 @@ app.post('/api/verify', (req: Request, res: Response) => {
     return res.sendStatus(200);
   });
 });
+
+app.ws('/', function(ws, req) {
+  console.log('Socket Connected');
+
+  ws.onmessage = function(msg) {
+    console.log(msg.data);
+    aWss.clients.forEach(function (client) {
+      client.send(msg.data);
+    });
+  };
+});
+
+app.get('/', (req: Request, res: Response) => res.sendFile(public_path + '/index.html'));
 
 // ***************************** Case_subscriptions *****************************
 
@@ -301,15 +325,20 @@ app.get('/api/cases/:case_id/status_comments', (req: Request, res: Response) => 
 });
 
 app.post('/api/cases/:case_id/status_comments', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 2, Status_comment.addStatus_comment);
+  reqAccessLevel(req, res, 3, Status_comment.addStatus_comment);
+  if(res.statusCode == 200){
+    aWss.clients.forEach(client => {
+      client.send(JSON.stringify({"case_id": req.params.case_id }))
+    })
+  }
 });
 
 app.put('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 2, Status_comment.updateStatus_comment);
+  reqAccessLevel(req, res, 3, Status_comment.updateStatus_comment);
 });
 
 app.delete('/api/cases/:case_id/status_comments/:status_comment_id', (req: Request, res: Response) => {
-  reqAccessLevel(req, res, 2, Status_comment.delStatus_comment);
+  reqAccessLevel(req, res, 3, Status_comment.delStatus_comment);
 });
 
 // ***************************** Users *****************************

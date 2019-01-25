@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Component } from 'react-simplified';
-import { BrowserRouter, Route, withRouter} from 'react-router-dom';
+import { HashRouter, Route, withRouter} from 'react-router-dom';
 import '../styles/styles.css';
 import '../styles/loginmodal.css';
 import '../styles/registermodal.css';
@@ -10,8 +10,8 @@ import '../styles/simple-sidebar.css';
 import '../styles/carousel.css';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faEdit, faUsers, faChartLine, faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell } from '@fortawesome/free-solid-svg-icons';
-library.add(faCaretDown,faEdit, faUsers, faChartLine, faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell);
+import { faCaretDown, faCaretLeft, faCaretRight, faEdit, faUsers, faChartLine, faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell } from '@fortawesome/free-solid-svg-icons';
+library.add(faCaretDown, faCaretLeft, faCaretRight ,faEdit, faUsers, faChartLine, faPlus, faCheck, faTrashAlt, faKey, faTh, faCoffee, faListUl, faBell);
 import Navbar from './Navbar.js';
 import ContentWrapper from './ContentWrapper.js';
 import Footer from './Footer.js';
@@ -30,19 +30,29 @@ import EmployeePage from "./Employee/EmployeePage";
 import AdminPage from "./Admin/AdminPage";
 import VerificationModal from "./VerificationModal";
 
+import Loader from 'react-loader-spinner'; //https://www.npmjs.com/package/react-loader-spinner
 axios.interceptors.response.use(response => response.data);
 
 class App extends Component {
-    logged_in = false;
+    logged_in: boolean = false;
     render() {
         let visited = JSON.parse(localStorage.getItem('visited'));
         if(!visited){
             localStorage.setItem('visited', JSON.stringify({visited: true}));
         }
 
+        
         return (
-            <BrowserRouter>
+            <HashRouter>
                 <div className={'h-100 w-100'}>
+                    <div id={'spinner'}>
+                        <Loader
+                            type="Oval"
+                            color="#428bca"
+                            height="200"
+                            width="200"
+                        />
+                    </div>
                     <div className={'h-100 w-100'}>
                         <Navbar
                             logged_in={this.logged_in}
@@ -60,7 +70,7 @@ class App extends Component {
                                 <Route exact path="/" render={() => <ContentWrapper logged_in={this.logged_in} onLogin={() => this.onLogin()}/>} />
                                 :
                                 <Route exact path="/" render={() => <InfoPage/>}/>}
-                            <Route exact path="/case/:case_id" render={() => <ViewCase/>} />
+                            <Route exact path="/case/:case_id" render={() => <ViewCase onCaseOpened={(c) => Navbar.onCaseOpened(c)}/>} />
                             <Route exact path="/notifications" render={() => <Notifications/>} />
                             <Route exact path="/new-case" render={() => <NewCase />} />
                             <Route exact path="/search/:query" component={ContentWrapper} />
@@ -70,14 +80,14 @@ class App extends Component {
                     </div>
                     <Footer/>
                 </div>
-            </BrowserRouter>
+            </HashRouter>
         );
     }
 
     mounted() {
         let loginService = new LoginService();
         loginService.isLoggedIn()
-            .then((logged_in: Boolean) => {
+            .then((logged_in: boolean) => {
                 this.logged_in = logged_in;
             })
             .catch((error: Error) => console.error(error))
@@ -88,13 +98,13 @@ class App extends Component {
         userService.logout()
             .then(res => {
                 this.logged_in = false;
-                console.log('Loggin out');
+                console.log('App logging out');
             })
             .catch((error: Error) => console.error(error));
     }
 
     onLogin = () => {
-        console.log('Logged in');
+        console.log('App Logged in');
         this.logged_in = true;
     }
 }

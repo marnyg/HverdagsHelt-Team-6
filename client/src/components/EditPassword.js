@@ -14,7 +14,7 @@ class EditPassword extends Component {
     // oldUser = JSON.parse(localStorage.getItem("user"))
     oldPass: string;
     oldPass = '';
-    error=null;
+    error = null;
 
 
     render() {
@@ -37,7 +37,7 @@ class EditPassword extends Component {
     getEditFormVersion() {
         return (
             <form ref="form" className={'row list-group-item mx-5'}>
-            {this.error}
+                {this.error}
                 <div className={'row'}>
                     <div className={'col-sm'}>Gammelt Passord:</div>
                     <div className={'col-lg'}>
@@ -46,9 +46,13 @@ class EditPassword extends Component {
                     </div>
                 </div>
                 <div className={'row'}>
-                    <div className={'col-sm'}>Passord:</div>
+                    <div className={'col-sm'}><small className={"text-muted"}>Passord må inneholde liten og stor bosktav og minst et tall </small></div>
+                </div>
+                <div className={'row'}>
+                    <div className={'col-sm'}>Passord: </div>
                     <div className={'col-lg'}>
                         <input
+                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$"
                             ref="passInput1"
                             type="password"
                             required
@@ -93,26 +97,26 @@ class EditPassword extends Component {
 
         if (passInput1.value === passInput2.value && this.refs.form.checkValidity()) {
             console.log('pass OK');
-            this.error=<Alert
-              type='success'
-              text='Passord ble oppdatert!'
+            this.error = <Alert
+                type='success'
+                text='Passord ble oppdatert!'
             />
             passInput2.setCustomValidity('');
             this.us
                 .updatePassword(this.user.user_id, this.oldPass, this.user.password)
                 .then(() => this.props.callback(null, <DisplayProfile callback={this.props.callback} />))
                 .catch((error: Error) => {
-                  this.error=<Alert
-                    type='danger'
-                    text='Feil oppstod! Passord ble ikke oppdatert, prøv igjen.'
-                  />
+                    this.error = <Alert
+                        type='danger'
+                        text='Feil oppstod! Var gammelt passord riktig?'
+                    />
                 });
-                //console.error(error));
+            //console.error(error));
 
         } else {
-            this.error=<Alert
-              type='danger'
-              text='Feil oppstod! Passord ble ikke oppdatert, prøv igjen.'
+            this.error = <Alert
+                type='danger'
+                text='Feil oppstod! Passord ble ikke oppdatert, prøv igjen.'
             />
             passInput2.setCustomValidity('Passwords must match');
             this.refs.form.reportValidity();

@@ -5,6 +5,11 @@ import LoginService from './LoginService.js';
 import User from '../classes/User.js';
 
 class RegionSubscriptionService {
+  /**
+   * Get all region subscriptions
+   * @param region_id
+   * @returns {Promise<RegionSubscription[]>}
+   */
   getAllRegionSubscribers(region_id: number): Promise<RegionSubscription[]> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
@@ -29,6 +34,12 @@ class RegionSubscriptionService {
     });
   }
 
+  /**
+   * Delete a region subscription
+   * @param region_id
+   * @param user_id
+   * @returns {Promise<void>}
+   */
   deleteRegionSubscription(region_id: number, user_id: number): Promise<void> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
@@ -54,6 +65,12 @@ class RegionSubscriptionService {
     });
   }
 
+  /**
+   * Create a region subscription
+   * @param r Region
+   * @param region_id
+   * @returns {Promise<RegionSubscription>}
+   */
   createRegionSubscription(r: RegionSubscription, region_id: number): Promise<RegionSubscription> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
@@ -78,6 +95,12 @@ class RegionSubscriptionService {
     });
   }
 
+  /**
+   * Update a region subscription
+   * @param r Region
+   * @param region_id
+   * @returns {Promise<void>}
+   */
   updateRegionSubscription(r: RegionSubscription, region_id: number): Promise<void> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
@@ -102,6 +125,11 @@ class RegionSubscriptionService {
     });
   }
 
+  /**
+   * Get region subscription for a given user
+   * @param user_id
+   * @returns {Promise<RegionSubscription[]>}
+   */
   getSubscribedRegionsForUser(user_id: number): Promise<RegionSubscription[]> {
     return new Promise((resolve, reject) => {
       let loginService = new LoginService();
@@ -125,7 +153,6 @@ class RegionSubscriptionService {
         .catch((error: Error) => reject(error));
     });
   }
-
 }
 
 export default RegionSubscriptionService;

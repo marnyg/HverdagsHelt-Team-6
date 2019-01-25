@@ -2,6 +2,8 @@
 import * as React from 'react';
 import { Component } from 'react-simplified';
 import CountyService from "../../../services/CountyService";
+import RegionService from "../../../services/RegionService";
+import ToolService from "../../../services/ToolService";
 
 class EditRegionForm extends Component{
     newregion = {
@@ -10,17 +12,20 @@ class EditRegionForm extends Component{
 
     counties = [];
     county = null;
+    error = null;
 
     render() {
         return(
             <div key={this.props.region.region_id}>
-                <div className={'form-group'}>
+                {this.error}
+                <form ref={'editRegionForm'} className={'form-group'}>
                     <label htmlFor={'edit-region-form-name'}>Kommunenavn:</label>
                     <input id={'edit-region-form-name'}
                            className={'form-control'}
                            type={'text'}
                            name={'edit-region-form-name'}
                            defaultValue={this.props.region.name}
+                           required
                     />
 
                     <label htmlFor={'edit-region-form-lat'}>Breddegrad</label>
@@ -31,6 +36,7 @@ class EditRegionForm extends Component{
                         name={'edit-region-form-lat'}
                         placeholder="Breddegrad"
                         defaultValue={this.props.region.lat}
+                        required
                     />
 
                     <label htmlFor={'edit-region-form-lon'}>Lengdegrad</label>
@@ -41,6 +47,7 @@ class EditRegionForm extends Component{
                         name={'edit-region-form-lon'}
                         placeholder="Lengdegrad"
                         defaultValue={this.props.region.lon}
+                        required
                     />
 
                     <label htmlFor={'edit-region-form-county-selector'}>Fylke</label>
@@ -59,12 +66,12 @@ class EditRegionForm extends Component{
                             </option>
                         ))}
                     </select>
-                </div>
+                </form>
                 <button onClick={(event) => console.log('Avbryter')}
                         type="button"
                         className="btn btn-danger float-right"
                         data-dismiss="modal">Avbryt</button>
-                <button onClick={(event) => this.submit()}
+                <button onClick={(event) => this.submit(event)}
                         type="button"
                         className="btn btn-primary"
                 >Oppdater</button>
@@ -95,22 +102,35 @@ class EditRegionForm extends Component{
             .catch((error: Error) => console.error(error));
     }
 
-    submit() {
-        let region_id = this.props.region.region_id;
-        let county_selector = document.querySelector('#edit-region-form-county-selector');
-        let county_id = Number(county_selector[county_selector.selectedIndex].value);
-        let name = document.querySelector('#edit-region-form-name').value;
-        let lat = Number(document.querySelector('#edit-region-form-lat').value);
-        let lon = Number(document.querySelector('#edit-region-form-lon').value);
+    submit(event) {
+        event.preventDefault();
+        let form = this.refs.editRegionForm;
+        if(form.checkValidity()) {
+            $('#spinner').show();
+            let county_selector = document.querySelector('#edit-region-form-county-selector');
 
-        let newRegion = {
-            region_id: region_id,
-            county_id: county_id,
-            name: name,
-            lat: lat,
-            lon: lon
-        };
-        this.props.editRegion(newRegion);
+            let newRegion = {
+                region_id: this.props.region.region_id,
+                county_id: Number(county_selector[county_selector.selectedIndex].value),
+                name: document.querySelector('#edit-region-form-name').value,
+                lat: Number(document.querySelector('#edit-region-form-lat').value),
+                lon: Number(document.querySelector('#edit-region-form-lon').value)
+            };
+            let regionService = new RegionService();
+            regionService.updateRegion(newRegion, newRegion.region_id)
+                .then(res => {
+                    console.log(res);
+                    $('#spinner').hide();
+                    this.props.editRegion(newRegion);
+                })
+                .catch((error: Error) => {
+                    $('#spinner').hide();
+                    this.error = ToolService.getUserUpdateErrorAlert(error);
+                    console.error(error);
+                });
+        } else {
+            form.reportValidity();
+        }
     }
 
     county_selected(event) {

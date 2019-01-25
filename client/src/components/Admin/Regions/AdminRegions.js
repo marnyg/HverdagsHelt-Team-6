@@ -38,6 +38,7 @@ class AdminRegions extends Component {
     }
 
     onRegionUpdate(updated_region) {
+        this.viewing_region = updated_region;
         this.fetch_regions();
     }
 

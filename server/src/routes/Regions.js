@@ -8,15 +8,33 @@ type Request = express$Request;
 type Response = express$Response;
 
 module.exports = {
+  /**
+   * Get all region belonging to given county
+   * @param req Request
+   * @param res Response
+   * @returns {Region}
+   */
   getAllRegionsInCounty: function(req: Request, res: Response) {
     if (!req.params || isNaN(Number(req.params.county_id))) return res.sendStatus(400);
-    return Region.findAll({ where: { county_id: Number(req.params.county_id) } }).then(
-      regions => (regions ? res.send(regions) : res.sendStatus(404))
+    return Region.findAll({ where: { county_id: Number(req.params.county_id) } }).then(regions =>
+      regions ? res.send(regions) : res.sendStatus(404)
     );
   },
+  /**
+   * Get all regions
+   * @param req Request
+   * @param res Response
+   * @returns {Region}
+   */
   getAllRegions: function(req: Request, res: Response) {
     return Region.findAll().then(regions => res.send(regions));
   },
+  /**
+   * Add a new region
+   * @param req Request
+   * @param res Response
+   * @returns {Region}
+   */
   addRegion: function(req: Request, res: Response) {
     if (
       !req.body ||
@@ -34,12 +52,24 @@ module.exports = {
       county_id: req.body.county_id
     }).then(regions => (regions ? res.send(regions) : res.sendStatus(404)));
   },
+  /**
+   * Get a region, given region_id
+   * @param req Request
+   * @param res Response
+   * @returns {Region}
+   */
   getRegion: function(req: Request, res: Response) {
     if (!req.params || isNaN(Number(req.params.region_id))) return res.sendStatus(400);
-    return Region.findOne({ where: { region_id: Number(req.params.region_id) } }).then(
-      region => (region ? res.send(region) : res.sendStatus(404))
+    return Region.findOne({ where: { region_id: Number(req.params.region_id) } }).then(region =>
+      region ? res.send(region) : res.sendStatus(404)
     );
   },
+  /**
+   * Update a region
+   * @param req Request
+   * @param res Response
+   * @returns {Region}
+   */
   updateRegion: function(req: Request, res: Response) {
     if (
       !req.body ||
@@ -63,6 +93,12 @@ module.exports = {
       { where: { region_id: Number(req.params.region_id) } }
     ).then(regions => (regions ? res.send(regions) : res.sendStatus(404)));
   },
+  /**
+   * Delete a region
+   * @param req Request
+   * @param res Response
+   * @returns {*}
+   */
   delRegion: function(req: Request, res: Response) {
     if (!req.params || isNaN(Number(req.params.region_id))) return res.sendStatus(400);
 
@@ -75,7 +111,12 @@ module.exports = {
         console.log(err.parent.sqlMessage);
       });
   },
-
+  /**
+   * Get all employees working in a region
+   * @param req Request
+   * @param res Response
+   * @returns {User}
+   */
   getRegionStaff: function(req: Request, res: Response) {
     if (!req.params || isNaN(Number(req.params.region_id))) return res.sendStatus(400);
 
@@ -87,16 +128,15 @@ module.exports = {
     })
       .then(users => {
         let my_users;
-        if(users) {
+        if (users) {
           my_users = [...users];
           my_users.forEach(user => {
             console.log(user);
-              delete user.dataValues['hashed_password'];
-              delete user.dataValues['salt'];
+            delete user.dataValues['hashed_password'];
+            delete user.dataValues['salt'];
           });
           return res.send(my_users);
         }
-
       })
       .catch(error => {
         console.log(error);
