@@ -59,7 +59,7 @@ class Content extends Component {
           );
       }
       return (
-          <div className={'container mx-5 px-5'}>
+          <div className={'container'}>
               {registerButton}
               {this.filter_error}
               <RegionSelect

@@ -75,14 +75,24 @@ class Navbar extends Component<{ logged_in: boolean }> {
                 <RegisterModal onLogin={() => this.onLogin()} />
                 <LoginModal modal_id={'login-modal'} onLogin={() => this.onLogin()} />
                 {this.logged_in ? (
-                    <NavLink to={'/'} className="navbar-left" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
+                    <NavLink exact to={'/'} className="navbar-left" onClick={(event) => {
+                        $('#navbarSupportedContent').collapse('hide');
+                        if(window.location.pathname === '/'){
+                            window.location.reload();
+                        }
+                    }}>
                         <img src={hverdagsheltLogo} height={29.7} width={185} />
                         <sup className="badge badge-primary mobile-notification">
                             {this.notification_count > 0 ? this.notification_count : null}
                         </sup>
                     </NavLink>
                 ) : (
-                    <NavLink to={'/'} className="navbar-left" onClick={(event) => $('#navbarSupportedContent').collapse('hide')}>
+                    <NavLink to={'/'} className="navbar-left" onClick={(event) => {
+                        $('#navbarSupportedContent').collapse('hide');
+                        if(window.location.pathname === '/'){
+                            window.location.reload();
+                        }
+                    }}>
                         <img src={hverdagsheltLogo} height={29.7} width={185} />
                     </NavLink>
                 )}
