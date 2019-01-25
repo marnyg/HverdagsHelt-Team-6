@@ -7,8 +7,17 @@ import Navigation from "../Navigation";
 import RegionRegistration from "./RegionRegistration/RegionRegistration";
 import AccessLevels from "./AccessLevel/AccessLevels";
 
+/**
+ * Admin page component.
+ * Implements a navigation Component that mounts various types of Admin related components when clicked.
+ */
 class AdminPage extends Component {
-    render() {
+  
+  /**
+   * Generates HTML code.
+   * @returns {*} HTML element with sub-elements.
+   */
+  render() {
         let regions_tab = {
             path:'/admin/regions',
             name: 'Kommuner',

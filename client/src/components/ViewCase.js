@@ -573,9 +573,9 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   }
 
   /**
-   *
-   * @param c
-   * @returns {boolean}
+   * Detects whether the user is currently subscribed to the goven case or not.
+   * @param c Case to check for subscription status.
+   * @returns {boolean} True if user is subscribed to case c, or false if not subscribed to case c.
    */
   isSubscribed(c: Case) {
     if (this.subscription) {
