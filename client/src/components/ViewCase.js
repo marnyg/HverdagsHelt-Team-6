@@ -19,16 +19,16 @@ import Category from '../classes/Category';
 import Status from '../classes/Status';
 import StatusComment from '../classes/StatusComment';
 import Location from '../classes/Location';
-import { faTrashAlt } from '@fortawesome/free-solid-svg-icons/index';
+import { faCheck, faEnvelope, faTrashAlt } from '@fortawesome/free-solid-svg-icons/index';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Picture from '../classes/Picture';
 import ToolService from '../services/ToolService';
 import CaseSubscription from '../classes/CaseSubscription';
 import Alert from './Alert.js';
-import ModalImage from 'react-modal-image'
+import ModalImage from 'react-modal-image';
 
 const MAX_NUMBER_IMG: number = 3; // Maximum number of images allowed in a single case.
-const subscriptionButtonStyles = ['btn btn-info', 'btn btn-outline-info'];
+const subscriptionButtonStyles = ['btn btn-primary float-right', 'btn btn-outline-primary float-right'];
 const editButtonStyles = ['btn btn-secondary', 'btn btn-outline-secondary'];
 
 // Privilege levels
@@ -83,17 +83,6 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
     return (
       <div className={'modal-body row'}>
         <div className={'col-md-6'}>
-          {this.loggedIn ? (
-            this.isSubscribed(this.case) ? (
-              <button className={this.getSubscriptionButtonStyles(this.case)} onClick={this.onClickSubscribeButton}>
-                Slutt å følg
-              </button>
-            ) : (
-              <button className={this.getSubscriptionButtonStyles(this.case)} onClick={this.onClickSubscribeButton}>
-                Følg sak
-              </button>
-            )
-          ) : null}
           {this.error}
           <form
             ref={e => {
@@ -130,9 +119,8 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             </table>
             <h3>Beskrivelse</h3>
             {this.case.description ? <p>{this.case.description}</p> : <p>INGEN BESKRIVELSE GITT</p>}
-            {(privilege <= OWNER_EMPLOYEE && this.loggedIn) ||
-            (this.case.status_id === STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE && this.loggedIn) ? (
-              <section>
+            {this.loggedIn ? (
+              <div className="btn-group mr-2" role="group">
                 {privilege <= NOT_OWNER_EMPLOYEE ? (
                   <button
                     className={this.edit === false ? editButtonStyles[0] : editButtonStyles[1]}
@@ -150,6 +138,31 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                     Rediger sak
                   </button>
                 )}
+                <button className={this.getSubscriptionButtonStyles(this.case)} onClick={this.onClickSubscribeButton}>
+                  {this.isSubscribed(this.case) ? 'Slutt å følg' : 'Følg sak'}
+                </button>
+                {this.isSubscribed(this.case) ? (
+                  <button
+                    className={this.isNotifyByEmail() ? 'btn btn-success' : 'btn btn-primary'}
+                    disabled={!this.isSubscribed(this.case)}
+                    onClick={this.onClickNotifyByEmailButton}
+                  >
+                    <FontAwesomeIcon
+                      icon={this.isNotifyByEmail() ? faCheck : faEnvelope}
+                      alt={
+                        this.isNotifyByEmail()
+                          ? 'Klikk her for å få varsler på epost om denne saken'
+                          : 'Klikk her for å skru av varsler på epost om denne saken'
+                      }
+                      className="float-right"
+                    />
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+            {(privilege <= OWNER_EMPLOYEE && this.loggedIn) ||
+            (this.case.status_id === STATUS_OPEN && privilege === OWNER_NOT_EMPLOYEE && this.loggedIn) ? (
+              <section>
                 {this.edit === true ? (
                   <section>
                     <h2>Oppdater sak</h2>
@@ -268,19 +281,19 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             <div className="row">
               {this.case.img.map(e => (
                 <div key={e.src} className="col-md-3">
-                    <ModalImage small={e.src} large={e.src} alt={e.src}/>
-                    {(privilege <= OWNER_EMPLOYEE && this.case.status_id !== STATUS_CLOSED) ||
-                    (privilege === OWNER_NOT_EMPLOYEE && this.case.status_id === STATUS_OPEN) ||
-                    privilege === ADMIN ? (
-                      <div className="card-img-overlay">
-                        <button
-                          className={'btn btn-danger img-overlay'}
-                          onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
-                        >
-                          <FontAwesomeIcon icon={faTrashAlt} />
-                        </button>
-                      </div>
-                    ) : null}
+                  <ModalImage small={e.src} large={e.src} alt={e.src} />
+                  {(privilege <= OWNER_EMPLOYEE && this.case.status_id !== STATUS_CLOSED) ||
+                  (privilege === OWNER_NOT_EMPLOYEE && this.case.status_id === STATUS_OPEN) ||
+                  privilege === ADMIN ? (
+                    <div className="card-img-overlay">
+                      <button
+                        className={'btn btn-danger img-overlay'}
+                        onClick={(event, src) => this.fileInputDeleteImage(event, e.src)}
+                      >
+                        <FontAwesomeIcon icon={faTrashAlt} />
+                      </button>
+                    </div>
+                  ) : null}
                 </div>
               ))}
             </div>
@@ -482,10 +495,10 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                 />
               );
               /*Notify.danger(
-                              'Klarte ikke å hente statuser. ' +
-                                'Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
-                                err.message
-                            );*/
+                                            'Klarte ikke å hente statuser. ' +
+                                              'Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+                                              err.message
+                                          );*/
             });
         }
         cat
@@ -509,9 +522,9 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
               />
             );
             /*Notify.danger(
-                          'Klarte ikke å hente statuser. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
-                            err.message
-                        );*/
+                                      'Klarte ikke å hente statuser. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+                                        err.message
+                                    );*/
           });
       })
       .catch((err: Error) => {
@@ -528,11 +541,11 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           />
         );
         /*Notify.danger(
-                  'Klarte ikke å hente sak med id ' +
-                    this.props.match.params.case_id +
-                    '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
-                    err.message
-                );*/
+                          'Klarte ikke å hente sak med id ' +
+                            this.props.match.params.case_id +
+                            '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+                            err.message
+                        );*/
       });
   }
 
@@ -587,6 +600,19 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
   isSubscribed(c: Case) {
     if (this.subscription) {
       return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Checks wheter or not the user is currently subscribed to the provided case.
+   * @param cs CaseSubscription to check for subscription status.
+   * @returns {boolean} Return true if user is currently subscribed to provided case, or false if user is not subscribed to provided case.
+   */
+  isNotifyByEmail() {
+    if (this.subscription) {
+      return this.subscription.notify_by_email;
     } else {
       return false;
     }
@@ -655,6 +681,26 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           console.log('Could not subscribe user from case with id ' + this.case.case_id);
           Notify.warning('Det oppstod en feil ved oppretting av abonnement på saken. \n\nFeilmelding: ' + err.message);
         });
+    }
+  }
+
+  onClickNotifyByEmailButton() {
+    console.log('CLICKED!!!');
+    let sub = new CaseSubscriptionService();
+    if (this.subscription) {
+      if (this.subscription.notify_by_email === true) {
+        this.subscription.notify_by_email = false;
+      } else {
+        this.subscription.notify_by_email = true;
+      }
+      sub
+        .updateCaseSubscription(this.subscription)
+        .then(() => {
+          console.log('Notify sub success!!');
+        })
+        .catch((err: Error) => console.log(err));
+    } else {
+      console.log('Did not find case subscribtion.');
     }
   }
 
@@ -889,11 +935,11 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
           />
         );
         /*Notify.danger(
-          'Klarte ikke å hente kommentarer til sak med id ' +
-            this.props.match.params.case_id +
-            '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
-            err.message
-        );*/
+                  'Klarte ikke å hente kommentarer til sak med id ' +
+                    this.props.match.params.case_id +
+                    '. Hvis problemet vedvarer vennligst kontakt oss. \n\nFeilmelding: ' +
+                    err.message
+                );*/
       });
   }
 
@@ -970,9 +1016,9 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
                   />
                 );
                 /*Notify.danger(
-                  'Feil ved opplasting av statuskommentar. Saken har blitt oppdatert, men kommentaren din har ikke blitt lagret. \n\nFeilmelding: ' +
-                    err.message
-                );*/
+                                  'Feil ved opplasting av statuskommentar. Saken har blitt oppdatert, men kommentaren din har ikke blitt lagret. \n\nFeilmelding: ' +
+                                    err.message
+                                );*/
               });
           }
         })
@@ -991,9 +1037,9 @@ class ViewCase extends Component<{ match: { params: { case_id: number } } }> {
             />
           );
           /*Notify.danger(
-            'Feil ved opplasting av oppdatert informasjon. Din sak har ikke blitt oppdatert. \n\nFeilmelding: ' +
-              err.message
-          );*/
+                      'Feil ved opplasting av oppdatert informasjon. Din sak har ikke blitt oppdatert. \n\nFeilmelding: ' +
+                        err.message
+                    );*/
         });
     }
   }
