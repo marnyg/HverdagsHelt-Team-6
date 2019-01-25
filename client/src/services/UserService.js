@@ -33,6 +33,12 @@ class UserService {
         });
     }
 
+    forgottenPassword(email: string): Promise<any> {
+        return axios.post('/api/users/new_password', {
+            email: email
+        });
+    }
+
     /**
      * Get one user, given user_id
      * @param user_id

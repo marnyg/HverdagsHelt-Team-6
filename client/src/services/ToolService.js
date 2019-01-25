@@ -160,6 +160,34 @@ class ToolService {
           );
       }
   }
+
+  static getForgottenPWErrorAlert(error: Error, onClose) {
+      if(error.response) {
+          if(error.response.status === 400) {
+              // bad req
+              return (
+                  <Alert type={'danger'} text={'Eposten du har oppgitt er ikke en gylidg epostadresse.'} onClose={() => onClose}/>
+              );
+          } else if (error.response.status === 404) {
+              // Email does not exist in database
+              return (
+                  <Alert type={'danger'} text={'Det finnes ingen bruker med denne epostadressen. Kan derfor ikke sende nytt passord på epost.'} onClose={() => onClose}/>
+              );
+          } else if (error.response.status === 500) {
+              return (
+                  <Alert type={'danger'} text={'Noe gikk galt med serveren, prøv igjen senere eller ta kontakt med oss.'} onClose={() => onClose}/>
+              );
+          } else {
+              return (
+                  <Alert type={'danger'} text={'Noe gikk galt, prøv igjen senere.'} onClose={() => onClose}/>
+              );
+          }
+      } else {
+          return (
+              <Alert type={'danger'} text={error.message} onClose={() => onClose}/>
+          );
+      }
+  }
 }
 
 export default ToolService;
