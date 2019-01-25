@@ -7,15 +7,24 @@ import UserService from '../services/UserService.js';
 import Notify from "./Notify";
 import Alert from './Alert.js';
 
+/**
+ * This component is renderin the login form of the webpage.
+ */
 
 class LoginModal extends Component {
     error = null;
     constructor(){
         super();
-        this.submit = this.submit.bind(this);
-        this.emailChange = this.emailChange.bind(this);
-        this.pwChange = this.pwChange.bind(this);
+        this.submit = this.submit.bind(this);   //Function to submit the login
+        this.emailChange = this.emailChange.bind(this); //Function to register the changes in email-input (username)
+        this.pwChange = this.pwChange.bind(this);   //Function to register the changes in the password-input
     }
+
+    /**
+     * Rendering the login form.
+     * @returns {*} HTML element returning the login form.
+     */
+
     render() {
         return (
             <div className="modal fade" id={this.props.modal_id} tabIndex="-1" role="dialog"
@@ -37,6 +46,11 @@ class LoginModal extends Component {
             </div>
         );
     }
+
+    /**
+     * Function to submit the login.
+     * @param event Triggered by a button-click.
+     */
 
     submit(event){
         this.error = false;
@@ -69,21 +83,42 @@ class LoginModal extends Component {
         }
     }
 
+    /**
+     * Function to available push of 'enter'-button for submitting login.
+     * @param event To be triggered by 'enter'-button click.
+     */
+
     keyCheck(event){
         if(event.key === 'Enter'){
             this.submit(event);
         }
     }
 
+    /**
+     * Function to register the changes in email-input (username).
+     * @param event Triggered by onChange field.
+     */
+
     pwChange(event){
         this.password = event.target.value;
         this.error = null;
     }
 
+    /**
+     * Function to register the changes in the password-input.
+     * @param event Triggered by onChange field.
+     */
+
     emailChange(event){
         this.email = event.target.value;
         this.error = null;
     }
+
+    /**
+     * Function to validate the input data.
+     * @param data  Data registered by the user.
+     * @returns {boolean}   Returning true or false, depending on the recived data.
+     */
 
     valid(data){
         if(data.email && data.password){

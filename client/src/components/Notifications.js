@@ -16,10 +16,21 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CaseItem from './CaseItem.js';
 import { faListUl, faTh } from '@fortawesome/free-solid-svg-icons/index';
 
+/**
+ * This component is representing the user's notifications page.
+ */
+
 class Notifications extends Component {
-  grid = true;
-  cases = [];
-  user = JSON.parse(localStorage.getItem('user'));
+  grid = true;  //Used to display cases in different view, depending on the user's preferences
+  cases = [];   //Array of cases that there exists notifications on
+  user = JSON.parse(localStorage.getItem('user'));  //Getting user information from the localStorage
+
+    /**
+     * If there is any new notifications those will be displayed in this element.
+     * If there is no new notifications, the user will be presented with necessary information about
+     * how to subscribe to cases.
+     * @returns {*} HTML element containing information about case notifications, depending on the result.
+     */
 
   render() {
     if (this.cases.length === 0) {
@@ -31,7 +42,7 @@ class Notifications extends Component {
             saker du har abonnert på, vil disse dukke opp på denne siden. Vennligst kom tilbake senere.
           </p>
           <p>
-            <strong>Vi i Hverdagshelter ønsker deg en fin dag videre!</strong>
+            <strong>Vi i HverdagsHelter ønsker deg en fin dag videre!</strong>
           </p>
         </div>
       );
@@ -75,6 +86,10 @@ class Notifications extends Component {
     );
   }
 
+    /**
+     * Getting all the cases that is outdated, to present new notifications for the user.
+     */
+
   mounted() {
     let caseSubscriptionService = new CaseSubscriptionService();
     caseSubscriptionService
@@ -88,6 +103,12 @@ class Notifications extends Component {
       })
       .catch((error: Error) => console.error(error));
   }
+
+    /**
+     * Function to format the date properly.
+     * @param date  Dateformat from the database. Used to convert to a more readable format.
+     * @returns {string}    Date result returned on a more readable format.
+     */
 
   dateFormat(date: string) {
     if (date) {

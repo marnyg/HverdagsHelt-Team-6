@@ -9,19 +9,29 @@ import User from '../classes/User.js';
 import Alert from './Alert.js';
 import ToolService from '../services/ToolService';
 
+/**
+ * This component is representing the the register new user form.
+ */
+
 class RegisterModal extends Component {
     _isMounted = false; // Used to not update state (promise resolve) when component has unmounted
-    counties = [];
-    regions = [];
+    counties = [];  //Array of counties
+    regions = [];   //Array of regions
     validemail = true;
     validpasswords = false;
-    region_id = null;
-    error = null;
+    region_id = null;   //
+    error = null;   //Used to display the error messages
 
     constructor() {
         super();
-        this.submit = this.submit.bind(this);
+        this.submit = this.submit.bind(this);   //Function to submit the the registration
     }
+
+    /**
+     * Function to check if exists.
+     * @returns {boolean}   Returns true / false depending on the given email's status.
+     */
+
     getEmailStatus() {
         if (this.email === undefined || this.email === null) {
             // email is good
@@ -39,6 +49,11 @@ class RegisterModal extends Component {
             }
         }
     }
+
+    /**
+     * Rendering the register new user form.
+     * @returns {*} HTML element that represents the register new user form.
+     */
 
     render() {
         console.log('Registermodal rendering');
@@ -103,10 +118,17 @@ class RegisterModal extends Component {
         );
     }
 
+    /**
+     * Function used to unmount component.
+     */
+
     componentWillUnmount() {
         this._isMounted = false;
     }
 
+    /**
+     * Getting all counties registered in the database.
+     */
 
     mounted() {
         this._isMounted = true;
@@ -120,6 +142,10 @@ class RegisterModal extends Component {
             .catch((error: Error) => console.error(error));
     }
 
+    /**
+     * Function used to get county from dropdown menu in register new user form.
+     * @param event Triggered by selected value in dropdown menu.
+     */
 
     countyListener(event) {
         let county = event.target.options[event.target.selectedIndex];
@@ -134,10 +160,20 @@ class RegisterModal extends Component {
             .catch((error: Error) => console.error(error));
     }
 
+    /**
+     * Function for setting region-id from dropdown menu in register new user form.
+     * @param event Triggered by selected value in dropdown menu.
+     */
+
     regionListener(event) {
         console.log('Region selected');
         this.region_id = event.target.options[event.target.selectedIndex].value;
     }
+
+    /**
+     * Function for submitting the register user process.
+     * @param event Triggered by a button-click.
+     */
 
     submit(event) {
         console.log('Is ' + this.email + ' a valid email?: ');

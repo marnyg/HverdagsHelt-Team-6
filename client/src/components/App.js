@@ -33,8 +33,18 @@ import VerificationModal from "./VerificationModal";
 import Loader from 'react-loader-spinner'; //https://www.npmjs.com/package/react-loader-spinner
 axios.interceptors.response.use(response => response.data);
 
+/**
+ * This component is used run the the system. In this component all the gets rendered onto
+ * the webpage.
+ */
+
 class App extends Component {
     logged_in: boolean = false;
+
+    /**
+     * The render method is rendering all the components onto the webpage.
+     */
+
     render() {
         let visited = JSON.parse(localStorage.getItem('visited'));
         if(!visited){
@@ -84,6 +94,10 @@ class App extends Component {
         );
     }
 
+    /**
+     * This method is handling the loginService.
+     */
+
     mounted() {
         let loginService = new LoginService();
         loginService.isLoggedIn()
@@ -92,6 +106,11 @@ class App extends Component {
             })
             .catch((error: Error) => console.error(error))
     }
+
+    /**
+     * This method is handling the logout from the system.
+     * @param event Triggered by a button
+     */
 
     logout(event) {
         let userService = new UserService();
@@ -102,6 +121,10 @@ class App extends Component {
             })
             .catch((error: Error) => console.error(error));
     }
+
+    /**
+     * This method is handling the login and setting variable this.logged_id = true.
+     */
 
     onLogin = () => {
         console.log('App Logged in');

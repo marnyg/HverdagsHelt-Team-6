@@ -10,9 +10,21 @@ import Alert from "../../Alert";
 
 const region_employee_id = 2;
 
+/**
+ * This component is used to create the 'Register new employee' modal.
+ * If you are logged in as a admin you will be able to register new employee
+ * to the system.
+ */
+
 class AdminTeamForm extends Component {
-    password_error = false;
-    error = null;
+    password_error = false; //Used to determine if password is alike
+    error = null;   //Used to display error messages
+
+    /**
+     * Rendering the register new employee form with different parameters.
+     * @returns {*} HTML elements for the register new employee form.
+     */
+
     render() {
         if(this.props.region === undefined || this.props.region === null){
             return(
@@ -104,6 +116,12 @@ class AdminTeamForm extends Component {
             </div>
         );
     }
+
+    /**
+     * Function that submits the parameters (based on information from
+     * register form).
+     * @param event Triggered by a button-click.
+     */
 
     submit(event) {
         event.preventDefault();
@@ -246,6 +264,10 @@ class AdminTeamForm extends Component {
             return false;
         }
     }
+
+    /**
+     * Function that is checking if password1 and password2 i alike.
+     */
 
     checkPW(){
         let pw1 = document.querySelector('#password1').value;

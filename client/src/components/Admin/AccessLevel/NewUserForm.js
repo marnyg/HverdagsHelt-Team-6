@@ -11,11 +11,22 @@ import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import Loader from 'react-loader-spinner'; //https://www.npmjs.com/package/react-loader-spinner
 import Alert from '../../Alert';
 
+/**
+ * This component is representing the register new user form, which is only
+ * available for administrators.
+ */
+
 class NewUserForm extends Component{
-    regions = [];
-    counties = [];
-    roles = [];
-    error = null;
+    regions = [];   //Array containing all registered regions
+    counties = [];  //Array containing all registered counties
+    roles = []; // Array containing all registered roles
+    error = null;   //To display the errormessages
+
+    /**
+     * Rendering the register new user form.
+     * @returns {*} HTML element that contains the register new user form.
+     */
+
     render() {
         return(
             <div className={'card px-3 py-3 mb-2'}>
@@ -163,6 +174,11 @@ class NewUserForm extends Component{
         );
     }
 
+    /**
+     * Function that submits the user registration.
+     * @param event Triggered by a button-click.
+     */
+
     submit(event) {
         event.preventDefault();
         if(this.refs.myform.checkValidity()) {
@@ -254,6 +270,11 @@ class NewUserForm extends Component{
         }
     }
 
+    /**
+     * Function for getting all counties and roles registered in the database.
+     * Those are added to the arrays 'counties' and 'roles'.
+     */
+
     mounted() {
         let countyService = new CountyService();
         countyService.getAllCounties()
@@ -270,6 +291,11 @@ class NewUserForm extends Component{
             })
             .catch((error: Error) => console.error(error));
     }
+
+    /**
+     * Function to select county. Based on selected county, you'll be able to present
+     * regions given the county's id.
+     */
 
     countySelected() {
         document.querySelector('#admin-user-form-region-selector').hidden = false;

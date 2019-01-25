@@ -12,16 +12,28 @@ import DisplayProfile from './DisplayProfile.js';
 import Statistics from './Statistics.js';
 import Alert from './Alert.js';
 
+/**
+ * This component is representing the 'My page'-tab, where you will be able to navigate to
+ * 'Min profil', 'Mine kommuner' and 'Mine saker'.
+ */
+
+
 class MyPage extends Component {
   menuItems = [
     { name: 'Min Profil', component: <MyProfile />, selected: true},
     { name: 'Mine Kommuner', component: <MyRegions />, selected: false},
     { name: 'Mine Saker', component: <CaseList user_id={JSON.parse(localStorage.getItem('user')).user_id} />, selected: false }
   ];
-  error=null;
+  error=null;   //To display error messages
 
   element = this.menuItems[0];
   comp = <MyProfile />;
+
+    /**
+     * Rendering the different options.
+     * @returns {*} HTML element with different menu-options.
+     */
+
   render() {
     return (
       <div>

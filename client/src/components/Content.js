@@ -18,6 +18,10 @@ import CountyService from "../services/CountyService";
 import RegionSelect from "./RegionSelect";
 import LoginModal from './LoginModal';
 
+/**
+ * This component is used to display given cases on the webpage.
+ */
+
 class Content extends Component {
   grid = true;
 
@@ -25,6 +29,11 @@ class Content extends Component {
     super();
     Notify.flush();
   }
+
+    /**
+     * The render method is rendering the cases on the webpage.
+     * @returns {*} HTML element containing table of cases.
+     */
 
   render() {
       let registerButton = null;

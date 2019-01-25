@@ -3,8 +3,19 @@ import * as React from 'react';
 import { Component } from 'react-simplified';
 import RoleService from "../../../services/RoleService";
 
+/**
+ * This component is representing a table of all the users registered in the system.
+ * The table is used to access user for changing access-level and view user information.
+ */
+
 class AdminUserList extends Component{
-    roles = [];
+    roles = []; //Array containing all roles registered in the database
+
+    /**
+     * Rendering the table containing all the users.
+     * @returns {*} HTML element containing all the users.
+     */
+
     render() {
         if(this.props.users === undefined || this.props.users === null) {
             return null;
@@ -35,6 +46,10 @@ class AdminUserList extends Component{
         );
     }
 
+    /**
+     * Function for getting all roles registered in the database.
+     */
+
     mounted() {
         let roleService = new RoleService();
         roleService.getAllRoles()
@@ -43,6 +58,12 @@ class AdminUserList extends Component{
             })
             .catch((error: Errror) => console.error(error));
     }
+
+    /**
+     * Function to convert role-id to role name.
+     * @param role_id   The role-id that you want to convert to its role name.
+     * @returns {*} The role name, based on its id.
+     */
 
     getRole(role_id: number) {
         let out = null;
