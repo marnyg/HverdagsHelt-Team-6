@@ -6,6 +6,7 @@ import AdminTeams from "./Employees/AdminTeams";
 import Navigation from "../Navigation";
 import RegionRegistration from "./RegionRegistration/RegionRegistration";
 import AccessLevels from "./AccessLevel/AccessLevels";
+import StatusCategoryRegistration from './StatusCategoryRegistration/StatusCategoryRegistration';
 
 class AdminPage extends Component {
     render() {
@@ -31,8 +32,13 @@ class AdminPage extends Component {
             name:'Kommuneregistrering',
             component: <RegionRegistration/>
         };
-        let left_tabs = [regions_tab, teams_tab];
-        let right_tabs = [access_level_tab, registration_tab];
+        let statuses_and_categories = {
+            path: '/admin/statuses_categories',
+            name: 'Statuser og kategorier',
+            component: <StatusCategoryRegistration/>
+        };
+        let left_tabs = [regions_tab, teams_tab, statuses_and_categories, access_level_tab, registration_tab];
+        let right_tabs = [];
         return(
             <div>
                 <Navigation left_tabs={left_tabs} right_tabs={right_tabs}/>

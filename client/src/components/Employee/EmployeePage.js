@@ -53,20 +53,8 @@ class EmployeePage extends Component{
             component: <Statistics/>,
         };
 
-        let team_tab = {
-            path:'/employee/team',
-            name: (
-                <div>
-                    <div className="badge" style={{'backgroundColor': ToolService.getStatusColour(2).color, 'color': 'white'}}>
-                        <FontAwesomeIcon icon={faUsers}/>
-                    </div> Ditt Team
-                </div>
-            ),
-            component: <Statistics/>
-        };
-
         let left_tabs = [inbox_tab, started_tab, closed_tab];
-        let right_tabs = [statistics_tab, team_tab];
+        let right_tabs = [statistics_tab];
         return(
             <div className={'w-100'}>
                 <Navigation left_tabs={left_tabs} right_tabs={right_tabs}/>

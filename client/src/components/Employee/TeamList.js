@@ -1,6 +1,7 @@
 //@flow
 import * as React from 'react';
 import { Component } from 'react-simplified';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faTrashAlt} from "@fortawesome/free-solid-svg-icons/index";
 
 class TeamList extends Component{

@@ -92,7 +92,9 @@ class Navbar extends Component<{ logged_in: boolean }> {
                         <li className="nav-item">
                             <NavLink exact to="/" className="nav-link" onClick={(event) => {
                                 $('#navbarSupportedContent').collapse('hide');
-                                window.location.reload();
+                                if(window.location.pathname === '/'){
+                                    window.location.reload();
+                                }
                             }}>
                                 Hjem
                             </NavLink>
