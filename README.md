@@ -1,14 +1,8 @@
-Almost empty readme file.
-
 # Hverdagshelt
 
-Web applikasjon for å publisere og administrere vedlikeholdssaker til kommunen. 
+En webapplikasjon for å publisere og administrere vedlikeholdssaker til kommunen. 
 
-## Getting Started
-
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
-
-### Prerequisites
+### Forutsetninger
 
 For å installere og kjøre prosjektet må du ha git og npm installert. 
 
@@ -24,7 +18,7 @@ https://nodejs.org/en/download/
 ```
 
 
-### Installing
+### Installasjon
 
 Last ned prosjektet til en lokal mappe:
 ```
@@ -49,9 +43,10 @@ DB_HOST = *database tjener*
 EMAIL_USER = hverdagshelt.team6
 EMAIL_PASS = j0XqIuQI9r9G
 ```
+Lagre filen og lukk teksteditoren
 
-Deretter trenger vi kun å hente prosjektets, altså både tjenerens og klientens, avhengigheter (dependencies):
-Fra rotmappa:
+Deretter trenger vi kun å hente prosjektets, altså både tjenerens og klientens, avhengigheter (dependencies). 
+Kjør følgende kommandoer fra rotmappa:
 ```
 cd server
 npm install
